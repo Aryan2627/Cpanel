@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String?  @unique
+  phone     String?
+  role      String?
+  erpId     String?
+  status    String   @default("Active")
+  createdAt DateTime @default(now())
+}
+
+model Team {
+  id         String   @id @default(uuid())
+  name       String?
+  type       String?
+  users      String?  // JSON string
+  categories String?  // JSON string
+  locations  String?  // JSON string
+  createdAt  DateTime @default(now())
+}
+
+model Location {
+  id        String   @id @default(uuid())
+  name      String?
+  city      String?
+  type      String?
+  address   String?
+  code      String?
+  status    String   @default("Active")
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String?
+  type      String?
+  code      String?
+  alias     String?
+  origins   String?
+  subCats   Int      @default(0)
+  products  Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  code        String   @unique @default(uuid())
+  name        String?
+  uom         String?
+  category    String?
+  subCategory String?
+  description String?
+  terms       String?
+  articleCode String?
+  hsnCode     String?
+  imageUrl    String?
+  status      String   @default("Active")
+  createdBy   String   @default("Admin")
+  phone       String?
+  createdAt   DateTime @default(now())
+}
+
+model Intake {
+  id        String   @id @default(uuid())
+  refId     String   @unique
+  title     String?
+  reqName   String?
+  status    String   @default("Draft")
+  type      String   @default("Standalone NFA")
+  buyer     String?
+  reqAt     String?
+  updAt     String?
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  refId       String   @unique
+  title       String?
+  type        String?
+  account     String?
+  itemsCount  Int      @default(1)
+  stages      String?  // JSON string of stages array
+  createdAt   DateTime @default(now())
+}
+
+model Vendor {
+  id           String   @id @default(uuid())
+  name         String?
+  email        String?
+  phone        String?
+  type         String?
+  vendorCode   String?
+  companyCode  String?
+  dealsIn      String?
+  tradeLicense String?
+  taxId        String?
+  city         String?
+  tags         String?  // JSON string of tags
+  status       String   @default("Invited")
+  createdAt    DateTime @default(now())
+}
+
+model PurchaseOrder {
+  id        String   @id @default(uuid())
+  poNumber  String   @unique
+  title     String?
+  status    String   @default("Draft")
+  vendorId  String?
+  eventId   String?
+  total     Float    @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Bid {
+  id         String   @id @default(uuid())
+  eventId    String
+  vendorId   String
+  vendorName String?
+  amount     Float
+  status     String   @default("Submitted")
+  createdAt  DateTime @default(now())
+}
