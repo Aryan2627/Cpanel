@@ -1,11 +1,12 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useIntake } from '../../../context/IntakeContext';
 import * as XLSX from 'xlsx';
 
 export default function IntakeTablePage() {
-  const { intakes } = useIntake();
+  const { intakes, addIntake } = useIntake();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // States for Search & Filter
   const [searchField, setSearchField] = useState('All');
@@ -28,6 +29,50 @@ export default function IntakeTablePage() {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Intake Data");
     XLSX.writeFile(workbook, "Intake_Data_Export.xlsx");
+  };
+
+  // Import from Excel function
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target?.result;
+        const workbook = XLSX.read(bstr, { type: 'binary' });
+        const wsname = workbook.SheetNames[0];
+        const ws = workbook.Sheets[wsname];
+        
+        // Parse the sheet to JSON
+        const data = XLSX.utils.sheet_to_json<any>(ws);
+        
+        // Loop through each row and save to the DB
+        for (const row of data) {
+          const intake = {
+            refId: row['Ref ID'] || `INT-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            title: row['Title'] || 'Untitled Intake',
+            reqName: row['Requester Name'] || 'System',
+            status: row['Status'] || 'Draft',
+            type: row['Intake Request Type'] || 'Standalone NFA',
+            buyer: row['Buyer Name'] || '-',
+            reqAt: row['Requested At'] || new Date().toISOString().split('T')[0],
+            updAt: row['Updated At'] || new Date().toISOString().split('T')[0],
+          };
+          await addIntake(intake);
+        }
+        
+        // Reset the file input so it can be reused
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        alert(`Successfully imported ${data.length} intakes!`);
+      } catch (err) {
+        console.error("Error parsing Excel file", err);
+        alert("Failed to import. Ensure the Excel file is correctly formatted.");
+      }
+    };
+    reader.readAsBinaryString(file);
   };
 
   // Derived Data based on Search and Filter for UI display
@@ -59,6 +104,15 @@ export default function IntakeTablePage() {
 
   return (
     <div style={{ backgroundColor: '#ffffff', color: '#333', borderRadius: '8px', minHeight: '100%' }}>
+      {/* Hidden file input for import */}
+      <input 
+        type="file" 
+        accept=".xlsx, .xls" 
+        ref={fileInputRef} 
+        onChange={handleImport} 
+        style={{ display: 'none' }} 
+      />
+      
       {/* Toolbar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderBottom: '1px solid #e5e7eb' }}>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -111,6 +165,9 @@ export default function IntakeTablePage() {
         
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           
+          <button onClick={() => fileInputRef.current?.click()} style={{ padding: '8px 16px', border: '1px solid #10b981', borderRadius: '4px', backgroundColor: '#fff', color: '#10b981', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}>
+            📤 Import
+          </button>
           <button onClick={handleExport} style={{ padding: '8px 16px', border: '1px solid #3b82f6', borderRadius: '4px', backgroundColor: '#fff', color: '#3b82f6', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}>
             📥 Export
           </button>

@@ -121,61 +121,43 @@ export default function VendorEventsPage() {
   };
 
   return (
-    <div style={{ 
-      height: '100vh', display: 'flex', overflow: 'hidden',
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-      fontFamily: '"Inter", sans-serif'
-    }}>
+    <div className="app-container">
       {/* Sidebar - Glassmorphism */}
-      <aside style={{ 
-        width: '280px', flexShrink: 0, 
-        background: 'rgba(15, 23, 42, 0.6)', 
-        backdropFilter: 'blur(12px)',
-        borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-        color: '#fff', display: 'flex', flexDirection: 'column',
-        boxShadow: '4px 0 24px rgba(0,0,0,0.2)'
-      }}>
-        <div style={{ padding: '32px 24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>V</div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', letterSpacing: '0.5px' }}>Vendor Portal</div>
-        </div>
+      <aside className="sidebar">
+        <div className="sidebar-logo">Vendor Portal</div>
         
-        <ul style={{ listStyle: 'none', padding: '0 16px', margin: 0, flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <li><Link href="/vendor" style={{ display: 'block', padding: '12px 16px', color: '#94a3b8', textDecoration: 'none', borderRadius: '8px', transition: 'all 0.2s' }}>Dashboard</Link></li>
+        <ul className="sidebar-nav">
+          <li><Link href="/vendor">Dashboard</Link></li>
           <li>
-            <Link href="/vendor/events" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', color: '#fff', background: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.3)', textDecoration: 'none', borderRadius: '8px' }}>
-              <span style={{ fontWeight: '500' }}>Active RFQs</span>
-              <span style={{ background: '#3b82f6', color: '#fff', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '12px', fontWeight: 'bold' }}>New</span>
+            <Link href="/vendor/events" className="active">
+              <span>Active RFQs</span>
+              <span className="badge badge-approved" style={{ marginLeft: '10px' }}>New</span>
             </Link>
           </li>
-          <li><Link href="#" style={{ display: 'block', padding: '12px 16px', color: '#94a3b8', textDecoration: 'none', borderRadius: '8px' }}>My Bids</Link></li>
-          <li><Link href="#" style={{ display: 'block', padding: '12px 16px', color: '#94a3b8', textDecoration: 'none', borderRadius: '8px' }}>Purchase Orders</Link></li>
+          <li><Link href="#">My Bids</Link></li>
+          <li><Link href="#">Purchase Orders</Link></li>
+          <li><Link href="/vendor/contracts">Contracts</Link></li>
         </ul>
         
-        <div style={{ padding: '24px' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px', background: 'rgba(255,255,255,0.05)', color: '#cbd5e1', textDecoration: 'none', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', transition: 'background 0.2s' }}>
+        <div style={{ padding: '24px', marginTop: 'auto' }}>
+          <Link href="/" className="btn btn-secondary" style={{ width: '100%', textAlign: 'center' }}>
             Logout
           </Link>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main style={{ flex: 1, padding: '40px', overflowY: 'auto', position: 'relative' }}>
-        
-        {/* Background glow effects */}
-        <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(15,23,42,0) 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '10%', left: '10%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, rgba(15,23,42,0) 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
-
+      <main className="main-content animate-fade-in">
         <div style={{ position: 'relative', zIndex: 10, maxWidth: '1200px', margin: '0 auto' }}>
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
+          <div className="page-header">
             <div>
-              <h1 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#fff', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>Bidding Arena</h1>
-              <p style={{ color: '#94a3b8', margin: 0, fontSize: '1.05rem' }}>Discover opportunities, submit quotes, and track your performance.</p>
+              <h1 className="page-title">Bidding Arena</h1>
+              <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '1.05rem' }}>Discover opportunities, submit quotes, and track your performance.</p>
             </div>
             
             {/* Elegant Tabs */}
-            <div style={{ display: 'flex', background: 'rgba(30, 41, 59, 0.7)', backdropFilter: 'blur(10px)', padding: '6px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', background: 'var(--surface-color)', border: '1px solid var(--surface-border)', padding: '6px', borderRadius: '12px' }}>
               {['Live', 'Open', 'History'].map(tab => (
                 <div 
                   key={tab}
@@ -183,9 +165,9 @@ export default function VendorEventsPage() {
                   style={{ 
                     padding: '8px 24px', cursor: 'pointer', borderRadius: '8px',
                     fontWeight: '600', fontSize: '0.95rem',
-                    color: activeTab === tab ? '#fff' : '#64748b',
-                    background: activeTab === tab ? 'rgba(255,255,255,0.1)' : 'transparent',
-                    boxShadow: activeTab === tab ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
+                    color: activeTab === tab ? 'var(--primary-color)' : 'var(--text-secondary)',
+                    background: activeTab === tab ? '#f1f5f9' : 'transparent',
+                    boxShadow: activeTab === tab ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
                     transition: 'all 0.2s ease'
                   }}
                 >
@@ -198,62 +180,44 @@ export default function VendorEventsPage() {
           {/* Event Cards Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '24px' }}>
             {filteredEvents.length === 0 ? (
-              <div style={{ gridColumn: '1 / -1', padding: '64px', textAlign: 'center', background: 'rgba(30, 41, 59, 0.5)', borderRadius: '16px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+              <div style={{ gridColumn: '1 / -1', padding: '64px', textAlign: 'center', background: 'var(--surface-color)', borderRadius: '16px', border: '1px dashed var(--surface-border)' }}>
                 <div style={{ fontSize: '3rem', marginBottom: '16px', opacity: 0.5 }}>📭</div>
-                <h3 style={{ color: '#f8fafc', margin: '0 0 8px 0' }}>No {activeTab.toLowerCase()} events right now</h3>
-                <p style={{ color: '#64748b', margin: 0 }}>Check back later for new procurement opportunities.</p>
+                <h3 style={{ color: 'var(--text-primary)', margin: '0 0 8px 0' }}>No {activeTab.toLowerCase()} events right now</h3>
+                <p style={{ color: 'var(--text-secondary)', margin: 0 }}>Check back later for new procurement opportunities.</p>
               </div>
             ) : (
               filteredEvents.map(event => (
-                <div key={event.id} style={{ 
-                  background: 'rgba(30, 41, 59, 0.6)', backdropFilter: 'blur(10px)',
-                  borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)',
-                  overflow: 'hidden', display: 'flex', flexDirection: 'column',
-                  boxShadow: '0 10px 30px -10px rgba(0,0,0,0.3)', transition: 'transform 0.2s, box-shadow 0.2s'
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 20px 40px -10px rgba(0,0,0,0.4)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 30px -10px rgba(0,0,0,0.3)'; }}
-                >
+                <div key={event.id} className="surface" style={{ display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}>
                   <div style={{ padding: '24px', flex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                      <span style={{ color: '#3b82f6', fontSize: '0.8rem', fontWeight: '700', letterSpacing: '1px' }}>{event.id}</span>
-                      <span style={{ 
-                        padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600',
-                        background: event.type === 'Rank based' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(139, 92, 246, 0.15)',
-                        color: event.type === 'Rank based' ? '#fbbf24' : '#a78bfa',
-                        border: `1px solid ${event.type === 'Rank based' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(139, 92, 246, 0.3)'}`
-                      }}>
-                        {event.type}
-                      </span>
+                      <span style={{ color: 'var(--primary-color)', fontSize: '0.8rem', fontWeight: '700', letterSpacing: '0.5px' }}>{event.id}</span>
+                      <span className="badge badge-approved">{event.type}</span>
                     </div>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#fff', margin: '0 0 16px 0', lineHeight: 1.4 }}>{event.title}</h3>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--text-primary)', margin: '0 0 16px 0', lineHeight: 1.4 }}>{event.title}</h3>
                     
                     <div style={{ display: 'flex', gap: '24px', marginBottom: '8px' }}>
                       <div>
-                        <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '4px' }}>Target Price</div>
-                        <div style={{ color: '#f8fafc', fontWeight: '600' }}>${event.targetPrice.toLocaleString()}</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Target Price</div>
+                        <div style={{ color: 'var(--text-primary)', fontWeight: '600' }}>${event.targetPrice.toLocaleString()}</div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '4px' }}>Ends In</div>
-                        <div style={{ color: '#f8fafc', fontWeight: '500' }}>48 Hours</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Ends In</div>
+                        <div style={{ color: 'var(--text-primary)', fontWeight: '500' }}>48 Hours</div>
                       </div>
                     </div>
                   </div>
                   
-                  <div style={{ padding: '16px 24px', background: 'rgba(0,0,0,0.2)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ padding: '16px 24px', background: '#f8fafc', borderTop: '1px solid var(--surface-border)' }}>
                     {activeTab !== 'History' ? (
                       <button 
                         onClick={() => { setSelectedEvent(event); setBidPrice(''); }}
-                        style={{ 
-                          width: '100%', padding: '12px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                          color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer',
-                          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
-                        }}
+                        className="btn btn-primary"
+                        style={{ width: '100%' }}
                       >
                         Enter Bidding Arena
                       </button>
                     ) : (
-                      <div style={{ width: '100%', padding: '12px', textAlign: 'center', color: '#64748b', fontWeight: '500' }}>
+                      <div style={{ width: '100%', padding: '12px', textAlign: 'center', color: 'var(--text-secondary)', fontWeight: '500' }}>
                         Event Closed
                       </div>
                     )}
@@ -270,25 +234,22 @@ export default function VendorEventsPage() {
         <div style={{ 
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
           background: 'rgba(2, 6, 23, 0.8)', backdropFilter: 'blur(16px)', 
+          background: 'rgba(2, 6, 23, 0.5)', backdropFilter: 'blur(8px)', 
           zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '24px'
         }}>
-          <div style={{ 
-            background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(255,255,255,0.1)', 
-            borderRadius: '24px', width: '100%', maxWidth: '700px', overflow: 'hidden',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-          }}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: '800px', background: 'var(--bg-color)', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
             
             {/* Modal Header */}
-            <div style={{ padding: '32px 40px', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ background: 'var(--surface-color)', borderBottom: '1px solid var(--surface-border)', padding: '32px 40px', position: 'relative' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <div style={{ color: '#3b82f6', fontSize: '0.85rem', fontWeight: '700', letterSpacing: '1px', marginBottom: '8px' }}>{selectedEvent.id}</div>
-                  <h2 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#fff', margin: 0 }}>{selectedEvent.title}</h2>
+                  <div style={{ color: 'var(--primary-color)', fontSize: '0.85rem', fontWeight: '700', letterSpacing: '1px', marginBottom: '8px' }}>{selectedEvent.id}</div>
+                  <h2 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>{selectedEvent.title}</h2>
                 </div>
                 <button 
                   onClick={() => setSelectedEvent(null)}
-                  style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '1.5rem', cursor: 'pointer', padding: '4px' }}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '1.5rem', cursor: 'pointer', padding: '4px' }}
                 >
                   &times;
                 </button>
@@ -299,69 +260,69 @@ export default function VendorEventsPage() {
             <div style={{ padding: '40px' }}>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px' }}>
-                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '20px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.03)' }}>
-                  <div style={{ color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Target Price</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: '#fff' }}>${selectedEvent.targetPrice.toLocaleString()}</div>
+                <div style={{ background: 'var(--surface-color)', padding: '20px', borderRadius: '16px', border: '1px solid var(--surface-border)' }}>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Target Price</div>
+                  <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>${selectedEvent.targetPrice.toLocaleString()}</div>
                 </div>
-                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '20px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.03)' }}>
-                  <div style={{ color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Event Mode</div>
+                <div style={{ background: 'var(--surface-color)', padding: '20px', borderRadius: '16px', border: '1px solid var(--surface-border)' }}>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Event Mode</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: selectedEvent.type === 'Rank based' ? '#fbbf24' : '#a78bfa' }}>
+                    <span className="badge badge-pending" style={{ fontSize: '1rem', padding: '6px 16px' }}>
                       {selectedEvent.type}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Bidding Engine Area */}
-              <div style={{ position: 'relative' }}>
-                <label style={{ display: 'block', fontSize: '1.1rem', fontWeight: '600', color: '#fff', marginBottom: '16px' }}>Submit Your Quote</label>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-                  <div style={{ position: 'relative', flex: 1 }}>
-                    <span style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: selectedEvent.type === 'Price based' ? getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice) : '#94a3b8', fontSize: '1.5rem', transition: 'color 0.3s' }}>$</span>
-                    <input 
-                      type="number"
-                      value={bidPrice}
-                      onChange={(e) => setBidPrice(e.target.value)}
-                      placeholder="0.00"
-                      style={{ 
-                        width: '100%', padding: '20px 20px 20px 50px', fontSize: '1.75rem', fontWeight: '800', 
-                        borderRadius: '16px', background: 'rgba(0,0,0,0.3)', border: '2px solid rgba(255,255,255,0.1)',
-                        color: selectedEvent.type === 'Price based' ? getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice) : '#fff',
-                        outline: 'none', transition: 'all 0.3s ease',
-                        boxShadow: currentPrice > 0 && selectedEvent.type === 'Price based' 
-                          ? `0 0 20px ${getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice)}30` 
-                          : 'inset 0 2px 4px rgba(0,0,0,0.5)'
-                      }}
-                    />
-                  </div>
+                {/* Bidding Engine Area */}
+                <div style={{ position: 'relative' }}>
+                  <label style={{ display: 'block', fontSize: '1.1rem', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '16px' }}>Submit Your Quote</label>
                   
-                  {/* Dynamic Rank Widget */}
-                  {selectedEvent.type === 'Rank based' && (
-                    <div style={{ 
-                      width: '140px', height: '80px', borderRadius: '16px', 
-                      background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', 
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                      boxShadow: currentPrice > 0 ? '0 0 30px rgba(251, 191, 36, 0.15)' : 'none',
-                      transition: 'all 0.3s'
-                    }}>
-                      <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#64748b', letterSpacing: '1px', marginBottom: '4px' }}>Your Rank</div>
-                      <div style={{ fontSize: '2rem', fontWeight: '900', color: currentPrice > 0 ? '#fbbf24' : '#334155', textShadow: currentPrice > 0 ? '0 0 20px rgba(251, 191, 36, 0.4)' : 'none' }}>
-                        {currentPrice > 0 ? `#${calculateRank(currentPrice, selectedEvent.competitorBids)}` : '-'}
-                      </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                    <div style={{ position: 'relative', flex: 1 }}>
+                      <span style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: selectedEvent.type === 'Price based' ? getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice) : 'var(--text-secondary)', fontSize: '1.5rem', transition: 'color 0.3s' }}>$</span>
+                      <input 
+                        type="number"
+                        value={bidPrice}
+                        onChange={(e) => setBidPrice(e.target.value)}
+                        placeholder="0.00"
+                        style={{ 
+                          width: '100%', padding: '20px 20px 20px 50px', fontSize: '1.75rem', fontWeight: '800', 
+                          borderRadius: '16px', background: 'var(--surface-color)', border: '2px solid var(--surface-border)',
+                          color: 'var(--text-primary)',
+                          outline: 'none', transition: 'all 0.3s ease',
+                          boxShadow: currentPrice > 0 && selectedEvent.type === 'Price based' 
+                            ? `0 0 0 2px ${getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice)}` 
+                            : '0 1px 3px rgba(0,0,0,0.05)'
+                        }}
+                      />
                     </div>
-                  )}
-                </div>
+                    
+                    {/* Dynamic Rank Widget */}
+                    {selectedEvent.type === 'Rank based' && (
+                      <div style={{ 
+                        width: '140px', height: '80px', borderRadius: '16px', 
+                        background: 'var(--surface-color)', 
+                        border: '1px solid var(--surface-border)',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                        transition: 'all 0.3s'
+                      }}>
+                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-secondary)', letterSpacing: '1px', marginBottom: '4px' }}>Your Rank</div>
+                        <div style={{ fontSize: '2rem', fontWeight: '900', color: currentPrice > 0 ? 'var(--warning-color)' : 'var(--text-primary)' }}>
+                          {currentPrice > 0 ? `#${calculateRank(currentPrice, selectedEvent.competitorBids)}` : '-'}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 
                 {/* Dynamic Price Feedback */}
                 {selectedEvent.type === 'Price based' && currentPrice > 0 && (
                   <div style={{ 
                     marginTop: '20px', padding: '16px', borderRadius: '12px',
-                    background: `linear-gradient(90deg, ${getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice)}15 0%, transparent 100%)`,
+                    background: `${getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice)}15`,
                     borderLeft: `4px solid ${getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice)}`,
-                    color: '#f8fafc', fontSize: '0.95rem', fontWeight: '500' 
+                    color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: '500' 
                   }}>
                     {currentPrice <= (selectedEvent.bestPrice || selectedEvent.targetPrice) ? 
                       "✨ Excellent! Your price is highly competitive in the current market." : 
@@ -373,26 +334,22 @@ export default function VendorEventsPage() {
             </div>
 
             {/* Modal Footer */}
-            <div style={{ padding: '24px 40px', background: 'rgba(0,0,0,0.2)', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
+            <div style={{ padding: '24px 40px', background: 'var(--surface-color)', borderTop: '1px solid var(--surface-border)', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
               <button 
                 onClick={() => setSelectedEvent(null)}
-                style={{ padding: '14px 28px', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '12px', color: '#f8fafc', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                className="btn btn-secondary"
               >
                 Cancel
               </button>
               <button 
                 onClick={submitBid}
                 disabled={!bidPrice}
+                className="btn btn-primary"
                 style={{ 
                   padding: '14px 36px', 
-                  background: bidPrice ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' : 'rgba(255,255,255,0.1)', 
-                  color: bidPrice ? '#fff' : '#64748b', 
-                  border: 'none', borderRadius: '12px', fontWeight: 'bold', fontSize: '1rem',
+                  fontSize: '1rem',
+                  opacity: bidPrice ? 1 : 0.5,
                   cursor: bidPrice ? 'pointer' : 'not-allowed',
-                  boxShadow: bidPrice ? '0 10px 25px -5px rgba(37, 99, 235, 0.4)' : 'none',
-                  transition: 'all 0.2s'
                 }}
               >
                 Lock In Bid

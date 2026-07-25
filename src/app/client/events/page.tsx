@@ -134,7 +134,8 @@ export default function EventsPage() {
 
   const handleAward = async (bid: any) => {
     try {
-      const res = await fetch('/api/pos', {
+      // 1. Generate PO
+      const poRes = await fetch('/api/pos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -146,12 +147,27 @@ export default function EventsPage() {
           poNumber: `PO-${Date.now()}` // Automatically generating a PO number for quick demo
         })
       });
-      if (res.ok) {
-        alert('Purchase Order successfully generated!');
+
+      // 2. Generate Contract
+      const contractRes = await fetch('/api/contracts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `Master Agreement - Event ${selectedEventId}`,
+          vendorId: bid.vendorId,
+          vendorName: bid.vendorName,
+          eventId: selectedEventId,
+          total: bid.amount,
+          status: 'Draft'
+        })
+      });
+
+      if (poRes.ok && contractRes.ok) {
+        alert('Purchase Order and Draft Contract successfully generated!');
         setSelectedEventId(null);
-        router.push('/client/po');
+        router.push('/client/contracts');
       } else {
-        alert('Failed to generate PO');
+        alert('Failed to generate PO or Contract');
       }
     } catch(err) {
       alert('Error awarding bid');

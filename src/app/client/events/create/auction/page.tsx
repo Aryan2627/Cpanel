@@ -14,12 +14,8 @@ export default function SingleStageCreatePage() {
   const [isEventTypeOpen, setIsEventTypeOpen] = useState(false);
   
   const [template, setTemplate] = useState('Select Templates');
-  const [selectedTemplateObj, setSelectedTemplateObj] = useState<any>(null);
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
   const [dbTemplates, setDbTemplates] = useState<any[]>([]);
-
-  const [lineItems, setLineItems] = useState<any[]>([{ id: Date.now(), values: {}, evaluatorId: '' }]);
-  const [users, setUsers] = useState<any[]>([]);
 
   useEffect(() => {
     // Fetch Templates from database
@@ -31,16 +27,6 @@ export default function SingleStageCreatePage() {
         }
       })
       .catch(err => console.error("Error fetching templates", err));
-      
-    // Fetch Users for Evaluators
-    fetch('/api/users')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setUsers(data);
-        }
-      })
-      .catch(err => console.error("Error fetching users", err));
   }, []);
 
   // States for Vendors / Participants
@@ -93,6 +79,9 @@ export default function SingleStageCreatePage() {
       
       <div style={{ flex: 1, backgroundColor: '#ffffff', margin: '24px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         
+        <h1 className="page-title" style={{ padding: '24px 32px 0 32px', margin: 0, fontSize: '1.5rem', color: '#1e293b' }}>Create Reverse Auction</h1>
+        <p style={{ padding: '0 32px', color: '#64748b' }}>Configure event settings, items, and invite suppliers to your reverse auction.</p>
+
         {/* Top Header - Event Title & Mode */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 32px', borderBottom: '1px solid #f1f5f9' }}>
           <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
@@ -183,11 +172,7 @@ export default function SingleStageCreatePage() {
                   dbTemplates.map((t: any) => (
                     <div 
                       key={t.id}
-                      onClick={() => { 
-                        setTemplate(t.name); 
-                        setSelectedTemplateObj(t);
-                        setIsTemplateOpen(false); 
-                      }}
+                      onClick={() => { setTemplate(t.name); setIsTemplateOpen(false); }}
                       style={{ padding: '8px 16px', cursor: 'pointer', whiteSpace: 'nowrap', borderBottom: '1px solid #f1f5f9' }}
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -207,107 +192,69 @@ export default function SingleStageCreatePage() {
 
         {/* Main Content Area - Product Requirements */}
         <div style={{ flex: 1, backgroundColor: '#ffffff', padding: '32px', overflowY: 'auto' }}>
-          <div style={{ margin: '0 auto' }}>
+          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e293b', marginBottom: '24px' }}>Product Requirements</h2>
             
-            {!selectedTemplateObj ? (
-              <div style={{ padding: '32px', textAlign: 'center', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px dashed #cbd5e1', color: '#64748b' }}>
-                Please select a Template to configure line items.
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>Category</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. IT Equipment"
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
+                />
               </div>
-            ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '2px solid #e2e8f0' }}>
-                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>Item #</th>
-                      
-                      {/* Dynamic Columns from Template */}
-                      {(() => {
-                        try {
-                          const fields = JSON.parse(selectedTemplateObj.fields);
-                          return fields.map((f: any) => (
-                            <th key={f.id} style={{ padding: '12px', textAlign: 'left', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>
-                              {f.name} {f.role === 'Participant' && <span style={{ color: '#94a3b8', fontWeight: 'normal', fontSize: '0.75rem' }}>(Vendor)</span>}
-                            </th>
-                          ));
-                        } catch(e) { return null; }
-                      })()}
-
-                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>Evaluator</th>
-                      <th style={{ padding: '12px', textAlign: 'center', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {lineItems.map((item, index) => {
-                      let parsedFields: any[] = [];
-                      try { parsedFields = JSON.parse(selectedTemplateObj.fields); } catch(e) {}
-                      
-                      return (
-                        <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                          <td style={{ padding: '12px', color: '#1e293b', fontWeight: '500' }}>{index + 1}</td>
-                          
-                          {parsedFields.map((f: any) => (
-                            <td key={f.id} style={{ padding: '12px' }}>
-                              <input 
-                                type="text" 
-                                placeholder={f.role === 'Participant' ? 'For vendor to fill' : 'Enter value'}
-                                value={item.values[f.key] || ''}
-                                onChange={(e) => {
-                                  const newItems = [...lineItems];
-                                  const idx = newItems.findIndex(i => i.id === item.id);
-                                  newItems[idx].values = { ...newItems[idx].values, [f.key]: e.target.value };
-                                  setLineItems(newItems);
-                                }}
-                                style={{ width: '100%', minWidth: '120px', padding: '8px', border: '1px solid #e2e8f0', borderRadius: '4px', outline: 'none' }}
-                              />
-                            </td>
-                          ))}
-
-                          <td style={{ padding: '12px' }}>
-                            <select 
-                              value={item.evaluatorId || ''}
-                              onChange={(e) => {
-                                const newItems = [...lineItems];
-                                const idx = newItems.findIndex(i => i.id === item.id);
-                                newItems[idx].evaluatorId = e.target.value;
-                                setLineItems(newItems);
-                              }}
-                              style={{ width: '100%', minWidth: '150px', padding: '8px', border: '1px solid #e2e8f0', borderRadius: '4px', outline: 'none', backgroundColor: '#fff' }}
-                            >
-                              <option value="">Select Evaluator</option>
-                              {users.map(u => (
-                                <option key={u.id} value={u.id}>{u.name}</option>
-                              ))}
-                            </select>
-                          </td>
-
-                          <td style={{ padding: '12px', textAlign: 'center' }}>
-                            <button 
-                              onClick={() => setLineItems(lineItems.filter(i => i.id !== item.id))}
-                              style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '1.2rem', padding: '4px' }}
-                              title="Remove Line Item"
-                            >
-                              ×
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>Delivery Date</label>
+                <input 
+                  type="date" 
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
+                />
               </div>
-            )}
+            </div>
 
-            <div style={{ marginTop: '24px', display: 'flex', gap: '16px' }}>
-              <button 
-                onClick={() => setLineItems([...lineItems, { id: Date.now(), values: {}, evaluatorId: '' }])}
-                disabled={!selectedTemplateObj}
-                style={{ padding: '8px 16px', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '4px', color: !selectedTemplateObj ? '#94a3b8' : '#000000', cursor: !selectedTemplateObj ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
-              >
-                ➕ Add Another Line Item
-              </button>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>Quantity</label>
+                <input 
+                  type="number" 
+                  placeholder="0"
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>UOM</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. EA, KG"
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>Target Price</label>
+                <input 
+                  type="number" 
+                  placeholder="0.00"
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>Product Specifications</label>
+              <textarea 
+                placeholder="Enter detailed specifications, requirements, and compliance standards..."
+                rows={5}
+                style={{ width: '100%', padding: '12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000', resize: 'vertical' }}
+              />
+            </div>
+
+            <div style={{ marginTop: '16px', display: 'flex', gap: '16px' }}>
               <button style={{ padding: '8px 16px', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '4px', color: '#000000', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 📎 Attach Documents
+              </button>
+              <button style={{ padding: '8px 16px', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '4px', color: '#000000', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                ➕ Add Another Line Item
               </button>
             </div>
           </div>

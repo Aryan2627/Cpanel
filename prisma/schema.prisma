@@ -79,6 +79,8 @@ model Intake {
   buyer     String?
   reqAt     String?
   updAt     String?
+  source    String   @default("Manual")
+  erpId     String?
   createdAt DateTime @default(now())
 }
 
@@ -118,6 +120,9 @@ model PurchaseOrder {
   vendorId  String?
   eventId   String?
   total     Float    @default(0)
+  source    String   @default("Manual")
+  erpId     String?
+  erpStatus String   @default("Pending Sync")
   createdAt DateTime @default(now())
 }
 
@@ -129,4 +134,26 @@ model Bid {
   amount     Float
   status     String   @default("Submitted")
   createdAt  DateTime @default(now())
+}
+
+model Contract {
+  id           String   @id @default(uuid())
+  title        String?
+  status       String   @default("Draft")
+  vendorId     String?
+  vendorName   String?
+  eventId      String?
+  poId         String?
+  content      String?
+  total        Float    @default(0)
+  clientSigned Boolean  @default(false)
+  vendorSigned Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+model Template {
+  id        String   @id @default(uuid())
+  name      String
+  fields    String   // JSON string of fields
+  createdAt DateTime @default(now())
 }

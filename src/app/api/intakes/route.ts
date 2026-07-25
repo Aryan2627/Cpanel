@@ -18,20 +18,22 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
+    console.log("Adding Intake:", data);
     const newIntake = await prisma.intake.create({
       data: {
-        refId: data.refId,
+        refId: data.refId || `INT-${Date.now()}`,
         title: data.title,
         reqName: data.reqName,
         status: data.status || 'Draft',
         type: data.type || 'Standalone NFA',
         buyer: data.buyer || '-',
-        reqAt: data.reqAt,
-        updAt: data.updAt,
+        reqAt: data.reqAt || new Date().toISOString().split('T')[0],
+        updAt: data.updAt || new Date().toISOString().split('T')[0],
       }
     });
     return NextResponse.json(newIntake, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to create intake' }, { status: 500 });
+  } catch (error: any) {
+    console.error('API Error creating intake:', error);
+    return NextResponse.json({ error: error.message || 'Failed to create intake' }, { status: 500 });
   }
 }

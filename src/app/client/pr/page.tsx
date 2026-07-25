@@ -199,8 +199,19 @@ export default function PRPage() {
               <button 
                 onClick={() => {
                   setIsModalOpen(false);
+                  
+                  // Generate URL with selected PRs
+                  const prs = selectedRows.join(',');
+                  let destination = '';
+                  
+                  if (auction) {
+                    destination = `/client/events/create/auction?prs=${prs}`;
+                  } else {
+                    destination = `/client/events/create/single-stage?prs=${prs}`;
+                  }
+                  
                   setSelectedRows([]);
-                  window.location.href = '/client/pr/project';
+                  window.location.href = destination;
                 }}
                 disabled={!techStage && !rfq && !auction}
                 style={{ 
