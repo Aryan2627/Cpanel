@@ -409,7 +409,8 @@ export default function SingleStageCreatePage() {
                         type: eventType,
                         account: 'Internal',
                         itemsCount: 1,
-                        stages: [{ name: template, mode: eventMode }]
+                        stages: [{ name: template, mode: eventMode }],
+                        participants: selectedVendors
                       })
                     });
                     if (res.ok) {

@@ -26,6 +26,7 @@ export async function POST(request: Request) {
         account: data.account,
         itemsCount: data.itemsCount || 1,
         stages: data.stages ? JSON.stringify(data.stages) : null,
+        participants: data.participants ? JSON.stringify(data.participants) : null,
       }
     });
     return NextResponse.json(event, { status: 201 });

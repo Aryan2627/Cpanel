@@ -92,6 +92,7 @@ model Event {
   account     String?
   itemsCount  Int      @default(1)
   stages      String?  // JSON string of stages array
+  participants String? // JSON string of invited vendors array
   createdAt   DateTime @default(now())
 }
 
