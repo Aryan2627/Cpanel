@@ -190,7 +190,6 @@ export default function IntakeTablePage() {
               <th style={{ padding: '12px 24px', fontWeight: '500', color: '#6b7280', borderRight: '1px solid #e5e7eb' }}>Buyer Name</th>
               <th style={{ padding: '12px 24px', fontWeight: '500', color: '#6b7280', borderRight: '1px solid #e5e7eb' }}>Requested At</th>
               <th style={{ padding: '12px 24px', fontWeight: '500', color: '#6b7280', borderRight: '1px solid #e5e7eb' }}>Updated At</th>
-              <th style={{ padding: '12px 24px', fontWeight: '500', color: '#6b7280' }}>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -215,17 +214,12 @@ export default function IntakeTablePage() {
                   <td style={{ padding: '12px 24px', color: '#4b5563', borderRight: '1px solid #e5e7eb' }}>{row.type}</td>
                   <td style={{ padding: '12px 24px', color: '#4b5563', borderRight: '1px solid #e5e7eb' }}>{row.buyer}</td>
                   <td style={{ padding: '12px 24px', color: '#6b7280', borderRight: '1px solid #e5e7eb' }}>{row.reqAt}</td>
-                  <td style={{ padding: '12px 24px', color: '#6b7280', borderRight: '1px solid #e5e7eb' }}>{row.updAt}</td>
-                  <td style={{ padding: '12px 24px' }}>
-                    <Link href={`/client/events/create/single-stage?intakeRef=${row.refId}&title=${encodeURIComponent(row.title || '')}`} style={{ padding: '6px 12px', backgroundColor: '#2563eb', color: '#fff', borderRadius: '4px', textDecoration: 'none', fontSize: '0.75rem', display: 'inline-block' }}>
-                      Create RFQ
-                    </Link>
-                  </td>
+                  <td style={{ padding: '12px 24px', color: '#6b7280' }}>{row.updAt}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={9} style={{ padding: '24px', textAlign: 'center', color: '#6b7280' }}>
+                <td colSpan={8} style={{ padding: '24px', textAlign: 'center', color: '#6b7280' }}>
                   No records found.
                 </td>
               </tr>
