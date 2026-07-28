@@ -1,6 +1,12 @@
 'use client';
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { 
+  Search, Plus, ChevronDown, Activity, 
+  Clock, FileCheck, Users, X, Award, Eye, 
+  AlertCircle, ShieldCheck, CheckCircle2,
+  TrendingUp, BarChart3
+} from 'lucide-react';
 
 export default function EventsPage() {
   const router = useRouter();
@@ -16,44 +22,45 @@ export default function EventsPage() {
   const [bids, setBids] = useState<any[]>([]);
   const [isBidsLoading, setIsBidsLoading] = useState(false);
 
+  // Mock Events
   const mockEvents = [
     {
-      account: 'Support S Account S',
+      id: 'mock-1',
+      account: 'Enterprise Corp',
       refId: 'RFX-20012',
       itemsCount: 2,
-      title: 'testing del item2',
+      title: 'Q3 Hardware Refresh',
       stages: [
         {
           name: 'Technical Offer',
-          statusIcon: '⚠️',
-          statusColor: '#9ca3af',
-          timeText: 'Overdue by about 1h',
+          statusIcon: <AlertCircle size={18} color="#f59e0b" />,
+          timeText: 'Overdue by 1h',
           timeColor: '#dc2626',
           participants: '1/2',
           participantsColor: '#3b82f6',
-          actionText: 'Send for TR',
+          actionText: 'Send for Review',
           actionBadge: '1',
           actionType: 'warning'
         }
       ]
     },
     {
-      account: 'Support S Account S',
+      id: 'mock-2',
+      account: 'Global Industries',
       refId: 'RFX-20009',
-      itemsCount: 1,
-      title: 'Demo Procol - 4',
+      itemsCount: 5,
+      title: 'Software Licensing Renewal',
       stages: [
         {
-          name: 'RFQ',
-          statusIcon: '◐',
-          statusColor: '#f97316',
-          timeText: 'Ends in 11m : 30d : 3h : 34m : 02s',
-          timeColor: '#374151',
-          participants: '0/5',
-          participantsColor: '#dc2626',
-          actionText: 'Evaluate RFQ Commercials',
-          actionBadge: '1',
-          actionType: 'warning'
+          name: 'RFQ Commercials',
+          statusIcon: <Clock size={18} color="#3b82f6" />,
+          timeText: 'Ends in 11 days',
+          timeColor: '#475569',
+          participants: '3/5',
+          participantsColor: '#10b981',
+          actionText: 'Evaluate Quotes',
+          actionBadge: '3',
+          actionType: 'primary'
         }
       ]
     }
@@ -65,17 +72,15 @@ export default function EventsPage() {
       .then(data => {
         if (Array.isArray(data)) {
           const mapped = data.map(dbEvent => ({
-            id: dbEvent.refId, // use refId for API calls
-            account: dbEvent.account || 'Default Account',
+            id: dbEvent.refId,
+            account: dbEvent.account || 'Internal Department',
             refId: dbEvent.refId,
             itemsCount: dbEvent.itemsCount || 1,
-            title: dbEvent.title || 'Untitled Event',
-            type: dbEvent.type || 'Price based',
+            title: dbEvent.title || 'Untitled Sourcing Event',
             stages: [
               {
                 name: 'Live RFQ (Database)',
-                statusIcon: '◐',
-                statusColor: '#10b981',
+                statusIcon: <Activity size={18} color="#10b981" />,
                 timeText: 'Live now',
                 timeColor: '#10b981',
                 participants: 'View Bids',
@@ -106,11 +111,9 @@ export default function EventsPage() {
 
       let matchesStage = true;
       if (activeStageFilter === 'Live') {
-        matchesStage = event.stages.some((s: any) => s.statusColor === '#10b981' || s.statusColor === '#f97316');
-      } else if (activeStageFilter === 'In - Evaluation') {
-        matchesStage = event.stages.some((s: any) => s.actionText.includes('Evaluate') || s.actionText.includes('Send for'));
-      } else if (activeStageFilter === 'Upcoming') {
-        matchesStage = event.stages.some((s: any) => s.statusColor === '#d1d5db' || s.timeText.includes('Scheduled'));
+        matchesStage = event.stages.some((s: any) => s.timeText.includes('Live'));
+      } else if (activeStageFilter === 'Action Required') {
+        matchesStage = event.stages.some((s: any) => s.actionText);
       }
 
       return matchesSearch && matchesStage;
@@ -134,7 +137,6 @@ export default function EventsPage() {
 
   const handleAward = async (bid: any) => {
     try {
-      // 1. Generate PO
       const poRes = await fetch('/api/pos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -144,11 +146,10 @@ export default function EventsPage() {
           total: bid.amount,
           eventId: selectedEventId,
           status: 'Draft',
-          poNumber: `PO-${Date.now()}` // Automatically generating a PO number for quick demo
+          poNumber: `PO-${Date.now()}`
         })
       });
 
-      // 2. Generate Contract
       const contractRes = await fetch('/api/contracts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -174,190 +175,287 @@ export default function EventsPage() {
     }
   };
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#f3f4f6', margin: '-32px', position: 'relative' }}>
-      
-      {/* Top Header Navigation */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', backgroundColor: '#ffffff', padding: '0 24px', borderBottom: '1px solid #e5e7eb', height: '60px' }}>
-        <div style={{ display: 'flex', gap: '32px', height: '100%' }}>
-          <div 
-            onClick={() => setActiveTab('LIVE')}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', borderBottom: activeTab === 'LIVE' ? '3px solid #2563eb' : '3px solid transparent', color: activeTab === 'LIVE' ? '#2563eb' : '#6b7280', fontWeight: 'bold', fontSize: '0.9rem', paddingTop: '16px' }}
-          >
-            LIVE <span style={{ backgroundColor: '#2563eb', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem' }}>{allEvents.length}</span>
-          </div>
-          <div 
-            onClick={() => setActiveTab('HISTORY')}
-            style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', borderBottom: activeTab === 'HISTORY' ? '3px solid #2563eb' : '3px solid transparent', color: activeTab === 'HISTORY' ? '#2563eb' : '#9ca3af', fontWeight: 'bold', fontSize: '0.9rem', paddingTop: '16px' }}
-          >
-            HISTORY
-          </div>
-        </div>
+  // KPI calculations
+  const totalEvents = allEvents.length;
+  const liveEvents = allEvents.filter(e => e.stages.some(s => s.timeText.includes('Live') || s.timeText.includes('Ends'))).length;
+  const actionRequired = allEvents.filter(e => e.stages.some(s => s.actionType === 'warning')).length;
 
-        <div style={{ paddingBottom: '10px', position: 'relative' }}>
+  return (
+    <div style={{ backgroundColor: '#f8fafc', color: '#333', minHeight: '100%', padding: '24px', fontFamily: 'system-ui, sans-serif' }}>
+      
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#0f172a', margin: 0 }}>Sourcing Events</h1>
+          <p style={{ color: '#64748b', margin: '4px 0 0 0', fontSize: '0.875rem' }}>Manage your RFQs, Auctions, and Bids in real-time.</p>
+        </div>
+        
+        <div style={{ position: 'relative' }}>
           <button 
             onClick={() => setIsCreateMenuOpen(!isCreateMenuOpen)}
-            style={{ backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: '4px', padding: '8px 16px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem' }}>
-            + Create Event
-            <span style={{ borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '8px', marginLeft: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-               ▼
+            style={{ 
+              backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: '6px', 
+              padding: '8px 16px', fontWeight: '500', display: 'flex', alignItems: 'center', 
+              gap: '8px', cursor: 'pointer', fontSize: '0.875rem', boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.2)'
+            }}
+          >
+            <Plus size={16} /> Create Event
+            <span style={{ borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '8px', marginLeft: '4px', display: 'flex', alignItems: 'center' }}>
+              <ChevronDown size={14} />
             </span>
           </button>
           
           {isCreateMenuOpen && (
-            <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '4px', backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '4px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', zIndex: 50, minWidth: '180px', overflow: 'hidden' }}>
-              <div onClick={() => router.push('/client/events/create/single-stage')} style={{ padding: '10px 16px', fontSize: '0.9rem', color: '#374151', cursor: 'pointer', borderBottom: '1px solid #f3f4f6' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f9fafb')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}>Single Stage</div>
+            <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', zIndex: 50, minWidth: '200px', overflow: 'hidden' }}>
+              <div onClick={() => router.push('/client/events/create/single-stage')} style={{ padding: '12px 16px', fontSize: '0.875rem', color: '#0f172a', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background-color 0.2s' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}>
+                <FileCheck size={16} color="#64748b" /> Single Stage Event
+              </div>
+              <div onClick={() => router.push('/client/events/create/auction')} style={{ padding: '12px 16px', fontSize: '0.875rem', color: '#0f172a', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background-color 0.2s', borderTop: '1px solid #f1f5f9' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}>
+                <TrendingUp size={16} color="#64748b" /> Reverse Auction
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '16px 24px', backgroundColor: '#eef2f6', gap: '16px' }}>
-        
-        {/* Search */}
-        <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff', border: '1px solid #d1d5db', borderRadius: '4px', overflow: 'hidden', width: '250px' }}>
-          <input 
-            type="text" 
-            placeholder="Search Title" 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ border: 'none', padding: '8px 12px', outline: 'none', width: '100%', fontSize: '0.9rem' }} 
-          />
-        </div>
-
-        <div style={{ flex: 1 }}></div>
-
-        {/* Stage Filters */}
-        <div style={{ display: 'flex', backgroundColor: '#fff', border: '1px solid #d1d5db', borderRadius: '4px', overflow: 'hidden', fontSize: '0.85rem', fontWeight: '600' }}>
-          <div 
-            onClick={() => setActiveStageFilter('All Stages')}
-            style={{ padding: '8px 16px', cursor: 'pointer', backgroundColor: activeStageFilter === 'All Stages' ? '#f3f4f6' : '#fff', color: '#374151', borderRight: '1px solid #e5e7eb' }}
-          >
-            All Stages
-          </div>
-          <div 
-            onClick={() => setActiveStageFilter('Live')}
-            style={{ padding: '8px 16px', cursor: 'pointer', backgroundColor: activeStageFilter === 'Live' ? '#f3f4f6' : '#fff', color: '#374151', borderRight: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <span style={{ color: '#10b981' }}>●</span> Live
-          </div>
-        </div>
-      </div>
-
-      {/* Events List */}
-      <div style={{ flex: 1, padding: '16px 24px', overflowY: 'auto' }}>
-        {filteredEvents.map((event, idx) => (
-          <div key={idx} style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e5e7eb', marginBottom: '16px', overflow: 'hidden', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-            
-            {/* Event Header */}
-            <div style={{ padding: '16px 20px', borderBottom: event.stages.length > 0 ? '1px solid #f3f4f6' : 'none' }}>
-              <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '4px' }}>
-                {event.account} • {event.refId} • {event.itemsCount} item{event.itemsCount > 1 ? 's' : ''}
-              </div>
-              <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1f2937' }}>
-                {event.title}
-              </div>
+      {/* KPI Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+        {[
+          { label: 'Total Events', value: totalEvents, icon: BarChart3, color: '#3b82f6', bg: '#eff6ff' },
+          { label: 'Live Events', value: liveEvents, icon: Activity, color: '#10b981', bg: '#ecfdf5' },
+          { label: 'Action Required', value: actionRequired, icon: AlertCircle, color: '#f59e0b', bg: '#fef3c7' },
+          { label: 'Avg Cycle Time', value: '14 Days', icon: Clock, color: '#8b5cf6', bg: '#f5f3ff' },
+        ].map((stat, i) => (
+          <div key={i} style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: stat.bg, color: stat.color }}>
+              <stat.icon size={24} />
             </div>
-
-            {/* Event Stages */}
-            {event.stages.map((stage: any, sIdx: number) => (
-              <div key={sIdx} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 2fr', alignItems: 'center', padding: '12px 20px', borderBottom: sIdx !== event.stages.length - 1 ? '1px solid #f3f4f6' : 'none', fontSize: '0.85rem' }}>
-                
-                {/* Stage Name */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', color: '#4b5563' }}>
-                  <span style={{ color: stage.statusColor, fontSize: '1.1rem' }}>{stage.statusIcon}</span>
-                  {stage.name}
-                </div>
-
-                {/* Time */}
-                <div style={{ color: stage.timeColor || '#374151', fontWeight: stage.timeColor === '#dc2626' ? '600' : '400' }}>
-                  {stage.timeText}
-                </div>
-
-                {/* Participants */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: stage.participantsColor, fontWeight: '500' }}>
-                  {stage.name.includes('Live RFQ') ? (
-                    <button onClick={() => handleViewBids(event.id || event.refId)} style={{ background: 'transparent', border: 'none', color: '#2563eb', cursor: 'pointer', textDecoration: 'underline' }}>View Bids</button>
-                  ) : (
-                    <span>{stage.participants}</span>
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  {stage.actionText && (
-                    <div 
-                      onClick={() => { if(stage.name.includes('Live RFQ')) handleViewBids(event.id || event.refId) }}
-                      style={{ 
-                      display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '4px',
-                      backgroundColor: stage.actionType === 'warning' ? '#fff7ed' : stage.actionType === 'success' ? '#f0fdf4' : '#fff',
-                      border: `1px solid ${stage.actionType === 'warning' ? '#fed7aa' : stage.actionType === 'success' ? '#bbf7d0' : '#e5e7eb'}`,
-                      color: stage.actionType === 'warning' ? '#c2410c' : stage.actionType === 'success' ? '#15803d' : '#374151',
-                      cursor: stage.name.includes('Live RFQ') ? 'pointer' : 'default'
-                    }}>
-                      <span style={{ fontSize: '0.8rem' }}>{stage.actionText}</span>
-                      <span style={{ 
-                        backgroundColor: stage.actionType === 'warning' ? '#ffedd5' : stage.actionType === 'success' ? '#dcfce7' : '#f3f4f6', 
-                        color: stage.actionType === 'warning' ? '#ea580c' : stage.actionType === 'success' ? '#166534' : '#6b7280',
-                        padding: '1px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' 
-                      }}>
-                        {stage.actionBadge}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+            <div>
+              <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>{stat.label}</p>
+              <h3 style={{ margin: '4px 0 0 0', color: '#0f172a', fontSize: '1.5rem', fontWeight: 600 }}>{stat.value}</h3>
+            </div>
           </div>
         ))}
       </div>
 
+      {/* Main Container */}
+      <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+        
+        {/* Navigation Tabs */}
+        <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', padding: '0 16px' }}>
+          {['LIVE', 'HISTORY'].map(tab => (
+            <div 
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                padding: '16px 24px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600,
+                color: activeTab === tab ? '#2563eb' : '#64748b',
+                borderBottom: activeTab === tab ? '2px solid #2563eb' : '2px solid transparent',
+                transition: 'all 0.2s', letterSpacing: '0.5px'
+              }}
+            >
+              {tab}
+            </div>
+          ))}
+        </div>
+
+        {/* Filters Area */}
+        <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          
+          {/* Search */}
+          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', overflow: 'hidden', width: '300px' }}>
+            <div style={{ padding: '0 12px' }}><Search size={16} color="#94a3b8" /></div>
+            <input 
+              type="text" 
+              placeholder="Search by Title, Ref ID, or Account..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ border: 'none', padding: '8px 12px 8px 0', outline: 'none', width: '100%', fontSize: '0.875rem', backgroundColor: 'transparent' }} 
+            />
+          </div>
+
+          {/* Stage Filters */}
+          <div style={{ display: 'flex', backgroundColor: '#f1f5f9', borderRadius: '6px', padding: '4px' }}>
+            {['All Stages', 'Live', 'Action Required'].map(filter => (
+              <button
+                key={filter}
+                onClick={() => setActiveStageFilter(filter)}
+                style={{
+                  padding: '6px 12px', border: 'none', borderRadius: '4px', fontSize: '0.8125rem', fontWeight: 500, cursor: 'pointer',
+                  backgroundColor: activeStageFilter === filter ? '#fff' : 'transparent',
+                  color: activeStageFilter === filter ? '#0f172a' : '#64748b',
+                  boxShadow: activeStageFilter === filter ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Events List */}
+        <div style={{ padding: '24px', backgroundColor: '#f8fafc' }}>
+          {filteredEvents.length > 0 ? (
+            filteredEvents.map((event) => (
+              <div key={event.id} style={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', transition: 'transform 0.2s, box-shadow 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)' }} onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.02)'; e.currentTarget.style.transform = 'none' }}>
+                
+                {/* Event Header */}
+                <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>
+                      <ShieldCheck size={14} color="#94a3b8" /> {event.account} <span style={{ color: '#cbd5e1' }}>•</span> {event.refId} <span style={{ color: '#cbd5e1' }}>•</span> {event.itemsCount} Items
+                    </div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: 600, color: '#0f172a' }}>
+                      {event.title}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                     <button style={{ padding: '6px 12px', border: '1px solid #e2e8f0', borderRadius: '4px', backgroundColor: '#fff', color: '#475569', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>View Details</button>
+                  </div>
+                </div>
+
+                {/* Event Stages */}
+                {event.stages.map((stage: any, sIdx: number) => (
+                  <div key={sIdx} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 2fr', alignItems: 'center', padding: '16px 24px', backgroundColor: '#fafaf9', borderBottom: sIdx !== event.stages.length - 1 ? '1px solid #f1f5f9' : 'none', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' }}>
+                    
+                    {/* Stage Name */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontWeight: 500, color: '#333' }}>
+                      {stage.statusIcon}
+                      {stage.name}
+                    </div>
+
+                    {/* Time */}
+                    <div style={{ color: stage.timeColor, fontWeight: stage.timeColor === '#dc2626' ? 600 : 400, fontSize: '0.875rem' }}>
+                      {stage.timeText}
+                    </div>
+
+                    {/* Participants */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: stage.participantsColor, fontWeight: 500, fontSize: '0.875rem' }}>
+                      <Users size={16} />
+                      {stage.name.includes('Live RFQ') ? (
+                        <button onClick={() => handleViewBids(event.id)} style={{ background: 'none', border: 'none', color: '#2563eb', cursor: 'pointer', textDecoration: 'underline', fontWeight: 500, padding: 0 }}>View Bids</button>
+                      ) : (
+                        <span>{stage.participants}</span>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      {stage.actionText && (
+                        <button 
+                          onClick={() => { if(stage.name.includes('Live RFQ')) handleViewBids(event.id) }}
+                          style={{ 
+                            display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', borderRadius: '6px', fontWeight: 600, fontSize: '0.8125rem', border: 'none',
+                            backgroundColor: stage.actionType === 'warning' ? '#fee2e2' : stage.actionType === 'success' ? '#dcfce7' : '#eff6ff',
+                            color: stage.actionType === 'warning' ? '#b91c1c' : stage.actionType === 'success' ? '#15803d' : '#1d4ed8',
+                            cursor: 'pointer', transition: 'opacity 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+                          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                        >
+                          {stage.actionType === 'success' ? <Eye size={14} /> : <AlertCircle size={14} />}
+                          {stage.actionText}
+                          <span style={{ 
+                            backgroundColor: stage.actionType === 'warning' ? '#f87171' : stage.actionType === 'success' ? '#22c55e' : '#3b82f6', 
+                            color: '#fff', padding: '2px 6px', borderRadius: '12px', fontSize: '0.7rem' 
+                          }}>
+                            {stage.actionBadge}
+                          </span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))
+          ) : (
+            <div style={{ padding: '64px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+              <Activity size={48} color="#cbd5e1" style={{ marginBottom: '16px' }} />
+              <h3 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '1.125rem' }}>No events found</h3>
+              <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>Try adjusting your search filters or create a new event.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* View Bids Modal */}
       {selectedEventId && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '24px', width: '600px', maxWidth: '90%', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#111827' }}>Event Bids: {selectedEventId}</h2>
-              <button onClick={() => setSelectedEventId(null)} style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#6b7280' }}>&times;</button>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.2s ease-out' }}>
+          <div style={{ backgroundColor: '#fff', borderRadius: '12px', width: '700px', maxWidth: '90%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', overflow: 'hidden', animation: 'slideUp 0.3s ease-out' }}>
+            
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}><Award color="#3b82f6" /> Evaluate Bids</h2>
+                <p style={{ margin: '4px 0 0 0', fontSize: '0.875rem', color: '#64748b' }}>Event Reference: {selectedEventId}</p>
+              </div>
+              <button onClick={() => setSelectedEventId(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}><X size={24} /></button>
             </div>
 
-            {isBidsLoading ? (
-              <p>Loading bids...</p>
-            ) : bids.length === 0 ? (
-              <p style={{ color: '#6b7280' }}>No bids have been submitted yet.</p>
-            ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
-                <thead>
-                  <tr style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                    <th style={{ padding: '12px', color: '#374151' }}>Vendor Name</th>
-                    <th style={{ padding: '12px', color: '#374151' }}>Date</th>
-                    <th style={{ padding: '12px', color: '#374151' }}>Bid Amount</th>
-                    <th style={{ padding: '12px', color: '#374151', textAlign: 'right' }}>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bids.map((bid, i) => (
-                    <tr key={bid.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                      <td style={{ padding: '12px', fontWeight: '500' }}>{bid.vendorName || 'Vendor'} {i === 0 ? <span style={{color: '#10b981', fontSize: '0.75rem', marginLeft: '4px'}}>(Best)</span> : ''}</td>
-                      <td style={{ padding: '12px', color: '#6b7280' }}>{new Date(bid.createdAt).toLocaleDateString()}</td>
-                      <td style={{ padding: '12px', fontWeight: 'bold' }}>${bid.amount.toLocaleString()}</td>
-                      <td style={{ padding: '12px', textAlign: 'right' }}>
-                        <button 
-                          onClick={() => handleAward(bid)}
-                          style={{ padding: '6px 12px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}
-                        >
-                          Award & Create PO
-                        </button>
-                      </td>
+            {/* Modal Body */}
+            <div style={{ padding: '24px', maxHeight: '60vh', overflowY: 'auto' }}>
+              {isBidsLoading ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 0', color: '#64748b' }}>
+                  <Activity size={32} className="spin-anim" style={{ marginBottom: '16px' }} />
+                  <p style={{ margin: 0 }}>Fetching latest bids...</p>
+                </div>
+              ) : bids.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '48px 0', color: '#64748b' }}>
+                  <Users size={32} color="#cbd5e1" style={{ marginBottom: '16px' }} />
+                  <p style={{ margin: 0 }}>No bids have been submitted by vendors yet.</p>
+                </div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
+                      <th style={{ padding: '12px 8px', color: '#475569', fontWeight: 600 }}>Vendor Name</th>
+                      <th style={{ padding: '12px 8px', color: '#475569', fontWeight: 600 }}>Submission Date</th>
+                      <th style={{ padding: '12px 8px', color: '#475569', fontWeight: 600 }}>Bid Amount</th>
+                      <th style={{ padding: '12px 8px', color: '#475569', fontWeight: 600, textAlign: 'right' }}>Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                  </thead>
+                  <tbody>
+                    {bids.map((bid, i) => (
+                      <tr key={bid.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: i === 0 ? '#f0fdf4' : '#fff' }}>
+                        <td style={{ padding: '16px 8px', fontWeight: 500, color: '#0f172a' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {bid.vendorName || 'Vendor'} 
+                            {i === 0 && <span style={{ backgroundColor: '#22c55e', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' }}>BEST PRICE</span>}
+                          </div>
+                        </td>
+                        <td style={{ padding: '16px 8px', color: '#64748b' }}>{new Date(bid.createdAt).toLocaleDateString()}</td>
+                        <td style={{ padding: '16px 8px', fontWeight: 600, color: i === 0 ? '#15803d' : '#0f172a', fontSize: '1rem' }}>
+                          ${bid.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                        </td>
+                        <td style={{ padding: '16px 8px', textAlign: 'right' }}>
+                          <button 
+                            onClick={() => handleAward(bid)}
+                            style={{ 
+                              padding: '8px 16px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', 
+                              cursor: 'pointer', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px',
+                              boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
+                            }}
+                          >
+                            <CheckCircle2 size={16} /> Award & Create PO
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         </div>
       )}
+
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .spin-anim { animation: spin 2s linear infinite; }
+      `}} />
     </div>
   );
 }
