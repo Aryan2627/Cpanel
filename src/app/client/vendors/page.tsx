@@ -38,16 +38,14 @@ export default function VendorManagement() {
   const [vendors, setVendors] = useState<any[]>(initialMockVendors);
 
   useEffect(() => {
-    const saved = localStorage.getItem('customVendors');
-    if (saved) {
-      try {
-        setVendors(JSON.parse(saved));
-      } catch(e) {}
-    } else {
-      // Seed with mock data initially
-      localStorage.setItem('customVendors', JSON.stringify(initialMockVendors));
-      setVendors(initialMockVendors);
-    }
+    fetch('/api/vendors')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setVendors(data);
+        }
+      })
+      .catch(e => console.error("Error fetching vendors:", e));
   }, []);
 
   const handleSubmit = async () => {
@@ -58,21 +56,35 @@ export default function VendorManagement() {
     
     setIsSubmitting(true);
     
-    const newVendor = {
-      id: 'V-' + Date.now(),
-      name: formData.name, vendorCode: formData.vendorCode || '-',
-      companyCode: '-', email: formData.email, phone: '-',
-      type: formData.type || 'Selling firm', city: formData.city || '-', status: 'Invited'
-    };
+    try {
+      const res = await fetch('/api/vendors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name, 
+          vendorCode: formData.vendorCode || '-',
+          companyCode: '-', 
+          email: formData.email, 
+          phone: '-',
+          type: formData.type || 'Selling firm', 
+          city: formData.city || '-', 
+          status: 'Invited'
+        })
+      });
 
-    const updatedVendors = [newVendor, ...vendors];
-    setVendors(updatedVendors);
-    localStorage.setItem('customVendors', JSON.stringify(updatedVendors));
-    window.dispatchEvent(new Event('customVendors_updated'));
-    
-    setIsInviteOpen(false);
-    setFormData({ name: '', email: '', type: 'Manufacturer/Trader', vendorCode: '', dealsIn: '', tradeLicense: '', inviteVia: 'Tax ID', city: '' });
-    setIsSubmitting(false);
+      if (res.ok) {
+        const newVendor = await res.json();
+        setVendors([newVendor, ...vendors]);
+        setIsInviteOpen(false);
+        setFormData({ name: '', email: '', type: 'Manufacturer/Trader', vendorCode: '', dealsIn: '', tradeLicense: '', inviteVia: 'Tax ID', city: '' });
+      } else {
+        alert('Failed to save vendor');
+      }
+    } catch(err) {
+      alert('Error saving vendor');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getStatusBadge = (status: string) => {
