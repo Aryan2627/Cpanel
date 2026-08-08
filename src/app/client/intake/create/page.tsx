@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useIntake } from '../../../../context/IntakeContext';
 
@@ -8,6 +8,19 @@ export default function PurchaseIntake() {
   const { addIntake } = useIntake();
   const [submitted, setSubmitted] = useState(false);
   const [title, setTitle] = useState('');
+  const [categories, setCategories] = useState<string[]>([]);
+  const [departments, setDepartments] = useState<string[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('customDropdowns');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.categories) setCategories(parsed.categories);
+        if (parsed.departments) setDepartments(parsed.departments);
+      } catch (e) {}
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,14 +75,29 @@ export default function PurchaseIntake() {
             <label className="form-label">Category</label>
             <select className="form-input" required>
               <option value="">Select Category...</option>
-              <option value="it">IT Hardware</option>
-              <option value="software">Software / SaaS</option>
-              <option value="services">Professional Services</option>
+              {categories.map((cat, idx) => (
+                <option key={idx} value={cat}>{cat}</option>
+              ))}
+              {categories.length === 0 && (
+                <>
+                  <option value="it">IT Hardware</option>
+                  <option value="software">Software / SaaS</option>
+                  <option value="services">Professional Services</option>
+                </>
+              )}
             </select>
           </div>
           <div className="form-group">
             <label className="form-label">Department</label>
-            <input type="text" className="form-input" required />
+            <select className="form-input" required>
+              <option value="">Select Department...</option>
+              {departments.map((dept, idx) => (
+                <option key={idx} value={dept}>{dept}</option>
+              ))}
+              {departments.length === 0 && (
+                <option value="general">General</option>
+              )}
+            </select>
           </div>
           <div className="form-group">
             <label className="form-label">Budget / Estimated Price</label>

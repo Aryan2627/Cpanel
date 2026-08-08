@@ -20,16 +20,16 @@ export async function OPTIONS() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const { email } = data;
+    let { email } = data;
+    email = email?.trim();
     
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400, headers: corsHeaders });
     }
 
-    // Try to find the vendor (case-insensitive for robust checking if sqlite allows, else exact)
-    const vendor = await prisma.vendor.findFirst({
-      where: { email: email }
-    });
+    // Try to find the vendor (case-insensitive for robust checking)
+    const vendors = await prisma.vendor.findMany();
+    const vendor = vendors.find(v => v.email?.trim().toLowerCase() === email.toLowerCase());
 
     if (!vendor) {
       return NextResponse.json({ error: 'Vendor not found' }, { status: 404, headers: corsHeaders });

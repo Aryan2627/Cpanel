@@ -48,7 +48,7 @@ export async function GET(request: Request) {
       try {
         const participants = JSON.parse(event.participants);
         if (Array.isArray(participants)) {
-          return participants.some((p: any) => p.email && p.email.toLowerCase() === email.toLowerCase());
+          return participants.some((p: any) => p.email && p.email.trim().toLowerCase() === email.trim().toLowerCase());
         }
       } catch(e) {
         return false;
