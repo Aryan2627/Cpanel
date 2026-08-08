@@ -1,8 +1,11 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { IntakeProvider } from '../../context/IntakeContext';
+import TourButton from './TourButton';
+import SpotlightSearch from './SpotlightSearch';
+import CartOverlay from './CartOverlay';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -14,26 +17,48 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     setOpenMenu(openMenu === name ? null : name);
   };
 
+  const [showWorkflows, setShowWorkflows] = useState(false);
+
+  useEffect(() => {
+    // Check initial state
+    setShowWorkflows(localStorage.getItem('enableWorkflows') === 'true');
+    
+    // Listen for changes from settings page
+    const handleSettingsChange = () => {
+      setShowWorkflows(localStorage.getItem('enableWorkflows') === 'true');
+    };
+    window.addEventListener('settings_updated', handleSettingsChange);
+    return () => window.removeEventListener('settings_updated', handleSettingsChange);
+  }, []);
+
+  const manageSubItems = [
+    { name: 'Users', path: '/client/manage/users' },
+    { name: 'Products', path: '/client/manage/products' },
+    { name: 'Templates', path: '/client/manage/templates' }
+  ];
+  if (showWorkflows) {
+    manageSubItems.push({ name: 'Workflows', path: '/client/manage/workflows' });
+  }
+
   const navItems = [
     { name: 'Dashboard', path: '/client' },
     { name: 'Purchase Intake', path: '/client/intake' },
     { name: 'Purchase Requisition', path: '/client/pr' },
     { name: 'Events / RFQs', path: '/client/events' },
-    { name: 'Vendor Management', path: '/client/vendors' },
+    { 
+      name: 'Vendor Management', 
+      path: '#',
+      subItems: [
+        { name: 'Vendors Directory', path: '/client/vendors' },
+        { name: 'Vendor Messages', path: '/client/vendors/messages' }
+      ]
+    },
     { name: 'Purchase Orders', path: '/client/po' },
-    { name: 'Contracts', path: '/client/contracts' },
-    { name: 'Reports', path: '/client/reports' },
+
     { 
       name: 'Manage', 
       path: '#',
-      subItems: [
-        { name: 'Users', path: '/client/manage/users' },
-        { name: 'Products', path: '/client/manage/products' },
-        { name: 'Category', path: '/client/manage/category' },
-        { name: 'Location', path: '/client/manage/location' },
-        { name: 'Teams', path: '/client/manage/teams' },
-        { name: 'Templates', path: '/client/manage/templates' }
-      ]
+      subItems: manageSubItems
     },
     { 
       name: 'Settings', 
@@ -119,6 +144,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <main className="main-content">
           {children}
         </main>
+        
+        {/* Global Tour Button */}
+        <TourButton />
+        
+        {/* Global Spotlight Search */}
+        <SpotlightSearch />
+
+        {/* Global RFQ Cart */}
+        <CartOverlay />
       </div>
     </IntakeProvider>
   );

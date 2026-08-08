@@ -114,8 +114,8 @@ export default function IntakeTablePage() {
 
     if (sortConfig) {
       result.sort((a, b) => {
-        const aVal = a[sortConfig.key];
-        const bVal = b[sortConfig.key];
+        const aVal = (a as any)[sortConfig.key];
+        const bVal = (b as any)[sortConfig.key];
         if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
         if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
@@ -185,7 +185,7 @@ export default function IntakeTablePage() {
           <button onClick={handleExport} style={{ padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: '6px', backgroundColor: '#fff', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
             <FileDown size={16} /> Export
           </button>
-          <Link href="/client/intake/create" style={{ padding: '8px 16px', border: 'none', borderRadius: '6px', backgroundColor: '#2563eb', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', textDecoration: 'none', boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.2)' }}>
+          <Link id="tour-create-intake" href="/client/intake/create" style={{ padding: '8px 16px', border: 'none', borderRadius: '6px', backgroundColor: '#2563eb', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', textDecoration: 'none', boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.2)' }}>
             <Plus size={16} /> Create Request
           </Link>
         </div>
@@ -279,8 +279,9 @@ export default function IntakeTablePage() {
                 </th>
                 {['Ref ID', 'Title', 'Requester Name', 'Status', 'Type', 'Requested At'].map((col) => {
                   const key = col === 'Type' ? 'type' : col === 'Requester Name' ? 'reqName' : col === 'Requested At' ? 'reqAt' : col === 'Ref ID' ? 'refId' : col.toLowerCase();
+                  const isStatus = col === 'Status';
                   return (
-                    <th key={col} onClick={() => handleSort(key)} style={{ padding: '16px 24px', fontWeight: 600, color: '#475569', cursor: 'pointer', userSelect: 'none' }}>
+                    <th id={isStatus ? 'tour-intake-status' : undefined} key={col} onClick={() => handleSort(key)} style={{ padding: '16px 24px', fontWeight: 600, color: '#475569', cursor: 'pointer', userSelect: 'none' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         {col}
                         <ArrowUpDown size={14} color="#cbd5e1" />

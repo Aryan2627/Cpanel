@@ -26,6 +26,7 @@ export async function POST(request: Request) {
         vendorId: data.vendorId,
         eventId: data.eventId,
         total: data.total || 0,
+        details: data.details || null
       }
     });
 

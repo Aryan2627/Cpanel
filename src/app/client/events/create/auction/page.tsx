@@ -1,8 +1,8 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function SingleStageCreatePage() {
+function SingleStageCreateContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTitle = searchParams.get('title') || '';
@@ -14,8 +14,12 @@ export default function SingleStageCreatePage() {
   const [isEventTypeOpen, setIsEventTypeOpen] = useState(false);
   
   const [template, setTemplate] = useState('Select Templates');
+  const [selectedTemplateObj, setSelectedTemplateObj] = useState<any>(null);
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
   const [dbTemplates, setDbTemplates] = useState<any[]>([]);
+
+  // State for dynamic creator fields
+  const [creatorData, setCreatorData] = useState<Record<string, string>>({});
 
   useEffect(() => {
     // Fetch Templates from database
@@ -172,7 +176,12 @@ export default function SingleStageCreatePage() {
                   dbTemplates.map((t: any) => (
                     <div 
                       key={t.id}
-                      onClick={() => { setTemplate(t.name); setIsTemplateOpen(false); }}
+                      onClick={() => { 
+                        setTemplate(t.name); 
+                        setSelectedTemplateObj(t); 
+                        setIsTemplateOpen(false);
+                        setCreatorData({}); 
+                      }}
                       style={{ padding: '8px 16px', cursor: 'pointer', whiteSpace: 'nowrap', borderBottom: '1px solid #f1f5f9' }}
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -257,6 +266,44 @@ export default function SingleStageCreatePage() {
                 ➕ Add Another Line Item
               </button>
             </div>
+            
+            {/* Dynamic Template Configuration Section */}
+            {selectedTemplateObj && (
+              <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid #e2e8f0' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>Template Configuration</h2>
+                <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '24px' }}>Fill in the fields required by you (the Creator) for this template.</p>
+                
+                {(() => {
+                  try {
+                    const fields = JSON.parse(selectedTemplateObj.fields) || [];
+                    const creatorFields = fields.filter((f: any) => f.role === 'Creator');
+                    
+                    if (creatorFields.length === 0) {
+                      return <div style={{ fontSize: '0.9rem', color: '#94a3b8' }}>This template has no Buyer-filled requirements.</div>;
+                    }
+
+                    return (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                        {creatorFields.map((f: any) => (
+                          <div key={f.id}>
+                            <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>{f.name}</label>
+                            <input 
+                              type="number" 
+                              placeholder={`Enter ${f.name}`}
+                              value={creatorData[f.key] || ''}
+                              onChange={(e) => setCreatorData({ ...creatorData, [f.key]: e.target.value })}
+                              style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  } catch(e) {
+                    return null;
+                  }
+                })()}
+              </div>
+            )}
           </div>
         </div>
 
@@ -356,7 +403,14 @@ export default function SingleStageCreatePage() {
                         type: eventType,
                         account: 'Internal',
                         itemsCount: 1,
-                        stages: [{ name: template, mode: eventMode }],
+                        stages: [{ 
+                          name: template, 
+                          mode: eventMode,
+                          templateFields: selectedTemplateObj ? JSON.parse(selectedTemplateObj.fields).map((f: any) => ({
+                            ...f,
+                            defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
+                          })) : [] 
+                        }],
                         participants: selectedVendors
                       })
                     });
@@ -394,3 +448,10 @@ export default function SingleStageCreatePage() {
   );
 }
 
+export default function SingleStageCreatePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SingleStageCreateContent />
+    </Suspense>
+  );
+}

@@ -10,10 +10,21 @@ export default function CreateProductPage() {
   const [categories, setCategories] = useState<any[]>([]);
   
   useEffect(() => {
-    fetch('/api/categories')
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(console.error);
+    const loadCategories = () => {
+      const saved = localStorage.getItem('customDropdowns');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setCategories(parsed.categories || []);
+        } catch (e) {}
+      }
+    };
+    
+    loadCategories();
+    
+    // Listen for updates from other tabs/components
+    window.addEventListener('customDropdowns_updated', loadCategories);
+    return () => window.removeEventListener('customDropdowns_updated', loadCategories);
   }, []);
   const [formData, setFormData] = useState({
     name: '',
@@ -77,22 +88,38 @@ export default function CreateProductPage() {
   return (
     <div style={{ backgroundColor: '#ffffff', color: '#333', borderRadius: '8px', minHeight: '100%', border: '1px solid #e5e7eb', padding: '32px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
       
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 2fr', gap: '32px', marginBottom: '48px' }}>
+      <div id="tour-product-form" style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 2fr', gap: '32px', marginBottom: '48px' }}>
         
         {/* Column 1: Image */}
-        <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Image:</label>
-          <label style={{ 
-            width: '100%', height: '200px', backgroundColor: '#f3f4f6', 
-            borderRadius: '4px', display: 'flex', alignItems: 'center', 
-            justifyContent: 'center', border: '1px dashed #d1d5db', cursor: 'pointer',
-            overflow: 'hidden', position: 'relative'
-          }}>
+        <div id="tour-product-image">
+          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#1f2937', marginBottom: '12px' }}>Product Image</label>
+          <label 
+            style={{ 
+              width: '100%', height: '240px', backgroundColor: '#f8fafc', 
+              borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', 
+              justifyContent: 'center', border: '2px dashed #cbd5e1', cursor: 'pointer',
+              overflow: 'hidden', position: 'relative', transition: 'all 0.2s ease',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.borderColor = '#3b82f6';
+              e.currentTarget.style.backgroundColor = '#eff6ff';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.borderColor = '#cbd5e1';
+              e.currentTarget.style.backgroundColor = '#f8fafc';
+            }}
+          >
             <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
             {imagePreview ? (
               <img src={imagePreview} alt="Product Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
-              <span style={{ fontSize: '2rem', color: '#9ca3af' }}>↑_</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: '1.5rem', color: '#4f46e5' }}>📸</span>
+                </div>
+                <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}>Click or drag to upload</span>
+              </div>
             )}
           </label>
         </div>
@@ -138,27 +165,13 @@ export default function CreateProductPage() {
               onChange={handleChange}
               style={{ width: '100%', padding: '10px 12px', borderRadius: '4px', border: '1px solid #d1d5db', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box', backgroundColor: '#fff', color: '#374151', appearance: 'none' }}>
               <option value="">Which category does your product belong to?</option>
-              {categories.filter(c => c.type === 'Category').map(cat => (
-                <option key={cat.id} value={cat.name}>{cat.name}</option>
+              {categories.map((cat, idx) => (
+                <option key={idx} value={cat}>{cat}</option>
               ))}
             </select>
           </div>
 
-          <div style={{ marginBottom: '32px' }}>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
-              <span style={{ color: '#ef4444' }}>*</span> Subcategory:
-            </label>
-            <select 
-              name="subCategory"
-              value={formData.subCategory}
-              onChange={handleChange}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: '4px', border: '1px solid #d1d5db', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box', backgroundColor: '#fff', color: '#374151', appearance: 'none' }}>
-              <option value="">Assign a subcategory for your product</option>
-              {categories.filter(c => c.type === 'Subcategory').map(cat => (
-                <option key={cat.id} value={cat.name}>{cat.name}</option>
-              ))}
-            </select>
-          </div>
+
 
           <button style={{ padding: '10px 16px', border: 'none', borderRadius: '4px', backgroundColor: '#2563eb', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: '500' }}>
             + ADD PRODUCT VARIANT
@@ -234,13 +247,22 @@ export default function CreateProductPage() {
 
       </div>
 
-      <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '24px' }}>
+      <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '32px', display: 'flex', justifyContent: 'flex-end' }}>
         <button 
           onClick={handleCreate}
           disabled={isSubmitting}
-          style={{ padding: '12px 24px', border: 'none', borderRadius: '4px', backgroundColor: isSubmitting ? '#94a3b8' : '#2563eb', color: '#fff', cursor: isSubmitting ? 'not-allowed' : 'pointer', fontSize: '0.9rem', fontWeight: '600' }}
+          style={{ 
+            padding: '14px 32px', border: 'none', borderRadius: '8px', 
+            background: isSubmitting ? '#94a3b8' : 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)', 
+            color: '#fff', cursor: isSubmitting ? 'not-allowed' : 'pointer', 
+            fontSize: '1rem', fontWeight: '600', letterSpacing: '0.025em',
+            boxShadow: isSubmitting ? 'none' : '0 10px 15px -3px rgba(37, 99, 235, 0.3)',
+            transition: 'transform 0.2s, box-shadow 0.2s'
+          }}
+          onMouseOver={(e) => { if (!isSubmitting) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 15px 20px -3px rgba(37, 99, 235, 0.4)'; } }}
+          onMouseOut={(e) => { if (!isSubmitting) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(37, 99, 235, 0.3)'; } }}
         >
-          {isSubmitting ? 'CREATING...' : 'CREATE'}
+          {isSubmitting ? 'CREATING...' : 'CREATE PRODUCT'}
         </button>
       </div>
       

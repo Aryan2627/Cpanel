@@ -17,11 +17,11 @@ export default function VendorManagement() {
     dealsIn: '', tradeLicense: '', inviteVia: 'Tax ID', city: ''
   });
 
-  const [vendors, setVendors] = useState<any[]>([
+  const initialMockVendors = [
     {
       id: 'mock1', name: 'Alpha Technologies', vendorCode: 'V-10045', companyCode: 'C-90',
       email: 'contact@alphatech.com', phone: '+1 555-0198', type: 'Manufacturer',
-      city: 'San Francisco', status: 'Joined'
+      city: 'San Francisco', status: 'Joined', liveEventId: 'EVT-0042'
     },
     {
       id: 'mock2', name: 'Global Supply Co.', vendorCode: 'V-10046', companyCode: 'C-91',
@@ -33,32 +33,21 @@ export default function VendorManagement() {
       email: 'spam@untrustworthy.com', phone: '+1 555-0000', type: 'Broker',
       city: 'Unknown', status: 'Blacklisted'
     }
-  ]);
+  ];
+
+  const [vendors, setVendors] = useState<any[]>(initialMockVendors);
 
   useEffect(() => {
-    fetch('/api/vendors')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          const formatted = data.map((v: any) => ({
-            id: v.id,
-            name: v.name || '-',
-            vendorCode: v.vendorCode || '-',
-            companyCode: v.companyCode || '-',
-            email: v.email || '-',
-            phone: v.phone || '-',
-            type: v.type || 'Selling firm',
-            city: v.city || '-',
-            status: v.status || 'Invited'
-          }));
-          setVendors(prev => {
-            const existingIds = new Set(prev.map(p => p.id));
-            const newVendors = formatted.filter(v => !existingIds.has(v.id));
-            return [...newVendors, ...prev];
-          });
-        }
-      })
-      .catch(err => console.error(err));
+    const saved = localStorage.getItem('customVendors');
+    if (saved) {
+      try {
+        setVendors(JSON.parse(saved));
+      } catch(e) {}
+    } else {
+      // Seed with mock data initially
+      localStorage.setItem('customVendors', JSON.stringify(initialMockVendors));
+      setVendors(initialMockVendors);
+    }
   }, []);
 
   const handleSubmit = async () => {
@@ -68,32 +57,21 @@ export default function VendorManagement() {
     }
     
     setIsSubmitting(true);
-    try {
-      const res = await fetch('/api/vendors', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name, email: formData.email, type: formData.type,
-          vendorCode: formData.vendorCode, dealsIn: formData.dealsIn,
-          tradeLicense: formData.tradeLicense, city: formData.city, status: 'Invited'
-        })
-      });
-      
-      if (res.ok) {
-        const newVendor = await res.json();
-        setVendors([{
-          id: newVendor.id, name: newVendor.name, vendorCode: newVendor.vendorCode || '-',
-          companyCode: '-', email: newVendor.email, phone: '-',
-          type: newVendor.type || 'Selling firm', city: newVendor.city || '-', status: 'Invited'
-        }, ...vendors]);
-        
-        setIsInviteOpen(false);
-        setFormData({ name: '', email: '', type: 'Manufacturer/Trader', vendorCode: '', dealsIn: '', tradeLicense: '', inviteVia: 'Tax ID', city: '' });
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Error inviting vendor');
-    }
+    
+    const newVendor = {
+      id: 'V-' + Date.now(),
+      name: formData.name, vendorCode: formData.vendorCode || '-',
+      companyCode: '-', email: formData.email, phone: '-',
+      type: formData.type || 'Selling firm', city: formData.city || '-', status: 'Invited'
+    };
+
+    const updatedVendors = [newVendor, ...vendors];
+    setVendors(updatedVendors);
+    localStorage.setItem('customVendors', JSON.stringify(updatedVendors));
+    window.dispatchEvent(new Event('customVendors_updated'));
+    
+    setIsInviteOpen(false);
+    setFormData({ name: '', email: '', type: 'Manufacturer/Trader', vendorCode: '', dealsIn: '', tradeLicense: '', inviteVia: 'Tax ID', city: '' });
     setIsSubmitting(false);
   };
 

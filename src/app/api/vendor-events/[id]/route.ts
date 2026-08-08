@@ -1,0 +1,73 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '../../../../lib/prisma';
+import jwt from 'jsonwebtoken';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-local-dev';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
+  try {
+    const params = await context.params;
+    
+    // Auth Check
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized: Missing or invalid token' }, { status: 401, headers: corsHeaders });
+    }
+
+    const token = authHeader.split(' ')[1];
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      return NextResponse.json({ error: 'Unauthorized: Invalid token signature' }, { status: 401, headers: corsHeaders });
+    }
+
+    const email = decoded.email;
+    if (!email) {
+      return NextResponse.json({ error: 'Invalid token payload' }, { status: 400, headers: corsHeaders });
+    }
+
+    // Fetch single event
+    const event = await prisma.event.findUnique({
+      where: { id: params.id }
+    });
+
+    if (!event) {
+      return NextResponse.json({ error: 'Event not found' }, { status: 404, headers: corsHeaders });
+    }
+
+    // Ensure this vendor is actually a participant
+    let isParticipant = false;
+    if (event.participants) {
+      try {
+        const participants = JSON.parse(event.participants);
+        if (Array.isArray(participants)) {
+          isParticipant = participants.some((p: any) => p.email && p.email.toLowerCase() === email.toLowerCase());
+        }
+      } catch(e) {
+        // ignore JSON parse error
+      }
+    }
+
+    if (!isParticipant) {
+      return NextResponse.json({ error: 'Unauthorized: Not a participant of this event' }, { status: 403, headers: corsHeaders });
+    }
+
+    return NextResponse.json(event, { status: 200, headers: corsHeaders });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
+  }
+}

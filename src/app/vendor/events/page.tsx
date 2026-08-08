@@ -1,61 +1,28 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function VendorEventsPage() {
   const [activeTab, setActiveTab] = useState('Live');
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
-  const [bidPrice, setBidPrice] = useState('');
+  const [events, setEvents] = useState<any[]>([]);
+  const router = useRouter();
   
-  // Mock data + dynamic state for events
-  const [events, setEvents] = useState<any[]>([
-    {
-      id: 'EVT-2026-001',
-      title: 'IT Equipment Procurement',
-      type: 'Rank based',
-      status: 'Live',
-      targetPrice: 5000,
-      bestPrice: 4200, 
-      endDate: '2026-07-05T12:00:00Z',
-      competitorBids: [4200, 4350, 4500, 4800] 
-    },
-    {
-      id: 'EVT-2026-002',
-      title: 'Office Supplies Bulk Order',
-      type: 'Price based',
-      status: 'Live',
-      targetPrice: 1500,
-      bestPrice: 1350,
-      endDate: '2026-07-10T15:00:00Z'
-    },
-    {
-      id: 'EVT-2026-003',
-      title: 'Logistics Partnership 2026',
-      type: 'Rank based',
-      status: 'Open',
-      targetPrice: 12000,
-      bestPrice: null, 
-      endDate: '2026-08-01T10:00:00Z',
-      competitorBids: [] 
-    },
-    {
-      id: 'EVT-2025-099',
-      title: 'Furniture Renewal',
-      type: 'Price based',
-      status: 'History',
-      targetPrice: 8000,
-      bestPrice: 7500,
-      endDate: '2025-12-01T10:00:00Z'
-    }
-  ]);
-
   useEffect(() => {
-    fetch('/api/events')
+    const token = localStorage.getItem('vendor_token');
+    if (!token) {
+      router.push('/vendor');
+      return;
+    }
+    fetch('/api/vendor-events', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
           const liveEvents = data.map(dbEvent => ({
-            id: dbEvent.refId,
+            id: dbEvent.id, // Use actual DB id for navigation
+            refId: dbEvent.refId,
             title: dbEvent.title || 'Untitled Event',
             type: dbEvent.type || 'Price based',
             status: 'Live', // Assume newly created events are Live for now
@@ -64,61 +31,13 @@ export default function VendorEventsPage() {
             endDate: new Date(Date.now() + 86400000 * 2).toISOString(), // 48 hours from now
             competitorBids: dbEvent.type === 'Rank based' ? [9500, 9800, 10500] : []
           }));
-          
-          setEvents(prev => {
-            // Merge to prevent duplicates if refId already exists
-            const existingIds = new Set(prev.map(p => p.id));
-            const newEvents = liveEvents.filter(e => !existingIds.has(e.id));
-            return [...newEvents, ...prev];
-          });
+          setEvents(liveEvents);
         }
       })
       .catch(err => console.error("Error fetching live events:", err));
-  }, []);
+  }, [router]);
 
   const filteredEvents = events.filter(e => e.status === activeTab);
-
-  const calculateRank = (price: number, competitors: number[]) => {
-    if (!price || isNaN(price)) return '-';
-    const allBids = [...competitors, price].sort((a, b) => a - b);
-    return allBids.indexOf(price) + 1;
-  };
-
-  const getPriceColor = (price: number, bestPrice: number | null, targetPrice: number) => {
-    if (!price || isNaN(price)) return '#f8fafc'; 
-    if (bestPrice && price <= bestPrice) return '#10b981'; // Neon Green
-    if (!bestPrice && price <= targetPrice) return '#10b981'; 
-    if (price <= targetPrice) return '#a3e635'; // Lime Green
-    if (price <= targetPrice * 1.1) return '#f59e0b'; // Amber
-    return '#ef4444'; // Red
-  };
-
-  const currentPrice = parseFloat(bidPrice);
-
-  const submitBid = async () => {
-    if (!bidPrice) return;
-    try {
-      const res = await fetch('/api/bids', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventId: selectedEvent.id,
-          vendorId: 'vendor-mock-id', // In a real app, from session
-          vendorName: 'Demo Vendor',
-          amount: parseFloat(bidPrice)
-        })
-      });
-      if (res.ok) {
-        alert(`Successfully locked in bid of $${bidPrice}`);
-        setSelectedEvent(null);
-        setBidPrice('');
-      } else {
-        alert('Error submitting bid');
-      }
-    } catch(err) {
-      alert('Error submitting bid');
-    }
-  };
 
   return (
     <div className="app-container">
@@ -137,6 +56,7 @@ export default function VendorEventsPage() {
           <li><Link href="#">My Bids</Link></li>
           <li><Link href="#">Purchase Orders</Link></li>
           <li><Link href="/vendor/contracts">Contracts</Link></li>
+          <li><Link href="/vendor/messages">Messages</Link></li>
         </ul>
         
         <div style={{ padding: '24px', marginTop: 'auto' }}>
@@ -210,7 +130,7 @@ export default function VendorEventsPage() {
                   <div style={{ padding: '16px 24px', background: '#f8fafc', borderTop: '1px solid var(--surface-border)' }}>
                     {activeTab !== 'History' ? (
                       <button 
-                        onClick={() => { setSelectedEvent(event); setBidPrice(''); }}
+                        onClick={() => router.push(`/vendor/events/${event.id}`)}
                         className="btn btn-primary"
                         style={{ width: '100%' }}
                       >
@@ -228,137 +148,6 @@ export default function VendorEventsPage() {
           </div>
         </div>
       </main>
-
-      {/* Premium Glassmorphism E-Bidding Modal */}
-      {selectedEvent && (
-        <div style={{ 
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-          background: 'rgba(2, 6, 23, 0.8)', backdropFilter: 'blur(16px)', 
-          background: 'rgba(2, 6, 23, 0.5)', backdropFilter: 'blur(8px)', 
-          zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '24px'
-        }}>
-          <div style={{ position: 'relative', width: '100%', maxWidth: '800px', background: 'var(--bg-color)', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
-            
-            {/* Modal Header */}
-            <div style={{ background: 'var(--surface-color)', borderBottom: '1px solid var(--surface-border)', padding: '32px 40px', position: 'relative' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <div style={{ color: 'var(--primary-color)', fontSize: '0.85rem', fontWeight: '700', letterSpacing: '1px', marginBottom: '8px' }}>{selectedEvent.id}</div>
-                  <h2 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>{selectedEvent.title}</h2>
-                </div>
-                <button 
-                  onClick={() => setSelectedEvent(null)}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '1.5rem', cursor: 'pointer', padding: '4px' }}
-                >
-                  &times;
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Body */}
-            <div style={{ padding: '40px' }}>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px' }}>
-                <div style={{ background: 'var(--surface-color)', padding: '20px', borderRadius: '16px', border: '1px solid var(--surface-border)' }}>
-                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Target Price</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>${selectedEvent.targetPrice.toLocaleString()}</div>
-                </div>
-                <div style={{ background: 'var(--surface-color)', padding: '20px', borderRadius: '16px', border: '1px solid var(--surface-border)' }}>
-                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Event Mode</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="badge badge-pending" style={{ fontSize: '1rem', padding: '6px 16px' }}>
-                      {selectedEvent.type}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-                {/* Bidding Engine Area */}
-                <div style={{ position: 'relative' }}>
-                  <label style={{ display: 'block', fontSize: '1.1rem', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '16px' }}>Submit Your Quote</label>
-                  
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-                    <div style={{ position: 'relative', flex: 1 }}>
-                      <span style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: selectedEvent.type === 'Price based' ? getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice) : 'var(--text-secondary)', fontSize: '1.5rem', transition: 'color 0.3s' }}>$</span>
-                      <input 
-                        type="number"
-                        value={bidPrice}
-                        onChange={(e) => setBidPrice(e.target.value)}
-                        placeholder="0.00"
-                        style={{ 
-                          width: '100%', padding: '20px 20px 20px 50px', fontSize: '1.75rem', fontWeight: '800', 
-                          borderRadius: '16px', background: 'var(--surface-color)', border: '2px solid var(--surface-border)',
-                          color: 'var(--text-primary)',
-                          outline: 'none', transition: 'all 0.3s ease',
-                          boxShadow: currentPrice > 0 && selectedEvent.type === 'Price based' 
-                            ? `0 0 0 2px ${getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice)}` 
-                            : '0 1px 3px rgba(0,0,0,0.05)'
-                        }}
-                      />
-                    </div>
-                    
-                    {/* Dynamic Rank Widget */}
-                    {selectedEvent.type === 'Rank based' && (
-                      <div style={{ 
-                        width: '140px', height: '80px', borderRadius: '16px', 
-                        background: 'var(--surface-color)', 
-                        border: '1px solid var(--surface-border)',
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                        transition: 'all 0.3s'
-                      }}>
-                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-secondary)', letterSpacing: '1px', marginBottom: '4px' }}>Your Rank</div>
-                        <div style={{ fontSize: '2rem', fontWeight: '900', color: currentPrice > 0 ? 'var(--warning-color)' : 'var(--text-primary)' }}>
-                          {currentPrice > 0 ? `#${calculateRank(currentPrice, selectedEvent.competitorBids)}` : '-'}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                
-                {/* Dynamic Price Feedback */}
-                {selectedEvent.type === 'Price based' && currentPrice > 0 && (
-                  <div style={{ 
-                    marginTop: '20px', padding: '16px', borderRadius: '12px',
-                    background: `${getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice)}15`,
-                    borderLeft: `4px solid ${getPriceColor(currentPrice, selectedEvent.bestPrice, selectedEvent.targetPrice)}`,
-                    color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: '500' 
-                  }}>
-                    {currentPrice <= (selectedEvent.bestPrice || selectedEvent.targetPrice) ? 
-                      "✨ Excellent! Your price is highly competitive in the current market." : 
-                      "⚠️ Your price is higher than the current best offer. Consider optimizing to win."}
-                  </div>
-                )}
-              </div>
-
-            </div>
-
-            {/* Modal Footer */}
-            <div style={{ padding: '24px 40px', background: 'var(--surface-color)', borderTop: '1px solid var(--surface-border)', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
-              <button 
-                onClick={() => setSelectedEvent(null)}
-                className="btn btn-secondary"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={submitBid}
-                disabled={!bidPrice}
-                className="btn btn-primary"
-                style={{ 
-                  padding: '14px 36px', 
-                  fontSize: '1rem',
-                  opacity: bidPrice ? 1 : 0.5,
-                  cursor: bidPrice ? 'pointer' : 'not-allowed',
-                }}
-              >
-                Lock In Bid
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
 
     </div>
   );

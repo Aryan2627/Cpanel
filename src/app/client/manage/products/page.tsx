@@ -128,8 +128,18 @@ export default function ProductsPage() {
                   <td style={{ padding: '16px 24px', color: '#4b5563' }}>{prod.createdBy}</td>
                   <td style={{ padding: '16px 24px', color: '#4b5563' }}>{new Date(prod.createdAt).toLocaleDateString()}</td>
                   <td style={{ padding: '16px 24px', color: '#4b5563' }}>
-                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: '#4b5563' }}>
-                      ⋮
+                    <button 
+                      onClick={() => {
+                        const currentCart = JSON.parse(localStorage.getItem('rfqCart') || '[]');
+                        if (!currentCart.find((p: any) => p.id === prod.id)) {
+                          const newCart = [...currentCart, prod];
+                          localStorage.setItem('rfqCart', JSON.stringify(newCart));
+                          window.dispatchEvent(new Event('cart_updated'));
+                        }
+                      }}
+                      style={{ padding: '6px 12px', border: '1px solid #3b82f6', borderRadius: '4px', backgroundColor: '#eff6ff', color: '#1d4ed8', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600' }}
+                    >
+                      + Add to Cart
                     </button>
                   </td>
                 </tr>

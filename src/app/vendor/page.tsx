@@ -11,6 +11,7 @@ export default function VendorPortal() {
           <li><Link href="#">My Bids</Link></li>
           <li><Link href="#">Purchase Orders</Link></li>
           <li><Link href="/vendor/contracts">Contracts</Link></li>
+          <li><Link href="/vendor/messages">Messages</Link></li>
           <li><Link href="#">Profile Settings</Link></li>
         </ul>
         <div style={{ padding: '24px' }}>

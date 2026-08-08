@@ -2,10 +2,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  Search, Plus, ChevronDown, Activity, 
-  Clock, FileCheck, Users, X, Award, Eye, 
-  AlertCircle, ShieldCheck, CheckCircle2,
-  TrendingUp, BarChart3
+  Search, Plus, Activity, AlertCircle, Clock, CheckCircle2, 
+  TrendingUp, BarChart3, Users, Filter, Check, X, 
+  ShieldCheck, Edit2, Eye, ChevronDown, Award, FileCheck
 } from 'lucide-react';
 
 export default function EventsPage() {
@@ -16,14 +15,24 @@ export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const [dbEvents, setDbEvents] = useState<any[]>([]);
+  const [now, setNow] = useState(new Date());
+  
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
   
   // Modal states for View Bids
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [bids, setBids] = useState<any[]>([]);
   const [isBidsLoading, setIsBidsLoading] = useState(false);
 
+  // Edit Time State
+  const [editingTimeFor, setEditingTimeFor] = useState<{ eventId: string, sIdx: number } | null>(null);
+  const [newTimeVal, setNewTimeVal] = useState('');
+
   // Mock Events
-  const mockEvents = [
+  const [mockEvents, setMockEvents] = useState<any[]>([
     {
       id: 'mock-1',
       account: 'Enterprise Corp',
@@ -64,7 +73,7 @@ export default function EventsPage() {
         }
       ]
     }
-  ];
+  ]);
 
   useEffect(() => {
     fetch('/api/events')
@@ -77,6 +86,7 @@ export default function EventsPage() {
             refId: dbEvent.refId,
             itemsCount: dbEvent.itemsCount || 1,
             title: dbEvent.title || 'Untitled Sourcing Event',
+            endTime: dbEvent.endTime,
             stages: [
               {
                 name: 'Live RFQ (Database)',
@@ -110,29 +120,33 @@ export default function EventsPage() {
         event.account.toLowerCase().includes(query);
 
       let matchesStage = true;
+      let isHistorical = false;
+      
+      if (event.endTime) {
+        isHistorical = now > new Date(event.endTime);
+      } else {
+        isHistorical = event.stages.every((s: any) => s.timeText && (s.timeText.includes('Ended') || s.timeText.includes('History') || s.timeText.includes('Overdue')));
+      }
+
       if (activeStageFilter === 'Live') {
-        matchesStage = event.stages.some((s: any) => s.timeText.includes('Live'));
+        matchesStage = event.endTime ? !isHistorical : event.stages.some((s: any) => s.timeText && s.timeText.includes('Live'));
       } else if (activeStageFilter === 'Action Required') {
         matchesStage = event.stages.some((s: any) => s.actionText);
       }
 
-      return matchesSearch && matchesStage;
+      let matchesTab = true;
+      if (activeTab === 'LIVE') {
+        matchesTab = !isHistorical;
+      } else if (activeTab === 'HISTORY') {
+        matchesTab = isHistorical;
+      }
+
+      return matchesSearch && matchesStage && matchesTab;
     });
-  }, [searchQuery, activeStageFilter, allEvents]);
+  }, [searchQuery, activeStageFilter, activeTab, allEvents, now]);
 
   const handleViewBids = async (eventId: string) => {
-    setSelectedEventId(eventId);
-    setIsBidsLoading(true);
-    try {
-      const res = await fetch(`/api/bids?eventId=${eventId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setBids(data);
-      }
-    } catch(err) {
-      console.error(err);
-    }
-    setIsBidsLoading(false);
+    router.push(`/client/events/${eventId}`);
   };
 
   const handleAward = async (bid: any) => {
@@ -175,10 +189,40 @@ export default function EventsPage() {
     }
   };
 
+  const saveNewTime = (eventId: string, sIdx: number, isDbEvent: boolean) => {
+    if (!newTimeVal) {
+      setEditingTimeFor(null);
+      return;
+    }
+    
+    if (isDbEvent) {
+      setDbEvents(prev => prev.map(e => {
+        if (e.id === eventId) {
+          const newStages = [...e.stages];
+          newStages[sIdx].timeText = `Ends on ${newTimeVal}`;
+          newStages[sIdx].timeColor = '#475569';
+          return { ...e, stages: newStages };
+        }
+        return e;
+      }));
+    } else {
+      setMockEvents(prev => prev.map(e => {
+        if (e.id === eventId) {
+          const newStages = [...e.stages];
+          newStages[sIdx].timeText = `Ends on ${newTimeVal}`;
+          newStages[sIdx].timeColor = '#475569';
+          return { ...e, stages: newStages };
+        }
+        return e;
+      }));
+    }
+    setEditingTimeFor(null);
+  };
+
   // KPI calculations
   const totalEvents = allEvents.length;
-  const liveEvents = allEvents.filter(e => e.stages.some(s => s.timeText.includes('Live') || s.timeText.includes('Ends'))).length;
-  const actionRequired = allEvents.filter(e => e.stages.some(s => s.actionType === 'warning')).length;
+  const liveEvents = allEvents.filter(e => e.stages.some((s: any) => s.timeText.includes('Live') || s.timeText.includes('Ends in'))).length;
+  const actionRequired = allEvents.filter(e => e.stages.some((s: any) => s.actionType === 'warning')).length;
 
   return (
     <div style={{ backgroundColor: '#f8fafc', color: '#333', minHeight: '100%', padding: '24px', fontFamily: 'system-ui, sans-serif' }}>
@@ -326,8 +370,51 @@ export default function EventsPage() {
                     </div>
 
                     {/* Time */}
-                    <div style={{ color: stage.timeColor, fontWeight: stage.timeColor === '#dc2626' ? 600 : 400, fontSize: '0.875rem' }}>
-                      {stage.timeText}
+                    <div style={{ color: stage.timeColor, fontWeight: stage.timeColor === '#dc2626' ? 600 : 400, fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {editingTimeFor?.eventId === event.id && editingTimeFor?.sIdx === sIdx ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <input 
+                            type="date" 
+                            value={newTimeVal}
+                            onChange={e => setNewTimeVal(e.target.value)}
+                            style={{ padding: '2px 4px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.8rem', outline: 'none' }}
+                          />
+                          <button onClick={() => saveNewTime(event.id, sIdx, !!dbEvents.find(e => e.id === event.id))} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', padding: '2px', cursor: 'pointer', display: 'flex' }}><Check size={14} /></button>
+                          <button onClick={() => setEditingTimeFor(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', padding: '2px', cursor: 'pointer', display: 'flex' }}><X size={14} /></button>
+                        </div>
+                      ) : (
+                        <>
+                          {(() => {
+                            if (event.endTime) {
+                              const end = new Date(event.endTime);
+                              const diff = end.getTime() - now.getTime();
+                              if (diff <= 0) return <span style={{ color: '#dc2626' }}>Ended</span>;
+                              
+                              const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                              const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                              const m = Math.floor((diff / 1000 / 60) % 60);
+                              const s = Math.floor((diff / 1000) % 60);
+                              
+                              let timeStr = '';
+                              if (d > 0) timeStr = `${d}d ${h}h remaining`;
+                              else if (h > 0) timeStr = `${h}h ${m}m remaining`;
+                              else timeStr = `${m}m ${s}s remaining`;
+                              
+                              return <span style={{ color: '#3b82f6', fontWeight: 600 }}>{timeStr}</span>;
+                            }
+                            return stage.timeText;
+                          })()}
+                          <button 
+                            onClick={() => { setEditingTimeFor({ eventId: event.id, sIdx }); setNewTimeVal(''); }}
+                            style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.2s' }}
+                            onMouseOver={(e) => e.currentTarget.style.color = '#3b82f6'}
+                            onMouseOut={(e) => e.currentTarget.style.color = '#94a3b8'}
+                            title="Edit Event Time"
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                        </>
+                      )}
                     </div>
 
                     {/* Participants */}

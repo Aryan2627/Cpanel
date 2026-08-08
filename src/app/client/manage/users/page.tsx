@@ -8,7 +8,8 @@ export default function UsersPage() {
 
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', role: '', erpId: '', status: 'Active' });
+  const [departments, setDepartments] = useState<string[]>([]);
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', role: '', erpId: '', status: 'Active', department: '' });
 
   const [searchField, setSearchField] = useState('name');
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,6 +26,20 @@ export default function UsersPage() {
 
   useEffect(() => {
     fetchUsers();
+    
+    const loadDepartments = () => {
+      const saved = localStorage.getItem('customDropdowns');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setDepartments(parsed.departments || []);
+        } catch (e) {}
+      }
+    };
+    
+    loadDepartments();
+    window.addEventListener('customDropdowns_updated', loadDepartments);
+    return () => window.removeEventListener('customDropdowns_updated', loadDepartments);
   }, []);
 
   const handleCreate = async () => {
@@ -39,7 +54,7 @@ export default function UsersPage() {
         body: JSON.stringify(formData)
       });
       setIsCreateModalOpen(false);
-      setFormData({ name: '', email: '', phone: '', role: '', erpId: '', status: 'Active' });
+      setFormData({ name: '', email: '', phone: '', role: '', erpId: '', status: 'Active', department: '' });
       fetchUsers();
     } catch (err) {
       console.error(err);
@@ -165,9 +180,17 @@ export default function UsersPage() {
                     <td style={{ padding: '16px', color: '#4b5563', borderRight: '1px solid #e5e7eb' }}>{user.name}</td>
                     <td style={{ padding: '16px', color: '#4b5563', borderRight: '1px solid #e5e7eb' }}>{user.email}</td>
                     <td style={{ padding: '16px', color: '#4b5563', borderRight: '1px solid #e5e7eb' }}>{user.phone}</td>
-                    <td style={{ padding: '16px', color: '#4b5563', borderRight: '1px solid #e5e7eb' }}>{user.role}</td>
+                    <td id="tour-user-roles" style={{ padding: '16px', color: '#4b5563', borderRight: '1px solid #e5e7eb' }}>
+                      <span style={{ 
+                        backgroundColor: user.role === 'Super Admin' ? '#fef2f2' : user.role === 'Manager' ? '#f0fdf4' : '#eff6ff', 
+                        color: user.role === 'Super Admin' ? '#dc2626' : user.role === 'Manager' ? '#16a34a' : '#2563eb', 
+                        padding: '4px 10px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: '600' 
+                      }}>
+                        {user.role}
+                      </span>
+                    </td>
                     <td style={{ padding: '16px', borderRight: '1px solid #e5e7eb' }}>
-                      <button style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #3b82f6', color: '#3b82f6', backgroundColor: '#eff6ff', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold' }}>
+                      <button style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #3b82f6', color: '#3b82f6', backgroundColor: '#eff6ff', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold', transition: 'all 0.2s' }} onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#3b82f6'; e.currentTarget.style.color = '#fff'; }} onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#eff6ff'; e.currentTarget.style.color = '#3b82f6'; }}>
                         +
                       </button>
                     </td>
@@ -185,17 +208,21 @@ export default function UsersPage() {
       {isCreateModalOpen && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-          backgroundColor: 'rgba(0,0,0,0.4)', zIndex: 50,
-          display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end'
+          backgroundColor: 'rgba(15, 23, 42, 0.4)', 
+          backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+          zIndex: 50,
+          display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
+          animation: 'fadeIn 0.2s ease-out'
         }}>
           {/* Slide-out panel from the right */}
           <div style={{ 
             backgroundColor: '#fff', width: '500px', height: '100%', 
-            boxShadow: '-4px 0 15px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column'
+            boxShadow: '-10px 0 25px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column',
+            animation: 'slideLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
           }}>
-            <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#111827' }}>Create User</h2>
-              <button onClick={() => setIsCreateModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', color: '#9ca3af', cursor: 'pointer' }}>×</button>
+            <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#111827', fontWeight: '700' }}>Create New User</h2>
+              <button onClick={() => setIsCreateModalOpen(false)} style={{ background: '#e2e8f0', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', color: '#475569', cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#cbd5e1'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}>✕</button>
             </div>
             
             <div style={{ padding: '24px', flex: 1, overflowY: 'auto' }}>
@@ -277,20 +304,21 @@ export default function UsersPage() {
                 </div>
               </div>
 
-              <h3 style={{ fontSize: '1rem', color: '#111827', margin: '0 0 16px 0' }}>Assign Teams and Team Roles</h3>
+              <h3 style={{ fontSize: '1rem', color: '#111827', margin: '0 0 16px 0' }}>Assign Department</h3>
               
-              {/* Add Team */}
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
-                  Add Team :
+                  Department :
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <span style={{ position: 'absolute', left: '12px', top: '10px', color: '#9ca3af' }}>🔍</span>
-                  <select style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: '4px', border: '1px solid #d1d5db', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box', backgroundColor: '#fff', color: '#9ca3af', appearance: 'none' }}>
-                    <option>Select Team</option>
-                    <option>Procurement</option>
-                    <option>Finance</option>
-                    <option>Engineering</option>
+                  <select 
+                    value={formData.department}
+                    onChange={e => setFormData({ ...formData, department: e.target.value })}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '4px', border: '1px solid #d1d5db', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box', backgroundColor: '#fff', color: formData.department ? '#374151' : '#9ca3af', appearance: 'none' }}>
+                    <option value="">Select Department</option>
+                    {departments.map((dept, idx) => (
+                      <option key={idx} value={dept}>{dept}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -298,17 +326,23 @@ export default function UsersPage() {
             </div>
             
             <div style={{ padding: '24px', borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'flex-end', gap: '12px', backgroundColor: '#f9fafb' }}>
-               <button 
-                  onClick={() => setIsCreateModalOpen(false)}
-                  style={{ padding: '10px 20px', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: '#fff', color: '#374151', cursor: 'pointer', fontWeight: '500', fontSize: '0.9rem' }}>
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleCreate}
-                  disabled={!formData.name || !formData.email || !formData.phone || !formData.role}
-                  style={{ padding: '10px 20px', border: 'none', borderRadius: '4px', backgroundColor: (!formData.name || !formData.email || !formData.phone || !formData.role) ? '#9ca3af' : '#2563eb', color: '#fff', cursor: (!formData.name || !formData.email || !formData.phone || !formData.role) ? 'not-allowed' : 'pointer', fontWeight: '500', fontSize: '0.9rem' }}>
-                  Save User
-                </button>
+              <button 
+                onClick={() => setIsCreateModalOpen(false)}
+                style={{ padding: '10px 20px', border: '1px solid #d1d5db', borderRadius: '6px', backgroundColor: '#fff', color: '#374151', cursor: 'pointer', fontWeight: '500', transition: 'background-color 0.2s' }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fff'}
+              >
+                Cancel
+              </button>
+              <button 
+                id="tour-save-user-btn"
+                onClick={handleCreate}
+                style={{ padding: '10px 20px', border: 'none', borderRadius: '6px', background: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)', color: '#fff', cursor: 'pointer', fontWeight: '600', boxShadow: '0 4px 6px rgba(37, 99, 235, 0.2)', transition: 'transform 0.2s, box-shadow 0.2s' }}
+                onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 10px rgba(37, 99, 235, 0.3)'; }}
+                onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 6px rgba(37, 99, 235, 0.2)'; }}
+              >
+                Create User
+              </button>
             </div>
           </div>
         </div>

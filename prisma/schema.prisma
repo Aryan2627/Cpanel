@@ -93,6 +93,7 @@ model Event {
   itemsCount  Int      @default(1)
   stages      String?  // JSON string of stages array
   participants String? // JSON string of invited vendors array
+  endTime     DateTime?
   createdAt   DateTime @default(now())
 }
 
@@ -121,6 +122,7 @@ model PurchaseOrder {
   vendorId  String?
   eventId   String?
   total     Float    @default(0)
+  details   String?  // JSON string containing detailed template and items
   source    String   @default("Manual")
   erpId     String?
   erpStatus String   @default("Pending Sync")
@@ -128,13 +130,14 @@ model PurchaseOrder {
 }
 
 model Bid {
-  id         String   @id @default(uuid())
-  eventId    String
-  vendorId   String
-  vendorName String?
-  amount     Float
-  status     String   @default("Submitted")
-  createdAt  DateTime @default(now())
+  id           String   @id @default(uuid())
+  eventId      String
+  vendorId     String
+  vendorName   String?
+  amount       Float
+  templateData String?  // JSON string
+  status       String   @default("Submitted")
+  createdAt    DateTime @default(now())
 }
 
 model Contract {
