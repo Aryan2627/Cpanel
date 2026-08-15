@@ -3,23 +3,30 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   FileCode2, PlusCircle, Search, Filter, 
-  MoreVertical, FileText, Code2, PlayCircle 
+  MoreVertical, FileText, Code2, PlayCircle, Trash2
 } from 'lucide-react';
 
 export default function TemplatesPage() {
   const [templates, setTemplates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState('All');
 
   useEffect(() => {
-    const loadTemplates = () => {
-      const saved = localStorage.getItem('customTemplates');
-      if (saved) {
-        try {
-          setTemplates(JSON.parse(saved));
-        } catch (e) {
-          console.error('Failed to parse templates', e);
+    const loadTemplates = async () => {
+      try {
+        const res = await fetch('/api/templates');
+        if (res.ok) {
+          const data = await res.json();
+          // We need to parse fields if it is a string from the DB
+          const parsedData = data.map((t: any) => ({
+            ...t,
+            fields: typeof t.fields === 'string' ? JSON.parse(t.fields) : t.fields
+          }));
+          setTemplates(parsedData);
         }
+      } catch (e) {
+        console.error('Failed to load templates', e);
       }
       setLoading(false);
     };
@@ -30,9 +37,26 @@ export default function TemplatesPage() {
     return () => window.removeEventListener('templates_updated', loadTemplates);
   }, []);
 
-  const filteredTemplates = templates.filter(tpl => 
-    tpl.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTemplates = templates.filter(tpl => {
+    const matchesSearch = tpl.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = filterType === 'All' || tpl.type === filterType || (!tpl.type && filterType === 'RFQ');
+    return matchesSearch && matchesType;
+  });
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this template?')) return;
+    try {
+      const res = await fetch(`/api/templates/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setTemplates(prev => prev.filter(t => t.id !== id));
+      } else {
+        alert('Failed to delete template');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error deleting template');
+    }
+  };
 
   return (
     <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100%', fontFamily: 'system-ui, sans-serif' }}>
@@ -84,9 +108,19 @@ export default function TemplatesPage() {
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button style={{ padding: '8px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#fff', color: '#475569', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>
-              <Filter size={16} /> Filter
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden' }}>
+              <div style={{ padding: '0 8px 0 12px', display: 'flex' }}><Filter size={16} color="#94a3b8" /></div>
+              <select 
+                value={filterType} 
+                onChange={e => setFilterType(e.target.value)}
+                style={{ padding: '8px 12px 8px 0', border: 'none', outline: 'none', backgroundColor: 'transparent', color: '#475569', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer' }}
+              >
+                <option value="All">All Categories</option>
+                <option value="Technical">Technical</option>
+                <option value="RFQ">Commercial (RFQ)</option>
+                <option value="Auction">Reverse Auction</option>
+              </select>
+            </div>
             <Link href="/client/manage/templates/create" style={{ textDecoration: 'none' }}>
               <button style={{ padding: '8px 16px', border: 'none', borderRadius: '6px', backgroundColor: '#2563eb', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500, boxShadow: '0 2px 4px rgba(37,99,235,0.2)' }}>
                 <PlusCircle size={16} /> Create Template
@@ -127,15 +161,21 @@ export default function TemplatesPage() {
                           <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb' }}>
                             <FileText size={16} />
                           </div>
-                          <span style={{ fontWeight: 600, color: '#0f172a' }}>{tpl.name}</span>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ fontWeight: 600, color: '#0f172a' }}>{tpl.name}</span>
+                            <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{tpl.type || 'RFQ'} Template</span>
+                          </div>
                         </div>
                       </td>
                       <td style={{ padding: '16px 24px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <span style={{ padding: '4px 10px', backgroundColor: '#f1f5f9', color: '#475569', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>{fields.length} Fields</span>
+                          <span style={{ padding: '4px 10px', backgroundColor: '#eff6ff', color: '#1d4ed8', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>
+                            {new Set(fields.map((f: any) => f.section || 'General')).size} Sections
+                          </span>
                           {hasFormula && (
                              <span style={{ padding: '4px 10px', backgroundColor: '#fdf4ff', color: '#c026d3', border: '1px solid #fae8ff', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                <Code2 size={12} /> Formula logic
+                                <Code2 size={12} /> Formula
                              </span>
                           )}
                         </div>
@@ -147,7 +187,9 @@ export default function TemplatesPage() {
                         <button style={{ background: 'none', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '6px 12px', color: '#0f172a', fontWeight: 500, cursor: 'pointer', fontSize: '0.75rem', marginRight: '8px' }}>
                           View Schema
                         </button>
-                        <button style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}><MoreVertical size={16} /></button>
+                        <button onClick={() => handleDelete(tpl.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', borderRadius: '4px' }} title="Delete Template">
+                          <Trash2 size={16} />
+                        </button>
                       </td>
                     </tr>
                   )

@@ -4,9 +4,44 @@ import { prisma } from '../../../lib/prisma';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const eventId = searchParams.get('eventId');
+
+    let whereClause: any = {};
+
+    if (eventId) {
+      // Find the event by its refId (e.g. EVT-1004)
+      const event = await prisma.event.findUnique({
+        where: { refId: eventId }
+      });
+
+      if (event && event.participants) {
+        try {
+          const participants = JSON.parse(event.participants);
+          // participants might be an array of vendor objects { id, name } or strings
+          const participantNames = participants.map((p: any) => typeof p === 'string' ? p : p.name);
+          
+          if (participantNames.length > 0) {
+            whereClause = {
+              name: { in: participantNames }
+            };
+          } else {
+             // Event has no participants, return empty list
+             whereClause = { id: 'no-match' };
+          }
+        } catch (e) {
+          console.error("Failed to parse participants", e);
+        }
+      } else {
+        // Event not found or no participants
+        whereClause = { id: 'no-match' };
+      }
+    }
+
     const vendors = await prisma.vendor.findMany({
+      where: whereClause,
       orderBy: { createdAt: 'desc' }
     });
     return NextResponse.json(vendors);

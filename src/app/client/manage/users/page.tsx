@@ -77,6 +77,10 @@ export default function UsersPage() {
         return u.name?.toLowerCase().includes(lowerQuery);
       } else if (searchField === 'email') {
         return u.email?.toLowerCase().includes(lowerQuery);
+      } else if (searchField === 'phone') {
+        return u.phone?.toLowerCase().includes(lowerQuery);
+      } else if (searchField === 'role') {
+        return u.role?.toLowerCase().includes(lowerQuery);
       }
       return true;
     });
@@ -107,6 +111,8 @@ export default function UsersPage() {
                >
                  <option value="name">Name</option>
                  <option value="email">Email</option>
+                 <option value="phone">Phone</option>
+                 <option value="role">Role</option>
                </select>
                <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px', backgroundColor: '#fff' }}>
                   <input 
@@ -144,39 +150,21 @@ export default function UsersPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
             <thead>
               <tr style={{ backgroundColor: '#eef2f6' }}>
-                <th style={{ padding: '16px 24px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb', width: '50px' }}>
-                  <input 
-                    type="checkbox" 
-                    onChange={handleSelectAll} 
-                    checked={filteredUsers.length > 0 && selectedUsers.length === filteredUsers.length}
-                    style={{ cursor: 'pointer' }}
-                  />
-                </th>
                 <th style={{ padding: '16px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Name</th>
                 <th style={{ padding: '16px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Email</th>
                 <th style={{ padding: '16px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Phone</th>
                 <th style={{ padding: '16px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Role</th>
-                <th style={{ padding: '16px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Tags</th>
-                <th style={{ padding: '16px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>ERP ID</th>
                 <th style={{ padding: '16px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Status</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} style={{ padding: '24px', textAlign: 'center' }}>Loading users...</td></tr>
+                <tr><td colSpan={5} style={{ padding: '24px', textAlign: 'center' }}>Loading users...</td></tr>
               ) : filteredUsers.length === 0 ? (
-                <tr><td colSpan={6} style={{ padding: '24px', textAlign: 'center', color: '#6b7280' }}>No users found.</td></tr>
+                <tr><td colSpan={5} style={{ padding: '24px', textAlign: 'center', color: '#6b7280' }}>No users found.</td></tr>
               ) : (
                 filteredUsers.map((user) => (
                   <tr key={user.id} style={{ backgroundColor: '#fff', borderBottom: '1px solid #e5e7eb' }}>
-                    <td style={{ padding: '16px', borderRight: '1px solid #e5e7eb' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={selectedUsers.includes(user.id)}
-                        onChange={() => handleSelectRow(user.id)}
-                        style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-                      />
-                    </td>
                     <td style={{ padding: '16px', color: '#4b5563', borderRight: '1px solid #e5e7eb' }}>{user.name}</td>
                     <td style={{ padding: '16px', color: '#4b5563', borderRight: '1px solid #e5e7eb' }}>{user.email}</td>
                     <td style={{ padding: '16px', color: '#4b5563', borderRight: '1px solid #e5e7eb' }}>{user.phone}</td>
@@ -189,12 +177,6 @@ export default function UsersPage() {
                         {user.role}
                       </span>
                     </td>
-                    <td style={{ padding: '16px', borderRight: '1px solid #e5e7eb' }}>
-                      <button style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #3b82f6', color: '#3b82f6', backgroundColor: '#eff6ff', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold', transition: 'all 0.2s' }} onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#3b82f6'; e.currentTarget.style.color = '#fff'; }} onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#eff6ff'; e.currentTarget.style.color = '#3b82f6'; }}>
-                        +
-                      </button>
-                    </td>
-                    <td style={{ padding: '16px', color: '#4b5563', borderRight: '1px solid #e5e7eb' }}>{user.erpId || '-'}</td>
                     <td style={{ padding: '16px', color: '#4b5563' }}>{user.status}</td>
                   </tr>
                 ))

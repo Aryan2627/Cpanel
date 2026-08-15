@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -158,6 +159,16 @@ model Contract {
 model Template {
   id        String   @id @default(uuid())
   name      String
+  type      String   @default("RFQ")
   fields    String   // JSON string of fields
   createdAt DateTime @default(now())
+}
+
+model JarvisMemory {
+  id         String   @id @default(uuid())
+  entityType String   // e.g., "Event"
+  entityRef  String   // e.g., "EVT-123"
+  context    String   // e.g., "New Sourcing Event Created"
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
 }

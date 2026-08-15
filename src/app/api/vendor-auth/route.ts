@@ -23,6 +23,8 @@ export async function POST(request: Request) {
     let { email } = data;
     email = email?.trim();
     
+    console.log(`[vendor-auth] Login attempt for email: ${email}`);
+    
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400, headers: corsHeaders });
     }
@@ -32,8 +34,11 @@ export async function POST(request: Request) {
     const vendor = vendors.find(v => v.email?.trim().toLowerCase() === email.toLowerCase());
 
     if (!vendor) {
+      console.log(`[vendor-auth] Vendor not found for email: ${email}`);
       return NextResponse.json({ error: 'Vendor not found' }, { status: 404, headers: corsHeaders });
     }
+    
+    console.log(`[vendor-auth] Vendor found: ${vendor.name} (${vendor.id})`);
 
     // Sign the JWT
     const token = jwt.sign(

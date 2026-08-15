@@ -103,10 +103,26 @@ export default function PRPage() {
 
   const handleWizardSubmit = () => {
     setIsModalOpen(false);
+    
+    const selectedPRData = filteredData.filter(d => selectedRows.has(d.refId));
+    const exportedItems: any[] = [];
+    selectedPRData.forEach(pr => {
+       pr.items.forEach((item: any) => {
+           exportedItems.push({
+               _source: pr.refId,
+               name: item.name,
+               qty: item.qty,
+               uom: item.uom,
+               code: item.id
+           });
+       });
+    });
+    localStorage.setItem('prToEventItems', JSON.stringify(exportedItems));
+
     const prs = Array.from(selectedRows).join(',');
     const destination = auction 
-      ? `/client/events/create/auction?prs=${prs}` 
-      : `/client/events/create/single-stage?prs=${prs}`;
+      ? `/client/events/create/auction?fromPR=true&prs=${prs}` 
+      : `/client/events/create/single-stage?fromPR=true&prs=${prs}`;
     
     setSelectedRows(new Set());
     window.location.href = destination;

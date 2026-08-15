@@ -1,12 +1,14 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Users, UserPlus, Upload, Filter, Tag, Search, 
   Building2, MapPin, Mail, Phone, CheckCircle2, 
-  XCircle, Clock, Check, X, ShieldAlert, BadgeCheck, ChevronDown
+  XCircle, Clock, Check, X, ShieldAlert, BadgeCheck, ChevronDown, Star, AlertTriangle
 } from 'lucide-react';
 
 export default function VendorManagement() {
+  const router = useRouter();
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,23 +23,34 @@ export default function VendorManagement() {
     {
       id: 'mock1', name: 'Alpha Technologies', vendorCode: 'V-10045', companyCode: 'C-90',
       email: 'contact@alphatech.com', phone: '+1 555-0198', type: 'Manufacturer',
-      city: 'San Francisco', status: 'Joined', liveEventId: 'EVT-0042'
+      city: 'San Francisco', status: 'Joined', liveEventId: 'EVT-0042', trustScore: 4.8, financialHealth: 'Excellent'
     },
     {
       id: 'mock2', name: 'Global Supply Co.', vendorCode: 'V-10046', companyCode: 'C-91',
       email: 'sales@globalsupply.com', phone: '+44 20-7946', type: 'Trader',
-      city: 'London', status: 'Invited'
+      city: 'London', status: 'Invited', trustScore: 3.5, financialHealth: 'Stable'
     },
     {
       id: 'mock3', name: 'Untrustworthy LLC', vendorCode: 'V-10047', companyCode: 'C-92',
       email: 'spam@untrustworthy.com', phone: '+1 555-0000', type: 'Broker',
-      city: 'Unknown', status: 'Blacklisted'
+      city: 'Unknown', status: 'Blacklisted', trustScore: 1.2, financialHealth: 'Critical'
     }
   ];
 
   const [vendors, setVendors] = useState<any[]>(initialMockVendors);
+  const [showBankruptcyPredictor, setShowBankruptcyPredictor] = useState(true);
 
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem('godTierFeatures');
+      if (saved) {
+        const features = JSON.parse(saved);
+        if (features.bankruptcyPredictor !== undefined) {
+          setShowBankruptcyPredictor(features.bankruptcyPredictor);
+        }
+      }
+    } catch (e) {}
+
     fetch('/api/vendors')
       .then(res => res.json())
       .then(data => {
@@ -182,13 +195,15 @@ export default function VendorManagement() {
                 <th style={{ padding: '16px', fontWeight: 600 }}>Contact Info</th>
                 <th style={{ padding: '16px', fontWeight: 600 }}>Type</th>
                 <th style={{ padding: '16px', fontWeight: 600 }}>Location</th>
+                <th style={{ padding: '16px', fontWeight: 600 }}>Trust Score</th>
+                {showBankruptcyPredictor && <th style={{ padding: '16px', fontWeight: 600 }}>Financial Health</th>}
                 <th style={{ padding: '16px', fontWeight: 600 }}>Status</th>
               </tr>
             </thead>
             <tbody>
               {filteredVendors.length > 0 ? filteredVendors.map((vendor) => (
-                <tr key={vendor.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>
-                  <td style={{ padding: '16px' }}>
+                <tr onClick={() => router.push(`/client/vendors/${vendor.id}`)} key={vendor.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'background-color 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>
+                  <td style={{ padding: '16px' }} onClick={e => e.stopPropagation()}>
                     <input type="checkbox" style={{ accentColor: '#2563eb', cursor: 'pointer' }} />
                   </td>
                   <td style={{ padding: '16px' }}>
@@ -210,6 +225,27 @@ export default function VendorManagement() {
                   <td style={{ padding: '16px', color: '#475569' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={14} color="#94a3b8" /> {vendor.city}</div>
                   </td>
+                  <td style={{ padding: '16px', color: '#475569' }}>
+                    {vendor.trustScore ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600, color: vendor.trustScore > 4 ? '#10b981' : vendor.trustScore < 3 ? '#ef4444' : '#f59e0b' }}>
+                        <Star size={14} fill={vendor.trustScore > 4 ? '#10b981' : vendor.trustScore < 3 ? '#ef4444' : '#f59e0b'} /> {vendor.trustScore}
+                      </div>
+                    ) : (
+                      <span style={{ color: '#94a3b8' }}>-</span>
+                    )}
+                  </td>
+                  {showBankruptcyPredictor && (
+                    <td style={{ padding: '16px', color: '#475569' }}>
+                      {vendor.financialHealth ? (
+                        <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, backgroundColor: vendor.financialHealth === 'Excellent' ? '#ecfdf5' : vendor.financialHealth === 'Stable' ? '#fef3c7' : '#fef2f2', color: vendor.financialHealth === 'Excellent' ? '#10b981' : vendor.financialHealth === 'Stable' ? '#f59e0b' : '#ef4444', display: 'flex', alignItems: 'center', gap: '4px', width: 'fit-content' }}>
+                          {vendor.financialHealth === 'Critical' && <AlertTriangle size={12} />}
+                          {vendor.financialHealth}
+                        </span>
+                      ) : (
+                        <span style={{ color: '#94a3b8' }}>-</span>
+                      )}
+                    </td>
+                  )}
                   <td style={{ padding: '16px' }}>
                     {getStatusBadge(vendor.status)}
                   </td>

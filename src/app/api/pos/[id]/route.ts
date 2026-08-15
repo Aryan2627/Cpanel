@@ -6,11 +6,12 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const po = await prisma.purchaseOrder.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
     if (!po) {
       return NextResponse.json({ error: 'Purchase Order not found' }, { status: 404 });

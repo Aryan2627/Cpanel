@@ -68,11 +68,11 @@ export default function PurchaseIntake() {
         <h3 style={{ marginBottom: '20px', color: 'var(--accent-color)' }}>General Information</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
           <div className="form-group">
-            <label className="form-label">Request Title</label>
+            <label className="form-label">Request Title <span style={{color: '#ef4444'}}>*</span></label>
             <input type="text" className="form-input" required value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
           <div className="form-group">
-            <label className="form-label">Category</label>
+            <label className="form-label">Category <span style={{color: '#ef4444'}}>*</span></label>
             <select className="form-input" required>
               <option value="">Select Category...</option>
               {categories.map((cat, idx) => (
@@ -88,7 +88,7 @@ export default function PurchaseIntake() {
             </select>
           </div>
           <div className="form-group">
-            <label className="form-label">Department</label>
+            <label className="form-label">Department <span style={{color: '#ef4444'}}>*</span></label>
             <select className="form-input" required>
               <option value="">Select Department...</option>
               {departments.map((dept, idx) => (
@@ -100,7 +100,7 @@ export default function PurchaseIntake() {
             </select>
           </div>
           <div className="form-group">
-            <label className="form-label">Budget / Estimated Price</label>
+            <label className="form-label">Budget / Estimated Price <span style={{color: '#ef4444'}}>*</span></label>
             <input type="number" className="form-input" required />
           </div>
         </div>
@@ -108,15 +108,15 @@ export default function PurchaseIntake() {
         <h3 style={{ margin: '30px 0 20px', color: 'var(--accent-color)' }}>Item Details & Delivery</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
            <div className="form-group">
-            <label className="form-label">Item Name / Description</label>
+            <label className="form-label">Item Name / Description <span style={{color: '#ef4444'}}>*</span></label>
             <textarea className="form-input" rows={3} required></textarea>
           </div>
           <div className="form-group">
-            <label className="form-label">Delivery Address</label>
+            <label className="form-label">Delivery Address <span style={{color: '#ef4444'}}>*</span></label>
             <textarea className="form-input" rows={3} required></textarea>
           </div>
           <div className="form-group">
-            <label className="form-label">Required Date</label>
+            <label className="form-label">Required Date <span style={{color: '#ef4444'}}>*</span></label>
             <input type="date" className="form-input" required />
           </div>
           <div className="form-group">

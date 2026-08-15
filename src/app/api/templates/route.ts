@@ -21,6 +21,7 @@ export async function POST(request: Request) {
     const newTemplate = await prisma.template.create({
       data: {
         name: data.name,
+        type: data.type || 'RFQ',
         fields: JSON.stringify(data.fields),
       }
     });

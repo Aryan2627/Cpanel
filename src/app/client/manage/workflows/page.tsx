@@ -166,9 +166,52 @@ export default function WorkflowsPage() {
         </div>
       </div>
 
-      <div id="tour-workflow-categories" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '32px' }}>
+      <div id="tour-workflow-categories" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '32px', marginBottom: '40px' }}>
         {renderList('Categories', 'categories', '📦', '#3b82f6', 'linear-gradient(90deg, #60a5fa, #3b82f6)')}
         {renderList('Departments', 'departments', '🏢', '#8b5cf6', 'linear-gradient(90deg, #a78bfa, #8b5cf6)')}
+      </div>
+
+      <div style={{ backgroundColor: '#fff', borderRadius: '16px', padding: '24px', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#1f2937', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '1.5rem' }}>🔄</span> Approval Routing Workflows
+            </h2>
+            <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: '4px 0 0 0' }}>Map departments to their specific approval chains.</p>
+          </div>
+          <button style={{ padding: '8px 16px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>+ New Workflow</button>
+        </div>
+
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
+              <th style={{ padding: '12px 16px', color: '#6b7280', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Workflow Name</th>
+              <th style={{ padding: '12px 16px', color: '#6b7280', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Department</th>
+              <th style={{ padding: '12px 16px', color: '#6b7280', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Approvers</th>
+              <th style={{ padding: '12px 16px', color: '#6b7280', fontWeight: '600', fontSize: '0.8rem', textTransform: 'uppercase' }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+              <td style={{ padding: '16px', fontWeight: '600', color: '#111827' }}>IT Hardware Requests</td>
+              <td style={{ padding: '16px' }}><span style={{ backgroundColor: '#f3e8ff', color: '#7e22ce', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600' }}>IT</span></td>
+              <td style={{ padding: '16px', color: '#4b5563', fontSize: '0.9rem' }}>IT Manager → IT Director</td>
+              <td style={{ padding: '16px' }}><span style={{ backgroundColor: '#dcfce7', color: '#16a34a', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600' }}>Active</span></td>
+            </tr>
+            <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+              <td style={{ padding: '16px', fontWeight: '600', color: '#111827' }}>Marketing Campaign Budgets</td>
+              <td style={{ padding: '16px' }}><span style={{ backgroundColor: '#f3e8ff', color: '#7e22ce', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600' }}>Marketing</span></td>
+              <td style={{ padding: '16px', color: '#4b5563', fontSize: '0.9rem' }}>CMO</td>
+              <td style={{ padding: '16px' }}><span style={{ backgroundColor: '#dcfce7', color: '#16a34a', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600' }}>Active</span></td>
+            </tr>
+            <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+              <td style={{ padding: '16px', fontWeight: '600', color: '#111827' }}>Standard Procurement</td>
+              <td style={{ padding: '16px' }}><span style={{ backgroundColor: '#f1f5f9', color: '#475569', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600' }}>General</span></td>
+              <td style={{ padding: '16px', color: '#4b5563', fontSize: '0.9rem' }}>Line Manager → Finance</td>
+              <td style={{ padding: '16px' }}><span style={{ backgroundColor: '#dcfce7', color: '#16a34a', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600' }}>Active</span></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );

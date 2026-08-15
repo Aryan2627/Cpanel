@@ -18,24 +18,40 @@ export default function VendorMessagesPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync Vendors from Directory
+  const [eventIdFilter, setEventIdFilter] = useState('');
+  const [debouncedEventId, setDebouncedEventId] = useState('');
+
+  // Debounce event filter
   useEffect(() => {
-    const loadVendors = () => {
-      const saved = localStorage.getItem('customVendors');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setVendors(parsed);
-          if (parsed.length > 0 && !parsed.find((v:any) => v.name === activeVendor)) {
-            setActiveVendor(parsed[0].name);
+    const timer = setTimeout(() => setDebouncedEventId(eventIdFilter), 500);
+    return () => clearTimeout(timer);
+  }, [eventIdFilter]);
+
+  // Fetch Vendors from Database
+  useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const url = debouncedEventId ? `/api/vendors?eventId=${debouncedEventId}` : '/api/vendors';
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          setVendors(data);
+          
+          if (data.length > 0) {
+            // Auto-select first if current active is not in list
+            if (!data.find((v:any) => v.name === activeVendor)) {
+              setActiveVendor(data[0].name);
+            }
+          } else {
+             setActiveVendor('');
           }
-        } catch(e) {}
+        }
+      } catch(e) {
+        console.error("Failed to fetch vendors", e);
       }
     };
-    loadVendors();
-    window.addEventListener('customVendors_updated', loadVendors);
-    return () => window.removeEventListener('customVendors_updated', loadVendors);
-  }, []);
+    fetchVendors();
+  }, [debouncedEventId]);
 
   // Load messages from local storage or set defaults
   useEffect(() => {
@@ -113,13 +129,27 @@ export default function VendorMessagesPage() {
       <div id="tour-vendor-list" style={{ width: '320px', borderRight: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', backgroundColor: '#f8fafc' }}>
         <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#111827', margin: 0 }}>Messages</h2>
-          <div style={{ marginTop: '16px', position: 'relative' }}>
-            <span style={{ position: 'absolute', left: '12px', top: '10px', color: '#9ca3af', fontSize: '0.9rem' }}>🔍</span>
-            <input 
-              type="text" 
-              placeholder="Search vendors..." 
-              style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: '8px', border: '1px solid #d1d5db', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box' }}
-            />
+          <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: '12px', top: '10px', color: '#9ca3af', fontSize: '0.9rem' }}>🏷️</span>
+              <input 
+                type="text" 
+                placeholder="Filter by Event ID (e.g. EVT-1004)" 
+                value={eventIdFilter}
+                onChange={(e) => setEventIdFilter(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: '8px', border: '1px solid #d1d5db', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box', backgroundColor: '#e0e7ff', color: '#4338ca', fontWeight: '600' }}
+              />
+            </div>
+
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: '12px', top: '10px', color: '#9ca3af', fontSize: '0.9rem' }}>🔍</span>
+              <input 
+                type="text" 
+                placeholder="Search vendors..." 
+                style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: '8px', border: '1px solid #d1d5db', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box' }}
+              />
+            </div>
           </div>
         </div>
         

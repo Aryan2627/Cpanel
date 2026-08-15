@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useIntake } from '../../../context/IntakeContext';
 import * as XLSX from 'xlsx';
@@ -30,6 +30,20 @@ export default function IntakeTablePage() {
   // Slide-out Drawer State
   const [selectedIntake, setSelectedIntake] = useState<any | null>(null);
 
+  // Import Modal State
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+
+  const [exportEnabled, setExportEnabled] = useState(false);
+  useEffect(() => {
+    setExportEnabled(localStorage.getItem('exportIntake') === 'true');
+    const handleSettingsUpdate = () => {
+      setExportEnabled(localStorage.getItem('exportIntake') === 'true');
+    };
+    window.addEventListener('settings_updated', handleSettingsUpdate);
+    return () => window.removeEventListener('settings_updated', handleSettingsUpdate);
+  }, []);
+
   // -- Mock Data Generation for metrics --
   const totalRequests = intakes.length;
   const pendingRequests = intakes.filter(i => i.status === 'Draft' || i.status === 'In Progress').length;
@@ -57,6 +71,22 @@ export default function IntakeTablePage() {
     XLSX.writeFile(workbook, "Intake_Data_Export.xlsx");
   };
 
+  const handleDownloadTemplate = () => {
+    const templateData = [{
+      'Request Title': 'e.g. Server Procurement',
+      'Category': 'IT Hardware',
+      'Department': 'IT',
+      'Budget / Estimated Price': '5000',
+      'Item Name / Description': 'Dell PowerEdge R740',
+      'Delivery Address': '123 Tech Lane, NY 10001',
+      'Required Date': '2024-12-01'
+    }];
+    const worksheet = XLSX.utils.json_to_sheet(templateData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
+    XLSX.writeFile(workbook, "Intake_Master_Template.xlsx");
+  };
+
   // Handle Import
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -65,31 +95,48 @@ export default function IntakeTablePage() {
     const reader = new FileReader();
     reader.onload = async (evt) => {
       try {
+        setImportError(null);
         const bstr = evt.target?.result;
         const workbook = XLSX.read(bstr, { type: 'binary' });
         const wsname = workbook.SheetNames[0];
         const ws = workbook.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json<any>(ws);
         
+        if (data.length === 0) {
+          setImportError("The uploaded file is empty.");
+          return;
+        }
+
+        // Validate Columns
+        const requiredColumns = ['Request Title', 'Category', 'Department', 'Budget / Estimated Price', 'Item Name / Description', 'Delivery Address', 'Required Date'];
+        const uploadedColumns = Object.keys(data[0]);
+        const missingColumns = requiredColumns.filter(col => !uploadedColumns.includes(col));
+        
+        if (missingColumns.length > 0) {
+          setImportError(`Invalid file format. Missing columns: ${missingColumns.join(', ')}. Please download and use the Master Template.`);
+          return;
+        }
+
         for (const row of data) {
           const intake = {
-            refId: row['Ref ID'] || `INT-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-            title: row['Title'] || 'Untitled Intake',
-            reqName: row['Requester Name'] || 'System',
-            status: row['Status'] || 'Draft',
-            type: row['Intake Request Type'] || 'Standalone NFA',
-            buyer: row['Buyer Name'] || '-',
-            reqAt: row['Requested At'] || new Date().toISOString().split('T')[0],
-            updAt: row['Updated At'] || new Date().toISOString().split('T')[0],
+            refId: `INT-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            title: row['Request Title'] || 'Untitled Intake',
+            reqName: 'System Import',
+            status: 'Draft',
+            type: row['Category'] || 'Standalone NFA',
+            buyer: '-',
+            reqAt: new Date().toISOString().split('T')[0],
+            updAt: new Date().toISOString().split('T')[0],
           };
           await addIntake(intake);
         }
         
         if (fileInputRef.current) fileInputRef.current.value = '';
+        setIsImportModalOpen(false);
         alert(`Successfully imported ${data.length} intakes!`);
       } catch (err) {
         console.error("Error parsing Excel file", err);
-        alert("Failed to import. Ensure the Excel file is correctly formatted.");
+        setImportError("Failed to import. Ensure the Excel file is correctly formatted and not corrupted.");
       }
     };
     reader.readAsBinaryString(file);
@@ -97,7 +144,7 @@ export default function IntakeTablePage() {
 
   // Data processing
   const filteredAndSortedIntakes = useMemo(() => {
-    let result = intakes.filter((row) => {
+    const result = intakes.filter((row) => {
       if (filterStatus !== 'All' && row.status !== filterStatus) return false;
       if (!searchQuery) return true;
       const query = searchQuery.toLowerCase();
@@ -179,12 +226,14 @@ export default function IntakeTablePage() {
           <p style={{ color: '#64748b', margin: '4px 0 0 0', fontSize: '0.875rem' }}>Manage and track all procurement requests.</p>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
-          <button onClick={() => fileInputRef.current?.click()} style={{ padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: '6px', backgroundColor: '#fff', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+          <button onClick={() => { setIsImportModalOpen(true); setImportError(null); }} style={{ padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: '6px', backgroundColor: '#fff', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
             <FileUp size={16} /> Import
           </button>
-          <button onClick={handleExport} style={{ padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: '6px', backgroundColor: '#fff', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-            <FileDown size={16} /> Export
-          </button>
+          {exportEnabled && (
+            <button onClick={handleExport} style={{ padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: '6px', backgroundColor: '#fff', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+              <FileDown size={16} /> Export
+            </button>
+          )}
           <Link id="tour-create-intake" href="/client/intake/create" style={{ padding: '8px 16px', border: 'none', borderRadius: '6px', backgroundColor: '#2563eb', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', textDecoration: 'none', boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.2)' }}>
             <Plus size={16} /> Create Request
           </Link>
@@ -416,6 +465,54 @@ export default function IntakeTablePage() {
         </div>
       )}
       
+      {/* Import Modal */}
+      {isImportModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.4)', zIndex: 100, display: 'flex', justifyContent: 'center', alignItems: 'center', animation: 'fadeIn 0.2s ease-out' }}>
+          <div style={{ width: '500px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', overflow: 'hidden', animation: 'slideIn 0.3s ease-out' }}>
+            <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Import Intake Data</h2>
+              <button onClick={() => setIsImportModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div style={{ padding: '24px' }}>
+              <p style={{ margin: '0 0 20px 0', color: '#475569', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                To import data in bulk, please use our Master Template. This ensures all columns are correctly mapped and validated before entry.
+              </p>
+              
+              <button onClick={handleDownloadTemplate} style={{ width: '100%', padding: '12px', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#334155', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', marginBottom: '24px', transition: 'background-color 0.2s' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseOut={e => e.currentTarget.style.backgroundColor = '#f1f5f9'}>
+                <FileDown size={18} /> Download Master Template
+              </button>
+
+              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '24px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155', fontSize: '0.9rem' }}>Upload Filled Template</label>
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{ border: '2px dashed #cbd5e1', borderRadius: '8px', padding: '32px', textAlign: 'center', cursor: 'pointer', backgroundColor: '#f8fafc', transition: 'border-color 0.2s' }}
+                  onMouseOver={e => e.currentTarget.style.borderColor = '#3b82f6'}
+                  onMouseOut={e => e.currentTarget.style.borderColor = '#cbd5e1'}
+                >
+                  <FileUp size={24} color="#94a3b8" style={{ margin: '0 auto 8px auto' }} />
+                  <div style={{ color: '#64748b', fontSize: '0.9rem' }}><span style={{ color: '#2563eb', fontWeight: 500 }}>Click to browse</span> or drag and drop</div>
+                  <div style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '4px' }}>XLSX or XLS only</div>
+                </div>
+              </div>
+
+              {importError && (
+                <div style={{ marginTop: '20px', padding: '12px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#ef4444', fontSize: '0.85rem', lineHeight: '1.4' }}>
+                  <strong>Import Error:</strong><br/>{importError}
+                </div>
+              )}
+            </div>
+            
+            <div style={{ padding: '16px 24px', borderTop: '1px solid #e2e8f0', backgroundColor: '#f8fafc', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button onClick={() => setIsImportModalOpen(false)} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#475569', fontWeight: 500, cursor: 'pointer' }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }

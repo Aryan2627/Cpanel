@@ -6,6 +6,7 @@ import { IntakeProvider } from '../../context/IntakeContext';
 import TourButton from './TourButton';
 import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
+import JarvisAssistant from './JarvisAssistant';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -37,7 +38,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     { name: 'Templates', path: '/client/manage/templates' }
   ];
   if (showWorkflows) {
-    manageSubItems.push({ name: 'Workflows', path: '/client/manage/workflows' });
+    manageSubItems.push({ name: 'Field Map', path: '/client/manage/workflows' });
   }
 
   const navItems = [
@@ -85,7 +86,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   <path d="M 25 35 L 35 45 L 75 45 M 35 55 L 70 55 M 40 65 L 65 65" stroke="#0f172a" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
                   <circle cx="55" cy="75" r="5" fill="#0f172a" />
                 </svg>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>PROCGEN</h2>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: '#ffffff', letterSpacing: '-0.05em' }}>PROCGEN</h2>
             </div>
           </div>
 
@@ -97,7 +98,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                     <div 
                       onClick={() => toggleMenu(item.name)}
                       className={openMenu === item.name ? 'active' : ''}
-                      style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', color: 'var(--text-secondary)', fontWeight: 500, borderRadius: '12px', marginBottom: '8px', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                      style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', color: '#94a3b8', fontWeight: 500, borderRadius: '12px', marginBottom: '8px', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
                     >
                       {item.name}
                       <span style={{ fontSize: '0.8rem', transform: openMenu === item.name ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
@@ -129,12 +130,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             ))}
           </ul>
 
-          <div style={{ marginTop: 'auto', borderTop: '1px solid var(--surface-border)', paddingTop: '24px' }}>
+          <div style={{ marginTop: 'auto', borderTop: '1px solid #1e293b', paddingTop: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px' }}>
-              <div style={{ width: '40px', height: '40px', background: 'var(--primary-color)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>JD</div>
+              <div style={{ width: '40px', height: '40px', background: 'var(--accent-color)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>JD</div>
               <div>
-                <div style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-primary)' }}>John Doe</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Procurement Team</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc' }}>John Doe</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Procurement Team</div>
               </div>
             </div>
           </div>
@@ -153,6 +154,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
         {/* Global RFQ Cart */}
         <CartOverlay />
+
+        {/* Global Jarvis Voice Assistant */}
+        <JarvisAssistant />
       </div>
     </IntakeProvider>
   );

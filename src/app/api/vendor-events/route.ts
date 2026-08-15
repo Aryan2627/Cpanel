@@ -34,13 +34,18 @@ export async function GET(request: Request) {
 
     const email = decoded.email;
     
+    console.log(`[vendor-events] Incoming request for email: ${email}`);
+
     if (!email) {
+      console.log(`[vendor-events] No email in token`);
       return NextResponse.json({ error: 'Invalid token payload' }, { status: 400, headers: corsHeaders });
     }
 
     const allEvents = await prisma.event.findMany({
       orderBy: { createdAt: 'desc' }
     });
+    
+    console.log(`[vendor-events] Found ${allEvents.length} total events in DB`);
 
     // Filter events where participants JSON contains the vendor's email
     const vendorEvents = allEvents.filter(event => {
@@ -56,8 +61,10 @@ export async function GET(request: Request) {
       return false;
     });
 
+    console.log(`[vendor-events] Returning ${vendorEvents.length} events for ${email}`);
     return NextResponse.json(vendorEvents, { status: 200, headers: corsHeaders });
   } catch (error: any) {
+    console.error(`[vendor-events] Error:`, error.message);
     return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
   }
 }

@@ -13,6 +13,22 @@ function SingleStageCreateContent() {
   const { intakes } = useIntake();
   const [isWorkspaceMode, setIsWorkspaceMode] = useState(false);
   
+  const [showTinderMatchmaking, setShowTinderMatchmaking] = useState(false);
+  const [isTinderModalOpen, setIsTinderModalOpen] = useState(false);
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('godTierFeatures');
+      if (saved) {
+        const features = JSON.parse(saved);
+        if (features.tinderMatchmaking !== undefined) {
+          setShowTinderMatchmaking(features.tinderMatchmaking);
+        }
+      }
+    } catch (e) {}
+  }, []);
+  
   // States for Event Type and Templates
   const [eventType, setEventType] = useState('Rank based');
   const [isEventTypeOpen, setIsEventTypeOpen] = useState(false);
@@ -21,6 +37,22 @@ function SingleStageCreateContent() {
   const [selectedTemplateObj, setSelectedTemplateObj] = useState<any>(null);
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
   const [dbTemplates, setDbTemplates] = useState<any[]>([]);
+
+  // Multi-Stage State
+  const [enableTechnical, setEnableTechnical] = useState(true);
+  const [technicalTemplate, setTechnicalTemplate] = useState('Select Templates');
+  const [selectedTechnicalTemplateObj, setSelectedTechnicalTemplateObj] = useState<any>(null);
+  const [isTechnicalTemplateOpen, setIsTechnicalTemplateOpen] = useState(false);
+
+  const [enableRFQ, setEnableRFQ] = useState(true);
+  const [rfqTemplate, setRfqTemplate] = useState('Select Templates');
+  const [selectedRfqTemplateObj, setSelectedRfqTemplateObj] = useState<any>(null);
+  const [isRfqTemplateOpen, setIsRfqTemplateOpen] = useState(false);
+
+  const [enableAuction, setEnableAuction] = useState(false);
+  const [auctionTemplate, setAuctionTemplate] = useState('Select Templates');
+  const [selectedAuctionTemplateObj, setSelectedAuctionTemplateObj] = useState<any>(null);
+  const [isAuctionTemplateOpen, setIsAuctionTemplateOpen] = useState(false);
 
   // State for dynamic creator fields
   const [creatorData, setCreatorData] = useState<Record<string, string>>({});
@@ -82,6 +114,32 @@ function SingleStageCreateContent() {
   const [eventMode, setEventMode] = useState('Live Event');
 
   useEffect(() => {
+    if (searchParams.get('fromPR') === 'true') {
+      const saved = localStorage.getItem('prToEventItems');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.length > 0) {
+            const newLineItems = parsed.map((prod: any, idx: number) => ({
+              id: Date.now() + idx,
+              evaluatorId: '',
+              _source: `PR ${prod._source}`,
+              values: {
+                "Item Name": prod.name,
+                "Product Code": prod.code,
+                "Quantity": prod.qty?.toString(),
+                "UOM": prod.uom || "EA",
+                "Category": "IT/Hardware"
+              }
+            }));
+            setLineItems(newLineItems);
+            setTitle(`Event from PR: ${searchParams.get('prs')}`);
+            localStorage.removeItem('prToEventItems');
+          }
+        } catch(e) {}
+      }
+    }
+
     if (searchParams.get('fromCart') === 'true') {
       const cart = localStorage.getItem('rfqCart');
       if (cart) {
@@ -110,11 +168,18 @@ function SingleStageCreateContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (dbTemplates.length > 0 && template !== 'Select Templates' && !selectedTemplateObj) {
-      const tempObj = dbTemplates.find((t: any) => t.name === template);
-      if (tempObj) setSelectedTemplateObj(tempObj);
+    if (dbTemplates.length > 0) {
+      if (technicalTemplate !== 'Select Templates' && !selectedTechnicalTemplateObj) {
+        setSelectedTechnicalTemplateObj(dbTemplates.find((t: any) => t.name === technicalTemplate));
+      }
+      if (rfqTemplate !== 'Select Templates' && !selectedRfqTemplateObj) {
+        setSelectedRfqTemplateObj(dbTemplates.find((t: any) => t.name === rfqTemplate));
+      }
+      if (auctionTemplate !== 'Select Templates' && !selectedAuctionTemplateObj) {
+        setSelectedAuctionTemplateObj(dbTemplates.find((t: any) => t.name === auctionTemplate));
+      }
     }
-  }, [dbTemplates, template, selectedTemplateObj]);
+  }, [dbTemplates, technicalTemplate, selectedTechnicalTemplateObj, rfqTemplate, selectedRfqTemplateObj, auctionTemplate, selectedAuctionTemplateObj]);
 
   const glassInputStyle = { width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', background: 'rgba(255, 255, 255, 0.9)', outline: 'none', fontSize: '0.95rem', transition: 'all 0.2s', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)' };
   
@@ -235,36 +300,78 @@ function SingleStageCreateContent() {
                 )}
               </div>
               
-              {/* Template */}
-              <div style={{ position: 'relative' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Category Template</label>
-                <div 
-                  onClick={() => setIsTemplateOpen(!isTemplateOpen)}
-                  style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-                >
-                  <span style={{ color: template === 'Select Templates' ? '#94a3b8' : '#0f172a', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <LayoutTemplate size={16} color={template === 'Select Templates' ? '#94a3b8' : '#3b82f6'} /> {template}
-                  </span>
-                  <ChevronDown size={16} color="#94a3b8" />
-                </div>
-                {isTemplateOpen && (
-                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, overflow: 'hidden', maxHeight: '250px', overflowY: 'auto' }}>
-                    {dbTemplates.length > 0 ? (
-                      dbTemplates.map((t: any) => (
-                        <div 
-                          key={t.id}
-                          onClick={() => { setTemplate(t.name); setSelectedTemplateObj(t); setIsTemplateOpen(false); }}
-                          style={{ padding: '12px 16px', cursor: 'pointer', fontWeight: '500', color: '#333', borderBottom: '1px solid #f1f5f9' }}
-                          onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                        >
-                          {t.name}
-                        </div>
-                      ))
-                    ) : (
-                      <div style={{ padding: '12px 16px', color: '#94a3b8', fontSize: '0.9rem' }}>No templates found</div>
-                    )}
+              {/* Multi-Stage Configuration */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', gridColumn: 'span 2' }}>
+                <h4 style={{ margin: 0, fontSize: '1rem', color: '#0f172a' }}>Configure Event Stages</h4>
+                
+                {/* Technical Stage */}
+                <div style={{ paddingBottom: '16px', borderBottom: '1px dashed #cbd5e1' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                    <input type="checkbox" checked={enableTechnical} onChange={e => setEnableTechnical(e.target.checked)} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                    <span style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>Technical Validation</span>
                   </div>
-                )}
+                  {enableTechnical && (
+                    <div style={{ position: 'relative', paddingLeft: '30px' }}>
+                      <div onClick={() => setIsTechnicalTemplateOpen(!isTechnicalTemplateOpen)} style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: '#fff' }}>
+                        <span style={{ color: technicalTemplate === 'Select Templates' ? '#94a3b8' : '#0f172a', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><LayoutTemplate size={16} /> {technicalTemplate}</span>
+                        <ChevronDown size={16} color="#94a3b8" />
+                      </div>
+                      {isTechnicalTemplateOpen && (
+                        <div style={{ position: 'absolute', top: '100%', left: '30px', right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, maxHeight: '200px', overflowY: 'auto' }}>
+                          {dbTemplates.filter((t: any) => t.type === 'Technical').map((t: any) => (
+                            <div key={t.id} onClick={() => { setTechnicalTemplate(t.name); setSelectedTechnicalTemplateObj(t); setIsTechnicalTemplateOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }}>{t.name}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* RFQ Stage */}
+                <div style={{ paddingBottom: '16px', borderBottom: '1px dashed #cbd5e1' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                    <input type="checkbox" checked={enableRFQ} onChange={e => setEnableRFQ(e.target.checked)} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                    <span style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>RFQ (Commercial)</span>
+                  </div>
+                  {enableRFQ && (
+                    <div style={{ position: 'relative', paddingLeft: '30px' }}>
+                      <div onClick={() => setIsRfqTemplateOpen(!isRfqTemplateOpen)} style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: '#fff' }}>
+                        <span style={{ color: rfqTemplate === 'Select Templates' ? '#94a3b8' : '#0f172a', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><LayoutTemplate size={16} /> {rfqTemplate}</span>
+                        <ChevronDown size={16} color="#94a3b8" />
+                      </div>
+                      {isRfqTemplateOpen && (
+                        <div style={{ position: 'absolute', top: '100%', left: '30px', right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, maxHeight: '200px', overflowY: 'auto' }}>
+                          {dbTemplates.filter((t: any) => !t.type || t.type === 'RFQ').map((t: any) => (
+                            <div key={t.id} onClick={() => { setRfqTemplate(t.name); setSelectedRfqTemplateObj(t); setIsRfqTemplateOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }}>{t.name}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Auction Stage */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                    <input type="checkbox" checked={enableAuction} onChange={e => setEnableAuction(e.target.checked)} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                    <span style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>Reverse Auction</span>
+                  </div>
+                  {enableAuction && (
+                    <div style={{ position: 'relative', paddingLeft: '30px' }}>
+                      <div onClick={() => setIsAuctionTemplateOpen(!isAuctionTemplateOpen)} style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: '#fff' }}>
+                        <span style={{ color: auctionTemplate === 'Select Templates' ? '#94a3b8' : '#0f172a', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><LayoutTemplate size={16} /> {auctionTemplate}</span>
+                        <ChevronDown size={16} color="#94a3b8" />
+                      </div>
+                      {isAuctionTemplateOpen && (
+                        <div style={{ position: 'absolute', top: '100%', left: '30px', right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, maxHeight: '200px', overflowY: 'auto' }}>
+                          {dbTemplates.filter((t: any) => t.type === 'Auction').map((t: any) => (
+                            <div key={t.id} onClick={() => { setAuctionTemplate(t.name); setSelectedAuctionTemplateObj(t); setIsAuctionTemplateOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }}>{t.name}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Duration */}
@@ -291,17 +398,24 @@ function SingleStageCreateContent() {
             </div>
             
             {/* Dynamic Template Fields */}
-            {selectedTemplateObj && (
+            {(selectedTechnicalTemplateObj || selectedRfqTemplateObj || selectedAuctionTemplateObj) && (
               <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid #f1f5f9' }}>
                 <h4 style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a', marginBottom: '16px' }}>Template Configuration</h4>
                 {(() => {
                   try {
-                    const fields = JSON.parse(selectedTemplateObj.fields) || [];
+                    let fields: any[] = [];
+                    if (selectedTechnicalTemplateObj) fields = [...fields, ...JSON.parse(selectedTechnicalTemplateObj.fields)];
+                    if (selectedRfqTemplateObj) fields = [...fields, ...JSON.parse(selectedRfqTemplateObj.fields)];
+                    if (selectedAuctionTemplateObj) fields = [...fields, ...JSON.parse(selectedAuctionTemplateObj.fields)];
+                    
                     const creatorFields = fields.filter((f: any) => f.role === 'Creator');
-                    if (creatorFields.length === 0) return <div style={{ fontSize: '0.9rem', color: '#64748b' }}>No buyer-filled requirements for this template.</div>;
+                    // Remove duplicates based on key
+                    const uniqueCreatorFields = Array.from(new Map(creatorFields.map(f => [f.key, f])).values());
+                    
+                    if (uniqueCreatorFields.length === 0) return <div style={{ fontSize: '0.9rem', color: '#64748b' }}>No buyer-filled requirements.</div>;
                     return (
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                        {creatorFields.map((f: any) => (
+                        {uniqueCreatorFields.map((f: any) => (
                           <div key={f.id}>
                             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', color: '#475569', marginBottom: '8px' }}>{f.name}</label>
                             <input 
@@ -441,7 +555,18 @@ function SingleStageCreateContent() {
 
           {/* Card 3: Participants */}
           <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.02)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 24px 0' }}><Users size={20} color="#8b5cf6" /> Participants</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}><Users size={20} color="#8b5cf6" /> Participants</h3>
+              {showTinderMatchmaking && (
+                <button 
+                  onClick={() => setIsTinderModalOpen(true)}
+                  style={{ background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)', color: '#fff', border: 'none', borderRadius: '24px', padding: '8px 16px', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 6px rgba(236, 72, 153, 0.3)', transition: 'transform 0.2s' }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}
+                >
+                  🔥 Smart Match AI
+                </button>
+              )}
+            </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ position: 'relative', maxWidth: '400px' }}>
@@ -519,23 +644,49 @@ function SingleStageCreateContent() {
                     }
                   }
 
+                  const finalStages = [];
+                  if (enableTechnical) {
+                    finalStages.push({
+                      type: 'Technical',
+                      name: technicalTemplate,
+                      mode: 'Technical Validation',
+                      templateFields: selectedTechnicalTemplateObj ? JSON.parse(selectedTechnicalTemplateObj.fields).map((f: any) => ({
+                        ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
+                      })) : []
+                    });
+                  }
+                  if (enableRFQ) {
+                    finalStages.push({
+                      type: 'RFQ',
+                      name: rfqTemplate,
+                      mode: eventMode,
+                      templateFields: selectedRfqTemplateObj ? JSON.parse(selectedRfqTemplateObj.fields).map((f: any) => ({
+                        ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
+                      })) : []
+                    });
+                  }
+                  if (enableAuction) {
+                    finalStages.push({
+                      type: 'Auction',
+                      name: auctionTemplate,
+                      mode: 'Live Auction',
+                      templateFields: selectedAuctionTemplateObj ? JSON.parse(selectedAuctionTemplateObj.fields).map((f: any) => ({
+                        ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
+                      })) : []
+                    });
+                  }
+
                   const res = await fetch('/api/events', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                      refId: `EVT-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
                       title: title,
+                      status: 'Draft',
                       type: eventType,
                       account: 'Internal',
                       itemsCount: lineItems.length,
                       endTime: calculatedEndTime,
-                      stages: [{ 
-                        name: template, 
-                        mode: eventMode,
-                        templateFields: selectedTemplateObj ? JSON.parse(selectedTemplateObj.fields).map((f: any) => ({
-                          ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
-                        })) : [] 
-                      }],
+                      stages: finalStages,
                       participants: selectedVendors
                     })
                   });
@@ -545,31 +696,112 @@ function SingleStageCreateContent() {
                   } else { alert("Error creating event"); }
                 } catch (err) { alert("Network error"); }
               } else {
-                let missing = [];
+                const missing = [];
                 if (!title) missing.push("Title");
                 if (selectedVendors.length === 0) missing.push("at least one Vendor");
-                if (template === 'Select Templates') missing.push("a Template");
+                if (enableTechnical && technicalTemplate === 'Select Templates') missing.push("a Technical Template");
+                if (enableRFQ && rfqTemplate === 'Select Templates') missing.push("an RFQ Template");
+                if (enableAuction && auctionTemplate === 'Select Templates') missing.push("an Auction Template");
+                if (!enableTechnical && !enableRFQ && !enableAuction) missing.push("at least one stage enabled");
                 alert(`Please provide: ${missing.join(', ')}`);
               }
             }}
             style={{ 
-              background: (title && selectedVendors.length > 0 && template !== 'Select Templates') ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
-              color: (title && selectedVendors.length > 0 && template !== 'Select Templates') ? '#ffffff' : '#94a3b8', 
+              background: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
+              color: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) ? '#ffffff' : '#94a3b8', 
               border: 'none', borderRadius: '30px', 
               padding: '16px 32px', fontWeight: '600', fontSize: '1.05rem', 
-              cursor: (title && selectedVendors.length > 0 && template !== 'Select Templates') ? 'pointer' : 'not-allowed',
-              boxShadow: (title && selectedVendors.length > 0 && template !== 'Select Templates') ? '0 10px 15px -3px rgba(37, 99, 235, 0.3)' : 'none',
+              cursor: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) ? 'pointer' : 'not-allowed',
+              boxShadow: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) ? '0 10px 15px -3px rgba(37, 99, 235, 0.3)' : 'none',
               transition: 'all 0.2s ease',
               display: 'flex', alignItems: 'center', gap: '8px'
             }}
-            onMouseEnter={e => { if (title && selectedVendors.length > 0 && template !== 'Select Templates') e.currentTarget.style.transform = 'translateY(-2px)' }}
-            onMouseLeave={e => { if (title && selectedVendors.length > 0 && template !== 'Select Templates') e.currentTarget.style.transform = 'none' }}
+            onMouseEnter={e => { if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) e.currentTarget.style.transform = 'translateY(-2px)' }}
+            onMouseLeave={e => { if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) e.currentTarget.style.transform = 'none' }}
           >
             Launch Event 🚀
           </button>
         </div>
 
       </div>
+
+      {/* Tinder Smart Matchmaking Modal */}
+      {isTinderModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: '#fff', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', position: 'relative' }}>
+            <button onClick={() => setIsTinderModalOpen(false)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}>
+              <X size={20} color="#0f172a" />
+            </button>
+            
+            <div style={{ padding: '24px', background: 'linear-gradient(to right, #fdf2f8, #fce7f3)', borderBottom: '1px solid #fbcfe8', textAlign: 'center' }}>
+              <h2 style={{ margin: 0, color: '#be185d', fontSize: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                🔥 Smart Match AI
+              </h2>
+              <p style={{ margin: '8px 0 0 0', color: '#db2777', fontSize: '0.9rem' }}>Algorithmic curation of the top perfect suppliers.</p>
+            </div>
+
+            <div style={{ padding: '32px 24px', background: '#f8fafc', minHeight: '350px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              {(() => {
+                const availableVendors = vendors.filter(v => !selectedVendors.find(sv => sv.id === v.id));
+                if (availableVendors.length === 0 || currentMatchIndex >= availableVendors.length) {
+                  return (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '4rem', marginBottom: '16px' }}>🎉</div>
+                      <h3 style={{ color: '#0f172a', margin: '0 0 8px 0' }}>No more matches!</h3>
+                      <p style={{ color: '#64748b', margin: 0 }}>You've reviewed all algorithmic recommendations.</p>
+                      <button onClick={() => setIsTinderModalOpen(false)} style={{ marginTop: '24px', padding: '10px 24px', background: '#ec4899', color: '#fff', border: 'none', borderRadius: '20px', fontWeight: 'bold', cursor: 'pointer' }}>Return to Event</button>
+                    </div>
+                  );
+                }
+
+                const cv = availableVendors[currentMatchIndex];
+                return (
+                  <div style={{ width: '100%', background: '#fff', borderRadius: '16px', padding: '24px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+                    <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#fce7f3', color: '#be185d', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 16px auto' }}>
+                      {cv.name.charAt(0)}
+                    </div>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#0f172a', margin: '0 0 8px 0' }}>{cv.name}</h3>
+                    <p style={{ color: '#64748b', margin: '0 0 16px 0', fontSize: '0.95rem' }}>{cv.city || 'Global Supplier'} • {cv.type || 'Manufacturer'}</p>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '24px' }}>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#10b981' }}>{cv.trustScore || '4.8'}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase' }}>Trust Score</div>
+                      </div>
+                      <div style={{ width: '1px', background: '#e2e8f0' }}></div>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#3b82f6' }}>98%</div>
+                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase' }}>Match Rate</div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '24px' }}>
+                      <button 
+                        onClick={() => setCurrentMatchIndex(currentMatchIndex + 1)}
+                        style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fff', border: '2px solid #ef4444', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 6px rgba(239,68,68,0.2)', transition: 'transform 0.1s' }}
+                        onMouseDown={e => e.currentTarget.style.transform = 'scale(0.9)'} onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                      >
+                        <X size={32} />
+                      </button>
+                      <button 
+                        onClick={() => {
+                          handleSelectVendor(cv);
+                          setCurrentMatchIndex(currentMatchIndex + 1);
+                        }}
+                        style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fff', border: '2px solid #10b981', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 6px rgba(16,185,129,0.2)', transition: 'transform 0.1s' }}
+                        onMouseDown={e => e.currentTarget.style.transform = 'scale(0.9)'} onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                      >
+                        <CheckCircle2 size={32} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -1,0 +1,472 @@
+'use client';
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { Mic, Terminal, X, BrainCircuit, Activity, Zap } from 'lucide-react';
+
+export default function JarvisAssistant() {
+  const router = useRouter();
+  const [isEnabled, setIsEnabled] = useState(false);
+  
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [jarvisResponse, setJarvisResponse] = useState('');
+  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+  const [pulseScale, setPulseScale] = useState(1);
+  const [isLockdown, setIsLockdown] = useState(false);
+  const [shouldCrash, setShouldCrash] = useState(false);
+  const [textInput, setTextInput] = useState('');
+  
+  const [targetResponse, setTargetResponse] = useState('');
+  const [displayedResponse, setDisplayedResponse] = useState('');
+  
+  const recognitionRef = useRef<any>(null);
+
+  const speak = (text: string) => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(v => v.name.includes('Google UK English') || v.name.includes('Samantha') || v.name.includes('Daniel'));
+      if (preferredVoice) utterance.voice = preferredVoice;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  useEffect(() => {
+    const checkSettings = () => {
+      try {
+        const saved = localStorage.getItem('godTierFeatures');
+        if (saved) {
+          const features = JSON.parse(saved);
+          setIsEnabled(!!features.jarvisAssistant);
+        }
+      } catch (e) {}
+    };
+    checkSettings();
+    
+    // Poll for settings changes as a fallback, or use event listeners
+    const interval = setInterval(checkSettings, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (displayedResponse !== targetResponse) {
+      const timeout = setTimeout(() => {
+        setDisplayedResponse(targetResponse.slice(0, displayedResponse.length + 1));
+      }, 15); // Typing speed
+      return () => clearTimeout(timeout);
+    }
+  }, [displayedResponse, targetResponse]);
+
+  // Global Keyboard Shortcut: Ctrl + J
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Ctrl + J or Cmd + J
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'j') {
+        e.preventDefault();
+        setIsTerminalOpen(prev => !prev);
+      }
+    };
+    
+    if (isEnabled) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isEnabled]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = true;
+
+      recognitionRef.current.onresult = (event: any) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const trans = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += trans;
+          } else {
+            interimTranscript += trans;
+          }
+        }
+        
+        const currentText = finalTranscript || interimTranscript;
+        setTranscript(currentText);
+        
+        // Pulse effect based on audio (simulated via text length changes)
+        setPulseScale(1 + Math.random() * 0.5);
+        setTimeout(() => setPulseScale(1), 100);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error', event.error);
+        setIsListening(false);
+      };
+    }
+  }, []);
+
+  // Process command when listening stops and we have a transcript
+  useEffect(() => {
+    if (!isListening && transcript) {
+      processCommand(transcript);
+    }
+  }, [isListening]);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert("Speech recognition is not supported in this browser.");
+      return;
+    }
+    
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      setTranscript('');
+      setJarvisResponse('Listening...');
+      setIsTerminalOpen(true);
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
+
+  const handleTextSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && textInput.trim()) {
+      const command = textInput;
+      setTranscript(command);
+      setTextInput('');
+      processCommand(command);
+    }
+  };
+
+  const handleChipClick = (command: string) => {
+    setTranscript(command);
+    processCommand(command);
+  };
+
+  const processCommand = (text: string) => {
+    const lowerText = text.toLowerCase();
+    const upperText = text.toUpperCase();
+    
+    setTargetResponse('');
+    setDisplayedResponse('');
+    
+    setTimeout(() => {
+      let reply = '';
+      
+      // Dynamic Regex Extractions
+      const poMatch = upperText.match(/PO-\d+/);
+      const vendorMatch = upperText.match(/V-\d+/);
+      const eventMatchLoose = upperText.match(/(?:EVT-|EVENT\s*#?\s*)?(\d{3,})/i);
+
+      if (poMatch) {
+        reply = `Accessing Purchase Order ${poMatch[0]}...`;
+        setTimeout(() => { router.push(`/client/po/${poMatch[0]}`); closeTerminal(); }, 2000);
+      }
+      else if (vendorMatch) {
+        reply = `Accessing Vendor Profile for ${vendorMatch[0]}...`;
+        setTimeout(() => { router.push(`/client/vendors/${vendorMatch[0]}`); closeTerminal(); }, 2000);
+      }
+      else if (eventMatchLoose && eventMatchLoose[1] && (upperText.includes('EVENT') || upperText.includes('EVT') || /^\d{3,}$/.test(text.trim()))) {
+        const evtRef = `EVT-${eventMatchLoose[1]}`;
+        reply = `Loading Sourcing Event ${evtRef}...`;
+        setTimeout(() => { router.push(`/client/events/${evtRef}`); closeTerminal(); }, 2000);
+      }
+      
+      // Global Dashboard
+      else if (lowerText.includes('dashboard') || lowerText.includes('home')) {
+        reply = 'Navigating to the Global Dashboard...';
+        setTimeout(() => { router.push('/client'); closeTerminal(); }, 1500);
+      } 
+      
+      // Intake
+      else if (lowerText.includes('create intake') || lowerText.includes('new intake')) {
+        reply = 'Opening the Intake Request form...';
+        setTimeout(() => { router.push('/client/intake/create'); closeTerminal(); }, 1500);
+      }
+      else if (lowerText.includes('intake')) {
+        reply = 'Pulling up the Purchase Intake tracker...';
+        setTimeout(() => { router.push('/client/intake'); closeTerminal(); }, 1500);
+      }
+      
+      // PRs
+      else if (lowerText.includes('new pr') || lowerText.includes('create purchase request')) {
+        reply = 'Initiating new Purchase Request...';
+        setTimeout(() => { router.push('/client/intake/create'); closeTerminal(); }, 1500);
+      }
+      else if (lowerText.includes('purchase request') || lowerText.includes('prs') || lowerText === 'pr') {
+        reply = 'Pulling up the Purchase Request tracker...';
+        setTimeout(() => { router.push('/client/pr'); closeTerminal(); }, 1500);
+      }
+      
+      // Events & Sourcing
+      else if (lowerText.includes('auction')) {
+        reply = 'Initializing Reverse Auction setup...';
+        setTimeout(() => { router.push('/client/events/create/auction'); closeTerminal(); }, 1500);
+      }
+      else if (lowerText.includes('create event') || lowerText.includes('new event') || lowerText.includes('rfq')) {
+        reply = 'Opening the Event Creation studio...';
+        setTimeout(() => { router.push('/client/events/create/single-stage'); closeTerminal(); }, 1500);
+      }
+      else if (lowerText.includes('events') || lowerText.includes('sourcing') || lowerText.includes('bidding')) {
+        reply = 'Opening Active Events matrix...';
+        setTimeout(() => { router.push('/client/events'); closeTerminal(); }, 1500);
+      }
+      
+      // Manage & Config
+      else if (lowerText.includes('product') || lowerText.includes('catalog') || lowerText.includes('items')) {
+        reply = 'Accessing the Global Product Catalog...';
+        setTimeout(() => { router.push('/client/manage/products'); closeTerminal(); }, 1500);
+      }
+      else if (lowerText.includes('template') || lowerText.includes('questionnaire')) {
+        reply = 'Opening Template Management...';
+        setTimeout(() => { router.push('/client/manage/templates'); closeTerminal(); }, 1500);
+      }
+      else if (lowerText.includes('user') || lowerText.includes('team') || lowerText.includes('access')) {
+        reply = 'Navigating to User Directory...';
+        setTimeout(() => { router.push('/client/manage/users'); closeTerminal(); }, 1500);
+      }
+      else if (lowerText.includes('workflow') || lowerText.includes('field map') || lowerText.includes('approval')) {
+        reply = 'Loading Workflow and Field Mapping controls...';
+        setTimeout(() => { router.push('/client/manage/workflows'); closeTerminal(); }, 1500);
+      }
+      
+      // POs & Contracts
+      else if (lowerText.includes('po') || lowerText.includes('order') || lowerText.includes('purchase order')) {
+        reply = 'Accessing Purchase Orders database...';
+        setTimeout(() => { router.push('/client/po'); closeTerminal(); }, 1500);
+      }
+      
+      // Settings
+      else if (lowerText.includes('setting') || lowerText.includes('config') || lowerText.includes('admin')) {
+        reply = 'Opening System Settings panel...';
+        setTimeout(() => { router.push('/client/settings'); closeTerminal(); }, 1500);
+      }
+      
+      // Vendors
+      else if (lowerText.includes('message') || lowerText.includes('chat') || lowerText.includes('inbox')) {
+        reply = 'Opening Secure Vendor Messaging...';
+        setTimeout(() => { router.push('/client/vendors/messages'); closeTerminal(); }, 1500);
+      }
+      else if (lowerText.includes('acme')) {
+        reply = 'Pulling up Acme Corporation vendor profile...';
+        setTimeout(() => { router.push('/client/vendors/V-1002'); closeTerminal(); }, 1500);
+      }
+      else if (lowerText.includes('vendor') || lowerText.includes('supplier') || lowerText.includes('directory')) {
+        reply = 'Accessing Global Supplier Network...';
+        setTimeout(() => { router.push('/client/vendors'); closeTerminal(); }, 1500);
+      }
+      
+      // Vendor Portal
+      else if (lowerText.includes('trading desk') || lowerText.includes('vendor portal')) {
+        reply = 'Switching contexts to the Live Trading Desk...';
+        setTimeout(() => { router.push('/vendor'); closeTerminal(); }, 1500);
+      }
+
+      // Hardcoded AI & UI Actions
+      else if (lowerText.includes('risk') || lowerText.includes('highest')) {
+        reply = 'Scanning global supply chain... Supplier C poses the highest risk due to recent financial insolvency alerts.';
+      }
+      else if (lowerText.includes('lockdown')) {
+        reply = 'Executing emergency system lockdown protocol.';
+        setIsLockdown(true);
+        document.body.style.backgroundColor = '#7f1d1d';
+        setTimeout(() => closeTerminal(), 3000);
+      }
+      else if (lowerText.includes('dark mode')) {
+        reply = 'Initializing dark mode interface.';
+        document.body.style.backgroundColor = '#0f172a';
+        document.body.style.color = '#f8fafc';
+        const els = document.querySelectorAll('.app-container, .sidebar, .main-content');
+        els.forEach((el: any) => el.style.backgroundColor = '#0f172a');
+      }
+      else if (lowerText.includes('crash') || lowerText.includes('throw error')) {
+        reply = 'WARNING: Initiating forced memory leak...';
+        setTimeout(() => setShouldCrash(true), 1500);
+      }
+      
+      // Help Menu
+      else if (lowerText.includes('help') || lowerText.includes('what can you do') || lowerText.includes('commands')) {
+        reply = `I can navigate you anywhere. Try commands like: "Open PO-1045", "What do you remember?", "Take me to Settings", or "Create a new Intake".`;
+      }
+      
+      // Memory Engine
+      else if (lowerText.includes('memory') || lowerText.includes('remember') || lowerText.includes('recent')) {
+        fetch('/api/jarvis/memory').then(r => r.json()).then(data => {
+            if (data && data.length > 0) {
+              const latest = data[0];
+              const memReply = `I am tracking ${data.length} active events in memory (expiring after 20 days). Most recent: ${latest.context} (${latest.entityRef}).`;
+              setTargetResponse(memReply);
+              speak(memReply);
+            } else {
+              const memReply = 'My active memory banks are currently empty.';
+              setTargetResponse(memReply);
+              speak(memReply);
+            }
+        }).catch(err => {
+            setTargetResponse('Failed to access memory banks.');
+        });
+        return; // Early return to prevent overwriting
+      }
+      // Fallback
+      else {
+        reply = `I heard: "${text}". I don't know that specific location, but try commands like "settings", "intake", or "vendors".`;
+      }
+      
+      setTargetResponse(reply);
+      speak(reply);
+    }, 500);
+  };
+
+  const closeTerminal = () => {
+    setIsTerminalOpen(false);
+    setTranscript('');
+    setTargetResponse('');
+    setDisplayedResponse('');
+    setTextInput('');
+  };
+
+  if (shouldCrash) {
+    throw new Error("CRITICAL_FAULT: Manual Override Exception Triggered by Jarvis Protocol.");
+  }
+
+  if (!isEnabled) return null;
+
+  return (
+    <>
+      {isLockdown && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(220, 38, 38, 0.2)', pointerEvents: 'none', zIndex: 9999999, animation: 'lockdownFlash 1s infinite alternate' }}>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#ef4444', fontSize: '5rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '10px', textShadow: '0 0 20px #ef4444' }}>
+            SYSTEM LOCKDOWN
+          </div>
+        </div>
+      )}
+
+      {/* Holographic Orb */}
+      <div 
+        onClick={toggleListening}
+        title="Toggle Jarvis (Ctrl + J)"
+        style={{
+          position: 'fixed', top: '20px', right: '30px',
+          width: '60px', height: '60px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', zIndex: 999999,
+          transform: `scale(${isListening ? pulseScale : 1})`,
+          transition: 'transform 0.1s'
+        }}
+      >
+        {/* Core Ring 1 */}
+        <div style={{
+          position: 'absolute', width: '100%', height: '100%',
+          border: `2px solid ${isListening ? '#f43f5e' : '#38bdf8'}`,
+          borderRadius: '50%', borderTopColor: 'transparent', borderBottomColor: 'transparent',
+          animation: 'spin 4s linear infinite',
+          boxShadow: `0 0 15px ${isListening ? '#f43f5e' : '#38bdf8'}`
+        }} />
+        {/* Core Ring 2 */}
+        <div style={{
+          position: 'absolute', width: '70%', height: '70%',
+          border: `3px solid ${isListening ? '#8b5cf6' : '#818cf8'}`,
+          borderRadius: '50%', borderLeftColor: 'transparent', borderRightColor: 'transparent',
+          animation: 'spin-reverse 3s linear infinite',
+          boxShadow: `inset 0 0 10px ${isListening ? '#8b5cf6' : '#818cf8'}`
+        }} />
+        {/* Center Glow */}
+        <div style={{
+          position: 'absolute', width: '40%', height: '40%',
+          backgroundColor: isListening ? '#f43f5e' : '#38bdf8',
+          borderRadius: '50%',
+          boxShadow: `0 0 20px 5px ${isListening ? '#f43f5e' : '#38bdf8'}`,
+          animation: 'pulse-glow 2s ease-in-out infinite'
+        }} />
+        <Zap color="#fff" size={20} style={{ position: 'relative', zIndex: 2 }} fill="#fff" />
+      </div>
+
+      {/* Slide-out Terminal Overlay */}
+      <div style={{
+        position: 'fixed',
+        top: '90px',
+        right: isTerminalOpen ? '30px' : '-400px',
+        width: '350px',
+        backgroundColor: 'rgba(10, 15, 30, 0.85)',
+        backdropFilter: 'blur(20px) saturate(150%)',
+        borderRadius: '16px',
+        border: '1px solid rgba(56, 189, 248, 0.4)',
+        boxShadow: '0 0 40px rgba(56, 189, 248, 0.15), 0 20px 25px -5px rgba(0, 0, 0, 0.8)',
+        padding: '20px',
+        color: '#fff',
+        zIndex: 999998,
+        transition: 'right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        fontFamily: 'monospace'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontWeight: 'bold' }}>
+            <BrainCircuit size={18} /> JARVIS TERMINAL
+          </div>
+          <button onClick={closeTerminal} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+            <X size={18} />
+          </button>
+        </div>
+
+        <div>
+          <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px', letterSpacing: '1px' }}>System Response</div>
+          <div style={{ minHeight: '60px', color: '#34d399', fontSize: '0.9rem', lineHeight: '1.5', marginBottom: '16px', textShadow: '0 0 10px rgba(52, 211, 153, 0.6)' }}>
+            {displayedResponse && '> ' + displayedResponse}
+            {displayedResponse !== targetResponse && displayedResponse.length > 0 && (
+              <span style={{ display: 'inline-block', width: '8px', height: '14px', backgroundColor: '#34d399', marginLeft: '4px', animation: 'blink 1s step-end infinite', boxShadow: '0 0 8px #34d399' }}></span>
+            )}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px', letterSpacing: '1px' }}>Manual Override</div>
+          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '8px', borderBottom: '2px solid rgba(56, 189, 248, 0.6)', transition: 'border-color 0.2s' }}>
+            <span style={{ color: '#38bdf8', paddingLeft: '12px', fontWeight: 'bold' }}>{'>'}</span>
+            <input 
+              type="text" 
+              placeholder="Type a command..." 
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              onKeyDown={handleTextSubmit}
+              style={{ width: '100%', padding: '12px 10px', backgroundColor: 'transparent', border: 'none', color: '#fff', fontSize: '0.9rem', outline: 'none', fontFamily: 'monospace' }}
+            />
+          </div>
+        </div>
+
+        <style>
+          {`
+            @keyframes blink {
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0; }
+            }
+            @keyframes spin {
+              100% { transform: rotate(360deg); }
+            }
+            @keyframes spin-reverse {
+              100% { transform: rotate(-360deg); }
+            }
+            @keyframes pulse-glow {
+              0%, 100% { transform: scale(1); opacity: 0.8; }
+              50% { transform: scale(1.2); opacity: 1; }
+            }
+            @keyframes lockdownFlash {
+              0% { background-color: rgba(220, 38, 38, 0.1); }
+              100% { background-color: rgba(220, 38, 38, 0.4); }
+            }
+          `}
+        </style>
+      </div>
+    </>
+  );
+}

@@ -1,16 +1,36 @@
 'use client';
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useIntake } from '@/context/IntakeContext';
+import { CheckCircle2, AlertCircle, FileCheck, Users, Clock, Settings, Search, LayoutTemplate, Plus, ShieldCheck, ChevronDown, Rocket, X, GripVertical } from 'lucide-react';
 
-function SingleStageCreateContent() {
+function AuctionCreateContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTitle = searchParams.get('title') || '';
   
   const [title, setTitle] = useState(initialTitle);
+  const { intakes } = useIntake();
+  const [isWorkspaceMode, setIsWorkspaceMode] = useState(false);
+  
+  const [showTinderMatchmaking, setShowTinderMatchmaking] = useState(false);
+  const [isTinderModalOpen, setIsTinderModalOpen] = useState(false);
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('godTierFeatures');
+      if (saved) {
+        const features = JSON.parse(saved);
+        if (features.tinderMatchmaking !== undefined) {
+          setShowTinderMatchmaking(features.tinderMatchmaking);
+        }
+      }
+    } catch (e) {}
+  }, []);
   
   // States for Event Type and Templates
-  const [eventType, setEventType] = useState('Rank based');
+  const [eventType, setEventType] = useState('Price based');
   const [isEventTypeOpen, setIsEventTypeOpen] = useState(false);
   
   const [template, setTemplate] = useState('Select Templates');
@@ -18,44 +38,52 @@ function SingleStageCreateContent() {
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
   const [dbTemplates, setDbTemplates] = useState<any[]>([]);
 
+  // Multi-Stage State
+  const [isMultiStage, setIsMultiStage] = useState(false);
+  const [stage1Name, setStage1Name] = useState('Technical Validation');
+  const [stage2Name, setStage2Name] = useState('Commercial / Live Bidding');
+  const [stage2Template, setStage2Template] = useState('Select Templates');
+  const [selectedStage2TemplateObj, setSelectedStage2TemplateObj] = useState<any>(null);
+  const [isStage2TemplateOpen, setIsStage2TemplateOpen] = useState(false);
+
   // State for dynamic creator fields
   const [creatorData, setCreatorData] = useState<Record<string, string>>({});
+  
+  // State for Event Duration
+  const [durationValue, setDurationValue] = useState('');
+  const [durationUnit, setDurationUnit] = useState('Days');
+
+  const [lineItems, setLineItems] = useState<any[]>([{ id: Date.now(), values: {}, evaluatorId: '' }]);
+  const [users, setUsers] = useState<any[]>([]);
 
   useEffect(() => {
-    // Fetch Templates from database
     fetch('/api/templates')
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) {
-          setDbTemplates(data);
-        }
+        if (Array.isArray(data)) setDbTemplates(data);
       })
-      .catch(err => console.error("Error fetching templates", err));
+      .catch(console.error);
+      
+    fetch('/api/users')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setUsers(data);
+      })
+      .catch(console.error);
   }, []);
 
-  // States for Vendors / Participants
   const [vendorSearch, setVendorSearch] = useState('');
   const [isVendorDropdownOpen, setIsVendorDropdownOpen] = useState(false);
   const [selectedVendors, setSelectedVendors] = useState<any[]>([]);
   const [vendors, setVendors] = useState<any[]>([]);
 
-  // Refs for closing dropdowns on outside click (simplified)
-  
   useEffect(() => {
-    const fetchVendors = async () => {
-      try {
-        const res = await fetch('/api/vendors');
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            setVendors(data);
-          }
-        }
-      } catch(err) {
-        console.error("Failed to fetch vendors", err);
-      }
-    };
-    fetchVendors();
+    fetch('/api/vendors')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setVendors(data);
+      })
+      .catch(console.error);
   }, []);
 
   const filteredVendors = vendors.filter(v => 
@@ -75,383 +103,722 @@ function SingleStageCreateContent() {
     setSelectedVendors(selectedVendors.filter(v => v.id !== id));
   };
 
-  // States for Live/Test Mode
   const [eventMode, setEventMode] = useState('Live Event');
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#f8fafc', margin: '-32px' }}>
-      
-      <div style={{ flex: 1, backgroundColor: '#ffffff', margin: '24px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        
-        <h1 className="page-title" style={{ padding: '24px 32px 0 32px', margin: 0, fontSize: '1.5rem', color: '#1e293b' }}>Create Reverse Auction</h1>
-        <p style={{ padding: '0 32px', color: '#64748b' }}>Configure event settings, items, and invite suppliers to your reverse auction.</p>
+  useEffect(() => {
+    if (searchParams.get('fromPR') === 'true') {
+      const saved = localStorage.getItem('prToEventItems');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.length > 0) {
+            const newLineItems = parsed.map((prod: any, idx: number) => ({
+              id: Date.now() + idx,
+              evaluatorId: '',
+              _source: `PR ${prod._source}`,
+              values: {
+                "Item Name": prod.name,
+                "Product Code": prod.code,
+                "Quantity": prod.qty?.toString(),
+                "UOM": prod.uom || "EA",
+                "Category": "IT/Hardware"
+              }
+            }));
+            setLineItems(newLineItems);
+            setTitle(`Event from PR: ${searchParams.get('prs')}`);
+            localStorage.removeItem('prToEventItems');
+          }
+        } catch(e) {}
+      }
+    }
 
-        {/* Top Header - Event Title & Mode */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 32px', borderBottom: '1px solid #f1f5f9' }}>
-          <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-            <div style={{ fontWeight: '600', color: '#1e293b', fontSize: '1.05rem', marginRight: '16px' }}>Event Title :</div>
+    if (searchParams.get('fromCart') === 'true') {
+      const cart = localStorage.getItem('rfqCart');
+      if (cart) {
+        try {
+          const parsedCart = JSON.parse(cart);
+          if (parsedCart.length > 0) {
+            const newLineItems = parsedCart.map((prod: any, idx: number) => ({
+              id: Date.now() + idx,
+              evaluatorId: '',
+              values: {
+                "Item Name": prod.name,
+                "Product Code": prod.code,
+                "Quantity": "1",
+                "UOM": prod.uom || "Unit",
+                "Category": prod.category
+              }
+            }));
+            setLineItems(newLineItems);
+            setTitle("New Cart RFQ Event");
+            localStorage.removeItem('rfqCart');
+            window.dispatchEvent(new Event('cart_updated')); 
+          }
+        } catch(e) {}
+      }
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (dbTemplates.length > 0 && template !== 'Select Templates' && !selectedTemplateObj) {
+      const tempObj = dbTemplates.find((t: any) => t.name === template);
+      if (tempObj) setSelectedTemplateObj(tempObj);
+    }
+    if (dbTemplates.length > 0 && stage2Template !== 'Select Templates' && !selectedStage2TemplateObj) {
+      const tempObj = dbTemplates.find((t: any) => t.name === stage2Template);
+      if (tempObj) setSelectedStage2TemplateObj(tempObj);
+    }
+  }, [dbTemplates, template, selectedTemplateObj, stage2Template, selectedStage2TemplateObj]);
+
+  const glassInputStyle = { width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', background: 'rgba(255, 255, 255, 0.9)', outline: 'none', fontSize: '0.95rem', transition: 'all 0.2s', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)' };
+  
+  return (
+    <div style={{ display: 'flex', height: '100%', minHeight: '100vh', background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', margin: '-32px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      
+      {/* Workspace Sidebar */}
+      {isWorkspaceMode && (
+        <div style={{ width: '380px', background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(20px)', borderRight: '1px solid rgba(255,255,255,0.6)', padding: '24px', overflowY: 'auto', boxShadow: '4px 0 24px rgba(0,0,0,0.02)', zIndex: 40 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <LayoutTemplate size={20} color="#0f172a" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', margin: 0 }}>Intake Workspace</h2>
+          </div>
+          <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '24px', lineHeight: '1.5' }}>Drag an intake and drop it into the Event Line Items table to auto-populate data.</p>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {intakes.length === 0 && (
+              <div style={{ padding: '24px', textAlign: 'center', background: 'rgba(255,255,255,0.5)', borderRadius: '12px', border: '1px dashed rgba(203,213,225,0.8)' }}>
+                <div style={{ color: '#94a3b8', fontSize: '0.9rem' }}>No intakes available.</div>
+              </div>
+            )}
+            {intakes.map((intake: any) => (
+              <div 
+                key={intake.refId} 
+                draggable 
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('text/plain', intake.refId);
+                  e.currentTarget.style.opacity = '0.5';
+                  e.currentTarget.style.transform = 'scale(0.98)';
+                }}
+                onDragEnd={(e) => {
+                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.style.transform = 'none';
+                }}
+                style={{ background: '#ffffff', border: '1px solid rgba(226, 232, 240, 0.8)', borderRadius: '12px', padding: '16px', cursor: 'grab', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', transition: 'all 0.2s ease', position: 'relative' }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)'; e.currentTarget.style.transform = 'none'; }}
+              >
+                <div style={{ position: 'absolute', right: '16px', top: '16px', color: '#cbd5e1' }}><GripVertical size={16} /></div>
+                <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#3b82f6', marginBottom: '4px', letterSpacing: '0.5px' }}>{intake.refId}</div>
+                <div style={{ fontSize: '1.05rem', fontWeight: '600', color: '#1e293b', marginBottom: '12px', paddingRight: '20px' }}>{intake.title}</div>
+                <div style={{ fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ background: '#f1f5f9', color: '#475569', padding: '4px 8px', borderRadius: '6px', fontWeight: '500' }}>{intake.type}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: intake.status === 'Approved' ? '#10b981' : '#f59e0b', fontWeight: '600' }}>
+                    {intake.status === 'Approved' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />} {intake.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Main Container */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+        
+        {/* Sticky Header */}
+        <div style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255, 255, 255, 0.75)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.6)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 20px -2px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', flex: 1, gap: '16px' }}>
+            <div style={{ background: '#3b82f6', color: '#fff', padding: '8px', borderRadius: '8px', display: 'flex' }}><Rocket size={20} /></div>
             <input 
               type="text" 
-              placeholder="Enter the title of this event" 
+              placeholder="Enter Event Title" 
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              style={{ border: 'none', outline: 'none', fontSize: '1.05rem', color: '#000000', width: '100%', backgroundColor: 'transparent' }}
+              style={{ border: 'none', outline: 'none', fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', width: '100%', background: 'transparent' }}
             />
           </div>
           
-          {/* Mode Toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '24px' }}>
-            <div 
+          <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.8)', padding: '6px', borderRadius: '30px', gap: '4px', border: '1px solid rgba(226,232,240,0.8)' }}>
+            <button 
+              onClick={() => setIsWorkspaceMode(!isWorkspaceMode)}
+              style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '24px', cursor: 'pointer', border: 'none', background: isWorkspaceMode ? '#e0f2fe' : 'transparent', color: isWorkspaceMode ? '#0369a1' : '#64748b', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <LayoutTemplate size={16} /> {isWorkspaceMode ? 'Hide Workspace' : 'Workspace'}
+            </button>
+            <button 
               onClick={() => setEventMode('Live Event')}
-              style={{ 
-                padding: '6px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '20px', cursor: 'pointer',
-                backgroundColor: eventMode === 'Live Event' ? '#ffffff' : 'transparent',
-                color: eventMode === 'Live Event' ? '#2563eb' : '#64748b',
-                boxShadow: eventMode === 'Live Event' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
-                transition: 'all 0.2s ease'
-              }}
+              style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '24px', cursor: 'pointer', border: 'none', background: eventMode === 'Live Event' ? '#fee2e2' : 'transparent', color: eventMode === 'Live Event' ? '#b91c1c' : '#64748b', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
-              🔴 Live Event
-            </div>
-            <div 
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: eventMode === 'Live Event' ? '#ef4444' : '#cbd5e1' }} /> Live
+            </button>
+            <button 
               onClick={() => setEventMode('Test Event')}
-              style={{ 
-                padding: '6px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '20px', cursor: 'pointer',
-                backgroundColor: eventMode === 'Test Event' ? '#ffffff' : 'transparent',
-                color: eventMode === 'Test Event' ? '#f59e0b' : '#64748b',
-                boxShadow: eventMode === 'Test Event' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
-                transition: 'all 0.2s ease'
-              }}
+              style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '24px', cursor: 'pointer', border: 'none', background: eventMode === 'Test Event' ? '#fef3c7' : 'transparent', color: eventMode === 'Test Event' ? '#b45309' : '#64748b', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
-              🧪 Test Event
-            </div>
+              <FileCheck size={16} /> Test
+            </button>
           </div>
         </div>
 
-        {/* Second Header - Event Type & Templates */}
-        <div style={{ display: 'flex', gap: '64px', padding: '16px 32px', borderBottom: '1px solid #f1f5f9' }}>
-          {/* Event Type */}
-          <div style={{ position: 'relative' }}>
-            <div style={{ fontSize: '0.85rem', color: '#000000', marginBottom: '8px' }}>Event Type</div>
-            <div 
-              onClick={() => setIsEventTypeOpen(!isEventTypeOpen)}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', color: '#000000', cursor: 'pointer', userSelect: 'none' }}
-            >
-              <span>{eventType === 'Rank based' ? '🏆' : '💰'}</span> {eventType} <span style={{ color: '#000000', marginLeft: '4px' }}>▼</span>
-            </div>
-            {isEventTypeOpen && (
-              <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: '8px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', zIndex: 10 }}>
-                <div 
-                  onClick={() => { setEventType('Rank based'); setIsEventTypeOpen(false); }}
-                  style={{ padding: '8px 16px', cursor: 'pointer', whiteSpace: 'nowrap', borderBottom: '1px solid #f1f5f9' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                >
-                  🏆 Rank based
-                </div>
-                <div 
-                  onClick={() => { setEventType('Price based'); setIsEventTypeOpen(false); }}
-                  style={{ padding: '8px 16px', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                >
-                  💰 Price based
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Scrollable Content */}
+        <div style={{ flex: 1, padding: '32px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
           
-          {/* Templates */}
-          <div style={{ position: 'relative' }}>
-            <div style={{ fontSize: '0.85rem', color: '#000000', marginBottom: '8px' }}>Templates</div>
-            <div 
-              onClick={() => setIsTemplateOpen(!isTemplateOpen)}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', color: '#000000', cursor: 'pointer', userSelect: 'none' }}
-            >
-              <span style={{ fontSize: '1.1rem' }}>⊞</span> {template} <span style={{ color: '#000000', marginLeft: '4px', fontSize: '0.8rem' }}>▼</span>
-            </div>
-            {isTemplateOpen && (
-              <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: '8px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', zIndex: 10, minWidth: '150px' }}>
-                {dbTemplates.length > 0 ? (
-                  dbTemplates.map((t: any) => (
-                    <div 
-                      key={t.id}
-                      onClick={() => { 
-                        setTemplate(t.name); 
-                        setSelectedTemplateObj(t); 
-                        setIsTemplateOpen(false);
-                        setCreatorData({}); 
-                      }}
-                      style={{ padding: '8px 16px', cursor: 'pointer', whiteSpace: 'nowrap', borderBottom: '1px solid #f1f5f9' }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      {t.name}
-                    </div>
-                  ))
-                ) : (
-                  <div style={{ padding: '8px 16px', color: '#94a3b8', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
-                    No templates found
+          {/* Card 1: Setup */}
+          <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.02)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}><Settings size={20} color="#3b82f6" /> Event Setup</h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+              
+              {/* Event Type */}
+              <div style={{ position: 'relative' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Evaluation Type</label>
+                <div 
+                  onClick={() => setIsEventTypeOpen(!isEventTypeOpen)}
+                  style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: '500' }}>
+                    {eventType === 'Rank based' ? '🏆' : '💰'} {eventType}
+                  </span>
+                  <ChevronDown size={16} color="#94a3b8" />
+                </div>
+                {isEventTypeOpen && (
+                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, overflow: 'hidden' }}>
+                    <div onClick={() => { setEventType('Rank based'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>🏆 Rank based</div>
+                    <div onClick={() => { setEventType('Price based'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333', borderTop: '1px solid #f1f5f9' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>💰 Price based</div>
                   </div>
                 )}
               </div>
-            )}
-          </div>
-        </div>
+              
+              {/* Multi-Stage Toggle */}
+              <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#0f172a', marginBottom: '4px' }}>Enable Two-Stage Evaluation</label>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>Separate technical evaluation from commercial bidding.</p>
+                </div>
+                <div 
+                  onClick={() => setIsMultiStage(!isMultiStage)}
+                  style={{ width: '44px', height: '24px', backgroundColor: isMultiStage ? '#10b981' : '#cbd5e1', borderRadius: '12px', position: 'relative', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                >
+                  <div style={{ width: '20px', height: '20px', backgroundColor: '#fff', borderRadius: '50%', position: 'absolute', top: '2px', left: isMultiStage ? '22px' : '2px', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }} />
+                </div>
+              </div>
 
-        {/* Main Content Area - Product Requirements */}
-        <div style={{ flex: 1, backgroundColor: '#ffffff', padding: '32px', overflowY: 'auto' }}>
-          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e293b', marginBottom: '24px' }}>Product Requirements</h2>
+              {/* Template Area */}
+              {!isMultiStage ? (
+                <div style={{ position: 'relative' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Category Template</label>
+                  <div 
+                    onClick={() => setIsTemplateOpen(!isTemplateOpen)}
+                    style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                  >
+                    <span style={{ color: template === 'Select Templates' ? '#94a3b8' : '#0f172a', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <LayoutTemplate size={16} color={template === 'Select Templates' ? '#94a3b8' : '#3b82f6'} /> {template}
+                    </span>
+                    <ChevronDown size={16} color="#94a3b8" />
+                  </div>
+                  {isTemplateOpen && (
+                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, overflow: 'hidden', maxHeight: '250px', overflowY: 'auto' }}>
+                      {dbTemplates.length > 0 ? (
+                        dbTemplates.map((t: any) => (
+                          <div 
+                            key={t.id}
+                            onClick={() => { setTemplate(t.name); setSelectedTemplateObj(t); setIsTemplateOpen(false); }}
+                            style={{ padding: '12px 16px', cursor: 'pointer', fontWeight: '500', color: '#333', borderBottom: '1px solid #f1f5f9' }}
+                            onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                          >
+                            {t.name}
+                          </div>
+                        ))
+                      ) : (
+                        <div style={{ padding: '12px 16px', color: '#94a3b8', fontSize: '0.9rem' }}>No templates found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  {/* Stage 1 */}
+                  <div style={{ paddingBottom: '24px', borderBottom: '1px dashed #cbd5e1' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.9rem' }}>1</div>
+                      <input 
+                        type="text" value={stage1Name} onChange={e => setStage1Name(e.target.value)}
+                        style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '1.1rem', fontWeight: '600', color: '#0f172a', flex: 1, borderBottom: '1px solid #cbd5e1', paddingBottom: '4px' }}
+                      />
+                    </div>
+                    <div style={{ position: 'relative', paddingLeft: '40px' }}>
+                      <div 
+                        onClick={() => setIsTemplateOpen(!isTemplateOpen)}
+                        style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: '#fff' }}
+                      >
+                        <span style={{ color: template === 'Select Templates' ? '#94a3b8' : '#0f172a', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <LayoutTemplate size={16} color={template === 'Select Templates' ? '#94a3b8' : '#3b82f6'} /> {template}
+                        </span>
+                        <ChevronDown size={16} color="#94a3b8" />
+                      </div>
+                      {isTemplateOpen && (
+                        <div style={{ position: 'absolute', top: '100%', left: '40px', right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, overflow: 'hidden', maxHeight: '250px', overflowY: 'auto' }}>
+                          {dbTemplates.map((t: any) => (
+                            <div key={t.id} onClick={() => { setTemplate(t.name); setSelectedTemplateObj(t); setIsTemplateOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', fontWeight: '500', color: '#333', borderBottom: '1px solid #f1f5f9' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>{t.name}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Stage 2 */}
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#10b981', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.9rem' }}>2</div>
+                      <input 
+                        type="text" value={stage2Name} onChange={e => setStage2Name(e.target.value)}
+                        style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '1.1rem', fontWeight: '600', color: '#0f172a', flex: 1, borderBottom: '1px solid #cbd5e1', paddingBottom: '4px' }}
+                      />
+                    </div>
+                    <div style={{ position: 'relative', paddingLeft: '40px' }}>
+                      <div 
+                        onClick={() => setIsStage2TemplateOpen(!isStage2TemplateOpen)}
+                        style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: '#fff' }}
+                      >
+                        <span style={{ color: stage2Template === 'Select Templates' ? '#94a3b8' : '#0f172a', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <LayoutTemplate size={16} color={stage2Template === 'Select Templates' ? '#94a3b8' : '#10b981'} /> {stage2Template}
+                        </span>
+                        <ChevronDown size={16} color="#94a3b8" />
+                      </div>
+                      {isStage2TemplateOpen && (
+                        <div style={{ position: 'absolute', top: '100%', left: '40px', right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, overflow: 'hidden', maxHeight: '250px', overflowY: 'auto' }}>
+                          {dbTemplates.map((t: any) => (
+                            <div key={t.id} onClick={() => { setStage2Template(t.name); setSelectedStage2TemplateObj(t); setIsStage2TemplateOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', fontWeight: '500', color: '#333', borderBottom: '1px solid #f1f5f9' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>{t.name}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Duration */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Event Duration</label>
+                <div style={{ display: 'flex', alignItems: 'center', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)' }}>
+                  <input 
+                    type="number" min="0" value={durationValue} onChange={e => setDurationValue(e.target.value)}
+                    placeholder=""
+                    style={{ width: '80px', padding: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', borderRight: 'none', borderRadius: '12px 0 0 12px', background: 'rgba(255,255,255,0.9)', outline: 'none', fontSize: '0.95rem', fontWeight: '500', color: '#0f172a' }}
+                    onFocus={e => e.currentTarget.style.borderColor = '#3b82f6'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.8)'}
+                  />
+                  <select
+                    value={durationUnit}
+                    onChange={e => setDurationUnit(e.target.value)}
+                    style={{ flex: 1, padding: '12px 24px 12px 16px', border: '1px solid rgba(226, 232, 240, 0.8)', borderRadius: '0 12px 12px 0', background: 'rgba(248, 250, 252, 0.9)', outline: 'none', fontSize: '0.95rem', fontWeight: '500', color: '#0f172a', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '10px' }}
+                  >
+                    <option value="Minutes">Minutes</option>
+                    <option value="Hours">Hours</option>
+                    <option value="Days">Days</option>
+                  </select>
+                </div>
+              </div>
+            </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>Category</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. IT Equipment"
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>Delivery Date</label>
-                <input 
-                  type="date" 
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>Quantity</label>
-                <input 
-                  type="number" 
-                  placeholder="0"
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>UOM</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. EA, KG"
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>Target Price</label>
-                <input 
-                  type="number" 
-                  placeholder="0.00"
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
-                />
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>Product Specifications</label>
-              <textarea 
-                placeholder="Enter detailed specifications, requirements, and compliance standards..."
-                rows={5}
-                style={{ width: '100%', padding: '12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000', resize: 'vertical' }}
-              />
-            </div>
-
-            <div style={{ marginTop: '16px', display: 'flex', gap: '16px' }}>
-              <button style={{ padding: '8px 16px', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '4px', color: '#000000', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                📎 Attach Documents
-              </button>
-              <button style={{ padding: '8px 16px', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '4px', color: '#000000', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                ➕ Add Another Line Item
-              </button>
-            </div>
-            
-            {/* Dynamic Template Configuration Section */}
+            {/* Dynamic Template Fields */}
             {selectedTemplateObj && (
-              <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid #e2e8f0' }}>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>Template Configuration</h2>
-                <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '24px' }}>Fill in the fields required by you (the Creator) for this template.</p>
-                
+              <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid #f1f5f9' }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a', marginBottom: '16px' }}>Template Configuration</h4>
                 {(() => {
                   try {
                     const fields = JSON.parse(selectedTemplateObj.fields) || [];
                     const creatorFields = fields.filter((f: any) => f.role === 'Creator');
-                    
-                    if (creatorFields.length === 0) {
-                      return <div style={{ fontSize: '0.9rem', color: '#94a3b8' }}>This template has no Buyer-filled requirements.</div>;
-                    }
-
+                    if (creatorFields.length === 0) return <div style={{ fontSize: '0.9rem', color: '#64748b' }}>No buyer-filled requirements for this template.</div>;
                     return (
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                         {creatorFields.map((f: any) => (
                           <div key={f.id}>
-                            <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '500', color: '#000000', marginBottom: '8px' }}>{f.name}</label>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', color: '#475569', marginBottom: '8px' }}>{f.name}</label>
                             <input 
-                              type="number" 
-                              placeholder={`Enter ${f.name}`}
-                              value={creatorData[f.key] || ''}
-                              onChange={(e) => setCreatorData({ ...creatorData, [f.key]: e.target.value })}
-                              style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '0.95rem', color: '#000000' }}
+                              type="number" placeholder={`Enter ${f.name}`} value={creatorData[f.key] || ''} onChange={(e) => setCreatorData({ ...creatorData, [f.key]: e.target.value })}
+                              style={glassInputStyle} onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'} onBlur={e => e.currentTarget.style.boxShadow = 'none'}
                             />
                           </div>
                         ))}
                       </div>
                     );
-                  } catch(e) {
-                    return null;
-                  }
+                  } catch(e) { return null; }
                 })()}
               </div>
             )}
           </div>
-        </div>
 
-        {/* Bottom Bar 1 - Participants */}
-        <div style={{ padding: '16px 32px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', color: '#000000', cursor: 'pointer' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            Participants <span style={{ fontSize: '0.75rem' }}>▼</span>
-          </div>
-          
-          {/* Selected Vendors Chips */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {selectedVendors.map(vendor => (
-              <div key={vendor.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#eff6ff', color: '#1e40af', padding: '4px 8px', borderRadius: '16px', fontSize: '0.85rem', border: '1px solid #bfdbfe' }}>
-                {vendor.name}
-                <span onClick={() => handleRemoveVendor(vendor.id)} style={{ cursor: 'pointer', fontWeight: 'bold' }}>&times;</span>
-              </div>
-            ))}
-          </div>
+          {/* Card 2: Line Items */}
+          <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.02)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}><FileCheck size={20} color="#10b981" /> Product Requirements</h3>
+              <div style={{ fontSize: '0.85rem', color: '#64748b', background: '#f8fafc', padding: '6px 12px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>💡 Ctrl+V inside table to paste from Excel</div>
+            </div>
 
-          {/* Vendor Search Input */}
-          <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
-            <input 
-              type="text" 
-              placeholder="Search vendors you want to add..." 
-              value={vendorSearch}
-              onChange={(e) => {
-                setVendorSearch(e.target.value);
-                setIsVendorDropdownOpen(true);
-              }}
-              onFocus={() => setIsVendorDropdownOpen(true)}
-              style={{ border: 'none', outline: 'none', fontSize: '0.95rem', color: '#000000', width: '100%', backgroundColor: 'transparent' }}
-            />
-            {isVendorDropdownOpen && vendorSearch.length > 0 && (
-              <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: '8px', width: '300px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px', boxShadow: '0 -4px 6px -1px rgba(0,0,0,0.1)', zIndex: 10, maxHeight: '200px', overflowY: 'auto' }}>
-                {filteredVendors.length > 0 ? (
-                  filteredVendors.map(vendor => (
-                    <div 
-                      key={vendor.id}
-                      onClick={() => handleSelectVendor(vendor)}
-                      style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      <div style={{ fontWeight: '500', color: '#000000', fontSize: '0.9rem' }}>{vendor.name}</div>
-                      <div style={{ color: '#000000', fontSize: '0.8rem' }}>{vendor.email}</div>
-                    </div>
-                  ))
-                ) : (
-                  <div style={{ padding: '8px 12px', color: '#000000', fontSize: '0.9rem' }}>No vendors found</div>
-                )}
+            {!selectedTemplateObj ? (
+              <div style={{ padding: '48px', textAlign: 'center', background: 'rgba(248, 250, 252, 0.5)', borderRadius: '12px', border: '2px dashed #cbd5e1' }}>
+                <LayoutTemplate size={48} color="#cbd5e1" style={{ marginBottom: '16px' }} />
+                <h4 style={{ margin: '0 0 8px 0', color: '#475569', fontSize: '1.1rem' }}>No Template Selected</h4>
+                <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>Select a category template above to configure line items.</p>
               </div>
+            ) : (
+              <>
+                <div 
+                  style={{ overflowX: 'auto', border: '2px dashed transparent', transition: 'all 0.3s', borderRadius: '12px' }}
+                  onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = '#3b82f6'; e.currentTarget.style.background = 'rgba(239, 246, 255, 0.5)'; }}
+                  onDragLeave={(e) => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent'; }}
+                  onDrop={(e) => {
+                    e.preventDefault(); e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent';
+                    const refId = e.dataTransfer.getData('text/plain');
+                    const intake = intakes.find((i: any) => i.refId === refId);
+                    if (intake) setLineItems([...lineItems, { id: Date.now(), values: {}, evaluatorId: '', _source: intake.title }]);
+                  }}
+                  onPaste={(e) => {
+                    e.preventDefault();
+                    const pasteData = e.clipboardData.getData('text');
+                    const rows = pasteData.split('\n').filter(r => r.trim() !== '');
+                    const newItems = rows.map((r, i) => ({ id: Date.now() + i, values: {}, evaluatorId: '', _source: 'Excel Import' }));
+                    const tableDiv = e.currentTarget;
+                    tableDiv.style.background = 'rgba(220, 252, 231, 0.5)';
+                    setTimeout(() => tableDiv.style.background = 'transparent', 600);
+                    setLineItems([...lineItems, ...newItems]);
+                  }}
+                >
+                  <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0', minWidth: '800px' }}>
+                    <thead>
+                      <tr>
+                        <th style={{ padding: '16px', textAlign: 'left', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', borderBottom: '2px solid #e2e8f0' }}>Item #</th>
+                        {(() => {
+                          try {
+                            const fields = JSON.parse(selectedTemplateObj.fields);
+                            return fields.map((f: any) => (
+                              <th key={f.id} style={{ padding: '16px', textAlign: 'left', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', borderBottom: '2px solid #e2e8f0' }}>
+                                {f.name} {f.role === 'Participant' && <span style={{ color: '#94a3b8', fontWeight: 'normal', fontSize: '0.75rem' }}>(Vendor)</span>}
+                              </th>
+                            ));
+                          } catch(e) { return null; }
+                        })()}
+                        <th style={{ padding: '16px', textAlign: 'left', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', borderBottom: '2px solid #e2e8f0' }}>Evaluator</th>
+                        <th style={{ padding: '16px', textAlign: 'center', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', borderBottom: '2px solid #e2e8f0' }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lineItems.map((item, index) => {
+                        let parsedFields: any[] = [];
+                        try { parsedFields = JSON.parse(selectedTemplateObj.fields); } catch(e) {}
+                        return (
+                          <tr key={item.id} style={{ transition: 'background-color 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                            <td style={{ padding: '16px', color: '#0f172a', fontWeight: '600', borderBottom: '1px solid #f1f5f9' }}>
+                              {index + 1}
+                              {item._source && <div style={{ fontSize: '0.7rem', color: '#3b82f6', marginTop: '4px', whiteSpace: 'nowrap', background: '#eff6ff', display: 'inline-block', padding: '2px 6px', borderRadius: '4px' }}>From: {item._source}</div>}
+                            </td>
+                            {parsedFields.map((f: any) => (
+                              <td key={f.id} style={{ padding: '16px', borderBottom: '1px solid #f1f5f9' }}>
+                                <input 
+                                  type="text" 
+                                  placeholder={f.role === 'Participant' ? 'Vendor fills this' : f.role === 'Creator' ? 'Set in setup' : 'Auto-calc'}
+                                  value={f.role === 'Creator' ? (creatorData[f.key] || '') : ''}
+                                  readOnly={true}
+                                  style={{ width: '100%', minWidth: '130px', padding: '10px 12px', border: '1px solid transparent', borderRadius: '8px', outline: 'none', background: f.role === 'Participant' ? '#f1f5f9' : '#f8fafc', color: '#64748b', fontSize: '0.9rem' }}
+                                />
+                              </td>
+                            ))}
+                            <td style={{ padding: '16px', borderBottom: '1px solid #f1f5f9' }}>
+                              <select 
+                                value={item.evaluatorId || ''}
+                                onChange={(e) => {
+                                  const newItems = [...lineItems];
+                                  const idx = newItems.findIndex(i => i.id === item.id);
+                                  newItems[idx].evaluatorId = e.target.value;
+                                  setLineItems(newItems);
+                                }}
+                                style={{ width: '100%', minWidth: '150px', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: '8px', outline: 'none', background: '#fff', fontSize: '0.9rem', color: '#0f172a', cursor: 'pointer' }}
+                              >
+                                <option value="">Select Evaluator</option>
+                                {users.map(u => (
+                                  <option key={u.id} value={u.id}>{u.name}</option>
+                                ))}
+                              </select>
+                            </td>
+                            <td style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid #f1f5f9' }}>
+                              <button 
+                                onClick={() => setLineItems(lineItems.filter(i => i.id !== item.id))}
+                                style={{ background: '#fee2e2', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '6px 10px', borderRadius: '6px', fontWeight: 'bold', transition: 'background 0.2s' }}
+                                onMouseEnter={e => e.currentTarget.style.background = '#fecaca'} onMouseLeave={e => e.currentTarget.style.background = '#fee2e2'}
+                              >
+                                <X size={14} />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div style={{ marginTop: '24px', display: 'flex', gap: '16px' }}>
+                  <button 
+                    onClick={() => setLineItems([...lineItems, { id: Date.now(), values: {}, evaluatorId: '' }])}
+                    style={{ padding: '10px 20px', background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '8px', color: '#3b82f6', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.borderColor = '#93c5fd'; }} onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
+                  >
+                    <Plus size={16} /> Add Line Item
+                  </button>
+                </div>
+              </>
             )}
           </div>
+
+          {/* Card 3: Participants */}
+          <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.02)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}><Users size={20} color="#8b5cf6" /> Participants</h3>
+              {showTinderMatchmaking && (
+                <button 
+                  onClick={() => setIsTinderModalOpen(true)}
+                  style={{ background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)', color: '#fff', border: 'none', borderRadius: '24px', padding: '8px 16px', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 6px rgba(236, 72, 153, 0.3)', transition: 'transform 0.2s' }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}
+                >
+                  🔥 Smart Match AI
+                </button>
+              )}
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ position: 'relative', maxWidth: '400px' }}>
+                <div style={{ position: 'absolute', top: '50%', left: '16px', transform: 'translateY(-50%)', color: '#94a3b8' }}><Search size={18} /></div>
+                <input 
+                  type="text" 
+                  placeholder="Search and invite vendors..." 
+                  value={vendorSearch}
+                  onChange={(e) => { setVendorSearch(e.target.value); setIsVendorDropdownOpen(true); }}
+                  onFocus={() => setIsVendorDropdownOpen(true)}
+                  style={{ ...glassInputStyle, paddingLeft: '44px' }}
+                  onFocusCapture={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.2)'} onBlurCapture={e => e.currentTarget.style.boxShadow = 'none'}
+                />
+                {isVendorDropdownOpen && vendorSearch.length > 0 && (
+                  <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: '8px', width: '100%', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, maxHeight: '250px', overflowY: 'auto' }}>
+                    {filteredVendors.length > 0 ? (
+                      filteredVendors.map(vendor => (
+                        <div 
+                          key={vendor.id} onClick={() => handleSelectVendor(vendor)}
+                          style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                          onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        >
+                          <div>
+                            <div style={{ fontWeight: '600', color: '#0f172a', fontSize: '0.95rem' }}>{vendor.name}</div>
+                            <div style={{ color: '#64748b', fontSize: '0.85rem' }}>{vendor.email}</div>
+                          </div>
+                          <Plus size={16} color="#8b5cf6" />
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ padding: '12px 16px', color: '#64748b', fontSize: '0.9rem' }}>No vendors found matching "{vendorSearch}"</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {selectedVendors.length > 0 ? (
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '8px' }}>
+                  {selectedVendors.map(vendor => (
+                    <div key={vendor.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(to right, #f3e8ff, #e0e7ff)', color: '#4338ca', padding: '8px 16px', borderRadius: '24px', fontSize: '0.9rem', fontWeight: '600', border: '1px solid #c7d2fe', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', animation: 'fadeIn 0.3s ease' }}>
+                      <ShieldCheck size={16} /> {vendor.name}
+                      <button onClick={() => handleRemoveVendor(vendor.id)} style={{ background: 'rgba(255,255,255,0.5)', border: 'none', color: '#4338ca', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginLeft: '4px' }}>&times;</button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ color: '#94a3b8', fontSize: '0.9rem', fontStyle: 'italic' }}>No vendors selected yet.</div>
+              )}
+            </div>
+          </div>
+          
+          <div style={{ height: '80px' }}></div> {/* Spacer */}
         </div>
 
-        {/* Bottom Bar 2 - Actions & Schedule */}
-        <div style={{ padding: '16px 32px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#ffffff' }}>
-          
-          {/* Left Actions */}
-          <div style={{ display: 'flex', gap: '24px', color: '#cbd5e1', fontWeight: '500', fontSize: '0.95rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-              <span style={{ fontSize: '1.2rem' }}>⊞</span> Savings
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-              <span style={{ fontSize: '1.2rem' }}>📄</span> Terms & Conditions
-            </div>
+        {/* Sticky Glass Footer - Launch Actions */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(226, 232, 240, 0.8)', padding: '20px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.05)', zIndex: 50 }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ fontSize: '0.8rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Timeline Status</div>
+            <div style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>Event is ready to launch</div>
           </div>
-
-          {/* Right Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-            
-            {/* Schedule Info */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-              <div style={{ fontSize: '0.8rem', color: '#000000', marginBottom: '4px' }}>Schedule</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#000000', fontSize: '0.9rem', cursor: 'pointer' }}>
-                <span>🕒</span> Now - 12:36 am, 1st Jul (30 Mins) <span style={{ fontSize: '0.75rem' }}>▼</span>
-              </div>
-            </div>
-
-            {/* Send Button */}
-            <button 
-              onClick={async () => {
-                if (title && selectedVendors.length > 0 && template !== 'Select Templates') {
-                  try {
-                    const res = await fetch('/api/events', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        refId: `EVT-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
-                        title: title,
-                        type: eventType,
-                        account: 'Internal',
-                        itemsCount: 1,
-                        stages: [{ 
-                          name: template, 
-                          mode: eventMode,
-                          templateFields: selectedTemplateObj ? JSON.parse(selectedTemplateObj.fields).map((f: any) => ({
-                            ...f,
-                            defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
-                          })) : [] 
-                        }],
-                        participants: selectedVendors
-                      })
-                    });
-                    if (res.ok) {
-                      alert("Event successfully created and published to Vendor Portal!");
-                      router.push('/client/events');
-                    } else {
-                      alert("Error creating event");
+          <button 
+            onClick={async () => {
+              if (title && selectedVendors.length > 0 && template !== 'Select Templates') {
+                try {
+                  // Calculate endTime if duration is provided
+                  let calculatedEndTime = null;
+                  if (durationValue) {
+                    const num = parseInt(durationValue);
+                    if (!isNaN(num) && num > 0) {
+                      let ms = 0;
+                      if (durationUnit === 'Minutes') ms = num * 60 * 1000;
+                      else if (durationUnit === 'Hours') ms = num * 60 * 60 * 1000;
+                      else if (durationUnit === 'Days') ms = num * 24 * 60 * 60 * 1000;
+                      calculatedEndTime = new Date(Date.now() + ms).toISOString();
                     }
-                  } catch (err) {
-                    alert("Network error");
                   }
-                } else {
-                  let missing = [];
-                  if (!title) missing.push("Title");
-                  if (selectedVendors.length === 0) missing.push("at least one Vendor");
-                  if (template === 'Select Templates') missing.push("a Template");
-                  alert(`Please provide: ${missing.join(', ')}`);
-                }
-              }}
-              style={{ 
-                backgroundColor: (title && selectedVendors.length > 0 && template !== 'Select Templates') ? '#2563eb' : '#f1f5f9', 
-                color: (title && selectedVendors.length > 0 && template !== 'Select Templates') ? '#ffffff' : '#94a3b8', 
-                border: '1px solid #cbd5e1', borderRadius: '4px', 
-                padding: '12px 24px', fontWeight: '600', fontSize: '0.95rem', 
-                cursor: 'pointer'
-              }}>
-              Launch Event
-            </button>
-          </div>
+
+                  const finalStages = isMultiStage 
+                      ? [
+                          { 
+                            name: stage1Name, 
+                            mode: 'Technical Validation',
+                            templateFields: selectedTemplateObj ? JSON.parse(selectedTemplateObj.fields).map((f: any) => ({
+                              ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
+                            })) : [] 
+                          },
+                          { 
+                            name: stage2Name, 
+                            mode: eventMode,
+                            templateFields: selectedStage2TemplateObj ? JSON.parse(selectedStage2TemplateObj.fields).map((f: any) => ({
+                              ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
+                            })) : [] 
+                          }
+                        ]
+                      : [
+                          { 
+                            name: template, 
+                            mode: eventMode,
+                            templateFields: selectedTemplateObj ? JSON.parse(selectedTemplateObj.fields).map((f: any) => ({
+                              ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
+                            })) : [] 
+                          }
+                        ];
+
+                  const res = await fetch('/api/events', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      title: title,
+                      status: 'Draft',
+                      type: eventType,
+                      account: 'Internal',
+                      itemsCount: lineItems.length,
+                      endTime: calculatedEndTime,
+                      stages: finalStages,
+                      participants: selectedVendors
+                    })
+                  });
+                  if (res.ok) {
+                    alert("Event successfully created and published to Vendor Portal!");
+                    router.push('/client/events');
+                  } else { alert("Error creating event"); }
+                } catch (err) { alert("Network error"); }
+              } else {
+                const missing = [];
+                if (!title) missing.push("Title");
+                if (selectedVendors.length === 0) missing.push("at least one Vendor");
+                if (template === 'Select Templates') missing.push("a Template for Stage 1");
+                if (isMultiStage && stage2Template === 'Select Templates') missing.push("a Template for Stage 2");
+                alert(`Please provide: ${missing.join(', ')}`);
+              }
+            }}
+            style={{ 
+              background: (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates')) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
+              color: (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates')) ? '#ffffff' : '#94a3b8', 
+              border: 'none', borderRadius: '30px', 
+              padding: '16px 32px', fontWeight: '600', fontSize: '1.05rem', 
+              cursor: (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates')) ? 'pointer' : 'not-allowed',
+              boxShadow: (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates')) ? '0 10px 15px -3px rgba(37, 99, 235, 0.3)' : 'none',
+              transition: 'all 0.2s ease',
+              display: 'flex', alignItems: 'center', gap: '8px'
+            }}
+            onMouseEnter={e => { if (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates')) e.currentTarget.style.transform = 'translateY(-2px)' }}
+            onMouseLeave={e => { if (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates')) e.currentTarget.style.transform = 'none' }}
+          >
+            Launch Event 🚀
+          </button>
         </div>
 
       </div>
+
+      {/* Tinder Smart Matchmaking Modal */}
+      {isTinderModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: '#fff', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', position: 'relative' }}>
+            <button onClick={() => setIsTinderModalOpen(false)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}>
+              <X size={20} color="#0f172a" />
+            </button>
+            
+            <div style={{ padding: '24px', background: 'linear-gradient(to right, #fdf2f8, #fce7f3)', borderBottom: '1px solid #fbcfe8', textAlign: 'center' }}>
+              <h2 style={{ margin: 0, color: '#be185d', fontSize: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                🔥 Smart Match AI
+              </h2>
+              <p style={{ margin: '8px 0 0 0', color: '#db2777', fontSize: '0.9rem' }}>Algorithmic curation of the top perfect suppliers.</p>
+            </div>
+
+            <div style={{ padding: '32px 24px', background: '#f8fafc', minHeight: '350px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              {(() => {
+                const availableVendors = vendors.filter(v => !selectedVendors.find(sv => sv.id === v.id));
+                if (availableVendors.length === 0 || currentMatchIndex >= availableVendors.length) {
+                  return (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '4rem', marginBottom: '16px' }}>🎉</div>
+                      <h3 style={{ color: '#0f172a', margin: '0 0 8px 0' }}>No more matches!</h3>
+                      <p style={{ color: '#64748b', margin: 0 }}>You've reviewed all algorithmic recommendations.</p>
+                      <button onClick={() => setIsTinderModalOpen(false)} style={{ marginTop: '24px', padding: '10px 24px', background: '#ec4899', color: '#fff', border: 'none', borderRadius: '20px', fontWeight: 'bold', cursor: 'pointer' }}>Return to Event</button>
+                    </div>
+                  );
+                }
+
+                const cv = availableVendors[currentMatchIndex];
+                return (
+                  <div style={{ width: '100%', background: '#fff', borderRadius: '16px', padding: '24px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+                    <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#fce7f3', color: '#be185d', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 16px auto' }}>
+                      {cv.name.charAt(0)}
+                    </div>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#0f172a', margin: '0 0 8px 0' }}>{cv.name}</h3>
+                    <p style={{ color: '#64748b', margin: '0 0 16px 0', fontSize: '0.95rem' }}>{cv.city || 'Global Supplier'} • {cv.type || 'Manufacturer'}</p>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '24px' }}>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#10b981' }}>{cv.trustScore || '4.8'}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase' }}>Trust Score</div>
+                      </div>
+                      <div style={{ width: '1px', background: '#e2e8f0' }}></div>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#3b82f6' }}>98%</div>
+                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase' }}>Match Rate</div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '24px' }}>
+                      <button 
+                        onClick={() => setCurrentMatchIndex(currentMatchIndex + 1)}
+                        style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fff', border: '2px solid #ef4444', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 6px rgba(239,68,68,0.2)', transition: 'transform 0.1s' }}
+                        onMouseDown={e => e.currentTarget.style.transform = 'scale(0.9)'} onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                      >
+                        <X size={32} />
+                      </button>
+                      <button 
+                        onClick={() => {
+                          handleSelectVendor(cv);
+                          setCurrentMatchIndex(currentMatchIndex + 1);
+                        }}
+                        style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fff', border: '2px solid #10b981', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 6px rgba(16,185,129,0.2)', transition: 'transform 0.1s' }}
+                        onMouseDown={e => e.currentTarget.style.transform = 'scale(0.9)'} onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                      >
+                        <CheckCircle2 size={32} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
 
-export default function SingleStageCreatePage() {
+export default function AuctionCreatePage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <SingleStageCreateContent />
+      <AuctionCreateContent />
     </Suspense>
   );
 }
