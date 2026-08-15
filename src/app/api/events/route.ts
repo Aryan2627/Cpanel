@@ -53,7 +53,7 @@ export async function POST(request: Request) {
           return sendVendorInvitation(
             vendor.email, 
             data.title || 'New Bidding Event', 
-            'http://localhost:5174/login' // TODO: Change to production URL
+            (process.env.VENDOR_PORTAL_URL || 'http://localhost:5174') + '/login' // TODO: Change to production URL
           );
         }
       })).catch(console.error);
