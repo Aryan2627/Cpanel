@@ -85,12 +85,12 @@ export default function BuyerEventDetailsPage() {
   };
 
   const handleDownloadCSV = () => {
-    let csv = 'Vendor Name,Composite Score,Total Amount (USD),Original Currency,CO2 Footprint,';
+    let csv = `Vendor Name,Composite Score,Total Amount (${event?.baseCurrency || 'USD'}),Original Currency,CO2 Footprint,`;
     csv += templateFields.map((f: any) => f.name).join(',') + '\n';
     bids.forEach(bid => {
       let templateData: any = {};
       try { templateData = JSON.parse(bid.templateData); } catch(e) {}
-      let row = `"${bid.vendorName}",${bid.score || 0},${bid.usdAmount},${bid.currency || 'USD'},"${bid.esgScore || 'N/A'}",`;
+      let row = `"${bid.vendorName}",${bid.score || 0},${bid.amount},${bid.currency || 'USD'},"${bid.esgScore || 'N/A'}",`;
       const tVals = templateFields.map((f: any) => `"${templateData[f.key] || ''}"`);
       row += tVals.join(',') + '\n';
       csv += row;
@@ -145,7 +145,7 @@ export default function BuyerEventDetailsPage() {
         body: JSON.stringify({
           title: `PO for Event ${event.refId}`,
           vendorId: bid.vendorName,
-          total: bid.usdAmount || bid.amount,
+          total: bid.amount,
           eventId: event.id,
           status: 'Draft',
           poNumber: `PO-${Date.now()}`,
@@ -178,10 +178,8 @@ export default function BuyerEventDetailsPage() {
 
   const enableESG = templateFields.some((f: any) => f.enableESG);
 
-  // Process Bids: Currency Conversion & Scoring
+  // Process Bids: Scoring
   const processedBids = useMemo(() => {
-    const exchangeRates: Record<string, number> = { 'USD': 1, 'EUR': 1.1, 'GBP': 1.25, 'JPY': 0.0067 };
-    
     // Find min values for scoring
     const minVals: Record<string, number> = {};
     templateFields.forEach((f: any) => {
@@ -201,7 +199,8 @@ export default function BuyerEventDetailsPage() {
       try { data = JSON.parse(bid.templateData); } catch(e) {}
       
       const currency = bid.currency || 'USD';
-      const usdAmount = bid.amount * (exchangeRates[currency] || 1);
+      // bid.amount is already converted to baseCurrency by the vendor portal
+      const baseAmount = bid.amount;
       
       // Calculate Composite Score out of 100
       let score = 0;
@@ -225,7 +224,7 @@ export default function BuyerEventDetailsPage() {
       // Mock ESG Carbon calculation (heuristic based on amount for demo)
       let esgScore = 'N/A';
       if (enableESG) {
-        esgScore = `${Math.floor(usdAmount * 0.015)} kg CO2e`;
+        esgScore = `${Math.floor(baseAmount * 0.015)} kg CO2e`;
       }
 
       // Mock Trust Score, Risk, and Financial Health
@@ -235,8 +234,11 @@ export default function BuyerEventDetailsPage() {
       if ((bid.vendorName || '').includes('Global') || (bid.vendorName || '').includes('Supplier B')) { trustScore = 3.5; riskLevel = 'Moderate Risk'; financialHealth = 'Stable'; }
       if ((bid.vendorName || '').includes('Untrustworthy') || (bid.vendorName || '').includes('Supplier C')) { trustScore = 1.2; riskLevel = 'High Risk'; financialHealth = 'Critical'; }
 
-      return { ...bid, usdAmount, score: Math.round(score * 10) / 10, esgScore, parsedData: data, trustScore, riskLevel, financialHealth };
-    }).sort((a: any, b: any) => b.score - a.score); // Highest score first
+      return { ...bid, baseAmount, score: Math.round(score * 10) / 10, esgScore, parsedData: data, trustScore, riskLevel, financialHealth };
+    }).sort((a: any, b: any) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.baseAmount - b.baseAmount; // Lowest amount wins if scores tie
+    });
     
     // Add AI Ghost Bid if enabled
     if (showGhostBidding && processed.length > 0) {
@@ -262,20 +264,19 @@ export default function BuyerEventDetailsPage() {
       });
       const totalWeight = templateFields.reduce((acc: number, f: any) => acc + (f.weight || 0), 0);
       score = totalWeight > 0 ? (score / totalWeight) * 100 : 0;
-      
-      // Approximate ghost usd amount from the lowest human bid * 0.95
-      const lowestHumanAmount = Math.min(...processed.map(b => b.usdAmount));
-      ghostUsdAmount = lowestHumanAmount * 0.95;
+      // Approximate ghost base amount from the lowest human bid * 0.95
+      const lowestHumanAmount = Math.min(...processed.map(b => b.baseAmount));
+      let ghostBaseAmount = lowestHumanAmount * 0.95;
 
       processed.unshift({
         id: 'ai-ghost-bid',
         vendorName: 'AI "Ghost Bid" (Market Intel)',
         isGhost: true,
         score: Math.round(score * 10) / 10,
-        usdAmount: ghostUsdAmount,
-        currency: 'USD',
-        amount: ghostUsdAmount,
-        esgScore: enableESG ? `${Math.floor(ghostUsdAmount * 0.012)} kg CO2e` : 'N/A', // 20% cleaner than human average
+        baseAmount: ghostBaseAmount,
+        currency: event?.baseCurrency || 'USD',
+        amount: ghostBaseAmount,
+        esgScore: enableESG ? `${Math.floor(ghostBaseAmount * 0.012)} kg CO2e` : 'N/A', // 20% cleaner than human average
         parsedData: ghostData,
         trustScore: 5.0,
         riskLevel: 'Low Risk',
@@ -305,13 +306,13 @@ export default function BuyerEventDetailsPage() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ display: 'flex', gap: '24px', flexDirection: 'column' }}>
+          <div style={{ width: '100%' }}>
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
               <h2 style={{ margin: '0 0 16px 0', fontSize: '1.1rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FileText size={18} color="#2563eb" /> Event Snapshot
               </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                 <div style={{ padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '4px' }}>Total Items</div>
                   <div style={{ fontWeight: 500, color: '#0f172a' }}>{event.itemsCount}</div>
@@ -320,7 +321,7 @@ export default function BuyerEventDetailsPage() {
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '4px' }}>Date Created</div>
                   <div style={{ fontWeight: 500, color: '#0f172a' }}>{new Date(event.createdAt).toLocaleDateString()}</div>
                 </div>
-                <div style={{ padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #f1f5f9', gridColumn: 'span 2' }}>
+                <div style={{ padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '4px' }}>Status</div>
                   {(() => {
                     if (event.endTime) {
@@ -348,7 +349,7 @@ export default function BuyerEventDetailsPage() {
             </div>
           </div>
 
-          <div style={{ flex: '2 1 600px' }}>
+          <div style={{ width: '100%' }}>
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <h2 style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -401,14 +402,14 @@ export default function BuyerEventDetailsPage() {
                       <tr>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Vendor</th>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Score</th>
-                        <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Total Amount (USD)</th>
+                        <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Total Amount ({event.baseCurrency || 'USD'})</th>
                         {enableESG && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Carbon Footprint</th>}
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textAlign: 'right', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {processedBids.map((bid: any, idx: number) => {
-                        const isBest = bid.id === bestBid?.id && bid.score > 0 && !bid.isGhost;
+                        const isBest = idx === 0 && !bid.isGhost;
                         
                         if (bid.isGhost) {
                           return (
@@ -427,7 +428,7 @@ export default function BuyerEventDetailsPage() {
                                 </span>
                               </td>
                               <td style={{ padding: '20px 24px', fontWeight: 700, color: '#6b21a8', fontSize: '1.1rem', borderTop: '1px solid #e9d5ff', borderBottom: '1px solid #e9d5ff' }}>
-                                ${bid.usdAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {bid.baseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {event.baseCurrency || 'USD'}
                               </td>
                               {enableESG && (
                                 <td style={{ padding: '20px 24px', color: '#16a34a', fontWeight: 600, borderTop: '1px solid #e9d5ff', borderBottom: '1px solid #e9d5ff' }}>
@@ -471,8 +472,14 @@ export default function BuyerEventDetailsPage() {
                               </div>
                             </td>
                             <td style={{ padding: '20px 24px', fontWeight: 700, color: '#0f172a', fontSize: '1.15rem', borderTop: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderBottom: isBest ? '2px solid #34d399' : '1px solid #e2e8f0' }}>
-                              ${bid.usdAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                              {bid.currency !== 'USD' && <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500, marginTop: '4px' }}>Orig: {bid.amount} {bid.currency}</div>}
+                              {bid.baseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {event.baseCurrency || 'USD'}
+                              {bid.initialAmount && bid.initialAmount > bid.baseAmount && (
+                                <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '6px' }}>
+                                  Initial: <span style={{ textDecoration: 'line-through' }}>{bid.initialAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {event.baseCurrency || 'USD'}</span>
+                                  <div style={{ color: '#10b981', fontWeight: 600, marginTop: '2px' }}>↓ Revised</div>
+                                </div>
+                              )}
+                              {bid.currency !== (event.baseCurrency || 'USD') && <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500, marginTop: '4px' }}>Orig: {bid.localAmount || bid.amount} {bid.currency}</div>}
                             </td>
                             {enableESG && (
                               <td style={{ padding: '20px 24px', color: '#16a34a', fontWeight: 600, borderTop: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderBottom: isBest ? '2px solid #34d399' : '1px solid #e2e8f0' }}>
@@ -484,9 +491,23 @@ export default function BuyerEventDetailsPage() {
                                 <button onClick={() => { setActiveVendorChat(bid); setIsChatOpen(true); }} style={{ padding: '10px 16px', backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#dbeafe'; e.currentTarget.style.transform = 'scale(1.05)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#eff6ff'; e.currentTarget.style.transform = 'scale(1)'; }}>
                                   💬 Negotiate
                                 </button>
-                                {isBest && (!showBankruptcyPredictor || bid.financialHealth !== 'Critical') && (
-                                  <button onClick={() => handleAward(bid)} style={{ padding: '10px 20px', background: 'linear-gradient(to right, #10b981, #059669)', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 10px rgba(16,185,129,0.4)', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 6px 15px rgba(16,185,129,0.5)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(16,185,129,0.4)'; }}>
-                                    🏆 Award Vendor
+                                {(!showBankruptcyPredictor || bid.financialHealth !== 'Critical') && (
+                                  <button onClick={() => handleAward(bid)} style={{ 
+                                    padding: '10px 20px', 
+                                    background: isBest ? 'linear-gradient(to right, #10b981, #059669)' : '#fff', 
+                                    color: isBest ? '#fff' : '#0f172a', 
+                                    border: isBest ? 'none' : '1px solid #cbd5e1', 
+                                    borderRadius: '8px', 
+                                    cursor: 'pointer', 
+                                    fontSize: '0.9rem', 
+                                    fontWeight: 700, 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: '6px', 
+                                    boxShadow: isBest ? '0 4px 10px rgba(16,185,129,0.4)' : '0 1px 2px rgba(0,0,0,0.05)', 
+                                    transition: 'all 0.2s' 
+                                  }} onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = isBest ? '0 6px 15px rgba(16,185,129,0.5)' : '0 4px 6px -1px rgba(0,0,0,0.1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = isBest ? '0 4px 10px rgba(16,185,129,0.4)' : '0 1px 2px rgba(0,0,0,0.05)'; }}>
+                                    {isBest ? '🏆 Award Best Bid' : 'Award Vendor'}
                                   </button>
                                 )}
                                 {showBankruptcyPredictor && bid.financialHealth === 'Critical' && (
@@ -628,7 +649,7 @@ export default function BuyerEventDetailsPage() {
                   <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '2px solid #cbd5e1' }}>
                     <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Vendor Name</th>
                     <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Composite Score</th>
-                    <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Total (USD)</th>
+                    <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Total ({event.baseCurrency || 'USD'})</th>
                     {enableESG && <th style={{ padding: '16px', fontWeight: 600, color: '#16a34a' }}>CO2 Footprint</th>}
                     {templateFields.map((f: any) => (
                       <th key={f.key} style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>
@@ -648,7 +669,7 @@ export default function BuyerEventDetailsPage() {
                           </td>
                           <td style={{ padding: '16px', fontWeight: 600, color: '#6b21a8' }}>{bid.score > 0 ? `${bid.score}/100` : 'N/A'}</td>
                           <td style={{ padding: '16px', fontWeight: 600, color: '#6b21a8' }}>
-                            ${bid.usdAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            {bid.baseAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                           </td>
                           {enableESG && <td style={{ padding: '16px', color: '#16a34a', fontWeight: 500 }}>{bid.esgScore}</td>}
                           {templateFields.map((f: any) => (
@@ -665,8 +686,8 @@ export default function BuyerEventDetailsPage() {
                         <td style={{ padding: '16px', fontWeight: 600, color: '#0f172a' }}>{bid.vendorName}</td>
                         <td style={{ padding: '16px', fontWeight: 600, color: '#2563eb' }}>{bid.score > 0 ? `${bid.score}/100` : 'N/A'}</td>
                         <td style={{ padding: '16px', fontWeight: 600, color: '#0f172a' }}>
-                          ${bid.usdAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                          {bid.currency !== 'USD' && <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 400, display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}><Globe size={10} /> {bid.currency} Rate Applied</div>}
+                          {bid.baseAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          {bid.currency !== (event.baseCurrency || 'USD') && <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 400, display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}><Globe size={10} /> {bid.currency} Rate Applied</div>}
                         </td>
                         {enableESG && <td style={{ padding: '16px', color: '#16a34a', fontWeight: 500 }}>{bid.esgScore}</td>}
                         

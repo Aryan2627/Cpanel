@@ -21,13 +21,15 @@ export async function POST(request: Request) {
     const data = await request.json();
     const event = await prisma.event.create({
       data: {
-        refId: data.refId,
+        refId: data.refId || `EVT-${Math.floor(Math.random() * 100000)}`,
         title: data.title,
         type: data.type,
         account: data.account,
         itemsCount: data.itemsCount || 1,
         stages: data.stages ? JSON.stringify(data.stages) : null,
         participants: data.participants ? JSON.stringify(data.participants) : null,
+        baseCurrency: data.baseCurrency || 'USD',
+        feedbackMode: data.feedbackMode || 'Sealed',
         endTime: data.endTime ? new Date(data.endTime) : null,
       }
     });

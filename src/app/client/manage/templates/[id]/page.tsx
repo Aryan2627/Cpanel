@@ -1,37 +1,39 @@
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { GripVertical, Plus, Trash2, ArrowUp, ArrowDown, Info, Save, X, Eye, Wand2, Leaf, Settings } from 'lucide-react';
 
-export default function CreateTemplatePage() {
+export default function EditTemplatePage() {
   const router = useRouter();
+  const params = useParams();
   const [templateName, setTemplateName] = useState('');
   const [description, setDescription] = useState('');
   const [templateType, setTemplateType] = useState('RFQ');
   const [enableESG, setEnableESG] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   
-  const [fields, setFields] = useState<any[]>([
-    { 
-      id: '1', 
-      name: 'Base Price', 
-      key: 'base_price', 
-      type: 'number', 
-      dropdownOptions: '', 
-      role: 'Participant', 
-      formula: '',
-      section: 'Pricing',
-      required: true,
-      tooltip: 'Enter your best base price per unit.',
-      weight: 100,
-      dependsOn: '',
-      dependsOnValue: '',
-      targetPrice: '',
-      validationRule: '',
-      autoFill: false,
-      showAdvanced: false
+  const [fields, setFields] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (params?.id) {
+      fetch(`/api/templates/${params.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && !data.error) {
+            setTemplateName(data.name || '');
+            setTemplateType(data.type || 'RFQ');
+            if (data.fields) {
+              try {
+                setFields(JSON.parse(data.fields));
+              } catch (e) {
+                console.error("Error parsing fields:", e);
+              }
+            }
+          }
+        })
+        .catch(console.error);
     }
-  ]);
+  }, [params]);
 
   const addField = () => {
     setFields([...fields, { 
@@ -114,8 +116,8 @@ export default function CreateTemplatePage() {
         return { ...rest, type: rest.type || 'number', section: rest.section || 'General', enableESG };
       });
 
-      const res = await fetch('/api/templates', {
-        method: 'POST',
+      const res = await fetch(`/api/templates/${params.id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: templateName,
@@ -123,7 +125,7 @@ export default function CreateTemplatePage() {
           fields: payloadFields
         })
       });
-      if (!res.ok) throw new Error('Failed to save template');
+      if (!res.ok) throw new Error('Failed to update template');
       window.dispatchEvent(new Event('templates_updated'));
       router.push('/client/manage/templates');
     } catch (err) {

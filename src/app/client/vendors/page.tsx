@@ -19,25 +19,8 @@ export default function VendorManagement() {
     dealsIn: '', tradeLicense: '', inviteVia: 'Tax ID', city: ''
   });
 
-  const initialMockVendors = [
-    {
-      id: 'mock1', name: 'Alpha Technologies', vendorCode: 'V-10045', companyCode: 'C-90',
-      email: 'contact@alphatech.com', phone: '+1 555-0198', type: 'Manufacturer',
-      city: 'San Francisco', status: 'Joined', liveEventId: 'EVT-0042', trustScore: 4.8, financialHealth: 'Excellent'
-    },
-    {
-      id: 'mock2', name: 'Global Supply Co.', vendorCode: 'V-10046', companyCode: 'C-91',
-      email: 'sales@globalsupply.com', phone: '+44 20-7946', type: 'Trader',
-      city: 'London', status: 'Invited', trustScore: 3.5, financialHealth: 'Stable'
-    },
-    {
-      id: 'mock3', name: 'Untrustworthy LLC', vendorCode: 'V-10047', companyCode: 'C-92',
-      email: 'spam@untrustworthy.com', phone: '+1 555-0000', type: 'Broker',
-      city: 'Unknown', status: 'Blacklisted', trustScore: 1.2, financialHealth: 'Critical'
-    }
-  ];
-
-  const [vendors, setVendors] = useState<any[]>(initialMockVendors);
+  const [vendors, setVendors] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showBankruptcyPredictor, setShowBankruptcyPredictor] = useState(true);
 
   useEffect(() => {
@@ -58,7 +41,8 @@ export default function VendorManagement() {
           setVendors(data);
         }
       })
-      .catch(e => console.error("Error fetching vendors:", e));
+      .catch(e => console.error("Error fetching vendors:", e))
+      .finally(() => setIsLoading(false));
   }, []);
 
   const handleSubmit = async () => {
@@ -201,7 +185,14 @@ export default function VendorManagement() {
               </tr>
             </thead>
             <tbody>
-              {filteredVendors.length > 0 ? filteredVendors.map((vendor) => (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={showBankruptcyPredictor ? 8 : 7} style={{ padding: '48px', textAlign: 'center', color: '#64748b' }}>
+                    <div style={{ display: 'inline-block', width: '24px', height: '24px', border: '3px solid #cbd5e1', borderTopColor: '#2563eb', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '16px' }}></div>
+                    <p style={{ margin: 0 }}>Loading vendors...</p>
+                  </td>
+                </tr>
+              ) : filteredVendors.length > 0 ? filteredVendors.map((vendor) => (
                 <tr onClick={() => router.push(`/client/vendors/${vendor.id}`)} key={vendor.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'background-color 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>
                   <td style={{ padding: '16px' }} onClick={e => e.stopPropagation()}>
                     <input type="checkbox" style={{ accentColor: '#2563eb', cursor: 'pointer' }} />
@@ -252,7 +243,7 @@ export default function VendorManagement() {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={7} style={{ padding: '48px', textAlign: 'center', color: '#64748b' }}>
+                  <td colSpan={showBankruptcyPredictor ? 8 : 7} style={{ padding: '48px', textAlign: 'center', color: '#64748b' }}>
                     <Users size={32} color="#cbd5e1" style={{ marginBottom: '16px' }} />
                     <p style={{ margin: 0 }}>No vendors found matching your search.</p>
                   </td>
@@ -338,6 +329,7 @@ export default function VendorManagement() {
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}} />
     </div>
   );

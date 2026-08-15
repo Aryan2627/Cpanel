@@ -162,7 +162,9 @@ export default function TemplatesPage() {
                             <FileText size={16} />
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ fontWeight: 600, color: '#0f172a' }}>{tpl.name}</span>
+                            <Link href={`/client/manage/templates/${tpl.id}`} style={{ fontWeight: 600, color: '#2563eb', textDecoration: 'none', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'} onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}>
+                              {tpl.name}
+                            </Link>
                             <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{tpl.type || 'RFQ'} Template</span>
                           </div>
                         </div>

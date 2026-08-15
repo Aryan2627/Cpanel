@@ -140,18 +140,6 @@ export default function PRPage() {
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Last synced: {lastSync}</span>
-          <button 
-            onClick={handleSync}
-            style={{ 
-              padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: '6px', 
-              backgroundColor: '#fff', color: '#2563eb', cursor: 'pointer', 
-              display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', 
-              boxShadow: '0 1px 2px rgba(0,0,0,0.05)', transition: 'all 0.2s'
-            }}
-          >
-            <RefreshCcw size={16} className={isSyncing ? 'spin-anim' : ''} />
-            {isSyncing ? 'Syncing...' : 'Sync with ERP'}
-          </button>
         </div>
       </div>
 
@@ -297,7 +285,7 @@ export default function PRPage() {
                         <Server size={28} color="#94a3b8" />
                       </div>
                       <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1rem' }}>No PRs available</h3>
-                      <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>Change the tab filter or click Sync with ERP to fetch data.</p>
+                      <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>Change the tab filter to view other requests.</p>
                     </div>
                   </td>
                 </tr>

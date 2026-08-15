@@ -17,11 +17,8 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
-export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const params = await context.params;
-    
-    // Auth Check
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized: Missing or invalid token' }, { status: 401, headers: corsHeaders });
@@ -40,34 +37,36 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       return NextResponse.json({ error: 'Invalid token payload' }, { status: 400, headers: corsHeaders });
     }
 
-    // Fetch single event
+    const resolvedParams = await params;
+    const eventId = resolvedParams.id;
     const event = await prisma.event.findUnique({
-      where: { id: params.id }
+      where: { id: eventId }
     });
 
     if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404, headers: corsHeaders });
     }
 
-    // Ensure this vendor is actually a participant
-    let isParticipant = false;
+    // Verify vendor has access to this event
+    let hasAccess = false;
     if (event.participants) {
       try {
         const participants = JSON.parse(event.participants);
         if (Array.isArray(participants)) {
-          isParticipant = participants.some((p: any) => p.email && p.email.toLowerCase() === email.toLowerCase());
+          hasAccess = participants.some((p: any) => p.email && p.email.trim().toLowerCase() === email.trim().toLowerCase());
         }
-      } catch(e) {
+      } catch (e) {
         // ignore JSON parse error
       }
     }
 
-    if (!isParticipant) {
-      return NextResponse.json({ error: 'Unauthorized: Not a participant of this event' }, { status: 403, headers: corsHeaders });
+    if (!hasAccess) {
+      return NextResponse.json({ error: 'Forbidden: You do not have access to this event' }, { status: 403, headers: corsHeaders });
     }
 
     return NextResponse.json(event, { status: 200, headers: corsHeaders });
   } catch (error: any) {
+    console.error(`[vendor-events-id] Error:`, error.message);
     return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
   }
 }

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '../../../../../lib/prisma';
-import { v4 as uuidv4 } from 'uuid';
+import { prisma } from '../../../../lib/prisma';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

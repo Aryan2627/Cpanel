@@ -2,6 +2,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useIntake } from '@/context/IntakeContext';
+import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { CheckCircle2, AlertCircle, FileCheck, Users, Clock, Settings, Search, LayoutTemplate, Plus, ShieldCheck, ChevronDown, Rocket, X, GripVertical } from 'lucide-react';
 
 function SingleStageCreateContent() {
@@ -10,6 +11,8 @@ function SingleStageCreateContent() {
   const initialTitle = searchParams.get('title') || '';
   
   const [title, setTitle] = useState(initialTitle);
+  const [baseCurrency, setBaseCurrency] = useState('USD');
+  const [feedbackMode, setFeedbackMode] = useState('Sealed');
   const { intakes } = useIntake();
   const [isWorkspaceMode, setIsWorkspaceMode] = useState(false);
   
@@ -84,12 +87,20 @@ function SingleStageCreateContent() {
   const [isVendorDropdownOpen, setIsVendorDropdownOpen] = useState(false);
   const [selectedVendors, setSelectedVendors] = useState<any[]>([]);
   const [vendors, setVendors] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
 
   useEffect(() => {
     fetch('/api/vendors')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setVendors(data);
+      })
+      .catch(console.error);
+
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setProducts(data);
       })
       .catch(console.error);
   }, []);
@@ -238,15 +249,41 @@ function SingleStageCreateContent() {
         
         {/* Sticky Header */}
         <div style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255, 255, 255, 0.75)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.6)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 20px -2px rgba(0,0,0,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', flex: 1, gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
             <div style={{ background: '#3b82f6', color: '#fff', padding: '8px', borderRadius: '8px', display: 'flex' }}><Rocket size={20} /></div>
             <input 
               type="text" 
               placeholder="Enter Event Title" 
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              style={{ border: 'none', outline: 'none', fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', width: '100%', background: 'transparent' }}
+              style={{ border: 'none', outline: 'none', fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', flex: 1, background: 'transparent' }}
             />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', padding: '6px 12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>Base Currency:</span>
+              <select 
+                value={baseCurrency} 
+                onChange={(e) => setBaseCurrency(e.target.value)}
+                style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: '0.85rem', fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}
+              >
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+                <option value="INR">INR (₹)</option>
+                <option value="JPY">JPY (¥)</option>
+                <option value="AUD">AUD (A$)</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', padding: '6px 12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>Feedback Mode:</span>
+              <select 
+                value={feedbackMode} 
+                onChange={(e) => setFeedbackMode(e.target.value)}
+                style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: '0.85rem', fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}
+              >
+                <option value="Sealed">Sealed Bid</option>
+                <option value="Rank Based">Rank Based</option>
+              </select>
+            </div>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.8)', padding: '6px', borderRadius: '30px', gap: '4px', border: '1px solid rgba(226,232,240,0.8)' }}>
@@ -418,10 +455,37 @@ function SingleStageCreateContent() {
                         {uniqueCreatorFields.map((f: any) => (
                           <div key={f.id}>
                             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', color: '#475569', marginBottom: '8px' }}>{f.name}</label>
-                            <input 
-                              type="number" placeholder={`Enter ${f.name}`} value={creatorData[f.key] || ''} onChange={(e) => setCreatorData({ ...creatorData, [f.key]: e.target.value })}
-                              style={glassInputStyle} onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'} onBlur={e => e.currentTarget.style.boxShadow = 'none'}
-                            />
+                            {f.type === 'product' ? (
+                              <select
+                                value={creatorData[f.key] || ''}
+                                onChange={(e) => setCreatorData({ ...creatorData, [f.key]: e.target.value })}
+                                style={{ ...glassInputStyle, appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
+                                onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'}
+                                onBlur={e => e.currentTarget.style.boxShadow = 'none'}
+                              >
+                                <option value="" disabled>Select a product...</option>
+                                {products.map(p => (
+                                  <option key={p.id} value={p.name}>{p.name}</option>
+                                ))}
+                              </select>
+                            ) : f.type === 'location' ? (
+                              <LocationAutocomplete
+                                value={creatorData[f.key] || ''}
+                                onChange={(val) => setCreatorData({ ...creatorData, [f.key]: val })}
+                                placeholder={`Search for ${f.name}`}
+                                style={glassInputStyle}
+                              />
+                            ) : f.type === 'date' ? (
+                              <input 
+                                type="date" value={creatorData[f.key] || ''} onChange={(e) => setCreatorData({ ...creatorData, [f.key]: e.target.value })}
+                                style={glassInputStyle} onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'} onBlur={e => e.currentTarget.style.boxShadow = 'none'}
+                              />
+                            ) : (
+                              <input 
+                                type="text" placeholder={`Enter ${f.name}`} value={creatorData[f.key] || ''} onChange={(e) => setCreatorData({ ...creatorData, [f.key]: e.target.value })}
+                                style={glassInputStyle} onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'} onBlur={e => e.currentTarget.style.boxShadow = 'none'}
+                              />
+                            )}
                           </div>
                         ))}
                       </div>
@@ -629,7 +693,7 @@ function SingleStageCreateContent() {
           </div>
           <button 
             onClick={async () => {
-              if (title && selectedVendors.length > 0 && template !== 'Select Templates') {
+              if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) {
                 try {
                   // Calculate endTime if duration is provided
                   let calculatedEndTime = null;
@@ -680,11 +744,11 @@ function SingleStageCreateContent() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                      title: title,
-                      status: 'Draft',
-                      type: eventType,
-                      account: 'Internal',
-                      itemsCount: lineItems.length,
+                      title,
+                      type: 'Single-Stage',
+                      account: 'Acme Corp',
+                      baseCurrency: baseCurrency,
+                      feedbackMode: feedbackMode,
                       endTime: calculatedEndTime,
                       stages: finalStages,
                       participants: selectedVendors
