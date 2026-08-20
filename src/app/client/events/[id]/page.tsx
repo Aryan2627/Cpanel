@@ -483,7 +483,7 @@ export default function BuyerEventDetailsPage() {
                             </td>
                             {enableESG && (
                               <td style={{ padding: '20px 24px', color: '#16a34a', fontWeight: 600, borderTop: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderBottom: isBest ? '2px solid #34d399' : '1px solid #e2e8f0' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#f0fdf4', padding: '6px 12px', borderRadius: '20px', display: 'inline-flex', border: '1px solid #bbf7d0' }}><Leaf size={16} /> {bid.esgScore}</div>
+                                <div style={{ alignItems: 'center', gap: '6px', backgroundColor: '#f0fdf4', padding: '6px 12px', borderRadius: '20px', display: 'inline-flex', border: '1px solid #bbf7d0' }}><Leaf size={16} /> {bid.esgScore}</div>
                               </td>
                             )}
                             <td style={{ padding: '20px 24px', textAlign: 'right', borderTopRightRadius: '12px', borderBottomRightRadius: '12px', border: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderLeft: 'none' }}>

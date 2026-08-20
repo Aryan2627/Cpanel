@@ -155,178 +155,46 @@ export default function JarvisAssistant() {
     processCommand(command);
   };
 
-  const processCommand = (text: string) => {
-    const lowerText = text.toLowerCase();
-    const upperText = text.toUpperCase();
-    
+  const processCommand = async (text: string) => {
     setTargetResponse('');
     setDisplayedResponse('');
     
-    setTimeout(() => {
-      let reply = '';
+    try {
+      const res = await fetch('/api/jarvis/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      const data = await res.json();
       
-      // Dynamic Regex Extractions
-      const poMatch = upperText.match(/PO-\d+/);
-      const vendorMatch = upperText.match(/V-\d+/);
-      const eventMatchLoose = upperText.match(/(?:EVT-|EVENT\s*#?\s*)?(\d{3,})/i);
-
-      if (poMatch) {
-        reply = `Accessing Purchase Order ${poMatch[0]}...`;
-        setTimeout(() => { router.push(`/client/po/${poMatch[0]}`); closeTerminal(); }, 2000);
-      }
-      else if (vendorMatch) {
-        reply = `Accessing Vendor Profile for ${vendorMatch[0]}...`;
-        setTimeout(() => { router.push(`/client/vendors/${vendorMatch[0]}`); closeTerminal(); }, 2000);
-      }
-      else if (eventMatchLoose && eventMatchLoose[1] && (upperText.includes('EVENT') || upperText.includes('EVT') || /^\d{3,}$/.test(text.trim()))) {
-        const evtRef = `EVT-${eventMatchLoose[1]}`;
-        reply = `Loading Sourcing Event ${evtRef}...`;
-        setTimeout(() => { router.push(`/client/events/${evtRef}`); closeTerminal(); }, 2000);
-      }
-      
-      // Global Dashboard
-      else if (lowerText.includes('dashboard') || lowerText.includes('home')) {
-        reply = 'Navigating to the Global Dashboard...';
-        setTimeout(() => { router.push('/client'); closeTerminal(); }, 1500);
-      } 
-      
-      // Intake
-      else if (lowerText.includes('create intake') || lowerText.includes('new intake')) {
-        reply = 'Opening the Intake Request form...';
-        setTimeout(() => { router.push('/client/intake/create'); closeTerminal(); }, 1500);
-      }
-      else if (lowerText.includes('intake')) {
-        reply = 'Pulling up the Purchase Intake tracker...';
-        setTimeout(() => { router.push('/client/intake'); closeTerminal(); }, 1500);
-      }
-      
-      // PRs
-      else if (lowerText.includes('new pr') || lowerText.includes('create purchase request')) {
-        reply = 'Initiating new Purchase Request...';
-        setTimeout(() => { router.push('/client/intake/create'); closeTerminal(); }, 1500);
-      }
-      else if (lowerText.includes('purchase request') || lowerText.includes('prs') || lowerText === 'pr') {
-        reply = 'Pulling up the Purchase Request tracker...';
-        setTimeout(() => { router.push('/client/pr'); closeTerminal(); }, 1500);
-      }
-      
-      // Events & Sourcing
-      else if (lowerText.includes('auction')) {
-        reply = 'Initializing Reverse Auction setup...';
-        setTimeout(() => { router.push('/client/events/create/auction'); closeTerminal(); }, 1500);
-      }
-      else if (lowerText.includes('create event') || lowerText.includes('new event') || lowerText.includes('rfq')) {
-        reply = 'Opening the Event Creation studio...';
-        setTimeout(() => { router.push('/client/events/create/single-stage'); closeTerminal(); }, 1500);
-      }
-      else if (lowerText.includes('events') || lowerText.includes('sourcing') || lowerText.includes('bidding')) {
-        reply = 'Opening Active Events matrix...';
-        setTimeout(() => { router.push('/client/events'); closeTerminal(); }, 1500);
-      }
-      
-      // Manage & Config
-      else if (lowerText.includes('product') || lowerText.includes('catalog') || lowerText.includes('items')) {
-        reply = 'Accessing the Global Product Catalog...';
-        setTimeout(() => { router.push('/client/manage/products'); closeTerminal(); }, 1500);
-      }
-      else if (lowerText.includes('template') || lowerText.includes('questionnaire')) {
-        reply = 'Opening Template Management...';
-        setTimeout(() => { router.push('/client/manage/templates'); closeTerminal(); }, 1500);
-      }
-      else if (lowerText.includes('user') || lowerText.includes('team') || lowerText.includes('access')) {
-        reply = 'Navigating to User Directory...';
-        setTimeout(() => { router.push('/client/manage/users'); closeTerminal(); }, 1500);
-      }
-      else if (lowerText.includes('workflow') || lowerText.includes('field map') || lowerText.includes('approval')) {
-        reply = 'Loading Workflow and Field Mapping controls...';
-        setTimeout(() => { router.push('/client/manage/workflows'); closeTerminal(); }, 1500);
-      }
-      
-      // POs & Contracts
-      else if (lowerText.includes('po') || lowerText.includes('order') || lowerText.includes('purchase order')) {
-        reply = 'Accessing Purchase Orders database...';
-        setTimeout(() => { router.push('/client/po'); closeTerminal(); }, 1500);
-      }
-      
-      // Settings
-      else if (lowerText.includes('setting') || lowerText.includes('config') || lowerText.includes('admin')) {
-        reply = 'Opening System Settings panel...';
-        setTimeout(() => { router.push('/client/settings'); closeTerminal(); }, 1500);
-      }
-      
-      // Vendors
-      else if (lowerText.includes('message') || lowerText.includes('chat') || lowerText.includes('inbox')) {
-        reply = 'Opening Secure Vendor Messaging...';
-        setTimeout(() => { router.push('/client/vendors/messages'); closeTerminal(); }, 1500);
-      }
-      else if (lowerText.includes('acme')) {
-        reply = 'Pulling up Acme Corporation vendor profile...';
-        setTimeout(() => { router.push('/client/vendors/V-1002'); closeTerminal(); }, 1500);
-      }
-      else if (lowerText.includes('vendor') || lowerText.includes('supplier') || lowerText.includes('directory')) {
-        reply = 'Accessing Global Supplier Network...';
-        setTimeout(() => { router.push('/client/vendors'); closeTerminal(); }, 1500);
-      }
-      
-      // Vendor Portal
-      else if (lowerText.includes('trading desk') || lowerText.includes('vendor portal')) {
-        reply = 'Switching contexts to the Live Trading Desk...';
-        setTimeout(() => { router.push('/vendor'); closeTerminal(); }, 1500);
-      }
-
-      // Hardcoded AI & UI Actions
-      else if (lowerText.includes('risk') || lowerText.includes('highest')) {
-        reply = 'Scanning global supply chain... Supplier C poses the highest risk due to recent financial insolvency alerts.';
-      }
-      else if (lowerText.includes('lockdown')) {
-        reply = 'Executing emergency system lockdown protocol.';
-        setIsLockdown(true);
-        document.body.style.backgroundColor = '#7f1d1d';
-        setTimeout(() => closeTerminal(), 3000);
-      }
-      else if (lowerText.includes('dark mode')) {
-        reply = 'Initializing dark mode interface.';
-        document.body.style.backgroundColor = '#0f172a';
-        document.body.style.color = '#f8fafc';
-        const els = document.querySelectorAll('.app-container, .sidebar, .main-content');
-        els.forEach((el: any) => el.style.backgroundColor = '#0f172a');
-      }
-      else if (lowerText.includes('crash') || lowerText.includes('throw error')) {
-        reply = 'WARNING: Initiating forced memory leak...';
-        setTimeout(() => setShouldCrash(true), 1500);
-      }
-      
-      // Help Menu
-      else if (lowerText.includes('help') || lowerText.includes('what can you do') || lowerText.includes('commands')) {
-        reply = `I can navigate you anywhere. Try commands like: "Open PO-1045", "What do you remember?", "Take me to Settings", or "Create a new Intake".`;
-      }
-      
-      // Memory Engine
-      else if (lowerText.includes('memory') || lowerText.includes('remember') || lowerText.includes('recent')) {
-        fetch('/api/jarvis/memory').then(r => r.json()).then(data => {
-            if (data && data.length > 0) {
-              const latest = data[0];
-              const memReply = `I am tracking ${data.length} active events in memory (expiring after 20 days). Most recent: ${latest.context} (${latest.entityRef}).`;
-              setTargetResponse(memReply);
-              speak(memReply);
-            } else {
-              const memReply = 'My active memory banks are currently empty.';
-              setTargetResponse(memReply);
-              speak(memReply);
-            }
-        }).catch(err => {
-            setTargetResponse('Failed to access memory banks.');
-        });
-        return; // Early return to prevent overwriting
-      }
-      // Fallback
-      else {
-        reply = `I heard: "${text}". I don't know that specific location, but try commands like "settings", "intake", or "vendors".`;
-      }
-      
+      const reply = data.reply || 'I encountered an error processing your request.';
       setTargetResponse(reply);
       speak(reply);
-    }, 500);
+
+      if (data.action) {
+        if (data.action.type === 'NAVIGATE' && data.action.payload) {
+          setTimeout(() => { router.push(data.action.payload); closeTerminal(); }, 2000);
+        } else if (data.action.type === 'UI_EFFECT') {
+          if (data.action.payload === 'LOCKDOWN') {
+            setIsLockdown(true);
+            document.body.style.backgroundColor = '#7f1d1d';
+            setTimeout(() => closeTerminal(), 3000);
+          } else if (data.action.payload === 'DARK_MODE') {
+            document.body.style.backgroundColor = '#0f172a';
+            document.body.style.color = '#f8fafc';
+            const els = document.querySelectorAll('.app-container, .sidebar, .main-content');
+            els.forEach((el: any) => el.style.backgroundColor = '#0f172a');
+          } else if (data.action.payload === 'CRASH') {
+            setTimeout(() => setShouldCrash(true), 1500);
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      const errReply = 'I lost connection to the mainframe.';
+      setTargetResponse(errReply);
+      speak(errReply);
+    }
   };
 
   const closeTerminal = () => {
