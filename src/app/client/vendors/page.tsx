@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { 
   Users, UserPlus, Upload, Filter, Tag, Search, 
   Building2, MapPin, Mail, Phone, CheckCircle2, 
-  XCircle, Clock, Check, X, ShieldAlert, BadgeCheck, ChevronDown, Star, AlertTriangle
+  XCircle, Clock, Check, X, ShieldAlert, BadgeCheck, ChevronDown, Star, AlertTriangle, Copy
 } from 'lucide-react';
 
 export default function VendorManagement() {
@@ -22,6 +22,13 @@ export default function VendorManagement() {
   const [vendors, setVendors] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showBankruptcyPredictor, setShowBankruptcyPredictor] = useState(true);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopy = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   useEffect(() => {
     try {
@@ -205,11 +212,42 @@ export default function VendorManagement() {
                       <span style={{ fontWeight: 500, color: '#0f172a' }}>{vendor.name}</span>
                     </div>
                   </td>
-                  <td style={{ padding: '16px', color: '#64748b', fontFamily: 'monospace' }}>{vendor.vendorCode}</td>
+                  <td style={{ padding: '16px', color: '#64748b', fontFamily: 'monospace' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {vendor.vendorCode}
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleCopy(vendor.vendorCode, `code-${vendor.id}`); }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px', display: 'flex' }}
+                        title="Copy Vendor Code"
+                      >
+                        {copiedId === `code-${vendor.id}` ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </td>
                   <td style={{ padding: '16px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}><Mail size={14} color="#94a3b8" /> {vendor.email}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}><Phone size={14} color="#94a3b8" /> {vendor.phone}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
+                        <Mail size={14} color="#94a3b8" /> 
+                        {vendor.email}
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleCopy(vendor.email, `email-${vendor.id}`); }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px', marginLeft: 'auto', display: 'flex' }}
+                          title="Copy Email"
+                        >
+                          {copiedId === `email-${vendor.id}` ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                        </button>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
+                        <Phone size={14} color="#94a3b8" /> 
+                        {vendor.phone}
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleCopy(vendor.phone, `phone-${vendor.id}`); }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px', marginLeft: 'auto', display: 'flex' }}
+                          title="Copy Phone"
+                        >
+                          {copiedId === `phone-${vendor.id}` ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                        </button>
+                      </div>
                     </div>
                   </td>
                   <td style={{ padding: '16px', color: '#475569' }}>{vendor.type}</td>
