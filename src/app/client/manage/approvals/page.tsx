@@ -4,6 +4,7 @@ import { Plus, X, GitBranch, ArrowRight, CheckCircle2, ShieldAlert } from 'lucid
 
 export default function ApprovalFlowsPage() {
   const [workflows, setWorkflows] = useState<any[]>([]);
+  const [systemUsers, setSystemUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   // Modal state
@@ -16,6 +17,7 @@ export default function ApprovalFlowsPage() {
 
   useEffect(() => {
     fetchWorkflows();
+    fetchUsers();
     
     // Also try to load categories from our simple dropdown list if they exist
     try {
@@ -38,6 +40,16 @@ export default function ApprovalFlowsPage() {
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch('/api/users');
+      const data = await res.json();
+      if (Array.isArray(data)) setSystemUsers(data);
+    } catch (err) {
+      console.error('Failed to fetch users', err);
     }
   };
 
@@ -189,11 +201,15 @@ export default function ApprovalFlowsPage() {
                       <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#e0e7ff', color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: 600 }}>
                         {index + 1}
                       </div>
-                      <input 
-                        type="email" value={appr} onChange={e => handleApproverChange(index, e.target.value)}
-                        placeholder="approver@company.com"
-                        style={{ flex: 1, padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }} 
-                      />
+                      <select 
+                        value={appr} onChange={e => handleApproverChange(index, e.target.value)}
+                        style={{ flex: 1, padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none', backgroundColor: '#fff' }}
+                      >
+                        <option value="" disabled>Select a user...</option>
+                        {systemUsers.map(user => (
+                          <option key={user.email} value={user.email}>{user.name} ({user.email})</option>
+                        ))}
+                      </select>
                       {approvers.length > 1 && (
                         <button onClick={() => handleRemoveApprover(index)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}><X size={18} /></button>
                       )}
