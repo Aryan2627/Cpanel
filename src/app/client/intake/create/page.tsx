@@ -8,8 +8,10 @@ export default function PurchaseIntake() {
   const { addIntake } = useIntake();
   const [submitted, setSubmitted] = useState(false);
   const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('');
   const [categories, setCategories] = useState<string[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('customDropdowns');
@@ -22,8 +24,10 @@ export default function PurchaseIntake() {
     }
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     setSubmitted(true);
     
     // Add to context
@@ -31,21 +35,19 @@ export default function PurchaseIntake() {
     const formattedDate = `${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}, ${now.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}`;
     const newId = `IR-210${Math.floor(Math.random() * 10) + 4}`;
 
-    addIntake({
+    await addIntake({
       refId: newId,
       title: title || 'New Request',
       reqName: 'Current User',
       status: 'Draft',
-      type: 'Standalone NFA',
+      type: category || 'Standalone NFA',
       buyer: '-',
       reqAt: formattedDate,
       updAt: formattedDate,
     });
 
-    setTimeout(() => {
-      // Redirect back to the intake table
-      router.push('/client/intake');
-    }, 1500);
+    // Redirect back to the intake table immediately after await finishes
+    router.push('/client/intake');
   };
 
   if (submitted) {
@@ -73,16 +75,16 @@ export default function PurchaseIntake() {
           </div>
           <div className="form-group">
             <label className="form-label">Category <span style={{color: '#ef4444'}}>*</span></label>
-            <select className="form-input" required>
+            <select className="form-input" required value={category} onChange={(e) => setCategory(e.target.value)}>
               <option value="">Select Category...</option>
               {categories.map((cat, idx) => (
                 <option key={idx} value={cat}>{cat}</option>
               ))}
               {categories.length === 0 && (
                 <>
-                  <option value="it">IT Hardware</option>
-                  <option value="software">Software / SaaS</option>
-                  <option value="services">Professional Services</option>
+                  <option value="IT Hardware">IT Hardware</option>
+                  <option value="Software / SaaS">Software / SaaS</option>
+                  <option value="Professional Services">Professional Services</option>
                 </>
               )}
             </select>
@@ -95,7 +97,7 @@ export default function PurchaseIntake() {
                 <option key={idx} value={dept}>{dept}</option>
               ))}
               {departments.length === 0 && (
-                <option value="general">General</option>
+                <option value="General">General</option>
               )}
             </select>
           </div>
@@ -127,7 +129,7 @@ export default function PurchaseIntake() {
         
         <div style={{ marginTop: '30px', display: 'flex', gap: '16px', justifyContent: 'flex-end' }}>
           <button type="button" className="btn btn-secondary" onClick={() => router.back()}>Cancel</button>
-          <button type="submit" className="btn btn-primary">Submit for Approval</button>
+          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>Submit for Approval</button>
         </div>
       </form>
     </div>
