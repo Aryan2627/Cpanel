@@ -5,7 +5,7 @@ import { Mic, Terminal, X, BrainCircuit, Activity, Zap } from 'lucide-react';
 
 export default function JarvisAssistant() {
   const router = useRouter();
-  const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(true);
   
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -40,7 +40,11 @@ export default function JarvisAssistant() {
         const saved = localStorage.getItem('godTierFeatures');
         if (saved) {
           const features = JSON.parse(saved);
-          setIsEnabled(!!features.jarvisAssistant);
+          if (features.jarvisAssistant === false) {
+             setIsEnabled(false);
+          } else {
+             setIsEnabled(true);
+          }
         }
       } catch (e) {}
     };
