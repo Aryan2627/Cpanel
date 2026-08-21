@@ -109,7 +109,19 @@ export default function PurchaseIntake() {
           </div>
           <div className="form-group">
             <label className="form-label">Requested Quantity <span style={{color: '#ef4444'}}>*</span></label>
-            <input type="number" className="form-input" min="1" required value={quantity} onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))} />
+            <input 
+              type="number" 
+              className="form-input" 
+              min="1" 
+              required 
+              value={quantity} 
+              onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))} 
+              onKeyDown={(e) => {
+                if (['-', '+', 'e', 'E', '.'].includes(e.key)) {
+                  e.preventDefault();
+                }
+              }}
+            />
           </div>
         </div>
 
