@@ -9,7 +9,7 @@ export default function PurchaseIntake() {
   const [submitted, setSubmitted] = useState(false);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState<number | string>('');
   const [categories, setCategories] = useState<string[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,7 +45,7 @@ export default function PurchaseIntake() {
       buyer: '-',
       reqAt: formattedDate,
       updAt: formattedDate,
-      quantity: quantity,
+      quantity: Number(quantity) || 1,
     });
 
     // Redirect back to the intake table immediately after await finishes
@@ -109,7 +109,7 @@ export default function PurchaseIntake() {
           </div>
           <div className="form-group">
             <label className="form-label">Requested Quantity <span style={{color: '#ef4444'}}>*</span></label>
-            <input type="number" className="form-input" min="1" required value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} />
+            <input type="number" className="form-input" min="1" required value={quantity} onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))} />
           </div>
         </div>
 
