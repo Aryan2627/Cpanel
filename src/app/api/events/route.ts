@@ -19,6 +19,22 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
+    let eventStatus = 'Active';
+    let pendingWorkflow = null;
+    let workflowApprovers = [];
+
+    // Check if there is an active workflow for this category (we use 'type' as category for events here)
+    const workflows = await prisma.workflow.findMany({ where: { isActive: true, category: data.type } });
+    if (workflows.length > 0) {
+      pendingWorkflow = workflows[0];
+      try {
+        workflowApprovers = JSON.parse(pendingWorkflow.approvers);
+        if (workflowApprovers.length > 0) {
+          eventStatus = 'Pending Approval';
+        }
+      } catch(e) {}
+    }
+
     const event = await prisma.event.create({
       data: {
         refId: data.refId || `EVT-${Math.floor(Math.random() * 100000)}`,
@@ -31,8 +47,20 @@ export async function POST(request: Request) {
         baseCurrency: data.baseCurrency || 'USD',
         feedbackMode: data.feedbackMode || 'Sealed',
         endTime: data.endTime ? new Date(data.endTime) : null,
+        status: eventStatus,
       }
     });
+
+    if (eventStatus === 'Pending Approval' && pendingWorkflow) {
+      await prisma.approvalRequest.create({
+        data: {
+          eventId: event.id,
+          workflowId: pendingWorkflow.id,
+          status: 'Pending',
+          currentStep: 0,
+        }
+      });
+    }
 
     // Add to Jarvis Memory (20 days expiration)
     const twentyDaysFromNow = new Date(Date.now() + 20 * 24 * 60 * 60 * 1000);

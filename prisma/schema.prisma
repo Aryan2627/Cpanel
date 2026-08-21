@@ -87,18 +87,19 @@ model Intake {
 }
 
 model Event {
-  id          String   @id @default(uuid())
-  refId       String   @unique
-  title       String?
-  type        String?
-  account     String?
-  itemsCount  Int      @default(1)
-  stages      String?  // JSON string of stages array
+  id           String   @id @default(uuid())
+  refId        String   @unique
+  title        String?
+  type         String?
+  account      String?
+  itemsCount   Int      @default(1)
+  stages       String?  // JSON string of stages array
   participants String? // JSON string of invited vendors array
-  endTime     DateTime?
+  endTime      DateTime?
   baseCurrency String   @default("USD")
   feedbackMode String   @default("Sealed")
-  createdAt   DateTime @default(now())
+  status       String   @default("Draft")
+  createdAt    DateTime @default(now())
 }
 
 model Vendor {
@@ -178,4 +179,24 @@ model JarvisMemory {
   context    String   // e.g., "New Sourcing Event Created"
   createdAt  DateTime @default(now())
   expiresAt  DateTime
+}
+
+model Workflow {
+  id        String   @id @default(uuid())
+  name      String
+  category  String   // e.g. "IT Hardware"
+  approvers String   // JSON array of approver emails
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ApprovalRequest {
+  id             String   @id @default(uuid())
+  eventId        String
+  workflowId     String
+  status         String   @default("Pending") // Pending, Approved, Rejected
+  currentStep    Int      @default(0)
+  history        String?  // JSON array of approval actions (who, when, comment)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

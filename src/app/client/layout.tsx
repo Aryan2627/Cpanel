@@ -38,11 +38,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     { name: 'Templates', path: '/client/manage/templates' }
   ];
   if (showWorkflows) {
-    manageSubItems.push({ name: 'Field Map', path: '/client/manage/workflows' });
+    manageSubItems.push(
+      { name: 'Field Map', path: '/client/manage/workflows' },
+      { name: 'Approval Workflows', path: '/client/manage/workflows' }
+    );
   }
 
   const navItems = [
     { name: 'Dashboard', path: '/client' },
+    { name: 'My Approvals', path: '/client/approvals' },
     { name: 'Purchase Intake', path: '/client/intake' },
     { name: 'Purchase Requisition', path: '/client/pr' },
     { name: 'Events / RFQs', path: '/client/events' },
