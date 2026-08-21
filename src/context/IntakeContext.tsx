@@ -10,6 +10,7 @@ type Intake = {
   buyer: string;
   reqAt: string;
   updAt: string;
+  quantity?: number;
 };
 
 type IntakeContextType = {

@@ -62,6 +62,7 @@ export default function IntakeTablePage() {
       'Requester Name': row.reqName,
       'Status': row.status,
       'Intake Request Type': row.type,
+      'Quantity': row.quantity || 1,
       'Buyer Name': row.buyer,
       'Requested At': row.reqAt,
       'Updated At': row.updAt,
@@ -326,8 +327,8 @@ export default function IntakeTablePage() {
                 <th style={{ padding: '16px 24px', width: '40px' }}>
                   <input type="checkbox" checked={isAllSelected} onChange={handleSelectAll} style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#2563eb' }} />
                 </th>
-                {['Ref ID', 'Title', 'Requester Name', 'Status', 'Type', 'Requested At'].map((col) => {
-                  const key = col === 'Type' ? 'type' : col === 'Requester Name' ? 'reqName' : col === 'Requested At' ? 'reqAt' : col === 'Ref ID' ? 'refId' : col.toLowerCase();
+                {['Ref ID', 'Title', 'Requester Name', 'Status', 'Type', 'Qty', 'Requested At'].map((col) => {
+                  const key = col === 'Type' ? 'type' : col === 'Requester Name' ? 'reqName' : col === 'Requested At' ? 'reqAt' : col === 'Qty' ? 'quantity' : col === 'Ref ID' ? 'refId' : col.toLowerCase();
                   const isStatus = col === 'Status';
                   return (
                     <th id={isStatus ? 'tour-intake-status' : undefined} key={col} onClick={() => handleSort(key)} style={{ padding: '16px 24px', fontWeight: 600, color: '#475569', cursor: 'pointer', userSelect: 'none' }}>
@@ -354,6 +355,7 @@ export default function IntakeTablePage() {
                     <td style={{ padding: '16px 24px', color: '#64748b' }}>{row.reqName}</td>
                     <td style={{ padding: '16px 24px' }}>{getStatusBadge(row.status)}</td>
                     <td style={{ padding: '16px 24px', color: '#64748b' }}>{row.type}</td>
+                    <td style={{ padding: '16px 24px', color: '#64748b', fontWeight: 500 }}>{row.quantity || 1}</td>
                     <td style={{ padding: '16px 24px', color: '#64748b' }}>{row.reqAt}</td>
                   </tr>
                 ))
@@ -441,6 +443,10 @@ export default function IntakeTablePage() {
                 <div>
                   <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 600 }}>Date</label>
                   <p style={{ margin: '4px 0 0 0', color: '#333', fontWeight: 500 }}>{selectedIntake.reqAt}</p>
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 600 }}>Quantity</label>
+                  <p style={{ margin: '4px 0 0 0', color: '#333', fontWeight: 500 }}>{selectedIntake.quantity || 1}</p>
                 </div>
               </div>
 

@@ -29,6 +29,7 @@ export async function POST(request: Request) {
         buyer: data.buyer || '-',
         reqAt: data.reqAt || new Date().toISOString().split('T')[0],
         updAt: data.updAt || new Date().toISOString().split('T')[0],
+        quantity: data.quantity || 1,
       }
     });
     return NextResponse.json(newIntake, { status: 201 });

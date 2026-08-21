@@ -82,6 +82,7 @@ model Intake {
   updAt     String?
   source    String   @default("Manual")
   erpId     String?
+  quantity  Int      @default(1)
   createdAt DateTime @default(now())
 }
 
