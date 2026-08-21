@@ -40,7 +40,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   if (showWorkflows) {
     manageSubItems.push(
       { name: 'Field Map', path: '/client/manage/workflows' },
-      { name: 'Approval Workflows', path: '/client/manage/workflows' }
+      { name: 'Approval Workflows', path: '/client/manage/approvals' }
     );
   }
 
