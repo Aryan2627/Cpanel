@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { sendVendorInvitation } from '../../../lib/email-service';
+import { getTenantId } from '../../../lib/tenant';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const orgId = await getTenantId();
     const events = await prisma.event.findMany({
+      where: { organizationId: orgId },
       orderBy: { createdAt: 'desc' }
     });
     return NextResponse.json(events);
@@ -18,13 +21,16 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const orgId = await getTenantId();
     const data = await request.json();
     let eventStatus = 'Active';
     let pendingWorkflow = null;
     let workflowApprovers = [];
 
     // Check if there is an active workflow for this category (we use 'type' as category for events here)
-    const workflows = await prisma.workflow.findMany({ where: { isActive: true, category: data.type } });
+    const workflows = await prisma.workflow.findMany({ 
+      where: { isActive: true, category: data.type, organizationId: orgId } 
+    });
     if (workflows.length > 0) {
       pendingWorkflow = workflows[0];
       try {
@@ -37,6 +43,7 @@ export async function POST(request: Request) {
 
     const event = await prisma.event.create({
       data: {
+        organizationId: orgId,
         refId: data.refId || `EVT-${Math.floor(Math.random() * 100000)}`,
         title: data.title,
         type: data.type,
@@ -54,6 +61,7 @@ export async function POST(request: Request) {
     if (eventStatus === 'Pending Approval' && pendingWorkflow) {
       await prisma.approvalRequest.create({
         data: {
+          organizationId: orgId,
           eventId: event.id,
           workflowId: pendingWorkflow.id,
           status: 'Pending',
@@ -66,8 +74,9 @@ export async function POST(request: Request) {
     const twentyDaysFromNow = new Date(Date.now() + 20 * 24 * 60 * 60 * 1000);
     await prisma.jarvisMemory.create({
       data: {
+        organizationId: orgId,
         entityType: 'Event',
-        entityRef: data.refId,
+        entityRef: data.refId || event.refId,
         context: `Created new sourcing event: ${data.title}`,
         expiresAt: twentyDaysFromNow,
       }

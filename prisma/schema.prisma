@@ -8,195 +8,251 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model User {
+model Organization {
   id        String   @id @default(uuid())
-  name      String?
-  email     String?  @unique
-  phone     String?
-  role      String?
-  erpId     String?
-  status    String   @default("Active")
+  name      String
+  domain    String?  @unique
+  theme     String?  // JSON string for colors, logos
+  features  String?  // JSON string for feature toggles
   createdAt DateTime @default(now())
+
+  // Relations
+  users           User[]
+  teams           Team[]
+  locations       Location[]
+  categories      Category[]
+  products        Product[]
+  intakes         Intake[]
+  events          Event[]
+  vendors         Vendor[]
+  purchaseOrders  PurchaseOrder[]
+  bids            Bid[]
+  contracts       Contract[]
+  templates       Template[]
+  jarvisMemories  JarvisMemory[]
+  workflows       Workflow[]
+  approvalReqs    ApprovalRequest[]
+}
+
+model User {
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  name           String?
+  email          String?       @unique
+  phone          String?
+  role           String?
+  erpId          String?
+  status         String        @default("Active")
+  createdAt      DateTime      @default(now())
 }
 
 model Team {
-  id         String   @id @default(uuid())
-  name       String?
-  type       String?
-  users      String?  // JSON string
-  categories String?  // JSON string
-  locations  String?  // JSON string
-  createdAt  DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  name           String?
+  type           String?
+  users          String?  // JSON string
+  categories     String?  // JSON string
+  locations      String?  // JSON string
+  createdAt      DateTime      @default(now())
 }
 
 model Location {
-  id        String   @id @default(uuid())
-  name      String?
-  city      String?
-  type      String?
-  address   String?
-  code      String?
-  status    String   @default("Active")
-  createdAt DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  name           String?
+  city           String?
+  type           String?
+  address        String?
+  code           String?
+  status         String        @default("Active")
+  createdAt      DateTime      @default(now())
 }
 
 model Category {
-  id        String   @id @default(uuid())
-  name      String?
-  type      String?
-  code      String?
-  alias     String?
-  origins   String?
-  subCats   Int      @default(0)
-  products  Int      @default(0)
-  createdAt DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  name           String?
+  type           String?
+  code           String?
+  alias          String?
+  origins        String?
+  subCats        Int           @default(0)
+  products       Int           @default(0)
+  createdAt      DateTime      @default(now())
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  code        String   @unique @default(uuid())
-  name        String?
-  uom         String?
-  category    String?
-  subCategory String?
-  description String?
-  terms       String?
-  articleCode String?
-  hsnCode     String?
-  imageUrl    String?
-  status      String   @default("Active")
-  createdBy   String   @default("Admin")
-  phone       String?
-  createdAt   DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  code           String        @unique @default(uuid())
+  name           String?
+  uom            String?
+  category       String?
+  subCategory    String?
+  description    String?
+  terms          String?
+  articleCode    String?
+  hsnCode        String?
+  imageUrl       String?
+  status         String        @default("Active")
+  createdBy      String        @default("Admin")
+  phone          String?
+  createdAt      DateTime      @default(now())
 }
 
 model Intake {
-  id        String   @id @default(uuid())
-  refId     String   @unique
-  title     String?
-  reqName   String?
-  status    String   @default("Draft")
-  type      String   @default("Standalone NFA")
-  buyer     String?
-  reqAt     String?
-  updAt     String?
-  source    String   @default("Manual")
-  erpId     String?
-  quantity  Int      @default(1)
-  createdAt DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  refId          String        @unique
+  title          String?
+  reqName        String?
+  status         String        @default("Draft")
+  type           String        @default("Standalone NFA")
+  buyer          String?
+  reqAt          String?
+  updAt          String?
+  source         String        @default("Manual")
+  erpId          String?
+  quantity       Int           @default(1)
+  createdAt      DateTime      @default(now())
 }
 
 model Event {
-  id           String   @id @default(uuid())
-  refId        String   @unique
-  title        String?
-  type         String?
-  account      String?
-  itemsCount   Int      @default(1)
-  stages       String?  // JSON string of stages array
-  participants String? // JSON string of invited vendors array
-  endTime      DateTime?
-  baseCurrency String   @default("USD")
-  feedbackMode String   @default("Sealed")
-  status       String   @default("Draft")
-  createdAt    DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  refId          String        @unique
+  title          String?
+  type           String?
+  account        String?
+  itemsCount     Int           @default(1)
+  stages         String?  // JSON string of stages array
+  participants   String? // JSON string of invited vendors array
+  endTime        DateTime?
+  baseCurrency   String        @default("USD")
+  feedbackMode   String        @default("Sealed")
+  status         String        @default("Draft")
+  createdAt      DateTime      @default(now())
 }
 
 model Vendor {
-  id           String   @id @default(uuid())
-  name         String?
-  email        String?
-  phone        String?
-  type         String?
-  vendorCode   String?
-  companyCode  String?
-  dealsIn      String?
-  tradeLicense String?
-  taxId        String?
-  city         String?
-  tags         String?  // JSON string of tags
-  status       String   @default("Invited")
-  createdAt    DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  name           String?
+  email          String?
+  phone          String?
+  type           String?
+  vendorCode     String?
+  companyCode    String?
+  dealsIn        String?
+  tradeLicense   String?
+  taxId          String?
+  city           String?
+  tags           String?  // JSON string of tags
+  status         String        @default("Invited")
+  createdAt      DateTime      @default(now())
 }
 
 model PurchaseOrder {
-  id        String   @id @default(uuid())
-  poNumber  String   @unique
-  title     String?
-  status    String   @default("Draft")
-  vendorId  String?
-  eventId   String?
-  total     Float    @default(0)
-  details   String?  // JSON string containing detailed template and items
-  source    String   @default("Manual")
-  erpId     String?
-  erpStatus String   @default("Pending Sync")
-  createdAt DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  poNumber       String        @unique
+  title          String?
+  status         String        @default("Draft")
+  vendorId       String?
+  eventId        String?
+  total          Float         @default(0)
+  details        String?  // JSON string containing detailed template and items
+  source         String        @default("Manual")
+  erpId          String?
+  erpStatus      String        @default("Pending Sync")
+  createdAt      DateTime      @default(now())
 }
 
 model Bid {
-  id           String   @id @default(uuid())
-  eventId      String
-  vendorId     String
-  vendorName   String?
-  amount       Float
-  initialAmount Float?
-  localAmount  Float?
-  currency     String   @default("USD")
-  exchangeRate Float    @default(1.0)
-  templateData String?  // JSON string
-  status       String   @default("Submitted")
-  createdAt    DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  eventId        String
+  vendorId       String
+  vendorName     String?
+  amount         Float
+  initialAmount  Float?
+  localAmount    Float?
+  currency       String        @default("USD")
+  exchangeRate   Float         @default(1.0)
+  templateData   String?  // JSON string
+  status         String        @default("Submitted")
+  createdAt      DateTime      @default(now())
 }
 
 model Contract {
-  id           String   @id @default(uuid())
-  title        String?
-  status       String   @default("Draft")
-  vendorId     String?
-  vendorName   String?
-  eventId      String?
-  poId         String?
-  content      String?
-  total        Float    @default(0)
-  clientSigned Boolean  @default(false)
-  vendorSigned Boolean  @default(false)
-  createdAt    DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  title          String?
+  status         String        @default("Draft")
+  vendorId       String?
+  vendorName     String?
+  eventId        String?
+  poId           String?
+  content        String?
+  total          Float         @default(0)
+  clientSigned   Boolean       @default(false)
+  vendorSigned   Boolean       @default(false)
+  createdAt      DateTime      @default(now())
 }
 
 model Template {
-  id        String   @id @default(uuid())
-  name      String
-  type      String   @default("RFQ")
-  fields    String   // JSON string of fields
-  createdAt DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  name           String
+  type           String        @default("RFQ")
+  fields         String   // JSON string of fields
+  createdAt      DateTime      @default(now())
 }
 
 model JarvisMemory {
-  id         String   @id @default(uuid())
-  entityType String   // e.g., "Event"
-  entityRef  String   // e.g., "EVT-123"
-  context    String   // e.g., "New Sourcing Event Created"
-  createdAt  DateTime @default(now())
-  expiresAt  DateTime
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  entityType     String   // e.g., "Event"
+  entityRef      String   // e.g., "EVT-123"
+  context        String   // e.g., "New Sourcing Event Created"
+  createdAt      DateTime      @default(now())
+  expiresAt      DateTime
 }
 
 model Workflow {
-  id        String   @id @default(uuid())
-  name      String
-  category  String   // e.g. "IT Hardware"
-  approvers String   // JSON array of approver emails
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  name           String
+  category       String   // e.g. "IT Hardware"
+  approvers      String   // JSON array of approver emails
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
 }
 
 model ApprovalRequest {
-  id             String   @id @default(uuid())
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
   eventId        String
   workflowId     String
-  status         String   @default("Pending") // Pending, Approved, Rejected
-  currentStep    Int      @default(0)
+  status         String        @default("Pending") // Pending, Approved, Rejected
+  currentStep    Int           @default(0)
   history        String?  // JSON array of approval actions (who, when, comment)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }

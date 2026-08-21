@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
+import { getTenantId } from '../../../lib/tenant';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   console.log("DATABASE_URL IS:", process.env.DATABASE_URL);
   try {
-    const users = await prisma.user.findMany();
+    const orgId = await getTenantId();
+    const users = await prisma.user.findMany({ where: { organizationId: orgId } });
     return NextResponse.json(users);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -16,9 +18,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const orgId = await getTenantId();
     const data = await request.json();
     const user = await prisma.user.create({
       data: {
+        organizationId: orgId,
         name: data.name,
         email: data.email,
         phone: data.phone,
