@@ -105,7 +105,18 @@ export default function PurchaseIntake() {
           </div>
           <div className="form-group">
             <label className="form-label">Budget / Estimated Price <span style={{color: '#ef4444'}}>*</span></label>
-            <input type="number" className="form-input" required />
+            <input 
+              type="number" 
+              className="form-input" 
+              min="0"
+              step="0.01"
+              required 
+              onKeyDown={(e) => {
+                if (['-', '+', 'e', 'E'].includes(e.key)) {
+                  e.preventDefault();
+                }
+              }}
+            />
           </div>
           <div className="form-group">
             <label className="form-label">Requested Quantity <span style={{color: '#ef4444'}}>*</span></label>
