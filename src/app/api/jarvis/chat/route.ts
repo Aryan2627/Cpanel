@@ -98,7 +98,9 @@ export async function POST(request: Request) {
             status: "Pending Approval",
             source: "Jarvis AI",
             organizationId: orgId,
-            quantity
+            quantity,
+            reqAt: new Date().toISOString().split('T')[0],
+            updAt: new Date().toISOString().split('T')[0]
           }
         });
         
