@@ -12,6 +12,7 @@ export default function VendorManagement() {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchFilter, setSearchFilter] = useState('All');
   
   // Form State
   const [formData, setFormData] = useState({
@@ -104,11 +105,24 @@ export default function VendorManagement() {
     }
   };
 
-  const filteredVendors = vendors.filter(v => 
-    v.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    v.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    v.vendorCode.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredVendors = vendors.filter(v => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    switch(searchFilter) {
+      case 'Vendor Name': return (v.name || '').toLowerCase().includes(q);
+      case 'Vendor Code': return (v.vendorCode || '').toLowerCase().includes(q);
+      case 'Contact Info': return (v.email || '').toLowerCase().includes(q) || (v.phone || '').toLowerCase().includes(q);
+      case 'Type': return (v.type || '').toLowerCase().includes(q);
+      case 'Location': return (v.city || '').toLowerCase().includes(q);
+      default:
+        return (v.name || '').toLowerCase().includes(q) || 
+               (v.email || '').toLowerCase().includes(q) ||
+               (v.vendorCode || '').toLowerCase().includes(q) ||
+               (v.phone || '').toLowerCase().includes(q) ||
+               (v.type || '').toLowerCase().includes(q) ||
+               (v.city || '').toLowerCase().includes(q);
+    }
+  });
 
   return (
     <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100%', fontFamily: 'system-ui, sans-serif', position: 'relative' }}>
@@ -148,10 +162,24 @@ export default function VendorManagement() {
         <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
           
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden', width: '280px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden', width: '420px' }}>
+              <div style={{ borderRight: '1px solid #e2e8f0', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', padding: '0 8px' }}>
+                <select 
+                  value={searchFilter} 
+                  onChange={(e) => setSearchFilter(e.target.value)}
+                  style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.875rem', color: '#475569', cursor: 'pointer', padding: '8px 4px' }}
+                >
+                  <option value="All">All Fields</option>
+                  <option value="Vendor Name">Vendor Name</option>
+                  <option value="Vendor Code">Vendor Code</option>
+                  <option value="Contact Info">Contact Info</option>
+                  <option value="Type">Type</option>
+                  <option value="Location">Location</option>
+                </select>
+              </div>
               <div style={{ padding: '0 12px' }}><Search size={16} color="#94a3b8" /></div>
               <input 
-                type="text" placeholder="Search by name, email, or code..." 
+                type="text" placeholder={`Search by ${searchFilter === 'All' ? 'name, email, code...' : searchFilter.toLowerCase()}...`}
                 value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                 style={{ border: 'none', padding: '8px 12px 8px 0', outline: 'none', width: '100%', fontSize: '0.875rem' }} 
               />
