@@ -1,17 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --primary-color: #0f172a; /* Deep Slate (Professional Enterprise) */
-  --primary-hover: #1e293b;
-  --bg-color: #f1f5f9; /* Soft industrial background */
+  --primary-color: #0B0E14; /* Deep Obsidian (Premium Enterprise) */
+  --primary-hover: #171E2B;
+  --bg-color: #F4F7F9; /* Softer, highly legible background */
   --surface-color: #ffffff; /* Clean white cards */
-  --surface-border: #cbd5e1; /* Crisp borders */
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --accent-color: #2563eb; /* Trust Blue */
-  --success-color: #059669; /* Emerald Green */
-  --warning-color: #d97706;
-  --danger-color: #dc2626;
+  --surface-border: #E2E8F0; /* Soft crisp borders */
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --accent-color: #4F46E5; /* Indigo Accent */
+  --success-color: #10B981; /* Premium Emerald */
+  --warning-color: #F59E0B;
+  --danger-color: #EF4444;
 }
 
 * {
@@ -137,14 +137,15 @@ a:hover {
 }
 
 .sidebar {
-  width: 260px;
-  background: #0f172a; /* Deep Slate Sidebar */
+  width: 270px;
+  background: #0B0E14; /* Deep premium obsidian */
+  background-image: radial-gradient(circle at top right, #171E2B 0%, #0B0E14 100%);
   color: #f8fafc;
   border-right: 1px solid #1e293b;
   padding: 24px 0;
   display: flex;
   flex-direction: column;
-  box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.15);
   z-index: 50;
 }
 
@@ -185,10 +186,14 @@ a:hover {
 }
 
 .sidebar-nav li a.active {
-  background: rgba(37, 99, 235, 0.15);
-  color: #60a5fa; /* Trust Blue accent */
-  border: 1px solid rgba(37, 99, 235, 0.3);
+  background: linear-gradient(90deg, rgba(79, 70, 229, 0.15) 0%, rgba(79, 70, 229, 0.05) 100%);
+  color: #818CF8; /* Vibrant Indigo accent */
+  border-left: 3px solid #818CF8;
+  border-top: 1px solid transparent;
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent;
   font-weight: 600;
+  padding-left: 13px; /* Adjust for border */
 }
 
 .main-content {

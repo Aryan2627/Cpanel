@@ -33,35 +33,35 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, []);
 
   const manageSubItems = [
-    { name: 'Users', path: '/client/manage/users' },
-    { name: 'Products', path: '/client/manage/products' },
-    { name: 'Templates', path: '/client/manage/templates' }
+    { name: 'User Directory', path: '/client/manage/users' },
+    { name: 'Product Catalog', path: '/client/manage/products' },
+    { name: 'Form Templates', path: '/client/manage/templates' }
   ];
   if (showWorkflows) {
     manageSubItems.push(
-      { name: 'Field Map', path: '/client/manage/workflows' },
-      { name: 'Approval Workflows', path: '/client/manage/approvals' }
+      { name: 'Data Field Mapping', path: '/client/manage/workflows' },
+      { name: 'Approval Chains', path: '/client/manage/approvals' }
     );
   }
 
   const navItems = [
-    { name: 'Dashboard', path: '/client' },
-    { name: 'My Approvals', path: '/client/approvals' },
-    { name: 'Purchase Intake', path: '/client/intake' },
-    { name: 'Purchase Requisition', path: '/client/pr' },
-    { name: 'Events / RFQs', path: '/client/events' },
+    { name: 'Command Center', path: '/client' },
+    { name: 'Approval Queue', path: '/client/approvals' },
+    { name: 'Intake Requests', path: '/client/intake' },
+    { name: 'Requisitions Hub', path: '/client/pr' },
+    { name: 'Sourcing Events', path: '/client/events' },
     { 
-      name: 'Vendor Management', 
+      name: 'Supplier Network', 
       path: '#',
       subItems: [
-        { name: 'Vendors Directory', path: '/client/vendors' },
-        { name: 'Vendor Messages', path: '/client/vendors/messages' }
+        { name: 'Global Directory', path: '/client/vendors' },
+        { name: 'Secure Messaging', path: '/client/vendors/messages' }
       ]
     },
-    { name: 'Purchase Orders', path: '/client/po' },
+    { name: 'PO Ledger', path: '/client/po' },
 
     { 
-      name: 'Manage', 
+      name: 'System Config', 
       path: '#',
       subItems: manageSubItems
     },

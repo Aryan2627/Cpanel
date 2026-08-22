@@ -129,7 +129,10 @@ export default function ApprovalFlowsPage() {
             ) : (
               workflows.map(wf => {
                 let parsedApprovers = [];
-                try { parsedApprovers = JSON.parse(wf.approvers); } catch(e) {}
+                try { 
+                  const parsed = JSON.parse(wf.approvers); 
+                  if (Array.isArray(parsed)) parsedApprovers = parsed;
+                } catch(e) {}
                 
                 return (
                   <tr key={wf.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
