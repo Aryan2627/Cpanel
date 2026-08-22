@@ -162,7 +162,6 @@ export default function ClientDashboard() {
           <h1 className="page-title">Command Center</h1>
           <p style={{ color: 'var(--text-secondary)', marginTop: '8px' }}>Welcome back to your procurement overview.</p>
         </div>
-        </div>
       </div>
       
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
