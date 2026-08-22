@@ -636,10 +636,12 @@ export default function BuyerEventDetailsPage() {
                 <h2 style={{ margin: 0, color: '#0f172a', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '8px' }}><Target size={20} color="#6366f1" /> Advanced Vendor Comparison Matrix</h2>
                 <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '0.85rem' }}>Fields flagged in red signify a breach of your internal Hidden Target Price.</p>
               </div>
-              <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <button onClick={handleDownloadCSV} style={{ padding: '8px 16px', border: '1px solid #cbd5e1', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px' }}><FileText size={16} /> Export CSV</button>
                 <button onClick={() => window.print()} style={{ padding: '8px 16px', border: '1px solid #cbd5e1', backgroundColor: '#fff', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px' }}><FileText size={16} /> Export PDF</button>
-                <button onClick={() => setIsCompareModalOpen(false)} style={{ padding: '8px 16px', border: 'none', backgroundColor: '#e2e8f0', color: '#334155', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}>Close Matrix</button>
+                <button onClick={() => setIsCompareModalOpen(false)} style={{ padding: '8px', border: 'none', backgroundColor: '#fee2e2', color: '#ef4444', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#fecaca'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fee2e2'} title="Close Matrix">
+                  <X size={20} />
+                </button>
               </div>
             </div>
             
