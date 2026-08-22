@@ -23,7 +23,22 @@ export default function VendorManagement() {
 
   const [vendors, setVendors] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showBankruptcyPredictor, setShowBankruptcyPredictor] = useState(true);
+  const [showBankruptcyPredictor, setShowBankruptcyPredictor] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('godTierFeatures');
+        if (saved) {
+          const features = JSON.parse(saved);
+          if (features.bankruptcyPredictor !== undefined) {
+            return features.bankruptcyPredictor;
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return true;
+  });
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleCopy = (text: string, id: string) => {
@@ -33,15 +48,6 @@ export default function VendorManagement() {
   };
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('godTierFeatures');
-      if (saved) {
-        const features = JSON.parse(saved);
-        if (features.bankruptcyPredictor !== undefined) {
-          setShowBankruptcyPredictor(features.bankruptcyPredictor);
-        }
-      }
-    } catch (e) {}
 
     fetch('/api/vendors')
       .then(res => res.json())
@@ -260,9 +266,9 @@ export default function VendorManagement() {
                   <td style={{ padding: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontWeight: 'bold' }}>
-                        {vendor.name.charAt(0).toUpperCase()}
+                        {(vendor.name || '?').charAt(0).toUpperCase()}
                       </div>
-                      <span style={{ fontWeight: 500, color: '#0f172a' }}>{vendor.name}</span>
+                      <span style={{ fontWeight: 500, color: '#0f172a' }}>{vendor.name || 'Unnamed Vendor'}</span>
                     </div>
                   </td>
                   <td style={{ padding: '16px', color: '#64748b', fontFamily: 'monospace' }}>
