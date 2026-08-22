@@ -244,12 +244,11 @@ export default function IntakeTablePage() {
       <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleImport} style={{ display: 'none' }} />
 
       {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {[
           { label: 'Total Requests', value: totalRequests, icon: Inbox, color: '#3b82f6', bg: '#eff6ff' },
           { label: 'Pending Approval', value: pendingRequests, icon: Clock, color: '#eab308', bg: '#fefce8' },
           { label: 'Approved', value: approvedRequests, icon: CheckCircle2, color: '#22c55e', bg: '#f0fdf4' },
-          { label: 'Avg Process Time', value: avgProcessingTime, icon: LayoutTemplate, color: '#8b5cf6', bg: '#f5f3ff' },
         ].map((stat, i) => (
           <div key={i} style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
             <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: stat.bg, color: stat.color }}>
