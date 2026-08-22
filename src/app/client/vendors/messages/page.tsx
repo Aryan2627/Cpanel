@@ -30,8 +30,14 @@ export default function VendorMessagesPage() {
   // Fetch Vendors from Database
   useEffect(() => {
     const fetchVendors = async () => {
+      if (!debouncedEventId.trim()) {
+        setVendors([]);
+        setActiveVendor('');
+        return;
+      }
+
       try {
-        const url = debouncedEventId ? `/api/vendors?eventId=${debouncedEventId}` : '/api/vendors';
+        const url = `/api/vendors?eventId=${debouncedEventId}`;
         const res = await fetch(url);
         if (res.ok) {
           const data = await res.json();
@@ -51,7 +57,7 @@ export default function VendorMessagesPage() {
       }
     };
     fetchVendors();
-  }, [debouncedEventId]);
+  }, [debouncedEventId, activeVendor]);
 
   // Load messages from local storage or set defaults
   useEffect(() => {
@@ -200,24 +206,26 @@ export default function VendorMessagesPage() {
       {/* Main Chat Area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#fff', position: 'relative' }}>
         
-        {/* Chat Header */}
-        <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(255, 255, 255, 0.8)', zIndex: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-             <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#c7d2fe', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5', fontWeight: '700', fontSize: '1.25rem' }}>
-                {activeVendor.charAt(0)}
+        {activeVendor ? (
+          <>
+            {/* Chat Header */}
+            <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(255, 255, 255, 0.8)', zIndex: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                 <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#c7d2fe', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5', fontWeight: '700', fontSize: '1.25rem' }}>
+                    {activeVendor.charAt(0)}
+                  </div>
+                  <div>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#111827', margin: '0 0 4px 0' }}>{activeVendor}</h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }} />
+                      <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>Active Now</span>
+                    </div>
+                  </div>
               </div>
-              <div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#111827', margin: '0 0 4px 0' }}>{activeVendor}</h2>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }} />
-                  <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>Active Now</span>
-                </div>
-              </div>
-          </div>
-          <button style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '8px', backgroundColor: '#fff', color: '#374151', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem', transition: 'background-color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fff'}>
-            View Profile
-          </button>
-        </div>
+              <button style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '8px', backgroundColor: '#fff', color: '#374151', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem', transition: 'background-color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fff'}>
+                View Profile
+              </button>
+            </div>
 
         {/* Chat Messages */}
         <div id="tour-chat-area" style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '24px', backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
@@ -297,6 +305,18 @@ export default function VendorMessagesPage() {
             </button>
           </div>
         </div>
+        </>
+        ) : (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc', padding: '48px', textAlign: 'center' }}>
+            <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
+              <span style={{ fontSize: '2.5rem' }}>💬</span>
+            </div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', margin: '0 0 12px 0' }}>No Event Selected</h3>
+            <p style={{ color: '#6b7280', fontSize: '1rem', maxWidth: '400px', lineHeight: '1.6' }}>
+              Please enter an Event ID in the filter box on the left to securely message the vendors participating in that event.
+            </p>
+          </div>
+        )}
 
       </div>
 
