@@ -274,7 +274,6 @@ export default function IntakeTablePage() {
                 <span style={{ fontSize: '0.875rem', color: '#475569', fontWeight: 500 }}>{selectedIds.size} selected</span>
                 <div style={{ height: '24px', width: '1px', backgroundColor: '#cbd5e1' }}></div>
                 <button style={{ padding: '6px 12px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '0.875rem', color: '#475569', cursor: 'pointer', fontWeight: 500 }}>Bulk Approve</button>
-                <button style={{ padding: '6px 12px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '0.875rem', color: '#ef4444', cursor: 'pointer', fontWeight: 500 }}>Delete</button>
               </div>
             ) : (
               <>
