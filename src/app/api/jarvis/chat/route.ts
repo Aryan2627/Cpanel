@@ -78,7 +78,16 @@ export async function POST(request: Request) {
       // Check if it's an actionable command (e.g., "create intake for X")
       const createIntakeMatch = upperText.match(/(?:CREATE|MAKE|ADD)(?:\s+A|\s+AN)?\s+INTAKE(?:\s+FOR)?\s+(.+)/);
       if (createIntakeMatch && createIntakeMatch[1]) {
-        const intakeTitle = createIntakeMatch[1].trim();
+        let intakeTitle = createIntakeMatch[1].trim();
+        let quantity = 1;
+        
+        // Extract quantity from the start of the item (e.g. "5 new servers")
+        const qtyMatch = intakeTitle.match(/^(\d+)\s+(.+)/);
+        if (qtyMatch) {
+          quantity = parseInt(qtyMatch[1], 10);
+          intakeTitle = qtyMatch[2];
+        }
+
         const refId = `PR-${Date.now().toString().slice(-6)}`;
         const orgId = await getTenantId();
         
@@ -88,7 +97,8 @@ export async function POST(request: Request) {
             title: intakeTitle,
             status: "Pending Approval",
             source: "Jarvis AI",
-            organizationId: orgId
+            organizationId: orgId,
+            quantity
           }
         });
         
