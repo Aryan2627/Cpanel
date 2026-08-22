@@ -162,17 +162,6 @@ export default function ClientDashboard() {
           <h1 className="page-title">Command Center</h1>
           <p style={{ color: 'var(--text-secondary)', marginTop: '8px' }}>Welcome back to your procurement overview.</p>
         </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <Link href="/client/intake/create">
-            <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>+</span> New Intake
-            </button>
-          </Link>
-          <Link href="/client/events">
-            <button className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>+</span> New Event
-            </button>
-          </Link>
         </div>
       </div>
       
