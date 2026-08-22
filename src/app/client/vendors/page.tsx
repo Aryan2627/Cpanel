@@ -12,7 +12,8 @@ export default function VendorManagement() {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchFilter, setSearchFilter] = useState('All');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState({ name: '', code: '', contact: '', type: '', location: '' });
   
   // Form State
   const [formData, setFormData] = useState({
@@ -106,22 +107,28 @@ export default function VendorManagement() {
   };
 
   const filteredVendors = vendors.filter(v => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    switch(searchFilter) {
-      case 'Vendor Name': return (v.name || '').toLowerCase().includes(q);
-      case 'Vendor Code': return (v.vendorCode || '').toLowerCase().includes(q);
-      case 'Contact Info': return (v.email || '').toLowerCase().includes(q) || (v.phone || '').toLowerCase().includes(q);
-      case 'Type': return (v.type || '').toLowerCase().includes(q);
-      case 'Location': return (v.city || '').toLowerCase().includes(q);
-      default:
-        return (v.name || '').toLowerCase().includes(q) || 
+    let matches = true;
+    
+    // Universal search query
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const matchUniversal = (v.name || '').toLowerCase().includes(q) || 
                (v.email || '').toLowerCase().includes(q) ||
                (v.vendorCode || '').toLowerCase().includes(q) ||
                (v.phone || '').toLowerCase().includes(q) ||
                (v.type || '').toLowerCase().includes(q) ||
                (v.city || '').toLowerCase().includes(q);
+      if (!matchUniversal) matches = false;
     }
+
+    // Advanced filters
+    if (advancedFilters.name && !(v.name || '').toLowerCase().includes(advancedFilters.name.toLowerCase())) matches = false;
+    if (advancedFilters.code && !(v.vendorCode || '').toLowerCase().includes(advancedFilters.code.toLowerCase())) matches = false;
+    if (advancedFilters.contact && !(v.email || '').toLowerCase().includes(advancedFilters.contact.toLowerCase()) && !(v.phone || '').toLowerCase().includes(advancedFilters.contact.toLowerCase())) matches = false;
+    if (advancedFilters.type && !(v.type || '').toLowerCase().includes(advancedFilters.type.toLowerCase())) matches = false;
+    if (advancedFilters.location && !(v.city || '').toLowerCase().includes(advancedFilters.location.toLowerCase())) matches = false;
+
+    return matches;
   });
 
   return (
@@ -162,32 +169,50 @@ export default function VendorManagement() {
         <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
           
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden', width: '420px' }}>
-              <div style={{ borderRight: '1px solid #e2e8f0', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', padding: '0 8px' }}>
-                <select 
-                  value={searchFilter} 
-                  onChange={(e) => setSearchFilter(e.target.value)}
-                  style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.875rem', color: '#475569', cursor: 'pointer', padding: '8px 4px' }}
-                >
-                  <option value="All">All Fields</option>
-                  <option value="Vendor Name">Vendor Name</option>
-                  <option value="Vendor Code">Vendor Code</option>
-                  <option value="Contact Info">Contact Info</option>
-                  <option value="Type">Type</option>
-                  <option value="Location">Location</option>
-                </select>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden', width: '280px' }}>
               <div style={{ padding: '0 12px' }}><Search size={16} color="#94a3b8" /></div>
               <input 
-                type="text" placeholder={`Search by ${searchFilter === 'All' ? 'name, email, code...' : searchFilter.toLowerCase()}...`}
+                type="text" placeholder="Search universally..." 
                 value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                 style={{ border: 'none', padding: '8px 12px 8px 0', outline: 'none', width: '100%', fontSize: '0.875rem' }} 
               />
             </div>
             
-            <button style={{ padding: '8px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#fff', color: '#475569', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>
-              <Filter size={16} /> Filter
-            </button>
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => setIsFilterOpen(!isFilterOpen)} style={{ padding: '8px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: isFilterOpen ? '#f1f5f9' : '#fff', color: '#475569', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>
+                <Filter size={16} /> Filter
+              </button>
+              
+              {isFilterOpen && (
+                <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: '8px', width: '300px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 50, padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <h3 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600, color: '#0f172a' }}>Advanced Filters</h3>
+                    <button onClick={() => setAdvancedFilters({ name: '', code: '', contact: '', type: '', location: '' })} style={{ background: 'none', border: 'none', color: '#2563eb', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 500 }}>Clear All</button>
+                  </div>
+                  
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#475569', marginBottom: '4px' }}>Vendor Name</label>
+                    <input type="text" value={advancedFilters.name} onChange={e => setAdvancedFilters({...advancedFilters, name: e.target.value})} style={{ width: '100%', padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem', outline: 'none' }} placeholder="e.g. Acme Corp" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#475569', marginBottom: '4px' }}>Vendor Code</label>
+                    <input type="text" value={advancedFilters.code} onChange={e => setAdvancedFilters({...advancedFilters, code: e.target.value})} style={{ width: '100%', padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem', outline: 'none' }} placeholder="e.g. VEN-1001" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#475569', marginBottom: '4px' }}>Contact Info</label>
+                    <input type="text" value={advancedFilters.contact} onChange={e => setAdvancedFilters({...advancedFilters, contact: e.target.value})} style={{ width: '100%', padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem', outline: 'none' }} placeholder="Email or Phone" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#475569', marginBottom: '4px' }}>Type</label>
+                    <input type="text" value={advancedFilters.type} onChange={e => setAdvancedFilters({...advancedFilters, type: e.target.value})} style={{ width: '100%', padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem', outline: 'none' }} placeholder="e.g. Manufacturer" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#475569', marginBottom: '4px' }}>Location</label>
+                    <input type="text" value={advancedFilters.location} onChange={e => setAdvancedFilters({...advancedFilters, location: e.target.value})} style={{ width: '100%', padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem', outline: 'none' }} placeholder="e.g. New York" />
+                  </div>
+                </div>
+              )}
+            </div>
             <button style={{ padding: '8px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#fff', color: '#475569', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>
               <Tag size={16} /> Tags
             </button>
