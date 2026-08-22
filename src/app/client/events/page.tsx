@@ -144,7 +144,23 @@ export default function EventsPage() {
   }, [searchQuery, activeStageFilter, activeTab, allEvents, now]);
 
   const handleViewBids = async (eventId: string) => {
-    router.push(`/client/events/${eventId}`);
+    setSelectedEventId(eventId);
+    setIsBidsLoading(true);
+    try {
+      // Find the actual DB event ID if it exists, otherwise use refId (for mocks)
+      const dbEvent = dbEvents.find(e => e.refId === eventId || e.id === eventId);
+      const queryId = dbEvent ? dbEvent.id : eventId;
+      
+      const res = await fetch(`/api/bids?eventId=${queryId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setBids(data);
+      }
+    } catch(err) {
+      console.error("Failed to fetch bids", err);
+    } finally {
+      setIsBidsLoading(false);
+    }
   };
 
   const handleAward = async (bid: any) => {
