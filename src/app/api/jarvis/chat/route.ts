@@ -81,11 +81,11 @@ export async function POST(request: Request) {
         let intakeTitle = (createIntakeMatch[1] || createIntakeMatch[2]).trim();
         let quantity = 1;
         
-        // Extract quantity from the start of the item (e.g. "5 new servers" -> 5)
-        const qtyMatch = intakeTitle.match(/^(\d+)\s+(.+)/);
+        // Extract ANY numerical value from the item to use as quantity
+        const qtyMatch = intakeTitle.match(/(\d+)/);
         if (qtyMatch) {
           quantity = parseInt(qtyMatch[1], 10);
-          intakeTitle = qtyMatch[2];
+          intakeTitle = intakeTitle.replace(qtyMatch[1], '').replace(/\s+/g, ' ').trim();
         }
 
         const refId = `PR-${Date.now().toString().slice(-6)}`;
