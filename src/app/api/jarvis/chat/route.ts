@@ -74,14 +74,14 @@ export async function POST(request: Request) {
     else if (text.includes('dashboard') || text.includes('home')) {
       return NextResponse.json({ reply: 'Navigating to the Global Dashboard...', action: { type: 'NAVIGATE', payload: '/client' } });
     } 
-    else if (text.includes('create intake') || text.includes('new intake')) {
-      // Check if it's an actionable command (e.g., "create intake for X")
-      const createIntakeMatch = upperText.match(/(?:CREATE|MAKE|ADD)(?:\s+A|\s+AN)?\s+INTAKE(?:\s+FOR)?\s+(.+)/);
-      if (createIntakeMatch && createIntakeMatch[1]) {
-        let intakeTitle = createIntakeMatch[1].trim();
+    else if (text.includes('intake') || text.includes('want') || text.includes('need') || text.includes('require')) {
+      // Check if it's an actionable command (e.g., "create intake for X" or "I want X")
+      const createIntakeMatch = upperText.match(/(?:CREATE|MAKE|ADD)(?:\s+A|\s+AN)?\s+INTAKE(?:\s+FOR)?\s+(.+)|(?:I|WE)\s+(?:WANT|NEED|REQUIRE)\s+(.+)/);
+      if (createIntakeMatch && (createIntakeMatch[1] || createIntakeMatch[2])) {
+        let intakeTitle = (createIntakeMatch[1] || createIntakeMatch[2]).trim();
         let quantity = 1;
         
-        // Extract quantity from the start of the item (e.g. "5 new servers")
+        // Extract quantity from the start of the item (e.g. "5 new servers" -> 5)
         const qtyMatch = intakeTitle.match(/^(\d+)\s+(.+)/);
         if (qtyMatch) {
           quantity = parseInt(qtyMatch[1], 10);
