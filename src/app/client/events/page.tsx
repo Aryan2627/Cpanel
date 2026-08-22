@@ -557,16 +557,35 @@ export default function EventsPage() {
                           ${bid.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}
                         </td>
                         <td style={{ padding: '16px 8px', textAlign: 'right' }}>
-                          <button 
-                            onClick={() => handleAward(bid)}
-                            style={{ 
-                              padding: '8px 16px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', 
-                              cursor: 'pointer', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px',
-                              boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
-                            }}
-                          >
-                            <CheckCircle2 size={16} /> Award & Create PO
-                          </button>
+                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                            <button 
+                              onClick={() => {
+                                const offer = prompt(`Enter counter-offer amount for ${bid.vendorName || 'Vendor'}:`);
+                                if (offer) {
+                                  alert(`Formal counter-offer of $${offer} has been issued to ${bid.vendorName || 'Vendor'}. They will be notified via the portal.`);
+                                }
+                              }}
+                              style={{ 
+                                padding: '8px 12px', backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '6px', 
+                                cursor: 'pointer', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                transition: 'all 0.2s'
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dbeafe'}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#eff6ff'}
+                            >
+                              💬 Counter Offer
+                            </button>
+                            <button 
+                              onClick={() => handleAward(bid)}
+                              style={{ 
+                                padding: '8px 16px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', 
+                                cursor: 'pointer', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
+                              }}
+                            >
+                              <CheckCircle2 size={16} /> Award & Create PO
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
