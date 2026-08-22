@@ -130,8 +130,6 @@ export default function EventsPage() {
 
       if (activeStageFilter === 'Live') {
         matchesStage = event.endTime ? !isHistorical : event.stages.some((s: any) => s.timeText && s.timeText.includes('Live'));
-      } else if (activeStageFilter === 'Action Required') {
-        matchesStage = event.stages.some((s: any) => s.actionText);
       }
 
       let matchesTab = true;
@@ -222,7 +220,14 @@ export default function EventsPage() {
   // KPI calculations
   const totalEvents = allEvents.length;
   const liveEvents = allEvents.filter(e => e.stages.some((s: any) => s.timeText.includes('Live') || s.timeText.includes('Ends in'))).length;
-  const actionRequired = allEvents.filter(e => e.stages.some((s: any) => s.actionType === 'warning')).length;
+  
+  // Historical Events definition is exactly what goes into the HISTORY tab
+  const historicalEvents = allEvents.filter(e => {
+    if (e.endTime) {
+      return now > new Date(e.endTime);
+    }
+    return e.stages.every((s: any) => s.timeText && (s.timeText.includes('Ended') || s.timeText.includes('History') || s.timeText.includes('Overdue')));
+  }).length;
 
   return (
     <div style={{ backgroundColor: '#f8fafc', color: '#333', minHeight: '100%', padding: '24px', fontFamily: 'system-ui, sans-serif' }}>
@@ -263,12 +268,11 @@ export default function EventsPage() {
       </div>
 
       {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {[
           { label: 'Total Events', value: totalEvents, icon: BarChart3, color: '#3b82f6', bg: '#eff6ff' },
           { label: 'Live Events', value: liveEvents, icon: Activity, color: '#10b981', bg: '#ecfdf5' },
-          { label: 'Action Required', value: actionRequired, icon: AlertCircle, color: '#f59e0b', bg: '#fef3c7' },
-          { label: 'Avg Cycle Time', value: '14 Days', icon: Clock, color: '#8b5cf6', bg: '#f5f3ff' },
+          { label: 'History Events', value: historicalEvents, icon: Clock, color: '#8b5cf6', bg: '#f5f3ff' },
         ].map((stat, i) => (
           <div key={i} style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
             <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: stat.bg, color: stat.color }}>
@@ -320,7 +324,7 @@ export default function EventsPage() {
 
           {/* Stage Filters */}
           <div style={{ display: 'flex', backgroundColor: '#f1f5f9', borderRadius: '6px', padding: '4px' }}>
-            {['All Stages', 'Live', 'Action Required'].map(filter => (
+            {['All Stages', 'Live'].map(filter => (
               <button
                 key={filter}
                 onClick={() => setActiveStageFilter(filter)}
