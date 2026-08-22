@@ -425,7 +425,28 @@ export default function EventsPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: stage.participantsColor, fontWeight: 500, fontSize: '0.875rem' }}>
                       <Users size={16} />
                       {stage.name.includes('Live RFQ') ? (
-                        <button onClick={() => handleViewBids(event.id)} style={{ background: 'none', border: 'none', color: '#2563eb', cursor: 'pointer', textDecoration: 'underline', fontWeight: 500, padding: 0 }}>View Bids</button>
+                        <button 
+                          onClick={() => handleViewBids(event.id)} 
+                          style={{ 
+                            background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', 
+                            border: '1px solid rgba(255,255,255,0.1)', 
+                            color: '#ffffff', 
+                            cursor: 'pointer', 
+                            fontWeight: 600, 
+                            padding: '6px 14px', 
+                            borderRadius: '99px',
+                            boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                            fontSize: '0.8rem'
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 16px rgba(79, 70, 229, 0.35)' }}
+                          onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(79, 70, 229, 0.25)' }}
+                        >
+                          View Bids <Eye size={14} />
+                        </button>
                       ) : (
                         <span>{stage.participants}</span>
                       )}
