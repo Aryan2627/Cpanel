@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
+import { getTenantId } from '../../../../lib/tenant';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -74,6 +75,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ reply: 'Navigating to the Global Dashboard...', action: { type: 'NAVIGATE', payload: '/client' } });
     } 
     else if (text.includes('create intake') || text.includes('new intake')) {
+      // Check if it's an actionable command (e.g., "create intake for X")
+      const createIntakeMatch = upperText.match(/(?:CREATE|MAKE|ADD)(?:\s+A|\s+AN)?\s+INTAKE(?:\s+FOR)?\s+(.+)/);
+      if (createIntakeMatch && createIntakeMatch[1]) {
+        const intakeTitle = createIntakeMatch[1].trim();
+        const refId = `PR-${Date.now().toString().slice(-6)}`;
+        const orgId = await getTenantId();
+        
+        await prisma.intake.create({
+          data: {
+            refId,
+            title: intakeTitle,
+            status: "Pending Approval",
+            source: "Jarvis AI",
+            organizationId: orgId
+          }
+        });
+        
+        return NextResponse.json({ 
+          reply: `I have successfully created an intake for "${intakeTitle}" (Reference: ${refId}). Taking you there now.`, 
+          action: { type: 'NAVIGATE', payload: '/client/intake' } 
+        });
+      }
+      
+      // Fallback to just navigating
       return NextResponse.json({ reply: 'Opening the Intake Request form...', action: { type: 'NAVIGATE', payload: '/client/intake/create' } });
     }
     else if (text.includes('intake')) {
