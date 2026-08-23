@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  Users, UserPlus, Upload, Filter, Tag, Search, 
+  Users, UserPlus, Filter, Search, 
   Building2, MapPin, Mail, Phone, CheckCircle2, 
   XCircle, Clock, Check, X, ShieldAlert, BadgeCheck, ChevronDown, Star, AlertTriangle, Copy, AlertCircle
 } from 'lucide-react';
@@ -244,15 +244,9 @@ export default function VendorManagement() {
                 </div>
               )}
             </div>
-            <button style={{ padding: '8px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#fff', color: '#475569', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>
-              <Tag size={16} /> Tags
-            </button>
           </div>
 
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button style={{ padding: '8px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#fff', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>
-              <Upload size={16} /> Bulk Upload
-            </button>
             <button onClick={() => setIsInviteOpen(true)} style={{ padding: '8px 16px', border: 'none', borderRadius: '6px', backgroundColor: '#2563eb', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500, boxShadow: '0 2px 4px rgba(37,99,235,0.2)' }}>
               <UserPlus size={16} /> Invite Vendor
             </button>
