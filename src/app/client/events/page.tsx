@@ -181,10 +181,8 @@ export default function EventsPage() {
   }, [searchQuery, activeStageFilter, activeTab, allEvents]);
 
   const handleViewBids = async (eventId: string) => {
-    // Find the actual DB event ID if it exists, otherwise use refId (for mocks)
-    const dbEvent = dbEvents.find(e => e.refId === eventId || e.id === eventId);
-    const queryId = dbEvent && dbEvent.dbId ? dbEvent.dbId : eventId;
-    router.push(`/client/events/${queryId}`);
+    // The API expects refId for the lookup, and eventId here is already the refId.
+    router.push(`/client/events/${eventId}`);
   };
 
   const handleAward = async (bid: any) => {
