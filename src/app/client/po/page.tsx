@@ -1,17 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { 
-  FileText, Search, Filter, Download, 
+  FileText, Search,
   CheckCircle2, Clock, XCircle, FileSignature, AlertCircle
 } from 'lucide-react';
 
-export default function PurchaseOrdersPage() {
-  const [pos, setPos] = useState<any[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Mock data to ensure we have something to display
-  const mockPos = [
-    {
+const mockPos = [
+  {
       id: 'mock-po-1',
       poNumber: 'PO-1706439000000',
       title: 'Q3 Enterprise Hardware Refresh',
@@ -40,8 +35,12 @@ export default function PurchaseOrdersPage() {
       total: 3200,
       createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
       status: 'Pending Review'
-    }
-  ];
+  }
+];
+
+export default function PurchaseOrdersPage() {
+  const [pos, setPos] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetch('/api/pos')
@@ -134,14 +133,7 @@ export default function PurchaseOrdersPage() {
             />
           </div>
           
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button style={{ padding: '8px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#fff', color: '#475569', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>
-              <Filter size={16} /> Filter
-            </button>
-            <button style={{ padding: '8px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#fff', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>
-              <Download size={16} /> Export
-            </button>
-          </div>
+          {/* Filter and Export buttons removed as requested */}
         </div>
 
         {/* Data Table */}
