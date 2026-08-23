@@ -38,10 +38,25 @@ export async function POST(req: Request) {
       }
     });
 
-    // Determine Role
+    const emailToSearch = identifier.trim().toLowerCase();
+
+    // Check Database for actual role
     let role = 'client';
-    if (identifier.includes('admin')) role = 'admin';
-    if (identifier.includes('vendor')) role = 'vendor';
+    const users = await prisma.user.findMany();
+    const vendors = await prisma.vendor.findMany();
+
+    const userMatch = users.find(u => u.email?.trim().toLowerCase() === emailToSearch);
+    const vendorMatch = vendors.find(v => v.email?.trim().toLowerCase() === emailToSearch);
+
+    if (userMatch) {
+      // Determine if the internal user is Admin or regular Client
+      role = userMatch.role?.toLowerCase() === 'admin' ? 'admin' : 'client';
+    } else if (vendorMatch) {
+      role = 'vendor';
+    } else {
+      // Should theoretically never hit this due to request-otp check, but safe fallback
+      return NextResponse.json({ error: 'Account record not found' }, { status: 404 });
+    }
 
     // Generate JWT
     const payload = {

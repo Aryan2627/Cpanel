@@ -43,6 +43,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Email/Identifier is required' }, { status: 400 });
     }
 
+    const emailToSearch = identifier.trim().toLowerCase();
+
+    // STRICT CHECK: The email MUST exist in the User or Vendor table
+    const users = await prisma.user.findMany();
+    const vendors = await prisma.vendor.findMany();
+    
+    const userMatch = users.find(u => u.email?.trim().toLowerCase() === emailToSearch);
+    const vendorMatch = vendors.find(v => v.email?.trim().toLowerCase() === emailToSearch);
+
+    if (!userMatch && !vendorMatch) {
+      // Reject if the email isn't registered in the system
+      return NextResponse.json({ error: 'Account not found. Please contact your administrator.' }, { status: 404 });
+    }
+
     // Generate 6 digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
