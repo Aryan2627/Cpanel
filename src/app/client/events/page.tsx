@@ -2,9 +2,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  Search, Plus, Activity, AlertCircle, Clock, CheckCircle2, 
-  TrendingUp, BarChart3, Users, Filter, Check, X, 
-  ShieldCheck, Edit2, Eye, ChevronDown, Award, FileCheck
+  Plus, Search, Filter, MoreHorizontal, ArrowUpRight, BarChart3, 
+  Activity, Calendar, Clock, DollarSign, ArrowRight, ShieldCheck, Zap, Upload, LayoutGrid, CheckCircle2, AlertCircle, ChevronDown, FileCheck, TrendingUp, Eye, Check, X, Edit2, Users, Award
 } from 'lucide-react';
 
 export default function EventsPage() {
@@ -13,6 +12,7 @@ export default function EventsPage() {
   const [activeStageFilter, setActiveStageFilter] = useState('All Stages');
   const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const [dbEvents, setDbEvents] = useState<any[]>([]);
   const [now, setNow] = useState(new Date());
@@ -78,7 +78,20 @@ export default function EventsPage() {
 
   useEffect(() => {
     fetch('/api/events')
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Server returned ${res.status}: ${text.substring(0, 100)}`);
+        }
+        // Safely check content type before parsing
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          return res.json();
+        } else {
+          const text = await res.text();
+          throw new Error(`Expected JSON but got HTML/text: ${text.substring(0, 50)}`);
+        }
+      })
       .then(data => {
         if (Array.isArray(data)) {
           const mapped = data.map(dbEvent => ({
@@ -105,7 +118,10 @@ export default function EventsPage() {
           setDbEvents(mapped);
         }
       })
-      .catch(console.error);
+      .catch(err => {
+        console.error("Error fetching events:", err);
+        setFetchError(err.message);
+      });
   }, []);
 
   const allEvents = useMemo(() => {
@@ -175,6 +191,7 @@ export default function EventsPage() {
           total: bid.amount,
           eventId: selectedEventId,
           status: 'Draft',
+          // eslint-disable-next-line react-hooks/purity
           poNumber: `PO-${Date.now()}`
         })
       });
@@ -285,6 +302,14 @@ export default function EventsPage() {
       </div>
 
       {/* KPI Cards */}
+      {fetchError && (
+        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', padding: '16px', borderRadius: '8px', marginBottom: '24px', color: '#b91c1c', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <AlertCircle size={20} />
+          <div>
+            <strong>Error fetching live events from database:</strong> {fetchError.includes('HTML') || fetchError.includes('504') ? 'The database server might be sleeping or timing out (common on free tiers). Please wait a moment and refresh.' : fetchError}
+          </div>
+        </div>
+      )}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {[
           { label: 'Total Events', value: totalEvents, icon: BarChart3, color: '#3b82f6', bg: '#eff6ff' },

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { 
   Users, UserPlus, Upload, Filter, Tag, Search, 
   Building2, MapPin, Mail, Phone, CheckCircle2, 
-  XCircle, Clock, Check, X, ShieldAlert, BadgeCheck, ChevronDown, Star, AlertTriangle, Copy
+  XCircle, Clock, Check, X, ShieldAlert, BadgeCheck, ChevronDown, Star, AlertTriangle, Copy, AlertCircle
 } from 'lucide-react';
 
 export default function VendorManagement() {
@@ -47,16 +47,32 @@ export default function VendorManagement() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  useEffect(() => {
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
+  useEffect(() => {
     fetch('/api/vendors')
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Server returned ${res.status}: ${text.substring(0, 100)}`);
+        }
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          return res.json();
+        } else {
+          const text = await res.text();
+          throw new Error(`Expected JSON but got HTML/text: ${text.substring(0, 50)}`);
+        }
+      })
       .then(data => {
         if (Array.isArray(data)) {
           setVendors(data);
         }
       })
-      .catch(e => console.error("Error fetching vendors:", e))
+      .catch(e => {
+        console.error("Error fetching vendors:", e);
+        setFetchError(e.message);
+      })
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -140,6 +156,15 @@ export default function VendorManagement() {
   return (
     <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100%', fontFamily: 'system-ui, sans-serif', position: 'relative' }}>
       
+      {/* Sub Header */}
+      {fetchError && (
+        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', padding: '16px', borderRadius: '8px', marginBottom: '24px', color: '#b91c1c', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <AlertCircle size={20} />
+          <div>
+            <strong>Error fetching vendors:</strong> {fetchError.includes('HTML') || fetchError.includes('504') ? 'Database server might be sleeping. Please wait a moment and refresh.' : fetchError}
+          </div>
+        </div>
+      )}
       {/* Header Area */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
         <div>
