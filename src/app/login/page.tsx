@@ -8,32 +8,57 @@ export default function Login() {
   const [identifier, setIdentifier] = useState('');
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const handleRequestOTP = (e: React.FormEvent) => {
+  const handleRequestOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!identifier) return;
     setIsLoading(true);
-    setTimeout(() => {
-      setStep('verify');
+    try {
+      const res = await fetch('/api/auth/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setStep('verify');
+        if (data.previewUrl) {
+          setPreviewUrl(data.previewUrl);
+        }
+      } else {
+        alert(data.error || 'Failed to request OTP');
+      }
+    } catch (err) {
+      alert('Network error');
+    } finally {
       setIsLoading(false);
-    }, 1000); // Simulate network request
+    }
   };
 
-  const handleVerifyOTP = (e: React.FormEvent) => {
+  const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length < 4) return;
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      // Mock routing based on email/number input for testing roles
-      if (identifier.includes('admin')) {
-        router.push('/admin');
-      } else if (identifier.includes('vendor')) {
-        router.push('/vendor');
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, otp })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        if (data.role === 'admin') router.push('/admin');
+        else if (data.role === 'vendor') router.push('/vendor');
+        else router.push('/client/intake');
       } else {
-        router.push('/client/intake'); // Default to client portal
+        alert(data.error || 'Invalid OTP');
       }
-    }, 1000);
+    } catch (err) {
+      alert('Network error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -51,7 +76,6 @@ export default function Login() {
         position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Decorative background circles */}
         <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '300px', height: '300px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(40px)' }}></div>
         <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '400px', height: '400px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(60px)' }}></div>
         
@@ -133,7 +157,14 @@ export default function Login() {
           ) : (
             <form onSubmit={handleVerifyOTP} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>Enter 6-digit OTP</label>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>Enter 6-digit OTP sent to {identifier}</label>
+                
+                {previewUrl && (
+                  <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', fontSize: '0.85rem' }}>
+                    <strong>Dev Mode:</strong> <a href={previewUrl} target="_blank" rel="noreferrer" style={{ color: '#2563eb', textDecoration: 'underline' }}>View OTP Email in Ethereal</a>
+                  </div>
+                )}
+
                 <input 
                   type="text" 
                   value={otp}
