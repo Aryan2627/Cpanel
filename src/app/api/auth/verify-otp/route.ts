@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
+import { logLoginActivity, logAudit } from '../../../lib/audit';
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_for_procgen';
@@ -77,6 +77,10 @@ export async function POST(req: Request) {
       path: '/',
       maxAge: 7 * 24 * 60 * 60 // 7 days
     });
+
+    // Log login activity and audit trail (fire-and-forget)
+    void logLoginActivity({ identifier, success: true });
+    void logAudit({ actorEmail: identifier, action: 'LOGIN', entityType: 'User', entityRef: identifier });
 
     return res;
 

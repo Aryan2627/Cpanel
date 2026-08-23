@@ -84,6 +84,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         { name: 'ERP Integrations', path: '/client/settings/erp' }
       ]
     },
+    { name: 'My Profile', path: '/client/profile' },
   ];
 
   return (

@@ -283,3 +283,29 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+model LoginActivity {
+  id         String   @id @default(uuid())
+  identifier String
+  ip         String?
+  userAgent  String?
+  city       String?
+  success    Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@index([identifier])
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  organizationId String?
+  actorEmail     String
+  action         String
+  entityType     String?
+  entityRef      String?
+  details        String?
+  createdAt      DateTime @default(now())
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([actorEmail])
+}
