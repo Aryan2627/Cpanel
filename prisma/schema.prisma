@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -12,26 +12,26 @@ model Organization {
   id        String   @id @default(uuid())
   name      String
   domain    String?  @unique
-  theme     String?  // JSON string for colors, logos
-  features  String?  // JSON string for feature toggles
+  theme     String? // JSON string for colors, logos
+  features  String? // JSON string for feature toggles
   createdAt DateTime @default(now())
 
   // Relations
-  users           User[]
-  teams           Team[]
-  locations       Location[]
-  categories      Category[]
-  products        Product[]
-  intakes         Intake[]
-  events          Event[]
-  vendors         Vendor[]
-  purchaseOrders  PurchaseOrder[]
-  bids            Bid[]
-  contracts       Contract[]
-  templates       Template[]
-  jarvisMemories  JarvisMemory[]
-  workflows       Workflow[]
-  approvalReqs    ApprovalRequest[]
+  users          User[]
+  teams          Team[]
+  locations      Location[]
+  categories     Category[]
+  products       Product[]
+  intakes        Intake[]
+  events         Event[]
+  vendors        Vendor[]
+  purchaseOrders PurchaseOrder[]
+  bids           Bid[]
+  contracts      Contract[]
+  templates      Template[]
+  jarvisMemories JarvisMemory[]
+  workflows      Workflow[]
+  approvalReqs   ApprovalRequest[]
 }
 
 model User {
@@ -53,9 +53,9 @@ model Team {
   organization   Organization? @relation(fields: [organizationId], references: [id])
   name           String?
   type           String?
-  users          String?  // JSON string
-  categories     String?  // JSON string
-  locations      String?  // JSON string
+  users          String? // JSON string
+  categories     String? // JSON string
+  locations      String? // JSON string
   createdAt      DateTime      @default(now())
 }
 
@@ -104,6 +104,8 @@ model Product {
   createdBy      String        @default("Admin")
   phone          String?
   createdAt      DateTime      @default(now())
+
+  @@index([organizationId])
 }
 
 model Intake {
@@ -122,6 +124,9 @@ model Intake {
   erpId          String?
   quantity       Int           @default(1)
   createdAt      DateTime      @default(now())
+
+  @@index([organizationId])
+  @@index([refId])
 }
 
 model Event {
@@ -133,13 +138,16 @@ model Event {
   type           String?
   account        String?
   itemsCount     Int           @default(1)
-  stages         String?  // JSON string of stages array
+  stages         String? // JSON string of stages array
   participants   String? // JSON string of invited vendors array
   endTime        DateTime?
   baseCurrency   String        @default("USD")
   feedbackMode   String        @default("Sealed")
   status         String        @default("Draft")
   createdAt      DateTime      @default(now())
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([refId])
 }
 
 model Vendor {
@@ -156,9 +164,11 @@ model Vendor {
   tradeLicense   String?
   taxId          String?
   city           String?
-  tags           String?  // JSON string of tags
+  tags           String? // JSON string of tags
   status         String        @default("Invited")
   createdAt      DateTime      @default(now())
+
+  @@index([organizationId])
 }
 
 model PurchaseOrder {
@@ -171,11 +181,14 @@ model PurchaseOrder {
   vendorId       String?
   eventId        String?
   total          Float         @default(0)
-  details        String?  // JSON string containing detailed template and items
+  details        String? // JSON string containing detailed template and items
   source         String        @default("Manual")
   erpId          String?
   erpStatus      String        @default("Pending Sync")
   createdAt      DateTime      @default(now())
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([poNumber])
 }
 
 model Bid {
@@ -190,9 +203,12 @@ model Bid {
   localAmount    Float?
   currency       String        @default("USD")
   exchangeRate   Float         @default(1.0)
-  templateData   String?  // JSON string
+  templateData   String? // JSON string
   status         String        @default("Submitted")
   createdAt      DateTime      @default(now())
+
+  @@index([eventId])
+  @@index([organizationId, createdAt(sort: Desc)])
 }
 
 model Contract {
@@ -210,6 +226,8 @@ model Contract {
   clientSigned   Boolean       @default(false)
   vendorSigned   Boolean       @default(false)
   createdAt      DateTime      @default(now())
+
+  @@index([organizationId, createdAt(sort: Desc)])
 }
 
 model Template {
@@ -218,7 +236,7 @@ model Template {
   organization   Organization? @relation(fields: [organizationId], references: [id])
   name           String
   type           String        @default("RFQ")
-  fields         String   // JSON string of fields
+  fields         String // JSON string of fields
   createdAt      DateTime      @default(now())
 }
 
@@ -226,9 +244,9 @@ model JarvisMemory {
   id             String        @id @default(uuid())
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
-  entityType     String   // e.g., "Event"
-  entityRef      String   // e.g., "EVT-123"
-  context        String   // e.g., "New Sourcing Event Created"
+  entityType     String // e.g., "Event"
+  entityRef      String // e.g., "EVT-123"
+  context        String // e.g., "New Sourcing Event Created"
   createdAt      DateTime      @default(now())
   expiresAt      DateTime
 }
@@ -238,8 +256,8 @@ model Workflow {
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
   name           String
-  category       String   // e.g. "IT Hardware"
-  approvers      String   // JSON array of approver emails
+  category       String // e.g. "IT Hardware"
+  approvers      String // JSON array of approver emails
   isActive       Boolean       @default(true)
   createdAt      DateTime      @default(now())
 }
@@ -252,7 +270,7 @@ model ApprovalRequest {
   workflowId     String
   status         String        @default("Pending") // Pending, Approved, Rejected
   currentStep    Int           @default(0)
-  history        String?  // JSON array of approval actions (who, when, comment)
+  history        String? // JSON array of approval actions (who, when, comment)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 }
