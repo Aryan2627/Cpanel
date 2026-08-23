@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
-import { logLoginActivity, logAudit } from '../../../lib/audit';
+import { logLoginActivity, logAudit } from '../../../../lib/audit';
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_for_procgen';
