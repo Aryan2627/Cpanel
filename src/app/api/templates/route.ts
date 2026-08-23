@@ -18,6 +18,15 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
+
+    const existing = await prisma.template.findFirst({
+      where: { name: data.name }
+    });
+    
+    if (existing) {
+      return NextResponse.json({ error: "A template with this name already exists" }, { status: 400 });
+    }
+
     const newTemplate = await prisma.template.create({
       data: {
         name: data.name,

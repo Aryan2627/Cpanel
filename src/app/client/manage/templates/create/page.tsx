@@ -123,12 +123,19 @@ export default function CreateTemplatePage() {
           fields: payloadFields
         })
       });
-      if (!res.ok) throw new Error('Failed to save template');
+      if (!res.ok) {
+        let errMsg = 'Failed to save template';
+        try {
+          const errData = await res.json();
+          if (errData.error) errMsg = errData.error;
+        } catch (e) {}
+        throw new Error(errMsg);
+      }
       window.dispatchEvent(new Event('templates_updated'));
       router.push('/client/manage/templates');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Error saving template');
+      alert(err.message || 'Error saving template');
     }
   };
 
