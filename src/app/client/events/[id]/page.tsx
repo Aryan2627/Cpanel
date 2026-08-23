@@ -3,6 +3,31 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, AlertCircle, BarChart3, FileText, User, Leaf, AlertTriangle, Target, Globe, BrainCircuit, Hammer, X } from 'lucide-react';
 
+const Countdown = ({ endTime }: { endTime: string | Date }) => {
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const diff = new Date(endTime).getTime() - now.getTime();
+  if (diff <= 0) {
+    return <div style={{ fontWeight: 500, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={16} /> Event Ended</div>;
+  }
+  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const m = Math.floor((diff / 1000 / 60) % 60);
+  const s = Math.floor((diff / 1000) % 60);
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ fontWeight: 500, color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle2 size={16} /> Live & Receiving Bids</div>
+      <div style={{ fontWeight: 700, color: '#b45309', fontFamily: 'monospace', fontSize: '1.1rem' }}>
+        {d > 0 && `${d}d `}{h.toString().padStart(2, '0')}:{m.toString().padStart(2, '0')}:{s.toString().padStart(2, '0')}
+      </div>
+    </div>
+  );
+};
+
 export default function BuyerEventDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -17,7 +42,6 @@ export default function BuyerEventDetailsPage() {
   const [activeVendorChat, setActiveVendorChat] = useState<any>(null);
   const [chatMessage, setChatMessage] = useState('');
   const [chatHistory, setChatHistory] = useState<any[]>([]);
-  const [now, setNow] = useState(new Date());
   
   const [isCounterOfferMode, setIsCounterOfferMode] = useState(false);
   const [counterOfferPrice, setCounterOfferPrice] = useState('');
@@ -42,9 +66,6 @@ export default function BuyerEventDetailsPage() {
         }
       }
     } catch (e) {}
-    
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
   }, []);
 
   const handleSendMsg = () => {
@@ -105,24 +126,25 @@ export default function BuyerEventDetailsPage() {
   };
 
   const fetchEventData = () => {
-    fetch(`/api/events/${params.id}`)
-      .then(res => {
+    Promise.all([
+      fetch(`/api/events/${params.id}`).then(res => {
         if (!res.ok) throw new Error('Failed to fetch event');
         return res.json();
-      })
-      .then(eventData => {
-        setEvent(eventData);
-        return fetch(`/api/bids?eventId=${eventData.id}`);
-      })
-      .then(res => res.json())
-      .then(bidsData => {
-        setBids(bidsData);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
+      }),
+      fetch(`/api/events/${params.id}`) // Temporary query to get eventId to fetch bids
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(eventData => fetch(`/api/bids?eventId=${eventData.id}`).then(r => r.json()))
+        .catch(() => []) // If bids fail, return empty
+    ])
+    .then(([eventData, bidsData]) => {
+      setEvent(eventData);
+      setBids(bidsData);
+      setLoading(false);
+    })
+    .catch(err => {
+      setError(err.message || 'Failed to load details');
+      setLoading(false);
+    });
   };
 
   useEffect(() => {
@@ -323,27 +345,11 @@ export default function BuyerEventDetailsPage() {
                 </div>
                 <div style={{ padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '4px' }}>Status</div>
-                  {(() => {
-                    if (event.endTime) {
-                      const diff = new Date(event.endTime).getTime() - now.getTime();
-                      if (diff <= 0) {
-                        return <div style={{ fontWeight: 500, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={16} /> Event Ended</div>;
-                      }
-                      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                      const m = Math.floor((diff / 1000 / 60) % 60);
-                      const s = Math.floor((diff / 1000) % 60);
-                      return (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div style={{ fontWeight: 500, color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle2 size={16} /> Live & Receiving Bids</div>
-                          <div style={{ fontWeight: 700, color: '#b45309', fontFamily: 'monospace', fontSize: '1.1rem' }}>
-                            {d > 0 && `${d}d `}{h.toString().padStart(2, '0')}:{m.toString().padStart(2, '0')}:{s.toString().padStart(2, '0')}
-                          </div>
-                        </div>
-                      );
-                    }
-                    return <div style={{ fontWeight: 500, color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle2 size={16} /> Live</div>;
-                  })()}
+                  {event.endTime ? (
+                    <Countdown endTime={event.endTime} />
+                  ) : (
+                    <div style={{ fontWeight: 500, color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle2 size={16} /> Live</div>
+                  )}
                 </div>
               </div>
             </div>
