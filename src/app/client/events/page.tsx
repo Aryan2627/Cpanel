@@ -181,24 +181,10 @@ export default function EventsPage() {
   }, [searchQuery, activeStageFilter, activeTab, allEvents]);
 
   const handleViewBids = async (eventId: string) => {
-    setSelectedEventId(eventId);
-    setIsBidsLoading(true);
-    try {
-      // Find the actual DB event ID if it exists, otherwise use refId (for mocks)
-      const dbEvent = dbEvents.find(e => e.refId === eventId || e.id === eventId);
-      const queryId = dbEvent && dbEvent.dbId ? dbEvent.dbId : eventId;
-      console.log('Fetching bids for eventId:', eventId, 'mapped to queryId:', queryId);
-      
-      const res = await fetch(`/api/bids?eventId=${queryId}&_t=${Date.now()}`);
-      if (res.ok) {
-        const data = await res.json();
-        setBids(data);
-      }
-    } catch(err) {
-      console.error("Failed to fetch bids", err);
-    } finally {
-      setIsBidsLoading(false);
-    }
+    // Find the actual DB event ID if it exists, otherwise use refId (for mocks)
+    const dbEvent = dbEvents.find(e => e.refId === eventId || e.id === eventId);
+    const queryId = dbEvent && dbEvent.dbId ? dbEvent.dbId : eventId;
+    router.push(`/client/events/${queryId}`);
   };
 
   const handleAward = async (bid: any) => {
