@@ -7,7 +7,7 @@ import {
   Search, Filter, Plus, FileUp, FileDown, 
   ChevronLeft, ChevronRight, CheckCircle2, 
   Clock, FileEdit, X, LayoutTemplate,
-  Inbox, FileText, ArrowUpDown, Activity, ArrowRight
+  Inbox, FileText, ArrowUpDown, Activity, ArrowRight, Users
 } from 'lucide-react';
 
 export default function IntakeTablePage() {
