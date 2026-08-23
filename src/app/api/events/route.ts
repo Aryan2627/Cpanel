@@ -11,7 +11,17 @@ export async function GET(request: Request) {
     const orgId = await getTenantId();
     const events = await prisma.event.findMany({
       where: { organizationId: orgId },
-      orderBy: { createdAt: 'desc' }
+      select: {
+        id: true,
+        refId: true,
+        account: true,
+        itemsCount: true,
+        title: true,
+        endTime: true,
+        participants: true
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 100
     });
     return NextResponse.json(events);
   } catch (error: any) {
