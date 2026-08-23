@@ -144,7 +144,10 @@ function SingleStageCreateContent() {
               }
             }));
             setLineItems(newLineItems);
-            setTitle(`Event from PR: ${searchParams.get('prs')}`);
+            const eventTitle = parsed.length === 1 
+              ? `Procurement of ${parsed[0].name}` 
+              : `Event from PR: ${searchParams.get('prs')}`;
+            setTitle(eventTitle);
             localStorage.removeItem('prToEventItems');
           }
         } catch(e) {}
