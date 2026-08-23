@@ -23,3 +23,25 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
+  try {
+    const params = await context.params;
+    const refId = params.id;
+    const data = await request.json();
+
+    const existingEvent = await prisma.event.findFirst({ where: { refId } });
+    if (!existingEvent) {
+      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    }
+
+    const updatedEvent = await prisma.event.update({
+      where: { id: existingEvent.id },
+      data: { endTime: data.endTime ? new Date(data.endTime) : null }
+    });
+
+    return NextResponse.json(updatedEvent, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

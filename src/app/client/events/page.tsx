@@ -221,29 +221,38 @@ export default function EventsPage() {
     }
   };
 
-  const saveNewTime = (eventId: string, sIdx: number, isDbEvent: boolean) => {
+  const saveNewTime = async (eventId: string, sIdx: number, isDbEvent: boolean) => {
     if (!newTimeVal) {
       setEditingTimeFor(null);
       return;
     }
     
     if (isDbEvent) {
-      setDbEvents(prev => prev.map(e => {
-        if (e.id === eventId) {
-          const newStages = [...e.stages];
-          newStages[sIdx].timeText = `Ends on ${newTimeVal}`;
-          newStages[sIdx].timeColor = '#475569';
-          return { ...e, stages: newStages };
+      try {
+        const res = await fetch(`/api/events/${eventId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endTime: new Date(newTimeVal).toISOString() })
+        });
+        if (res.ok) {
+          setDbEvents(prev => prev.map(e => {
+            if (e.id === eventId || e.refId === eventId) {
+              const newStages = [...e.stages];
+              return { ...e, endTime: new Date(newTimeVal).toISOString(), stages: newStages };
+            }
+            return e;
+          }));
+        } else {
+          alert('Failed to update event time in database');
         }
-        return e;
-      }));
+      } catch (err) {
+        alert('Error updating event time');
+      }
     } else {
       setMockEvents(prev => prev.map(e => {
-        if (e.id === eventId) {
+        if (e.id === eventId || e.refId === eventId) {
           const newStages = [...e.stages];
-          newStages[sIdx].timeText = `Ends on ${newTimeVal}`;
-          newStages[sIdx].timeColor = '#475569';
-          return { ...e, stages: newStages };
+          return { ...e, endTime: new Date(newTimeVal).toISOString(), stages: newStages };
         }
         return e;
       }));
@@ -441,7 +450,7 @@ export default function EventsPage() {
                       {editingTimeFor?.eventId === event.id && editingTimeFor?.sIdx === sIdx ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <input 
-                            type="date" 
+                            type="datetime-local" 
                             value={newTimeVal}
                             onChange={e => setNewTimeVal(e.target.value)}
                             style={{ padding: '2px 4px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.8rem', outline: 'none' }}
