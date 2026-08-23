@@ -101,6 +101,7 @@ export default function EventsPage() {
             itemsCount: dbEvent.itemsCount || 1,
             title: dbEvent.title || 'Untitled Sourcing Event',
             endTime: dbEvent.endTime,
+            participants: dbEvent.participants,
             stages: [
               {
                 name: 'Live RFQ (Database)',
@@ -604,6 +605,35 @@ export default function EventsPage() {
                   <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Current Status</p>
                   <p style={{ margin: 0, fontSize: '1rem', color: '#10b981', fontWeight: 600 }}>Active Phase</p>
                 </div>
+              </div>
+
+              {/* Invited Vendors */}
+              <div style={{ marginTop: '20px', borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
+                <p style={{ margin: '0 0 8px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Invited Vendors</p>
+                {(() => {
+                  let vendors = [];
+                  if (selectedEventForDetails.participants) {
+                    try {
+                      vendors = typeof selectedEventForDetails.participants === 'string' 
+                        ? JSON.parse(selectedEventForDetails.participants) 
+                        : selectedEventForDetails.participants;
+                    } catch(e) {}
+                  }
+                  
+                  if (vendors && vendors.length > 0) {
+                    return (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {vendors.map((v: any, idx: number) => (
+                          <div key={idx} style={{ backgroundColor: '#f1f5f9', padding: '6px 12px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Users size={14} color="#64748b" /> {v.name || v.email || 'Unknown Vendor'}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
+                  
+                  return <p style={{ margin: 0, fontSize: '0.9rem', color: '#94a3b8', fontStyle: 'italic' }}>No vendors have been specifically invited to this event.</p>;
+                })()}
               </div>
             </div>
             <div style={{ padding: '16px 24px', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
