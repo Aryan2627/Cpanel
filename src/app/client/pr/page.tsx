@@ -5,7 +5,7 @@ import { useIntake } from '../../../context/IntakeContext';
 import { 
   RefreshCcw, Filter, LayoutGrid, List, Plus, 
   ChevronDown, ChevronRight, AlertCircle, CheckCircle2, 
-  Package, Server, FileText, X, ArrowRight, Lightbulb
+  Package, Server, FileText, X, ArrowRight, Lightbulb, Search
 } from 'lucide-react';
 
 export default function PRPage() {
@@ -13,6 +13,8 @@ export default function PRPage() {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState('Open');
+  const [searchField, setSearchField] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSync, setLastSync] = useState('2 mins ago');
   
@@ -52,8 +54,28 @@ export default function PRPage() {
     });
   }, [intakes]);
 
-  // Tab Filtering
-  const filteredData = prData.filter(d => activeTab === 'All' || d.tabStatus === activeTab);
+  // Tab Filtering & Search Filtering
+  const filteredData = useMemo(() => {
+    return prData.filter(d => {
+      if (activeTab !== 'All' && d.tabStatus !== activeTab) return false;
+      if (!searchQuery) return true;
+      
+      const query = searchQuery.toLowerCase();
+      const refId = d.refId || '';
+      const title = d.title || '';
+      const reqName = d.reqName || '';
+
+      if (searchField === 'Ref ID') return refId.toLowerCase().includes(query);
+      if (searchField === 'Title') return title.toLowerCase().includes(query);
+      if (searchField === 'Requester Name') return reqName.toLowerCase().includes(query);
+      
+      return (
+        refId.toLowerCase().includes(query) ||
+        title.toLowerCase().includes(query) ||
+        reqName.toLowerCase().includes(query)
+      );
+    });
+  }, [prData, activeTab, searchQuery, searchField]);
 
   // Handlers
   const handleSelectRow = (refId: string) => {
@@ -177,11 +199,30 @@ export default function PRPage() {
         <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
-            {/* Smart Consolidation Alert */}
-            {selectedRows.size > 1 && (
+            {/* Smart Consolidation Alert & Search */}
+            {selectedRows.size > 1 ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#fefce8', border: '1px solid #fef08a', color: '#a16207', padding: '8px 16px', borderRadius: '6px', fontSize: '0.875rem', animation: 'fadeIn 0.3s ease-out' }}>
                 <Lightbulb size={16} />
                 <span style={{ fontWeight: 500 }}>Smart Tip:</span> You selected {selectedRows.size} PRs. We recommend combining these into a single RFQ event to leverage volume discounts!
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', borderRadius: '6px', overflow: 'hidden', backgroundColor: '#fff' }}>
+                <select 
+                  value={searchField} onChange={(e) => setSearchField(e.target.value)}
+                  style={{ padding: '8px 12px', border: 'none', borderRight: '1px solid #e2e8f0', outline: 'none', backgroundColor: '#f8fafc', color: '#475569', cursor: 'pointer', fontSize: '0.875rem' }}
+                >
+                  <option value="All">All Fields</option>
+                  <option value="Ref ID">Ref ID</option>
+                  <option value="Title">Title</option>
+                  <option value="Requester Name">Requester Name</option>
+                </select>
+                <div style={{ display: 'flex', alignItems: 'center', padding: '0 12px' }}>
+                  <Search size={16} color="#94a3b8" />
+                  <input 
+                    type="text" placeholder={`Search...`} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{ padding: '8px', border: 'none', outline: 'none', width: '220px', fontSize: '0.875rem' }} 
+                  />
+                </div>
               </div>
             )}
           </div>

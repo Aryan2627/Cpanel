@@ -151,13 +151,17 @@ export default function IntakeTablePage() {
       if (!searchQuery) return true;
       const query = searchQuery.toLowerCase();
       
-      if (searchField === 'Ref ID') return row.refId.toLowerCase().includes(query);
-      if (searchField === 'Title') return row.title.toLowerCase().includes(query);
-      if (searchField === 'Requester Name') return row.reqName.toLowerCase().includes(query);
+      const refId = row.refId || '';
+      const title = row.title || '';
+      const reqName = row.reqName || '';
+
+      if (searchField === 'Ref ID') return refId.toLowerCase().includes(query);
+      if (searchField === 'Title') return title.toLowerCase().includes(query);
+      if (searchField === 'Requester Name') return reqName.toLowerCase().includes(query);
       return (
-        row.refId.toLowerCase().includes(query) ||
-        row.title.toLowerCase().includes(query) ||
-        row.reqName.toLowerCase().includes(query)
+        refId.toLowerCase().includes(query) ||
+        title.toLowerCase().includes(query) ||
+        reqName.toLowerCase().includes(query)
       );
     });
 
