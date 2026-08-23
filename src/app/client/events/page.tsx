@@ -6,6 +6,30 @@ import {
   Activity, Calendar, Clock, DollarSign, ArrowRight, ShieldCheck, Zap, Upload, LayoutGrid, CheckCircle2, AlertCircle, ChevronDown, FileCheck, TrendingUp, Eye, Check, X, Edit2, Users, Award
 } from 'lucide-react';
 
+const Countdown = ({ endTime }: { endTime: string | Date }) => {
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const end = new Date(endTime);
+  const diff = end.getTime() - now.getTime();
+  if (diff <= 0) return <span style={{ color: '#dc2626' }}>Ended</span>;
+  
+  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const m = Math.floor((diff / 1000 / 60) % 60);
+  const s = Math.floor((diff / 1000) % 60);
+  
+  let timeStr = '';
+  if (d > 0) timeStr = `${d}d ${h}h remaining`;
+  else if (h > 0) timeStr = `${h}h ${m}m remaining`;
+  else timeStr = `${m}m ${s}s remaining`;
+  
+  return <span style={{ color: '#3b82f6', fontWeight: 600 }}>{timeStr}</span>;
+};
+
 export default function EventsPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('LIVE');
@@ -15,12 +39,6 @@ export default function EventsPage() {
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const [dbEvents, setDbEvents] = useState<any[]>([]);
-  const [now, setNow] = useState(new Date());
-  
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
   
   // Modal states for View Bids
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
@@ -142,7 +160,7 @@ export default function EventsPage() {
       let isHistorical = false;
       
       if (event.endTime) {
-        isHistorical = now > new Date(event.endTime);
+        isHistorical = new Date() > new Date(event.endTime);
       } else {
         isHistorical = event.stages.every((s: any) => s.timeText && (s.timeText.includes('Ended') || s.timeText.includes('History') || s.timeText.includes('Overdue')));
       }
@@ -160,7 +178,7 @@ export default function EventsPage() {
 
       return matchesSearch && matchesStage && matchesTab;
     });
-  }, [searchQuery, activeStageFilter, activeTab, allEvents, now]);
+  }, [searchQuery, activeStageFilter, activeTab, allEvents]);
 
   const handleViewBids = async (eventId: string) => {
     setSelectedEventId(eventId);
@@ -270,7 +288,7 @@ export default function EventsPage() {
   // Historical Events definition is exactly what goes into the HISTORY tab
   const historicalEvents = allEvents.filter(e => {
     if (e.endTime) {
-      return now > new Date(e.endTime);
+      return new Date() > new Date(e.endTime);
     }
     return e.stages.every((s: any) => s.timeText && (s.timeText.includes('Ended') || s.timeText.includes('History') || s.timeText.includes('Overdue')));
   }).length;
@@ -463,26 +481,11 @@ export default function EventsPage() {
                         </div>
                       ) : (
                         <>
-                          {(() => {
-                            if (event.endTime) {
-                              const end = new Date(event.endTime);
-                              const diff = end.getTime() - now.getTime();
-                              if (diff <= 0) return <span style={{ color: '#dc2626' }}>Ended</span>;
-                              
-                              const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                              const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                              const m = Math.floor((diff / 1000 / 60) % 60);
-                              const s = Math.floor((diff / 1000) % 60);
-                              
-                              let timeStr = '';
-                              if (d > 0) timeStr = `${d}d ${h}h remaining`;
-                              else if (h > 0) timeStr = `${h}h ${m}m remaining`;
-                              else timeStr = `${m}m ${s}s remaining`;
-                              
-                              return <span style={{ color: '#3b82f6', fontWeight: 600 }}>{timeStr}</span>;
-                            }
-                            return stage.timeText;
-                          })()}
+                          {event.endTime ? (
+                            <Countdown endTime={event.endTime} />
+                          ) : (
+                            stage.timeText
+                          )}
                           <button 
                             onClick={() => { setEditingTimeFor({ eventId: event.id, sIdx }); setNewTimeVal(''); }}
                             style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.2s' }}
