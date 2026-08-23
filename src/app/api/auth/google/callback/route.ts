@@ -71,7 +71,14 @@ export async function GET(req: Request) {
     void logLoginActivity({ identifier: email, success: true });
     void logAudit({ actorEmail: email, action: 'LOGIN', entityType: 'User', entityRef: `${email} (Google SSO)` });
 
-    // Redirect to correct dashboard with cookie set
+    // Check if request came from supplier portal
+    const state = searchParams.get('state');
+    if (state === 'vendor') {
+      const vendorUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5173' : 'https://csupplier.vercel.app'; // Modify prod URL here if needed
+      return NextResponse.redirect(`${vendorUrl}/login?vendor_token=${token}`);
+    }
+
+    // Otherwise, standard Cpanel login
     const destination = role === 'admin' ? '/admin' : role === 'vendor' ? '/vendor' : '/client/intake';
     const res = NextResponse.redirect(`${baseUrl}${destination}`);
     res.cookies.set({
