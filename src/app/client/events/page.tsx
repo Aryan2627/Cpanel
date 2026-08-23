@@ -96,6 +96,7 @@ export default function EventsPage() {
         if (Array.isArray(data)) {
           const mapped = data.map(dbEvent => ({
             id: dbEvent.refId,
+            dbId: dbEvent.id,
             account: dbEvent.account || 'Internal Department',
             refId: dbEvent.refId,
             itemsCount: dbEvent.itemsCount || 1,
@@ -167,9 +168,10 @@ export default function EventsPage() {
     try {
       // Find the actual DB event ID if it exists, otherwise use refId (for mocks)
       const dbEvent = dbEvents.find(e => e.refId === eventId || e.id === eventId);
-      const queryId = dbEvent ? dbEvent.id : eventId;
+      const queryId = dbEvent && dbEvent.dbId ? dbEvent.dbId : eventId;
+      console.log('Fetching bids for eventId:', eventId, 'mapped to queryId:', queryId);
       
-      const res = await fetch(`/api/bids?eventId=${queryId}`);
+      const res = await fetch(`/api/bids?eventId=${queryId}&_t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         setBids(data);

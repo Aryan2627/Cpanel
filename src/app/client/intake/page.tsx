@@ -405,64 +405,95 @@ export default function IntakeTablePage() {
         )}
       </div>
 
-      {/* Slide-out Drawer for Quick View */}
+      {/* Slide-out Drawer for Quick View - VIBRANT PREMIUM UI */}
       {selectedIntake && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.4)', zIndex: 100, display: 'flex', justifyContent: 'flex-end', animation: 'fadeIn 0.2s ease-out' }}>
-          <div style={{ width: '500px', backgroundColor: '#fff', height: '100%', boxShadow: '-4px 0 15px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', animation: 'slideIn 0.3s ease-out' }}>
-            <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Request Details</h2>
-              <button onClick={() => setSelectedIntake(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
-                <X size={24} />
-              </button>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', zIndex: 100, display: 'flex', justifyContent: 'flex-end', animation: 'fadeIn 0.2s ease-out' }} onClick={() => setSelectedIntake(null)}>
+          <div style={{ width: '500px', backgroundColor: '#ffffff', height: '100%', boxShadow: '-10px 0 30px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', animation: 'slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }} onClick={(e) => e.stopPropagation()}>
+            {/* Vibrant Header with Gradient Background */}
+            <div style={{ padding: '32px 24px', background: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: -50, right: -50, width: '150px', height: '150px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }}></div>
+              <div style={{ position: 'absolute', bottom: -20, left: -20, width: '100px', height: '100px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }}></div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 2 }}>
+                <div style={{ color: '#fff' }}>
+                  <span style={{ display: 'inline-block', padding: '4px 10px', backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px', marginBottom: '12px', backdropFilter: 'blur(10px)' }}>
+                    {selectedIntake.refId}
+                  </span>
+                  <h1 style={{ fontSize: '1.75rem', margin: '0 0 8px 0', fontWeight: 700, lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>{selectedIntake.title}</h1>
+                  <p style={{ margin: 0, color: '#e0e7ff', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    Requested by <strong>{selectedIntake.reqName}</strong>
+                  </p>
+                </div>
+                <button onClick={() => setSelectedIntake(null)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', cursor: 'pointer', color: '#fff', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s', backdropFilter: 'blur(10px)' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}>
+                  <X size={20} />
+                </button>
+              </div>
             </div>
             
-            <div style={{ padding: '24px', flex: 1, overflowY: 'auto' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
-                <div>
-                  <h1 style={{ fontSize: '1.5rem', margin: '0 0 8px 0', color: '#0f172a' }}>{selectedIntake.title}</h1>
-                  <span style={{ color: '#64748b', fontSize: '0.875rem' }}>{selectedIntake.refId}</span>
-                </div>
-                {getStatusBadge(selectedIntake.status)}
+            <div style={{ padding: '24px', flex: 1, overflowY: 'auto', backgroundColor: '#f8fafc' }}>
+              
+              {/* Status Badge */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', marginBottom: '24px', border: '1px solid #f1f5f9' }}>
+                <span style={{ fontSize: '0.875rem', color: '#64748b', fontWeight: 500 }}>Current Status</span>
+                <div style={{ transform: 'scale(1.1)' }}>{getStatusBadge(selectedIntake.status)}</div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
-                <div>
-                  <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 600 }}>Requester</label>
-                  <p style={{ margin: '4px 0 0 0', color: '#333', fontWeight: 500 }}>{selectedIntake.reqName}</p>
-                </div>
-                <div>
-                  <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 600 }}>Buyer</label>
-                  <p style={{ margin: '4px 0 0 0', color: '#333', fontWeight: 500 }}>{selectedIntake.buyer}</p>
-                </div>
-                <div>
-                  <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 600 }}>Type</label>
-                  <p style={{ margin: '4px 0 0 0', color: '#333', fontWeight: 500 }}>{selectedIntake.type}</p>
-                </div>
-                <div>
-                  <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 600 }}>Date</label>
-                  <p style={{ margin: '4px 0 0 0', color: '#333', fontWeight: 500 }}>{selectedIntake.reqAt}</p>
-                </div>
-                <div>
-                  <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 600 }}>Quantity</label>
-                  <p style={{ margin: '4px 0 0 0', color: '#333', fontWeight: 500 }}>{selectedIntake.quantity || 1}</p>
-                </div>
+              {/* Key Details Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
+                {[
+                  { label: 'Category / Type', value: selectedIntake.type, icon: LayoutTemplate, color: '#8b5cf6', bg: '#f5f3ff' },
+                  { label: 'Assigned Buyer', value: selectedIntake.buyer, icon: Users, color: '#0ea5e9', bg: '#e0f2fe' },
+                  { label: 'Requested Date', value: selectedIntake.reqAt, icon: Clock, color: '#f59e0b', bg: '#fef3c7' },
+                  { label: 'Total Quantity', value: selectedIntake.quantity || 1, icon: Inbox, color: '#10b981', bg: '#d1fae5' }
+                ].map((item, i) => (
+                  <div key={i} style={{ backgroundColor: '#fff', padding: '16px', borderRadius: '12px', border: '1px solid #f1f5f9', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', gap: '12px', transition: 'transform 0.2s, box-shadow 0.2s' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 15px rgba(0,0,0,0.05)' }} onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: item.bg, color: item.color, display: 'flex' }}>
+                        <item.icon size={16} />
+                      </div>
+                      <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 600, letterSpacing: '0.5px' }}>{item.label}</span>
+                    </div>
+                    <span style={{ fontSize: '1rem', color: '#1e293b', fontWeight: 600 }}>{item.value}</span>
+                  </div>
+                ))}
               </div>
 
-              <div style={{ padding: '20px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <h3 style={{ margin: '0 0 12px 0', fontSize: '0.875rem', color: '#475569', textTransform: 'uppercase' }}>Activity Timeline</h3>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#2563eb', marginTop: '6px' }}></div>
-                  <div>
-                    <p style={{ margin: 0, fontWeight: 500, color: '#333', fontSize: '0.875rem' }}>Request Created</p>
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{selectedIntake.reqAt} by {selectedIntake.reqName}</span>
+              {/* Activity Timeline */}
+              <div style={{ padding: '24px', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #f1f5f9', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                <h3 style={{ margin: '0 0 20px 0', fontSize: '0.9rem', color: '#1e293b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Activity size={18} color="#3b82f6" /> Activity Timeline
+                </h3>
+                
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: '15px', top: '24px', bottom: '-24px', width: '2px', backgroundColor: '#e2e8f0', zIndex: 0 }}></div>
+                  
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#eff6ff', border: '2px solid #3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
+                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#3b82f6' }}></div>
+                  </div>
+                  
+                  <div style={{ paddingBottom: '24px' }}>
+                    <p style={{ margin: '0 0 4px 0', fontWeight: 600, color: '#1e293b', fontSize: '0.9rem' }}>Request Created</p>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>Submitted on {selectedIntake.reqAt} by <span style={{color: '#3b82f6', fontWeight: 500}}>{selectedIntake.reqName}</span></p>
                   </div>
                 </div>
+
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', position: 'relative' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#f1f5f9', border: '2px solid #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
+                    <Clock size={14} color="#94a3b8" />
+                  </div>
+                  
+                  <div>
+                    <p style={{ margin: '0 0 4px 0', fontWeight: 500, color: '#94a3b8', fontSize: '0.9rem' }}>Pending Review</p>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#cbd5e1' }}>Awaiting buyer assignment</p>
+                  </div>
+                </div>
+
               </div>
             </div>
 
-            <div style={{ padding: '24px', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '12px' }}>
-              <Link href={`/client/events/create/single-stage?intakeRef=${selectedIntake.refId}&title=${encodeURIComponent(selectedIntake.title || '')}`} style={{ flex: 1, padding: '12px', textAlign: 'center', backgroundColor: '#2563eb', color: '#fff', borderRadius: '6px', fontWeight: 500, textDecoration: 'none' }}>
-                Convert to RFQ
+            <div style={{ padding: '24px', borderTop: '1px solid #e2e8f0', backgroundColor: '#fff', display: 'flex', gap: '12px' }}>
+              <Link href={`/client/events/create/single-stage?intakeRef=${selectedIntake.refId}&title=${encodeURIComponent(selectedIntake.title || '')}`} style={{ flex: 1, padding: '14px', textAlign: 'center', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: '#fff', borderRadius: '8px', fontWeight: 600, textDecoration: 'none', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)', transition: 'all 0.2s', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(37, 99, 235, 0.35)' }} onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.25)' }}>
+                Convert to Sourcing Event <ArrowRight size={16} />
               </Link>
             </div>
           </div>
