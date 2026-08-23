@@ -2,17 +2,17 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Get the token from cookies
   const token = request.cookies.get('auth_token')?.value;
+  const nextAuthSession = request.cookies.get('next-auth.session-token')?.value 
+    || request.cookies.get('__Secure-next-auth.session-token')?.value;
 
-  // Protect admin, client, and vendor routes
   const isProtectedRoute = 
     request.nextUrl.pathname.startsWith('/admin') ||
     request.nextUrl.pathname.startsWith('/client') ||
     request.nextUrl.pathname.startsWith('/vendor');
 
-  if (isProtectedRoute && !token) {
-    // Redirect to login if accessing a protected route without a token
+  // Allow if either our JWT cookie OR NextAuth session exists
+  if (isProtectedRoute && !token && !nextAuthSession) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
