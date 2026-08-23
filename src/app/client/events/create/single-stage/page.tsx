@@ -42,17 +42,22 @@ function SingleStageCreateContent() {
   const [dbTemplates, setDbTemplates] = useState<any[]>([]);
 
   // Multi-Stage State
-  const [enableTechnical, setEnableTechnical] = useState(true);
+  const fromPR = searchParams.get('fromPR') === 'true';
+  const techParam = searchParams.get('tech') === 'true';
+  const rfqParam = searchParams.get('rfq') === 'true';
+  const auctionParam = searchParams.get('auction') === 'true';
+
+  const [enableTechnical, setEnableTechnical] = useState(fromPR ? techParam : true);
   const [technicalTemplate, setTechnicalTemplate] = useState('Select Templates');
   const [selectedTechnicalTemplateObj, setSelectedTechnicalTemplateObj] = useState<any>(null);
   const [isTechnicalTemplateOpen, setIsTechnicalTemplateOpen] = useState(false);
 
-  const [enableRFQ, setEnableRFQ] = useState(true);
+  const [enableRFQ, setEnableRFQ] = useState(fromPR ? rfqParam : true);
   const [rfqTemplate, setRfqTemplate] = useState('Select Templates');
   const [selectedRfqTemplateObj, setSelectedRfqTemplateObj] = useState<any>(null);
   const [isRfqTemplateOpen, setIsRfqTemplateOpen] = useState(false);
 
-  const [enableAuction, setEnableAuction] = useState(false);
+  const [enableAuction, setEnableAuction] = useState(fromPR ? auctionParam : false);
   const [auctionTemplate, setAuctionTemplate] = useState('Select Templates');
   const [selectedAuctionTemplateObj, setSelectedAuctionTemplateObj] = useState<any>(null);
   const [isAuctionTemplateOpen, setIsAuctionTemplateOpen] = useState(false);
@@ -181,6 +186,7 @@ function SingleStageCreateContent() {
     }
   }, [searchParams]);
 
+  // eslint-disable-next-line
   useEffect(() => {
     if (dbTemplates.length > 0) {
       if (technicalTemplate !== 'Select Templates' && !selectedTechnicalTemplateObj) {
@@ -345,50 +351,54 @@ function SingleStageCreateContent() {
                 <h4 style={{ margin: 0, fontSize: '1rem', color: '#0f172a' }}>Configure Event Stages</h4>
                 
                 {/* Technical Stage */}
-                <div style={{ paddingBottom: '16px', borderBottom: '1px dashed #cbd5e1' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                    <input type="checkbox" checked={enableTechnical} onChange={e => setEnableTechnical(e.target.checked)} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
-                    <span style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>Technical Validation</span>
-                  </div>
-                  {enableTechnical && (
-                    <div style={{ position: 'relative', paddingLeft: '30px' }}>
-                      <div onClick={() => setIsTechnicalTemplateOpen(!isTechnicalTemplateOpen)} style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: '#fff' }}>
-                        <span style={{ color: technicalTemplate === 'Select Templates' ? '#94a3b8' : '#0f172a', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><LayoutTemplate size={16} /> {technicalTemplate}</span>
-                        <ChevronDown size={16} color="#94a3b8" />
-                      </div>
-                      {isTechnicalTemplateOpen && (
-                        <div style={{ position: 'absolute', top: '100%', left: '30px', right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, maxHeight: '200px', overflowY: 'auto' }}>
-                          {dbTemplates.filter((t: any) => t.type === 'Technical').map((t: any) => (
-                            <div key={t.id} onClick={() => { setTechnicalTemplate(t.name); setSelectedTechnicalTemplateObj(t); setIsTechnicalTemplateOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }}>{t.name}</div>
-                          ))}
-                        </div>
-                      )}
+                {(!fromPR || techParam) && (
+                  <div style={{ paddingBottom: '16px', borderBottom: '1px dashed #cbd5e1' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <input type="checkbox" checked={enableTechnical} disabled={fromPR} onChange={e => setEnableTechnical(e.target.checked)} style={{ width: '18px', height: '18px', cursor: fromPR ? 'not-allowed' : 'pointer' }} />
+                      <span style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>Technical Validation</span>
                     </div>
-                  )}
-                </div>
+                    {enableTechnical && (
+                      <div style={{ position: 'relative', paddingLeft: '30px' }}>
+                        <div onClick={() => setIsTechnicalTemplateOpen(!isTechnicalTemplateOpen)} style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: '#fff' }}>
+                          <span style={{ color: technicalTemplate === 'Select Templates' ? '#94a3b8' : '#0f172a', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><LayoutTemplate size={16} /> {technicalTemplate}</span>
+                          <ChevronDown size={16} color="#94a3b8" />
+                        </div>
+                        {isTechnicalTemplateOpen && (
+                          <div style={{ position: 'absolute', top: '100%', left: '30px', right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, maxHeight: '200px', overflowY: 'auto' }}>
+                            {dbTemplates.filter((t: any) => t.type === 'Technical').map((t: any) => (
+                              <div key={t.id} onClick={() => { setTechnicalTemplate(t.name); setSelectedTechnicalTemplateObj(t); setIsTechnicalTemplateOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }}>{t.name}</div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* RFQ Stage */}
-                <div style={{ paddingBottom: '16px', borderBottom: '1px dashed #cbd5e1' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                    <input type="checkbox" checked={enableRFQ} onChange={e => setEnableRFQ(e.target.checked)} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
-                    <span style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>RFQ (Commercial)</span>
-                  </div>
-                  {enableRFQ && (
-                    <div style={{ position: 'relative', paddingLeft: '30px' }}>
-                      <div onClick={() => setIsRfqTemplateOpen(!isRfqTemplateOpen)} style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: '#fff' }}>
-                        <span style={{ color: rfqTemplate === 'Select Templates' ? '#94a3b8' : '#0f172a', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><LayoutTemplate size={16} /> {rfqTemplate}</span>
-                        <ChevronDown size={16} color="#94a3b8" />
-                      </div>
-                      {isRfqTemplateOpen && (
-                        <div style={{ position: 'absolute', top: '100%', left: '30px', right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, maxHeight: '200px', overflowY: 'auto' }}>
-                          {dbTemplates.filter((t: any) => !t.type || t.type === 'RFQ').map((t: any) => (
-                            <div key={t.id} onClick={() => { setRfqTemplate(t.name); setSelectedRfqTemplateObj(t); setIsRfqTemplateOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }}>{t.name}</div>
-                          ))}
-                        </div>
-                      )}
+                {(!fromPR || rfqParam) && (
+                  <div style={{ paddingBottom: '16px', borderBottom: '1px dashed #cbd5e1' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <input type="checkbox" checked={enableRFQ} disabled={fromPR} onChange={e => setEnableRFQ(e.target.checked)} style={{ width: '18px', height: '18px', cursor: fromPR ? 'not-allowed' : 'pointer' }} />
+                      <span style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>RFQ (Commercial)</span>
                     </div>
-                  )}
-                </div>
+                    {enableRFQ && (
+                      <div style={{ position: 'relative', paddingLeft: '30px' }}>
+                        <div onClick={() => setIsRfqTemplateOpen(!isRfqTemplateOpen)} style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: '#fff' }}>
+                          <span style={{ color: rfqTemplate === 'Select Templates' ? '#94a3b8' : '#0f172a', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><LayoutTemplate size={16} /> {rfqTemplate}</span>
+                          <ChevronDown size={16} color="#94a3b8" />
+                        </div>
+                        {isRfqTemplateOpen && (
+                          <div style={{ position: 'absolute', top: '100%', left: '30px', right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, maxHeight: '200px', overflowY: 'auto' }}>
+                            {dbTemplates.filter((t: any) => !t.type || t.type === 'RFQ').map((t: any) => (
+                              <div key={t.id} onClick={() => { setRfqTemplate(t.name); setSelectedRfqTemplateObj(t); setIsRfqTemplateOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }}>{t.name}</div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Auction Stage */}
                 <div>

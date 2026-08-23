@@ -143,8 +143,8 @@ export default function PRPage() {
 
     const prs = Array.from(selectedRows).join(',');
     const destination = auction 
-      ? `/client/events/create/auction?fromPR=true&prs=${prs}` 
-      : `/client/events/create/single-stage?fromPR=true&prs=${prs}`;
+      ? `/client/events/create/auction?fromPR=true&prs=${prs}&auction=true` 
+      : `/client/events/create/single-stage?fromPR=true&prs=${prs}&tech=${techStage}&rfq=${rfq}`;
     
     setSelectedRows(new Set());
     window.location.href = destination;
