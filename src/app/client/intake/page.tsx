@@ -7,7 +7,7 @@ import {
   Search, Filter, Plus, FileUp, FileDown, 
   ChevronLeft, ChevronRight, CheckCircle2, 
   Clock, FileEdit, X, LayoutTemplate,
-  Inbox, FileText, ArrowUpDown
+  Inbox, FileText, ArrowUpDown, Activity, ArrowRight
 } from 'lucide-react';
 
 export default function IntakeTablePage() {
@@ -36,19 +36,20 @@ export default function IntakeTablePage() {
 
   const [exportEnabled, setExportEnabled] = useState(false);
   useEffect(() => {
+    // Only run on client
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setExportEnabled(localStorage.getItem('exportIntake') === 'true');
     const handleSettingsUpdate = () => {
       setExportEnabled(localStorage.getItem('exportIntake') === 'true');
     };
-    window.addEventListener('settings_updated', handleSettingsUpdate);
-    return () => window.removeEventListener('settings_updated', handleSettingsUpdate);
+    window.addEventListener('settings-updated', handleSettingsUpdate);
+    return () => window.removeEventListener('settings-updated', handleSettingsUpdate);
   }, []);
 
   // -- Mock Data Generation for metrics --
   const totalRequests = intakes.length;
   const pendingRequests = intakes.filter(i => i.status === 'Draft' || i.status === 'In Progress').length;
   const approvedRequests = intakes.filter(i => i.status === 'Approved').length;
-  const avgProcessingTime = "2.4 Days"; // Static for mockup
 
   // Handle Export
   const handleExport = () => {
