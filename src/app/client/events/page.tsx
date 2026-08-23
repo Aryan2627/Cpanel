@@ -24,6 +24,7 @@ export default function EventsPage() {
   
   // Modal states for View Bids
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [selectedEventForDetails, setSelectedEventForDetails] = useState<any>(null);
   const [bids, setBids] = useState<any[]>([]);
   const [isBidsLoading, setIsBidsLoading] = useState(false);
 
@@ -375,7 +376,28 @@ export default function EventsPage() {
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                     <button style={{ padding: '6px 12px', border: '1px solid #e2e8f0', borderRadius: '4px', backgroundColor: '#fff', color: '#475569', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>View Details</button>
+                     <button 
+                       onClick={() => setSelectedEventForDetails(event)}
+                       style={{ 
+                         padding: '8px 16px', 
+                         border: 'none', 
+                         borderRadius: '6px', 
+                         background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', 
+                         color: '#fff', 
+                         cursor: 'pointer', 
+                         fontSize: '0.875rem', 
+                         fontWeight: 600,
+                         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                         transition: 'all 0.2s ease',
+                         display: 'flex',
+                         alignItems: 'center',
+                         gap: '6px'
+                       }}
+                       onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 8px -1px rgba(0, 0, 0, 0.15)' }}
+                       onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                     >
+                       <Eye size={14} color="#cbd5e1" /> View Details
+                     </button>
                   </div>
                 </div>
 
@@ -506,6 +528,56 @@ export default function EventsPage() {
           )}
         </div>
       </div>
+
+      {/* Event Details Modal */}
+      {selectedEventForDetails && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.2s ease-out' }} onClick={() => setSelectedEventForDetails(null)}>
+          <div style={{ backgroundColor: '#fff', borderRadius: '12px', width: '600px', maxWidth: '90%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', overflow: 'hidden', animation: 'slideUp 0.3s ease-out' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #e2e8f0', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)' }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}><ShieldCheck color="#3b82f6" /> Event Details</h2>
+                <p style={{ margin: '4px 0 0 0', fontSize: '0.875rem', color: '#64748b' }}>{selectedEventForDetails.refId}</p>
+              </div>
+              <button onClick={() => setSelectedEventForDetails(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}><X size={24} /></button>
+            </div>
+            <div style={{ padding: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+                <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Event Title</p>
+                  <p style={{ margin: 0, fontSize: '1rem', color: '#0f172a', fontWeight: 500 }}>{selectedEventForDetails.title}</p>
+                </div>
+                <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Account / Department</p>
+                  <p style={{ margin: 0, fontSize: '1rem', color: '#0f172a', fontWeight: 500 }}>{selectedEventForDetails.account}</p>
+                </div>
+              </div>
+              
+              <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+                <p style={{ margin: '0 0 8px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Purpose & Scope</p>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: '#334155', lineHeight: '1.5' }}>
+                  This sourcing event is intended for the procurement of {selectedEventForDetails.itemsCount} items. 
+                  It follows the standard internal purchasing guidelines and is currently managed under the template: 
+                  <strong> {selectedEventForDetails.title.includes('Auction') ? 'Reverse Auction Template' : 'Standard RFQ Template'}</strong>.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Items Count</p>
+                  <p style={{ margin: 0, fontSize: '1rem', color: '#0f172a', fontWeight: 600 }}>{selectedEventForDetails.itemsCount} <span style={{fontSize:'0.8rem', color:'#64748b', fontWeight:400}}>Line Items</span></p>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Current Status</p>
+                  <p style={{ margin: 0, fontSize: '1rem', color: '#10b981', fontWeight: 600 }}>Active Phase</p>
+                </div>
+              </div>
+            </div>
+            <div style={{ padding: '16px 24px', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
+              <button onClick={() => setSelectedEventForDetails(null)} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#475569', fontWeight: 500, cursor: 'pointer' }}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* View Bids Modal */}
       {selectedEventId && (
