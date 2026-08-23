@@ -156,13 +156,13 @@ export default function VendorManagement() {
           { label: 'Pending Invites', value: vendors.filter(v => v.status === 'Invited').length, icon: Clock, color: '#f59e0b', bg: '#fef3c7' },
           { label: 'Blacklisted', value: vendors.filter(v => v.status === 'Blacklisted').length, icon: ShieldAlert, color: '#ef4444', bg: '#fef2f2' },
         ].map((stat, i) => (
-          <div key={i} style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: stat.bg, color: stat.color }}>
-              <stat.icon size={24} />
+          <div key={i} className="kpi-card" style={{ backgroundColor: '#fff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)', transition: 'all 0.2s ease', cursor: 'default' }}>
+            <div style={{ padding: '14px', borderRadius: '12px', backgroundColor: stat.bg, color: stat.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <stat.icon size={28} strokeWidth={1.5} />
             </div>
             <div>
-              <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>{stat.label}</p>
-              <h3 style={{ margin: '4px 0 0 0', color: '#0f172a', fontSize: '1.5rem', fontWeight: 600 }}>{stat.value}</h3>
+              <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem', fontWeight: 500, letterSpacing: '0.01em' }}>{stat.label}</p>
+              <h3 style={{ margin: '6px 0 0 0', color: '#0f172a', fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.02em' }}>{stat.value}</h3>
             </div>
           </div>
         ))}
@@ -238,16 +238,16 @@ export default function VendorManagement() {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
             <thead>
-              <tr style={{ backgroundColor: '#fff', borderBottom: '2px solid #e2e8f0', color: '#475569' }}>
-                <th style={{ padding: '16px', width: '40px' }}><input type="checkbox" style={{ accentColor: '#2563eb', cursor: 'pointer' }} /></th>
-                <th style={{ padding: '16px', fontWeight: 600 }}>Vendor Name</th>
-                <th style={{ padding: '16px', fontWeight: 600 }}>Vendor Code</th>
-                <th style={{ padding: '16px', fontWeight: 600 }}>Contact Info</th>
-                <th style={{ padding: '16px', fontWeight: 600 }}>Type</th>
-                <th style={{ padding: '16px', fontWeight: 600 }}>Location</th>
-                <th style={{ padding: '16px', fontWeight: 600 }}>Trust Score</th>
-                {showBankruptcyPredictor && <th style={{ padding: '16px', fontWeight: 600 }}>Financial Health</th>}
-                <th style={{ padding: '16px', fontWeight: 600 }}>Status</th>
+              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <th style={{ padding: '16px 24px', width: '40px' }}><input type="checkbox" style={{ accentColor: '#2563eb', cursor: 'pointer', width: '16px', height: '16px' }} /></th>
+                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Vendor Name</th>
+                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Vendor Code</th>
+                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Contact Info</th>
+                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Type</th>
+                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Location</th>
+                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Trust Score</th>
+                {showBankruptcyPredictor && <th style={{ padding: '16px 24px', fontWeight: 600 }}>Financial Health</th>}
+                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -259,63 +259,69 @@ export default function VendorManagement() {
                   </td>
                 </tr>
               ) : filteredVendors.length > 0 ? filteredVendors.map((vendor) => (
-                <tr onClick={() => router.push(`/client/vendors/${vendor.id}`)} key={vendor.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'background-color 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}>
-                  <td style={{ padding: '16px' }} onClick={e => e.stopPropagation()}>
-                    <input type="checkbox" style={{ accentColor: '#2563eb', cursor: 'pointer' }} />
+                <tr className="vendor-row" onClick={() => router.push(`/client/vendors/${vendor.id}`)} key={vendor.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'all 0.2s ease', cursor: 'pointer' }}>
+                  <td style={{ padding: '20px 24px' }} onClick={e => e.stopPropagation()}>
+                    <input type="checkbox" style={{ accentColor: '#2563eb', cursor: 'pointer', width: '16px', height: '16px' }} />
                   </td>
-                  <td style={{ padding: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontWeight: 'bold' }}>
+                  <td style={{ padding: '20px 24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4338ca', fontWeight: 'bold', fontSize: '1.1rem', boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.5)' }}>
                         {(vendor.name || '?').charAt(0).toUpperCase()}
                       </div>
-                      <span style={{ fontWeight: 500, color: '#0f172a' }}>{vendor.name || 'Unnamed Vendor'}</span>
+                      <span style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.95rem' }}>{vendor.name || 'Unnamed Vendor'}</span>
                     </div>
                   </td>
-                  <td style={{ padding: '16px', color: '#64748b', fontFamily: 'monospace' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <td style={{ padding: '20px 24px', color: '#475569', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', fontSize: '0.85rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#f1f5f9', padding: '4px 8px', borderRadius: '6px', width: 'fit-content' }}>
                       {vendor.vendorCode}
                       <button 
                         onClick={(e) => { e.stopPropagation(); handleCopy(vendor.vendorCode, `code-${vendor.id}`); }}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px', display: 'flex' }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '2px', display: 'flex', transition: 'color 0.2s' }}
                         title="Copy Vendor Code"
                       >
                         {copiedId === `code-${vendor.id}` ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
                       </button>
                     </div>
                   </td>
-                  <td style={{ padding: '16px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
-                        <Mail size={14} color="#94a3b8" /> 
+                  <td style={{ padding: '20px 24px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', fontSize: '0.875rem' }}>
+                        <div style={{ backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '4px', display: 'flex' }}><Mail size={14} color="#64748b" /></div>
                         {vendor.email}
                         <button 
                           onClick={(e) => { e.stopPropagation(); handleCopy(vendor.email, `email-${vendor.id}`); }}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px', marginLeft: 'auto', display: 'flex' }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px', marginLeft: 'auto', display: 'flex', opacity: 0.6, transition: 'opacity 0.2s' }}
                           title="Copy Email"
+                          className="copy-btn"
                         >
                           {copiedId === `email-${vendor.id}` ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
                         </button>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
-                        <Phone size={14} color="#94a3b8" /> 
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', fontSize: '0.875rem' }}>
+                        <div style={{ backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '4px', display: 'flex' }}><Phone size={14} color="#64748b" /></div>
                         {vendor.phone}
                         <button 
                           onClick={(e) => { e.stopPropagation(); handleCopy(vendor.phone, `phone-${vendor.id}`); }}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px', marginLeft: 'auto', display: 'flex' }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px', marginLeft: 'auto', display: 'flex', opacity: 0.6, transition: 'opacity 0.2s' }}
                           title="Copy Phone"
+                          className="copy-btn"
                         >
                           {copiedId === `phone-${vendor.id}` ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
                         </button>
                       </div>
                     </div>
                   </td>
-                  <td style={{ padding: '16px', color: '#475569' }}>{vendor.type}</td>
-                  <td style={{ padding: '16px', color: '#475569' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={14} color="#94a3b8" /> {vendor.city}</div>
+                  <td style={{ padding: '20px 24px', color: '#475569', fontWeight: 500 }}>
+                    <span style={{ backgroundColor: '#f1f5f9', padding: '4px 10px', borderRadius: '6px', fontSize: '0.85rem' }}>{vendor.type}</span>
                   </td>
-                  <td style={{ padding: '16px', color: '#475569' }}>
+                  <td style={{ padding: '20px 24px', color: '#475569' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
+                      <MapPin size={16} color="#94a3b8" /> {vendor.city}
+                    </div>
+                  </td>
+                  <td style={{ padding: '20px 24px', color: '#475569' }}>
                     {vendor.trustScore ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600, color: vendor.trustScore > 4 ? '#10b981' : vendor.trustScore < 3 ? '#ef4444' : '#f59e0b' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, color: vendor.trustScore > 4 ? '#10b981' : vendor.trustScore < 3 ? '#ef4444' : '#f59e0b', backgroundColor: vendor.trustScore > 4 ? '#ecfdf5' : vendor.trustScore < 3 ? '#fef2f2' : '#fef3c7', padding: '4px 10px', borderRadius: '12px', width: 'fit-content' }}>
                         <Star size={14} fill={vendor.trustScore > 4 ? '#10b981' : vendor.trustScore < 3 ? '#ef4444' : '#f59e0b'} /> {vendor.trustScore}
                       </div>
                     ) : (
@@ -323,18 +329,18 @@ export default function VendorManagement() {
                     )}
                   </td>
                   {showBankruptcyPredictor && (
-                    <td style={{ padding: '16px', color: '#475569' }}>
+                    <td style={{ padding: '20px 24px', color: '#475569' }}>
                       {vendor.financialHealth ? (
-                        <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, backgroundColor: vendor.financialHealth === 'Excellent' ? '#ecfdf5' : vendor.financialHealth === 'Stable' ? '#fef3c7' : '#fef2f2', color: vendor.financialHealth === 'Excellent' ? '#10b981' : vendor.financialHealth === 'Stable' ? '#f59e0b' : '#ef4444', display: 'flex', alignItems: 'center', gap: '4px', width: 'fit-content' }}>
+                        <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700, backgroundColor: vendor.financialHealth === 'Excellent' ? '#ecfdf5' : vendor.financialHealth === 'Stable' ? '#fef3c7' : '#fef2f2', color: vendor.financialHealth === 'Excellent' ? '#10b981' : vendor.financialHealth === 'Stable' ? '#f59e0b' : '#ef4444', display: 'flex', alignItems: 'center', gap: '6px', width: 'fit-content' }}>
                           {vendor.financialHealth === 'Critical' && <AlertTriangle size={12} />}
-                          {vendor.financialHealth}
+                          {vendor.financialHealth.toUpperCase()}
                         </span>
                       ) : (
                         <span style={{ color: '#94a3b8' }}>-</span>
                       )}
                     </td>
                   )}
-                  <td style={{ padding: '16px' }}>
+                  <td style={{ padding: '20px 24px' }}>
                     {getStatusBadge(vendor.status)}
                   </td>
                 </tr>
@@ -427,6 +433,9 @@ export default function VendorManagement() {
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05) !important; }
+        .vendor-row:hover { background-color: #f8fafc !important; }
+        .vendor-row:hover .copy-btn { opacity: 1 !important; }
       `}} />
     </div>
   );
