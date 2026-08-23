@@ -18,12 +18,23 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     setOpenMenu(openMenu === name ? null : name);
   };
 
-  const [showWorkflows, setShowWorkflows] = useState(false);
+  const [showWorkflows, setShowWorkflows] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('enableWorkflows') === 'true';
+    }
+    return false;
+  });
+
+  const [currentUser, setCurrentUser] = useState<{ name: string; email: string } | null>(null);
 
   useEffect(() => {
-    // Check initial state
-    setShowWorkflows(localStorage.getItem('enableWorkflows') === 'true');
-    
+    fetch('/api/auth/me')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.name) setCurrentUser(data); })
+      .catch(() => null);
+  }, []);
+
+  useEffect(() => {
     // Listen for changes from settings page
     const handleSettingsChange = () => {
       setShowWorkflows(localStorage.getItem('enableWorkflows') === 'true');
@@ -136,10 +147,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
           <div style={{ marginTop: 'auto', borderTop: '1px solid #1e293b', paddingTop: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px' }}>
-              <div style={{ width: '40px', height: '40px', background: 'var(--accent-color)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>JD</div>
+              <div style={{ width: '40px', height: '40px', background: 'var(--accent-color)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>
+                {currentUser?.name ? currentUser.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : '?'}
+              </div>
               <div>
-                <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc' }}>John Doe</div>
-                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Procurement Team</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '600', color: '#f8fafc' }}>{currentUser?.name || 'Loading...'}</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{currentUser?.email || ''}</div>
               </div>
             </div>
           </div>
