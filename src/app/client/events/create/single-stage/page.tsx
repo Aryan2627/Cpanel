@@ -186,7 +186,7 @@ function SingleStageCreateContent() {
     }
   }, [searchParams]);
 
-  // eslint-disable-next-line
+   
   useEffect(() => {
     if (dbTemplates.length > 0) {
       if (technicalTemplate !== 'Select Templates' && !selectedTechnicalTemplateObj) {
@@ -536,126 +536,6 @@ function SingleStageCreateContent() {
             )}
           </div>
 
-          {/* Card 2: Line Items */}
-          <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.02)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}><FileCheck size={20} color="#10b981" /> Product Requirements</h3>
-              <div style={{ fontSize: '0.85rem', color: '#64748b', background: '#f8fafc', padding: '6px 12px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>💡 Ctrl+V inside table to paste from Excel</div>
-            </div>
-
-            {!selectedTemplateObj ? (
-              <div style={{ padding: '48px', textAlign: 'center', background: 'rgba(248, 250, 252, 0.5)', borderRadius: '12px', border: '2px dashed #cbd5e1' }}>
-                <LayoutTemplate size={48} color="#cbd5e1" style={{ marginBottom: '16px' }} />
-                <h4 style={{ margin: '0 0 8px 0', color: '#475569', fontSize: '1.1rem' }}>No Template Selected</h4>
-                <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>Select a category template above to configure line items.</p>
-              </div>
-            ) : (
-              <>
-                <div 
-                  style={{ overflowX: 'auto', border: '2px dashed transparent', transition: 'all 0.3s', borderRadius: '12px' }}
-                  onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = '#3b82f6'; e.currentTarget.style.background = 'rgba(239, 246, 255, 0.5)'; }}
-                  onDragLeave={(e) => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent'; }}
-                  onDrop={(e) => {
-                    e.preventDefault(); e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent';
-                    const refId = e.dataTransfer.getData('text/plain');
-                    const intake = intakes.find((i: any) => i.refId === refId);
-                    if (intake) setLineItems([...lineItems, { id: Date.now(), values: {}, evaluatorId: '', _source: intake.title }]);
-                  }}
-                  onPaste={(e) => {
-                    e.preventDefault();
-                    const pasteData = e.clipboardData.getData('text');
-                    const rows = pasteData.split('\n').filter(r => r.trim() !== '');
-                    const newItems = rows.map((r, i) => ({ id: Date.now() + i, values: {}, evaluatorId: '', _source: 'Excel Import' }));
-                    const tableDiv = e.currentTarget;
-                    tableDiv.style.background = 'rgba(220, 252, 231, 0.5)';
-                    setTimeout(() => tableDiv.style.background = 'transparent', 600);
-                    setLineItems([...lineItems, ...newItems]);
-                  }}
-                >
-                  <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0', minWidth: '800px' }}>
-                    <thead>
-                      <tr>
-                        <th style={{ padding: '16px', textAlign: 'left', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', borderBottom: '2px solid #e2e8f0' }}>Item #</th>
-                        {(() => {
-                          try {
-                            const fields = JSON.parse(selectedTemplateObj.fields);
-                            return fields.map((f: any) => (
-                              <th key={f.id} style={{ padding: '16px', textAlign: 'left', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', borderBottom: '2px solid #e2e8f0' }}>
-                                {f.name} {f.role === 'Participant' && <span style={{ color: '#94a3b8', fontWeight: 'normal', fontSize: '0.75rem' }}>(Vendor)</span>}
-                              </th>
-                            ));
-                          } catch(e) { return null; }
-                        })()}
-                        <th style={{ padding: '16px', textAlign: 'left', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', borderBottom: '2px solid #e2e8f0' }}>Evaluator</th>
-                        <th style={{ padding: '16px', textAlign: 'center', fontSize: '0.85rem', fontWeight: '600', color: '#64748b', borderBottom: '2px solid #e2e8f0' }}>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {lineItems.map((item, index) => {
-                        let parsedFields: any[] = [];
-                        try { parsedFields = JSON.parse(selectedTemplateObj.fields); } catch(e) {}
-                        return (
-                          <tr key={item.id} style={{ transition: 'background-color 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                            <td style={{ padding: '16px', color: '#0f172a', fontWeight: '600', borderBottom: '1px solid #f1f5f9' }}>
-                              {index + 1}
-                              {item._source && <div style={{ fontSize: '0.7rem', color: '#3b82f6', marginTop: '4px', whiteSpace: 'nowrap', background: '#eff6ff', display: 'inline-block', padding: '2px 6px', borderRadius: '4px' }}>From: {item._source}</div>}
-                            </td>
-                            {parsedFields.map((f: any) => (
-                              <td key={f.id} style={{ padding: '16px', borderBottom: '1px solid #f1f5f9' }}>
-                                <input 
-                                  type="text" 
-                                  placeholder={f.role === 'Participant' ? 'Vendor fills this' : f.role === 'Creator' ? 'Set in setup' : 'Auto-calc'}
-                                  value={f.role === 'Creator' ? (creatorData[f.key] || '') : ''}
-                                  readOnly={true}
-                                  style={{ width: '100%', minWidth: '130px', padding: '10px 12px', border: '1px solid transparent', borderRadius: '8px', outline: 'none', background: f.role === 'Participant' ? '#f1f5f9' : '#f8fafc', color: '#64748b', fontSize: '0.9rem' }}
-                                />
-                              </td>
-                            ))}
-                            <td style={{ padding: '16px', borderBottom: '1px solid #f1f5f9' }}>
-                              <select 
-                                value={item.evaluatorId || ''}
-                                onChange={(e) => {
-                                  const newItems = [...lineItems];
-                                  const idx = newItems.findIndex(i => i.id === item.id);
-                                  newItems[idx].evaluatorId = e.target.value;
-                                  setLineItems(newItems);
-                                }}
-                                style={{ width: '100%', minWidth: '150px', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: '8px', outline: 'none', background: '#fff', fontSize: '0.9rem', color: '#0f172a', cursor: 'pointer' }}
-                              >
-                                <option value="">Select Evaluator</option>
-                                {users.map(u => (
-                                  <option key={u.id} value={u.id}>{u.name}</option>
-                                ))}
-                              </select>
-                            </td>
-                            <td style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid #f1f5f9' }}>
-                              <button 
-                                onClick={() => setLineItems(lineItems.filter(i => i.id !== item.id))}
-                                style={{ background: '#fee2e2', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '6px 10px', borderRadius: '6px', fontWeight: 'bold', transition: 'background 0.2s' }}
-                                onMouseEnter={e => e.currentTarget.style.background = '#fecaca'} onMouseLeave={e => e.currentTarget.style.background = '#fee2e2'}
-                              >
-                                <X size={14} />
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-                
-                <div style={{ marginTop: '24px', display: 'flex', gap: '16px' }}>
-                  <button 
-                    onClick={() => setLineItems([...lineItems, { id: Date.now(), values: {}, evaluatorId: '' }])}
-                    style={{ padding: '10px 20px', background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '8px', color: '#3b82f6', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.borderColor = '#93c5fd'; }} onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
-                  >
-                    <Plus size={16} /> Add Line Item
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
 
           {/* Card 3: Participants */}
           <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.02)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
