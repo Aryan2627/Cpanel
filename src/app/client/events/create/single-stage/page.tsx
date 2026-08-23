@@ -429,6 +429,7 @@ function SingleStageCreateContent() {
                     <option value="Minutes">Minutes</option>
                     <option value="Hours">Hours</option>
                     <option value="Days">Days</option>
+                    <option value="Months">Months</option>
                   </select>
                 </div>
               </div>
@@ -730,6 +731,7 @@ function SingleStageCreateContent() {
                       if (durationUnit === 'Minutes') ms = num * 60 * 1000;
                       else if (durationUnit === 'Hours') ms = num * 60 * 60 * 1000;
                       else if (durationUnit === 'Days') ms = num * 24 * 60 * 60 * 1000;
+                      else if (durationUnit === 'Months') ms = num * 30 * 24 * 60 * 60 * 1000;
                       calculatedEndTime = new Date(Date.now() + ms).toISOString();
                     }
                   }
