@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,19 +18,45 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
+let testAccount: nodemailer.TestAccount | null = null;
+async function getEmailTransporter() {
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: Number(process.env.SMTP_PORT) === 465, 
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  } else {
+    if (!testAccount) {
+      testAccount = await nodemailer.createTestAccount();
+    }
+    return nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: {
+        user: testAccount.user,
+        pass: testAccount.pass,
+      },
+    });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    let { email } = data;
-    email = email?.trim();
-    
-    console.log(`[vendor-auth] Login attempt for email: ${email}`);
+    const { action, otp } = data;
+    const email = data.email?.trim();
     
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400, headers: corsHeaders });
     }
 
-    // Try to find the vendor (case-insensitive for robust checking)
+    // Try to find the vendor
     const vendors = await prisma.vendor.findMany();
     const vendor = vendors.find(v => v.email?.trim().toLowerCase() === email.toLowerCase());
 
@@ -37,18 +64,78 @@ export async function POST(request: Request) {
       console.log(`[vendor-auth] Vendor not found for email: ${email}`);
       return NextResponse.json({ error: 'Vendor not found' }, { status: 404, headers: corsHeaders });
     }
-    
-    console.log(`[vendor-auth] Vendor found: ${vendor.name} (${vendor.id})`);
 
-    // Sign the JWT
-    const token = jwt.sign(
-      { id: vendor.id, email: vendor.email, name: vendor.name },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
+    if (action === 'request') {
+      const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    return NextResponse.json({ vendor, token }, { status: 200, headers: corsHeaders });
+      await prisma.verificationToken.create({
+        data: {
+          identifier: email,
+          token: generatedOtp,
+          expires: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+        },
+      });
+
+      const transporter = await getEmailTransporter();
+      const fromAddress = process.env.SMTP_FROM_EMAIL || '"ProcGen Auth" <auth@procgen.com>';
+
+      const info = await transporter.sendMail({
+        from: fromAddress,
+        to: email,
+        subject: 'Your VendorPortal Login Code',
+        text: `Your login code is ${generatedOtp}. It expires in 10 minutes.`,
+        html: `<b>Your login code is ${generatedOtp}</b><br>It expires in 10 minutes.`
+      });
+
+      const previewUrl = nodemailer.getTestMessageUrl(info);
+
+      return NextResponse.json({ 
+        success: true, 
+        message: 'OTP sent successfully',
+        previewUrl: previewUrl || null 
+      }, { headers: corsHeaders });
+    } 
+    else if (action === 'verify') {
+      if (!otp) {
+        return NextResponse.json({ error: 'OTP is required' }, { status: 400, headers: corsHeaders });
+      }
+
+      const tokenRecord = await prisma.verificationToken.findFirst({
+        where: {
+          identifier: email,
+          token: otp,
+          expires: { gt: new Date() }
+        },
+        orderBy: { expires: 'desc' }
+      });
+
+      if (!tokenRecord) {
+        return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 401, headers: corsHeaders });
+      }
+
+      // Cleanup token
+      await prisma.verificationToken.delete({
+        where: {
+          identifier_token: {
+            identifier: tokenRecord.identifier,
+            token: tokenRecord.token
+          }
+        }
+      });
+
+      const token = jwt.sign(
+        { id: vendor.id, email: vendor.email, name: vendor.name },
+        JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      return NextResponse.json({ vendor, token }, { status: 200, headers: corsHeaders });
+    } 
+    else {
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400, headers: corsHeaders });
+    }
   } catch (error: any) {
+    console.error('[vendor-auth] error:', error);
     return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
   }
 }
