@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
 
 export default function Login() {
   const router = useRouter();
@@ -126,7 +125,7 @@ export default function Login() {
             <>
               <button
                 type="button"
-                onClick={() => signIn('google', { callbackUrl: '/client/intake' })}
+                onClick={() => { window.location.href = '/api/auth/google'; }}
                 style={{
                   width: '100%', padding: '13px', borderRadius: '8px',
                   border: '1px solid #e2e8f0', backgroundColor: '#fff',
