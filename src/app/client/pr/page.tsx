@@ -258,6 +258,7 @@ export default function PRPage() {
                 <th style={{ padding: '16px', width: '40px' }}></th>
                 <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>PR NO (Ref ID)</th>
                 <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Title / Material</th>
+                <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Quantity</th>
                 <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Requester</th>
                 <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Priority</th>
                 <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>FUND CENTER</th>
@@ -278,6 +279,7 @@ export default function PRPage() {
                       </td>
                       <td style={{ padding: '16px', color: '#2563eb', fontWeight: 500 }}>{row.refId}</td>
                       <td style={{ padding: '16px', color: '#333', fontWeight: 500 }}>{row.title}</td>
+                      <td style={{ padding: '16px', color: '#64748b' }}>{row.quantity || 1}</td>
                       <td style={{ padding: '16px', color: '#64748b' }}>{row.reqName}</td>
                       <td style={{ padding: '16px' }}>{getPriorityBadge(row.priority)}</td>
                       <td style={{ padding: '16px', color: '#64748b', fontFamily: 'monospace' }}>{row.fundCenter}</td>
@@ -288,7 +290,7 @@ export default function PRPage() {
                     {expandedRows.has(row.refId) && (
                       <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                         <td colSpan={2}></td>
-                        <td colSpan={6} style={{ padding: '0 16px 16px 0' }}>
+                        <td colSpan={7} style={{ padding: '0 16px 16px 0' }}>
                           <div style={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '12px', marginTop: '-8px' }}>
                             <table style={{ width: '100%', fontSize: '0.8125rem' }}>
                               <thead>
@@ -320,7 +322,7 @@ export default function PRPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} style={{ padding: '48px', textAlign: 'center' }}>
+                  <td colSpan={9} style={{ padding: '48px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '56px', height: '56px', backgroundColor: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Server size={28} color="#94a3b8" />
