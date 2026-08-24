@@ -191,25 +191,9 @@ export default function BuyerEventDetailsPage() {
 
   const proceedWithAward = async (bid: any, quantities: Record<string, number>) => {
     try {
-      if (Object.keys(quantities).length > 0) {
-        for (const intake of sourceIntakes) {
-          const awardedQty = quantities[intake.refId];
-          if (awardedQty > 0) {
-            const remaining = intake.quantity - awardedQty;
-            const status = remaining <= 0 ? 'Approved' : intake.status;
-            const newQty = Math.max(0, remaining);
-            await fetch('/api/intakes', {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ refId: intake.refId, quantity: newQty, status })
-            });
-          }
-        }
-      }
-      
       let bidTemplateData: any = {};
       try { bidTemplateData = JSON.parse(bid.templateData); } catch(e) {}
-      const poDetails = { templateFields, bidData: bidTemplateData, vendorEmail: bid.vendorId || 'vendor@example.com' };
+      const poDetails = { templateFields, bidData: bidTemplateData, vendorEmail: bid.vendorId || 'vendor@example.com', awardedPrs: quantities };
       const poRes = await fetch('/api/pos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -218,7 +202,7 @@ export default function BuyerEventDetailsPage() {
           vendorId: bid.vendorName,
           total: bid.amount,
           eventId: event.id,
-          status: 'Draft',
+          status: 'Pending Vendor',
           poNumber: `PO-${Date.now()}`,
           details: JSON.stringify(poDetails)
         })
