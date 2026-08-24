@@ -74,7 +74,7 @@ export async function GET(req: Request) {
     // Check if request came from supplier portal
     const state = searchParams.get('state');
     if (state === 'vendor') {
-      const vendorUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5173' : 'https://csupplier.vercel.app'; // Modify prod URL here if needed
+      const vendorUrl = process.env.CSUPPLIER_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:5173' : 'https://supplier.procgen.com');
       return NextResponse.redirect(`${vendorUrl}/login?vendor_token=${token}`);
     }
 
