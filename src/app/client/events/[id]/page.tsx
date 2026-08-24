@@ -12,17 +12,34 @@ const Countdown = ({ endTime }: { endTime: string | Date }) => {
 
   const diff = new Date(endTime).getTime() - now.getTime();
   if (diff <= 0) {
-    return <div style={{ fontWeight: 500, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={16} /> Event Ended</div>;
+    return <div style={{ fontWeight: 700, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#fef2f2', padding: '12px 16px', borderRadius: '12px', border: '1px solid #fecaca' }}><AlertCircle size={20} /> EVENT ENDED</div>;
   }
   const d = Math.floor(diff / (1000 * 60 * 60 * 24));
   const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
   const m = Math.floor((diff / 1000 / 60) % 60);
   const s = Math.floor((diff / 1000) % 60);
+  
+  const TimeBox = ({ value, label }: { value: string, label: string }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#fff', padding: '6px 12px', borderRadius: '8px', border: '1px solid #ffedd5', boxShadow: '0 2px 4px rgba(234, 88, 12, 0.05)' }}>
+      <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#ea580c', lineHeight: 1 }}>{value}</span>
+      <span style={{ fontSize: '0.65rem', color: '#c2410c', textTransform: 'uppercase', fontWeight: 700, marginTop: '2px' }}>{label}</span>
+    </div>
+  );
+
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <div style={{ fontWeight: 500, color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle2 size={16} /> Live & Receiving Bids</div>
-      <div style={{ fontWeight: 700, color: '#b45309', fontFamily: 'monospace', fontSize: '1.1rem' }}>
-        {d > 0 && `${d}d `}{h.toString().padStart(2, '0')}:{m.toString().padStart(2, '0')}:{s.toString().padStart(2, '0')}
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+      <div style={{ fontWeight: 600, color: '#16a34a', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem' }}>
+        <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block', boxShadow: '0 0 8px #22c55e', animation: 'pulse 2s infinite' }}></span>
+        Live & Receiving Bids
+      </div>
+      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+        {d > 0 && <TimeBox value={d.toString()} label="Days" />}
+        {d > 0 && <span style={{ color: '#ea580c', fontWeight: 'bold' }}>:</span>}
+        <TimeBox value={h.toString().padStart(2, '0')} label="Hrs" />
+        <span style={{ color: '#ea580c', fontWeight: 'bold' }}>:</span>
+        <TimeBox value={m.toString().padStart(2, '0')} label="Min" />
+        <span style={{ color: '#ea580c', fontWeight: 'bold' }}>:</span>
+        <TimeBox value={s.toString().padStart(2, '0')} label="Sec" />
       </div>
     </div>
   );
@@ -376,12 +393,17 @@ export default function BuyerEventDetailsPage() {
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '4px' }}>Date Created</div>
                   <div style={{ fontWeight: 500, color: '#0f172a' }}>{new Date(event.createdAt).toLocaleDateString()}</div>
                 </div>
-                <div style={{ padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '4px' }}>Status</div>
+                <div style={{ padding: '16px 20px', backgroundColor: '#fff7ed', borderRadius: '12px', border: '1px solid #ffedd5', gridColumn: '1 / -1' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#c2410c', marginBottom: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Clock size={16} /> Time Remaining
+                  </div>
                   {event.endTime ? (
                     <Countdown endTime={event.endTime} />
                   ) : (
-                    <div style={{ fontWeight: 500, color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle2 size={16} /> Live</div>
+                    <div style={{ fontWeight: 700, color: '#16a34a', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.2rem' }}>
+                      <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block', boxShadow: '0 0 10px #22c55e', animation: 'pulse 2s infinite' }}></span>
+                      Live / No Time Limit
+                    </div>
                   )}
                 </div>
               </div>
