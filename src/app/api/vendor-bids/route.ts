@@ -143,3 +143,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
   }
 }
+export async function PUT(request: Request) {
+  try {
+    const data = await request.json();
+    const bid = await prisma.bid.update({
+      where: { id: data.id },
+      data: {
+        chatHistory: data.chatHistory ? JSON.stringify(data.chatHistory) : undefined,
+      }
+    });
+    return NextResponse.json(bid, { status: 200, headers: corsHeaders });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
+  }
+}

@@ -205,6 +205,7 @@ model Bid {
   currency       String        @default("USD")
   exchangeRate   Float         @default(1.0)
   templateData   String? // JSON string
+  chatHistory    String? // JSON array of messages
   status         String        @default("Submitted")
   createdAt      DateTime      @default(now())
 

@@ -71,17 +71,34 @@ export default function BuyerEventDetailsPage() {
     } catch (e) {}
   }, []);
 
-  const handleSendMsg = () => {
-    if (!chatMessage.trim()) return;
-    setChatHistory([...chatHistory, { id: Date.now(), sender: 'You', type: 'text', msg: chatMessage, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }]);
-    setChatMessage('');
-    setTimeout(() => {
-      setChatHistory(prev => [...prev, { id: Date.now()+1, sender: activeVendorChat?.vendorName || 'Vendor', type: 'text', msg: 'Understood. We will review and get back to you shortly.', time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }]);
-    }, 1500);
+  const openChat = (bid: any) => {
+    setActiveVendorChat(bid);
+    setIsChatOpen(true);
+    let parsedHistory = [];
+    try {
+      if (bid.chatHistory) {
+        parsedHistory = typeof bid.chatHistory === 'string' ? JSON.parse(bid.chatHistory) : bid.chatHistory;
+      }
+    } catch(e) {}
+    setChatHistory(parsedHistory);
   };
 
-  const handleSendCounterOffer = () => {
-    if (!counterOfferPrice) return;
+  const handleSendMsg = async () => {
+    if (!chatMessage.trim() || !activeVendorChat) return;
+    const newMsg = { id: Date.now(), sender: 'You', type: 'text', msg: chatMessage, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
+    const updatedHistory = [...chatHistory, newMsg];
+    setChatHistory(updatedHistory);
+    setChatMessage('');
+    
+    await fetch('/api/bids', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: activeVendorChat.id, chatHistory: updatedHistory })
+    });
+  };
+
+  const handleSendCounterOffer = async () => {
+    if (!counterOfferPrice || !activeVendorChat) return;
     const newOffer = {
       id: Date.now(),
       sender: 'You',
@@ -93,19 +110,16 @@ export default function BuyerEventDetailsPage() {
         reason: counterOfferReason
       }
     };
-    setChatHistory([...chatHistory, newOffer]);
+    const updatedHistory = [...chatHistory, newOffer];
+    setChatHistory(updatedHistory);
     setIsCounterOfferMode(false);
     setCounterOfferPrice('');
     
-    setTimeout(() => {
-      setChatHistory(prev => [...prev, { 
-        id: Date.now()+1, 
-        sender: activeVendorChat?.vendorName || 'Vendor', 
-        type: 'text',
-        msg: `We have reviewed your counter-offer of $${newOffer.offerDetails.price}. After consulting with our management, we accept these revised terms to secure the partnership.`, 
-        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
-      }]);
-    }, 2500);
+    await fetch('/api/bids', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: activeVendorChat.id, chatHistory: updatedHistory })
+    });
   };
 
   const handleDownloadCSV = () => {
@@ -529,7 +543,7 @@ export default function BuyerEventDetailsPage() {
                             )}
                             <td style={{ padding: '20px 24px', textAlign: 'right', borderTopRightRadius: '12px', borderBottomRightRadius: '12px', border: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderLeft: 'none' }}>
                               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' }}>
-                                <button onClick={() => { setActiveVendorChat(bid); setIsChatOpen(true); }} style={{ padding: '10px 16px', backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#dbeafe'; e.currentTarget.style.transform = 'scale(1.05)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#eff6ff'; e.currentTarget.style.transform = 'scale(1)'; }}>
+                                <button onClick={() => openChat(bid)} style={{ padding: '10px 16px', backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#dbeafe'; e.currentTarget.style.transform = 'scale(1.05)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#eff6ff'; e.currentTarget.style.transform = 'scale(1)'; }}>
                                   💬 Negotiate
                                 </button>
                                 {(!showBankruptcyPredictor || bid.financialHealth !== 'Critical') && (
