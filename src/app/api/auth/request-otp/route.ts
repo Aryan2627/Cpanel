@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import nodemailer from 'nodemailer';
+import twilio from 'twilio';
 
 const prisma = new PrismaClient();
 
@@ -40,20 +41,31 @@ export async function POST(req: Request) {
   try {
     const { identifier } = await req.json();
     if (!identifier) {
-      return NextResponse.json({ error: 'Email/Identifier is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Email/Phone is required' }, { status: 400 });
     }
 
-    const emailToSearch = identifier.trim().toLowerCase();
+    const inputId = identifier.trim();
+    const isEmail = inputId.includes('@');
 
-    // STRICT CHECK: The email MUST exist in the User or Vendor table
+    // STRICT CHECK: The email or phone MUST exist in the User or Vendor table
     const users = await prisma.user.findMany();
     const vendors = await prisma.vendor.findMany();
     
-    const userMatch = users.find(u => u.email?.trim().toLowerCase() === emailToSearch);
-    const vendorMatch = vendors.find(v => v.email?.trim().toLowerCase() === emailToSearch);
+    let userMatch = null;
+    let vendorMatch = null;
+
+    if (isEmail) {
+      const emailToSearch = inputId.toLowerCase();
+      userMatch = users.find(u => u.email?.trim().toLowerCase() === emailToSearch);
+      vendorMatch = vendors.find(v => v.email?.trim().toLowerCase() === emailToSearch);
+    } else {
+      const phoneToSearch = inputId.replace(/\D/g, '');
+      userMatch = users.find(u => u.phone?.replace(/\D/g, '') === phoneToSearch);
+      vendorMatch = vendors.find(v => v.phone?.replace(/\D/g, '') === phoneToSearch);
+    }
 
     if (!userMatch && !vendorMatch) {
-      // Reject if the email isn't registered in the system
+      // Reject if the identifier isn't registered in the system
       return NextResponse.json({ error: 'Account not found. Please contact your administrator.' }, { status: 404 });
     }
 
@@ -63,38 +75,51 @@ export async function POST(req: Request) {
     // Store in Database
     await prisma.verificationToken.create({
       data: {
-        identifier,
+        identifier: inputId,
         token: otp,
         expires: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
       },
     });
 
-    // Send email
-    const transporter = await getEmailTransporter();
-    
-    // Determine the "From" address based on real SMTP vs fallback
-    const fromAddress = process.env.SMTP_FROM_EMAIL || '"ProcGen Auth" <auth@procgen.com>';
+    let previewUrl = null;
 
-    const info = await transporter.sendMail({
-      from: fromAddress,
-      to: identifier,
-      subject: 'Your ProcGen Login Code',
-      text: `Your login code is ${otp}. It expires in 10 minutes.`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-          <h2 style="color: #1e3a8a; margin-top: 0;">ProcGen Authentication</h2>
-          <p>You requested to sign in to ProcGen.</p>
-          <p>Your 6-digit login code is:</p>
-          <div style="background-color: #f8fafc; padding: 16px; border-radius: 8px; font-size: 24px; font-weight: bold; letter-spacing: 4px; text-align: center; color: #3b82f6; margin: 20px 0;">
-            ${otp}
+    if (isEmail) {
+      // Send email
+      const transporter = await getEmailTransporter();
+      const fromAddress = process.env.SMTP_FROM_EMAIL || '"ProcGen Auth" <auth@procgen.com>';
+
+      const info = await transporter.sendMail({
+        from: fromAddress,
+        to: inputId,
+        subject: 'Your ProcGen Login Code',
+        text: \Your login code is \. It expires in 10 minutes.\,
+        html: \
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <h2 style="color: #1e3a8a; margin-top: 0;">ProcGen Authentication</h2>
+            <p>You requested to sign in to ProcGen.</p>
+            <p>Your 6-digit login code is:</p>
+            <div style="background-color: #f8fafc; padding: 16px; border-radius: 8px; font-size: 24px; font-weight: bold; letter-spacing: 4px; text-align: center; color: #3b82f6; margin: 20px 0;">
+              \
+            </div>
+            <p style="color: #64748b; font-size: 14px;">This code expires in 10 minutes. If you did not request this code, please ignore this email.</p>
           </div>
-          <p style="color: #64748b; font-size: 14px;">This code expires in 10 minutes. If you did not request this code, please ignore this email.</p>
-        </div>
-      `
-    });
-
-    // If using ethereal, we return the preview URL. If real SMTP, this is false.
-    const previewUrl = nodemailer.getTestMessageUrl(info);
+        \
+      });
+      previewUrl = nodemailer.getTestMessageUrl(info);
+    } else {
+      // Send SMS via Twilio
+      if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
+        const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+        await client.messages.create({
+          body: \Your ProcGen login code is \\,
+          from: process.env.TWILIO_PHONE_NUMBER,
+          to: inputId
+        });
+      } else {
+        console.log(\[DEV MODE SMS] To: \, OTP: \\);
+        previewUrl = \sms-mock://\\;
+      }
+    }
 
     return NextResponse.json({ 
       success: true, 

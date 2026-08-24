@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import twilio from 'twilio';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -50,19 +51,27 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
     const { action, otp } = data;
-    const email = data.email?.trim();
+    const identifier = (data.email || data.identifier || '').trim();
     
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400, headers: corsHeaders });
+    if (!identifier) {
+      return NextResponse.json({ error: 'Email or Phone is required' }, { status: 400, headers: corsHeaders });
     }
+
+    const isEmail = identifier.includes('@');
 
     // Try to find the vendor
     const vendors = await prisma.vendor.findMany();
-    const vendor = vendors.find(v => v.email?.trim().toLowerCase() === email.toLowerCase());
+    const vendor = vendors.find(v => {
+      if (isEmail) {
+        return v.email?.trim().toLowerCase() === identifier.toLowerCase();
+      } else {
+        return v.phone?.replace(/\D/g, '') === identifier.replace(/\D/g, '');
+      }
+    });
 
     if (!vendor) {
-      console.log(`[vendor-auth] Vendor not found for email: ${email}`);
-      return NextResponse.json({ error: 'Vendor not found' }, { status: 404, headers: corsHeaders });
+      console.log([vendor-auth] Vendor not found for: );
+      return NextResponse.json({ error: 'Vendor not found with that email or phone' }, { status: 404, headers: corsHeaders });
     }
 
     if (action === 'request') {
@@ -70,24 +79,41 @@ export async function POST(request: Request) {
 
       await prisma.verificationToken.create({
         data: {
-          identifier: email,
+          identifier: identifier,
           token: generatedOtp,
           expires: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
         },
       });
 
-      const transporter = await getEmailTransporter();
-      const fromAddress = process.env.SMTP_FROM_EMAIL || '"ProcGen Auth" <auth@procgen.com>';
+      let previewUrl = null;
 
-      const info = await transporter.sendMail({
-        from: fromAddress,
-        to: email,
-        subject: 'Your VendorPortal Login Code',
-        text: `Your login code is ${generatedOtp}. It expires in 10 minutes.`,
-        html: `<b>Your login code is ${generatedOtp}</b><br>It expires in 10 minutes.`
-      });
+      if (isEmail) {
+        const transporter = await getEmailTransporter();
+        const fromAddress = process.env.SMTP_FROM_EMAIL || '"ProcGen Auth" <auth@procgen.com>';
 
-      const previewUrl = nodemailer.getTestMessageUrl(info);
+        const info = await transporter.sendMail({
+          from: fromAddress,
+          to: identifier,
+          subject: 'Your VendorPortal Login Code',
+          text: \Your login code is \. It expires in 10 minutes.\,
+          html: \<b>Your login code is \</b><br>It expires in 10 minutes.\
+        });
+
+        previewUrl = nodemailer.getTestMessageUrl(info);
+      } else {
+        // Send SMS via Twilio
+        if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
+          const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+          await client.messages.create({
+            body: \Your VendorPortal login code is \\,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: identifier
+          });
+        } else {
+          console.log(\[DEV MODE SMS] To: \, OTP: \\);
+          previewUrl = \sms-mock://\\;
+        }
+      }
 
       return NextResponse.json({ 
         success: true, 
@@ -102,7 +128,7 @@ export async function POST(request: Request) {
 
       const tokenRecord = await prisma.verificationToken.findFirst({
         where: {
-          identifier: email,
+          identifier: identifier,
           token: otp,
           expires: { gt: new Date() }
         },
@@ -124,7 +150,7 @@ export async function POST(request: Request) {
       });
 
       const token = jwt.sign(
-        { id: vendor.id, email: vendor.email, name: vendor.name },
+        { id: vendor.id, email: vendor.email, phone: vendor.phone, name: vendor.name },
         JWT_SECRET,
         { expiresIn: '24h' }
       );

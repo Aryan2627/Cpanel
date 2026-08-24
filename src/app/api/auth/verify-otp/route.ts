@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { logLoginActivity, logAudit } from '../../../../lib/audit';
@@ -14,10 +14,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Identifier and OTP are required' }, { status: 400 });
     }
 
+    const inputId = identifier.trim();
+
     // Find the latest valid OTP for this identifier
     const tokenRecord = await prisma.verificationToken.findFirst({
       where: {
-        identifier,
+        identifier: inputId,
         token: otp,
         expires: { gt: new Date() } // not expired
       },
@@ -38,15 +40,25 @@ export async function POST(req: Request) {
       }
     });
 
-    const emailToSearch = identifier.trim().toLowerCase();
+    const isEmail = inputId.includes('@');
 
     // Check Database for actual role
     let role = 'client';
     const users = await prisma.user.findMany();
     const vendors = await prisma.vendor.findMany();
 
-    const userMatch = users.find(u => u.email?.trim().toLowerCase() === emailToSearch);
-    const vendorMatch = vendors.find(v => v.email?.trim().toLowerCase() === emailToSearch);
+    let userMatch = null;
+    let vendorMatch = null;
+
+    if (isEmail) {
+      const emailToSearch = inputId.toLowerCase();
+      userMatch = users.find(u => u.email?.trim().toLowerCase() === emailToSearch);
+      vendorMatch = vendors.find(v => v.email?.trim().toLowerCase() === emailToSearch);
+    } else {
+      const phoneToSearch = inputId.replace(/\D/g, '');
+      userMatch = users.find(u => u.phone?.replace(/\D/g, '') === phoneToSearch);
+      vendorMatch = vendors.find(v => v.phone?.replace(/\D/g, '') === phoneToSearch);
+    }
 
     if (userMatch) {
       // Determine if the internal user is Admin or regular Client
@@ -60,7 +72,7 @@ export async function POST(req: Request) {
 
     // Generate JWT
     const payload = {
-      identifier,
+      identifier: inputId,
       role,
       loginTime: Date.now()
     };
@@ -79,8 +91,8 @@ export async function POST(req: Request) {
     });
 
     // Log login activity and audit trail (fire-and-forget)
-    void logLoginActivity({ identifier, success: true });
-    void logAudit({ actorEmail: identifier, action: 'LOGIN', entityType: 'User', entityRef: identifier });
+    void logLoginActivity({ identifier: inputId, success: true });
+    void logAudit({ actorEmail: inputId, action: 'LOGIN', entityType: 'User', entityRef: inputId });
 
     return res;
 
