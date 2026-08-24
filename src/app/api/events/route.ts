@@ -18,7 +18,8 @@ export async function GET(request: Request) {
         itemsCount: true,
         title: true,
         endTime: true,
-        participants: true
+        participants: true,
+        sourcePrs: true
       },
       orderBy: { createdAt: 'desc' },
       take: 100
@@ -65,6 +66,7 @@ export async function POST(request: Request) {
         feedbackMode: data.feedbackMode || 'Sealed',
         endTime: data.endTime ? new Date(data.endTime) : null,
         status: eventStatus,
+        sourcePrs: data.sourcePrs || null
       }
     });
 

@@ -144,6 +144,7 @@ model Event {
   baseCurrency   String        @default("USD")
   feedbackMode   String        @default("Sealed")
   status         String        @default("Draft")
+  sourcePrs      String?
   createdAt      DateTime      @default(now())
 
   @@index([organizationId, createdAt(sort: Desc)])

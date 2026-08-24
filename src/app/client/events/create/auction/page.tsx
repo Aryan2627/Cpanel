@@ -636,10 +636,11 @@ function AuctionCreateContent() {
                       status: 'Draft',
                       type: eventType,
                       account: 'Internal',
-                      itemsCount: lineItems.length,
+                      itemsCount: 1,
                       endTime: calculatedEndTime,
                       stages: finalStages,
-                      participants: selectedVendors
+                      participants: selectedVendors,
+                      sourcePrs: searchParams.get('prs') || null
                     })
                   });
                   if (res.ok) {

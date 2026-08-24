@@ -672,7 +672,8 @@ function SingleStageCreateContent() {
                       feedbackMode: feedbackMode,
                       endTime: calculatedEndTime,
                       stages: finalStages,
-                      participants: selectedVendors
+                      participants: selectedVendors,
+                      sourcePrs: searchParams.get('prs') || null
                     })
                   });
                   if (res.ok) {

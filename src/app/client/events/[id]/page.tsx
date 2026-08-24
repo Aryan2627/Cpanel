@@ -44,6 +44,9 @@ export default function BuyerEventDetailsPage() {
   const [chatHistory, setChatHistory] = useState<any[]>([]);
   
   const [isCounterOfferMode, setIsCounterOfferMode] = useState(false);
+  const [awardModalBid, setAwardModalBid] = useState<any>(null);
+  const [awardQuantities, setAwardQuantities] = useState<Record<string, number>>({});
+  const [sourceIntakes, setSourceIntakes] = useState<any[]>([]);
   const [counterOfferPrice, setCounterOfferPrice] = useState('');
   const [counterOfferExpiry, setCounterOfferExpiry] = useState('24h');
   const [counterOfferReason, setCounterOfferReason] = useState('Market intel suggests this is the ceiling');
@@ -157,7 +160,39 @@ export default function BuyerEventDetailsPage() {
   }, [params.id]);
 
   const handleAward = async (bid: any) => {
+    if (event?.sourcePrs) {
+       const res = await fetch('/api/intakes');
+       const allIntakes = await res.json();
+       const prIds = event.sourcePrs.split(',');
+       const matchedIntakes = allIntakes.filter((i: any) => prIds.includes(i.refId));
+       setSourceIntakes(matchedIntakes);
+       const defaultQties: Record<string, number> = {};
+       matchedIntakes.forEach((i: any) => defaultQties[i.refId] = i.quantity);
+       setAwardQuantities(defaultQties);
+       setAwardModalBid(bid);
+    } else {
+       proceedWithAward(bid, {});
+    }
+  };
+
+  const proceedWithAward = async (bid: any, quantities: Record<string, number>) => {
     try {
+      if (Object.keys(quantities).length > 0) {
+        for (const intake of sourceIntakes) {
+          const awardedQty = quantities[intake.refId];
+          if (awardedQty > 0) {
+            const remaining = intake.quantity - awardedQty;
+            const status = remaining <= 0 ? 'Approved' : intake.status;
+            const newQty = Math.max(0, remaining);
+            await fetch('/api/intakes', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ refId: intake.refId, quantity: newQty, status })
+            });
+          }
+        }
+      }
+      
       let bidTemplateData: any = {};
       try { bidTemplateData = JSON.parse(bid.templateData); } catch(e) {}
       const poDetails = { templateFields, bidData: bidTemplateData, vendorEmail: bid.vendorId || 'vendor@example.com' };
@@ -628,6 +663,48 @@ export default function BuyerEventDetailsPage() {
           )}
         </div>
       </div>
+
+      {/* Award Modal */}
+      {awardModalBid && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+          <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', width: '500px', maxWidth: '90%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 color="#10b981" /> Award Vendor: {awardModalBid.vendorName}</h2>
+              <button onClick={() => setAwardModalBid(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b' }}><X size={20} /></button>
+            </div>
+            
+            <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '24px' }}>Select the quantity you want to award from the requested PRs. If you award partial quantity, the remaining quantity will stay open in the PR tab.</p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
+              {sourceIntakes.map(intake => (
+                <div key={intake.refId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <div>
+                    <div style={{ fontWeight: 600, color: '#0f172a' }}>{intake.refId}</div>
+                    <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{intake.title}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Awarded Qty:</div>
+                    <input 
+                      type="number" 
+                      min="0" 
+                      max={intake.quantity} 
+                      value={awardQuantities[intake.refId] || 0}
+                      onChange={(e) => setAwardQuantities({...awardQuantities, [intake.refId]: parseInt(e.target.value) || 0})}
+                      style={{ width: '80px', padding: '8px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', textAlign: 'center' }}
+                    />
+                    <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>/ {intake.quantity}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button onClick={() => setAwardModalBid(null)} style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => { proceedWithAward(awardModalBid, awardQuantities); setAwardModalBid(null); }} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#2563eb', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Confirm & Generate PO</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Comparison Matrix Modal */}
       {isCompareModalOpen && (

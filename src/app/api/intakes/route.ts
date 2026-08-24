@@ -38,3 +38,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message || 'Failed to create intake' }, { status: 500 });
   }
 }
+export async function PUT(request: Request) {
+  try {
+    const data = await request.json();
+    console.log("Updating Intake:", data);
+    const updatedIntake = await prisma.intake.update({
+      where: { refId: data.refId },
+      data: {
+        status: data.status,
+        quantity: data.quantity,
+        updAt: new Date().toISOString().split('T')[0],
+      }
+    });
+    return NextResponse.json(updatedIntake, { status: 200 });
+  } catch (error: any) {
+    console.error('API Error updating intake:', error);
+    return NextResponse.json({ error: error.message || 'Failed to update intake' }, { status: 500 });
+  }
+}
