@@ -269,18 +269,7 @@ function AuctionCreateContent() {
             >
               <LayoutTemplate size={16} /> {isWorkspaceMode ? 'Hide Workspace' : 'Workspace'}
             </button>
-            <button 
-              onClick={() => setEventMode('Live Event')}
-              style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '24px', cursor: 'pointer', border: 'none', background: eventMode === 'Live Event' ? '#fee2e2' : 'transparent', color: eventMode === 'Live Event' ? '#b91c1c' : '#64748b', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: eventMode === 'Live Event' ? '#ef4444' : '#cbd5e1' }} /> Live
-            </button>
-            <button 
-              onClick={() => setEventMode('Test Event')}
-              style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '24px', cursor: 'pointer', border: 'none', background: eventMode === 'Test Event' ? '#fef3c7' : 'transparent', color: eventMode === 'Test Event' ? '#b45309' : '#64748b', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <FileCheck size={16} /> Test
-            </button>
+            
           </div>
         </div>
 

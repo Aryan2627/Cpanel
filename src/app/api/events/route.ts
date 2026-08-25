@@ -62,7 +62,7 @@ export async function POST(request: Request) {
         itemsCount: data.itemsCount || 1,
         stages: data.stages ? JSON.stringify(data.stages) : null,
         participants: data.participants ? JSON.stringify(data.participants) : null,
-        baseCurrency: data.baseCurrency || 'USD',
+        baseCurrency: data.baseCurrency || 'INR',
         feedbackMode: data.feedbackMode || 'Sealed',
         endTime: data.endTime ? new Date(data.endTime) : null,
         status: eventStatus,

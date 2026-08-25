@@ -11,7 +11,7 @@ function SingleStageCreateContent() {
   const initialTitle = searchParams.get('title') || '';
   
   const [title, setTitle] = useState(initialTitle);
-  const [baseCurrency, setBaseCurrency] = useState('USD');
+  const [baseCurrency, setBaseCurrency] = useState('INR');
   const [feedbackMode, setFeedbackMode] = useState('Sealed');
   const { intakes } = useIntake();
   const [isWorkspaceMode, setIsWorkspaceMode] = useState(false);
@@ -280,32 +280,8 @@ function SingleStageCreateContent() {
               onChange={(e) => setTitle(e.target.value)}
               style={{ border: 'none', outline: 'none', fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', flex: 1, background: 'transparent' }}
             />
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', padding: '6px 12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>Base Currency:</span>
-              <select 
-                value={baseCurrency} 
-                onChange={(e) => setBaseCurrency(e.target.value)}
-                style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: '0.85rem', fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}
-              >
-                <option value="USD">USD ($)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="INR">INR (₹)</option>
-                <option value="JPY">JPY (¥)</option>
-                <option value="AUD">AUD (A$)</option>
-              </select>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', padding: '6px 12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>Feedback Mode:</span>
-              <select 
-                value={feedbackMode} 
-                onChange={(e) => setFeedbackMode(e.target.value)}
-                style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: '0.85rem', fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}
-              >
-                <option value="Sealed">Sealed Bid</option>
-                <option value="Rank Based">Rank Based</option>
-              </select>
-            </div>
+            
+            
           </div>
               {/* Constraints */}
               <div>
@@ -332,18 +308,7 @@ function SingleStageCreateContent() {
             >
               <LayoutTemplate size={16} /> {isWorkspaceMode ? 'Hide Workspace' : 'Workspace'}
             </button>
-            <button 
-              onClick={() => setEventMode('Live Event')}
-              style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '24px', cursor: 'pointer', border: 'none', background: eventMode === 'Live Event' ? '#fee2e2' : 'transparent', color: eventMode === 'Live Event' ? '#b91c1c' : '#64748b', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: eventMode === 'Live Event' ? '#ef4444' : '#cbd5e1' }} /> Live
-            </button>
-            <button 
-              onClick={() => setEventMode('Test Event')}
-              style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '24px', cursor: 'pointer', border: 'none', background: eventMode === 'Test Event' ? '#fef3c7' : 'transparent', color: eventMode === 'Test Event' ? '#b45309' : '#64748b', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <FileCheck size={16} /> Test
-            </button>
+            
           </div>
         </div>
 

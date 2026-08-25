@@ -97,7 +97,7 @@ export default function VendorLiveBidding() {
           vendorId: 'vendor-123',
           vendorName: 'Acme Corporation',
           amount: calculateTotal(),
-          currency: event.baseCurrency || 'USD',
+          currency: event.baseCurrency || 'INR',
           status: 'Submitted',
           templateData: fieldData
         })

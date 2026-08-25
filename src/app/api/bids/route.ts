@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         vendorName: data.vendorName,
         amount: parseFloat(data.amount),
         localAmount: data.localAmount ? parseFloat(data.localAmount) : null,
-        currency: data.currency || 'USD',
+        currency: data.currency || 'INR',
         exchangeRate: data.exchangeRate ? parseFloat(data.exchangeRate) : 1.0,
         status: data.status || 'Submitted',
         templateData: data.templateData ? JSON.stringify(data.templateData) : null,

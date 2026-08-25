@@ -140,12 +140,12 @@ export default function BuyerEventDetailsPage() {
   };
 
   const handleDownloadCSV = () => {
-    let csv = `Vendor Name,Composite Score,Total Amount (${event?.baseCurrency || 'USD'}),Original Currency,CO2 Footprint,`;
+    let csv = `Vendor Name,Composite Score,Total Amount (${event?.baseCurrency || 'INR'}),Original Currency,CO2 Footprint,`;
     csv += templateFields.map((f: any) => f.name).join(',') + '\n';
     bids.forEach(bid => {
       let templateData: any = {};
       try { templateData = JSON.parse(bid.templateData); } catch(e) {}
-      let row = `"${bid.vendorName}",${bid.score || 0},${bid.amount},${bid.currency || 'USD'},"${bid.esgScore || 'N/A'}",`;
+      let row = `"${bid.vendorName}",${bid.score || 0},${bid.amount},${bid.currency || 'INR'},"${bid.esgScore || 'N/A'}",`;
       const tVals = templateFields.map((f: any) => `"${templateData[f.key] || ''}"`);
       row += tVals.join(',') + '\n';
       csv += row;
@@ -270,7 +270,7 @@ export default function BuyerEventDetailsPage() {
       let data: any = {};
       try { data = JSON.parse(bid.templateData); } catch(e) {}
       
-      const currency = bid.currency || 'USD';
+      const currency = bid.currency || 'INR';
       // bid.amount is already converted to baseCurrency by the vendor portal
       const baseAmount = bid.amount;
       
@@ -346,7 +346,7 @@ export default function BuyerEventDetailsPage() {
         isGhost: true,
         score: Math.round(score * 10) / 10,
         baseAmount: ghostBaseAmount,
-        currency: event?.baseCurrency || 'USD',
+        currency: event?.baseCurrency || 'INR',
         amount: ghostBaseAmount,
         esgScore: enableESG ? `${Math.floor(ghostBaseAmount * 0.012)} kg CO2e` : 'N/A', // 20% cleaner than human average
         parsedData: ghostData,
@@ -464,7 +464,7 @@ export default function BuyerEventDetailsPage() {
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Vendor</th>
                         {event?.type === 'Rank based' && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Rank</th>}
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Score</th>
-                        <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Total Amount ({event.baseCurrency || 'USD'})</th>
+                        <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Total Amount ({event.baseCurrency || 'INR'})</th>
                         {enableESG && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Carbon Footprint</th>}
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textAlign: 'right', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Actions</th>
                       </tr>
@@ -495,7 +495,7 @@ export default function BuyerEventDetailsPage() {
                                 </span>
                               </td>
                               <td style={{ padding: '20px 24px', fontWeight: 700, color: '#6b21a8', fontSize: '1.1rem', borderTop: '1px solid #e9d5ff', borderBottom: '1px solid #e9d5ff' }}>
-                                {bid.baseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {event.baseCurrency || 'USD'}
+                                {bid.baseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {event.baseCurrency || 'INR'}
                               </td>
                               {enableESG && (
                                 <td style={{ padding: '20px 24px', color: '#16a34a', fontWeight: 600, borderTop: '1px solid #e9d5ff', borderBottom: '1px solid #e9d5ff' }}>
@@ -539,14 +539,14 @@ export default function BuyerEventDetailsPage() {
                               </div>
                             </td>
                             <td style={{ padding: '20px 24px', fontWeight: 700, color: '#0f172a', fontSize: '1.15rem', borderTop: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderBottom: isBest ? '2px solid #34d399' : '1px solid #e2e8f0' }}>
-                              {bid.baseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {event.baseCurrency || 'USD'}
+                              {bid.baseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {event.baseCurrency || 'INR'}
                               {bid.initialAmount && bid.initialAmount > bid.baseAmount && (
                                 <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '6px' }}>
-                                  Initial: <span style={{ textDecoration: 'line-through' }}>{bid.initialAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {event.baseCurrency || 'USD'}</span>
+                                  Initial: <span style={{ textDecoration: 'line-through' }}>{bid.initialAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {event.baseCurrency || 'INR'}</span>
                                   <div style={{ color: '#10b981', fontWeight: 600, marginTop: '2px' }}>↓ Revised</div>
                                 </div>
                               )}
-                              {bid.currency !== (event.baseCurrency || 'USD') && <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500, marginTop: '4px' }}>Orig: {bid.localAmount || bid.amount} {bid.currency}</div>}
+                              {bid.currency !== (event.baseCurrency || 'INR') && <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500, marginTop: '4px' }}>Orig: {bid.localAmount || bid.amount} {bid.currency}</div>}
                             </td>
                             {enableESG && (
                               <td style={{ padding: '20px 24px', color: '#16a34a', fontWeight: 600, borderTop: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderBottom: isBest ? '2px solid #34d399' : '1px solid #e2e8f0' }}>
@@ -765,7 +765,7 @@ export default function BuyerEventDetailsPage() {
                   <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '2px solid #cbd5e1' }}>
                     <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Vendor Name</th>
                     <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Composite Score</th>
-                    <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Total ({event.baseCurrency || 'USD'})</th>
+                    <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Total ({event.baseCurrency || 'INR'})</th>
                     {enableESG && <th style={{ padding: '16px', fontWeight: 600, color: '#16a34a' }}>CO2 Footprint</th>}
                     {templateFields.map((f: any) => (
                       <th key={f.key} style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>
@@ -803,7 +803,7 @@ export default function BuyerEventDetailsPage() {
                         <td style={{ padding: '16px', fontWeight: 600, color: '#2563eb' }}>{bid.score > 0 ? `${bid.score}/100` : 'N/A'}</td>
                         <td style={{ padding: '16px', fontWeight: 600, color: '#0f172a' }}>
                           {bid.baseAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                          {bid.currency !== (event.baseCurrency || 'USD') && <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 400, display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}><Globe size={10} /> {bid.currency} Rate Applied</div>}
+                          {bid.currency !== (event.baseCurrency || 'INR') && <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 400, display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}><Globe size={10} /> {bid.currency} Rate Applied</div>}
                         </td>
                         {enableESG && <td style={{ padding: '16px', color: '#16a34a', fontWeight: 500 }}>{bid.esgScore}</td>}
                         
