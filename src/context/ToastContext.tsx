@@ -45,7 +45,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             animation: 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
             display: 'flex', alignItems: 'center', gap: '8px'
           }}>
-            <span>{toast.type === 'success' ? '✓' : toast.type === 'error' ? '✖' : 'ℹ'}</span>
+            <span>{toast.type === 'success' ? '' : toast.type === 'error' ? '' : 'ℹ'}</span>
             {toast.message}
           </div>
         ))}

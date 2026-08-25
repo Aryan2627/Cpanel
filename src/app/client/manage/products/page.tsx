@@ -143,7 +143,7 @@ export default function ProductsPage() {
                   placeholder="Enter Search Criteria"
                   style={{ padding: '8px 0', border: 'none', outline: 'none', width: '100%', fontSize: '0.85rem' }} 
                 />
-                <span style={{ color: '#9ca3af', marginLeft: '8px' }}>🔍</span>
+                <span style={{ color: '#9ca3af', marginLeft: '8px' }}></span>
              </div>
           </div>
           

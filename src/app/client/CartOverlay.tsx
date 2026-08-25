@@ -39,7 +39,7 @@ export default function CartOverlay() {
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#111827', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          🛒 RFQ Cart <span style={{ backgroundColor: '#2563eb', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem' }}>{cart.length}</span>
+           RFQ Cart <span style={{ backgroundColor: '#2563eb', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem' }}>{cart.length}</span>
         </h3>
         <button 
           onClick={() => {
@@ -83,7 +83,7 @@ export default function CartOverlay() {
         onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#059669'}
         onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
       >
-        ⚡ Convert to RFQ Event
+         Convert to RFQ Event
       </button>
     </div>
   );

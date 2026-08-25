@@ -39,11 +39,11 @@ export default function ProfilePage() {
 
   const getBrowser = (ua: string | null) => {
     if (!ua) return 'Unknown Device';
-    if (ua.includes('Chrome')) return '🌐 Chrome';
-    if (ua.includes('Firefox')) return '🦊 Firefox';
-    if (ua.includes('Safari')) return '🧭 Safari';
-    if (ua.includes('Edge')) return '🔷 Edge';
-    return '🖥️ Browser';
+    if (ua.includes('Chrome')) return ' Chrome';
+    if (ua.includes('Firefox')) return ' Firefox';
+    if (ua.includes('Safari')) return ' Safari';
+    if (ua.includes('Edge')) return ' Edge';
+    return '️ Browser';
   };
 
   if (loading) return <div style={{ padding: '40px', color: '#64748b' }}>Loading profile...</div>;
@@ -66,7 +66,7 @@ export default function ProfilePage() {
 
       {/* Login Activity */}
       <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', border: '1px solid #e2e8f0' }}>
-        <h2 style={{ margin: '0 0 20px', fontSize: '1.1rem', fontWeight: '700', color: '#0f172a' }}>🔐 Login Activity</h2>
+        <h2 style={{ margin: '0 0 20px', fontSize: '1.1rem', fontWeight: '700', color: '#0f172a' }}> Login Activity</h2>
 
         {activities.length === 0 ? (
           <p style={{ color: '#94a3b8', textAlign: 'center', padding: '20px 0' }}>No login activity recorded yet.</p>
@@ -75,7 +75,7 @@ export default function ProfilePage() {
             {activities.map((act, i) => (
               <div key={act.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: '10px', background: i === 0 ? '#f0fdf4' : '#f8fafc', border: `1px solid ${i === 0 ? '#bbf7d0' : '#e2e8f0'}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '1.25rem' }}>{act.success ? '✅' : '❌'}</span>
+                  <span style={{ fontSize: '1.25rem' }}>{act.success ? '' : ''}</span>
                   <div>
                     <div style={{ fontWeight: '600', color: '#0f172a', fontSize: '0.9rem' }}>
                       {getBrowser(act.userAgent)} {i === 0 && <span style={{ marginLeft: '6px', fontSize: '0.75rem', color: '#16a34a', fontWeight: '700' }}>Current Session</span>}

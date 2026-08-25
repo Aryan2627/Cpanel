@@ -52,7 +52,7 @@ export default function AuditPage() {
   return (
     <div style={{ padding: '32px', fontFamily: 'Inter, sans-serif' }}>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700', color: '#0f172a' }}>📋 Audit Trail</h1>
+        <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700', color: '#0f172a' }}> Audit Trail</h1>
         <p style={{ margin: '4px 0 0', color: '#64748b' }}>{total} total actions recorded</p>
       </div>
 

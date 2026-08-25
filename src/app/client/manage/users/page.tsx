@@ -137,7 +137,7 @@ export default function UsersPage() {
                     placeholder={`Search by ${searchField}`}
                     style={{ padding: '8px', border: 'none', outline: 'none', width: '220px', fontSize: '0.85rem' }} 
                   />
-                  <span style={{ color: '#9ca3af' }}>🔍</span>
+                  <span style={{ color: '#9ca3af' }}></span>
                </div>
             </div>
             
@@ -147,7 +147,7 @@ export default function UsersPage() {
             </button>
             
             <button disabled style={{ padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '4px', backgroundColor: '#f9fafb', color: '#9ca3af', cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
-              🏷 Add Tag
+               Add Tag
             </button>
           </div>
           
@@ -225,7 +225,7 @@ export default function UsersPage() {
           }}>
             <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
               <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#111827', fontWeight: '700' }}>Create New User</h2>
-              <button onClick={() => setIsCreateModalOpen(false)} style={{ background: '#e2e8f0', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', color: '#475569', cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#cbd5e1'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}>✕</button>
+              <button onClick={() => setIsCreateModalOpen(false)} style={{ background: '#e2e8f0', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', color: '#475569', cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#cbd5e1'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}></button>
             </div>
             
             <div style={{ padding: '24px', flex: 1, overflowY: 'auto' }}>

@@ -116,7 +116,7 @@ export default function CreateProductPage() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                 <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: '1.5rem', color: '#4f46e5' }}>📸</span>
+                  <span style={{ fontSize: '1.5rem', color: '#4f46e5' }}></span>
                 </div>
                 <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}>Click or drag to upload</span>
               </div>
@@ -226,7 +226,7 @@ export default function CreateProductPage() {
               Attachments:
             </label>
             <button style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: '#fff', color: '#374151', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: '500' }}>
-              📎 Add Attachments
+               Add Attachments
             </button>
           </div>
 

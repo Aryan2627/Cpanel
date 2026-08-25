@@ -11,11 +11,11 @@ export default function SpotlightSearch() {
   const router = useRouter();
 
   const commands = [
-    { id: 'dashboard', title: 'Go to Dashboard', icon: '📊', path: '/client' },
-    { id: 'create-event', title: 'Create Single-Stage Event', icon: '⚡', path: '/client/events/create/single-stage' },
-    { id: 'intakes', title: 'View Purchase Intakes', icon: '📥', path: '/client/intake' },
-    { id: 'templates', title: 'Manage Templates', icon: '📋', path: '/client/manage/templates' },
-    { id: 'products', title: 'Product Catalog', icon: '📦', path: '/client/manage/products' },
+    { id: 'dashboard', title: 'Go to Dashboard', icon: '', path: '/client' },
+    { id: 'create-event', title: 'Create Single-Stage Event', icon: '', path: '/client/events/create/single-stage' },
+    { id: 'intakes', title: 'View Purchase Intakes', icon: '', path: '/client/intake' },
+    { id: 'templates', title: 'Manage Templates', icon: '', path: '/client/manage/templates' },
+    { id: 'products', title: 'Product Catalog', icon: '', path: '/client/manage/products' },
   ];
 
   const filteredCommands = commands.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));

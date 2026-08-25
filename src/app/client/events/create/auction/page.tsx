@@ -290,14 +290,14 @@ function AuctionCreateContent() {
                   style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
                 >
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: '500' }}>
-                    {eventType === 'Rank based' ? '🏆' : '💰'} {eventType}
+                    {eventType === 'Rank based' ? '' : ''} {eventType}
                   </span>
                   <ChevronDown size={16} color="#94a3b8" />
                 </div>
                 {isEventTypeOpen && (
                   <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, overflow: 'hidden' }}>
-                    <div onClick={() => { setEventType('Rank based'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>🏆 Rank based</div>
-                    <div onClick={() => { setEventType('Price based'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333', borderTop: '1px solid #f1f5f9' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>💰 Price based</div>
+                    <div onClick={() => { setEventType('Rank based'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}> Rank based</div>
+                    <div onClick={() => { setEventType('Price based'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333', borderTop: '1px solid #f1f5f9' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}> Price based</div>
                   </div>
                 )}
               </div>
@@ -544,7 +544,7 @@ function AuctionCreateContent() {
                   style={{ background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)', color: '#fff', border: 'none', borderRadius: '24px', padding: '8px 16px', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 6px rgba(236, 72, 153, 0.3)', transition: 'transform 0.2s' }}
                   onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}
                 >
-                  🔥 Smart Match AI
+                   Smart Match AI
                 </button>
               )}
             </div>
@@ -701,7 +701,7 @@ function AuctionCreateContent() {
             onMouseEnter={e => { if (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates')) e.currentTarget.style.transform = 'translateY(-2px)' }}
             onMouseLeave={e => { if (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates')) e.currentTarget.style.transform = 'none' }}
           >
-            Launch Event 🚀
+            Launch Event 
           </button>
         </div>
 
@@ -717,7 +717,7 @@ function AuctionCreateContent() {
             
             <div style={{ padding: '24px', background: 'linear-gradient(to right, #fdf2f8, #fce7f3)', borderBottom: '1px solid #fbcfe8', textAlign: 'center' }}>
               <h2 style={{ margin: 0, color: '#be185d', fontSize: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                🔥 Smart Match AI
+                 Smart Match AI
               </h2>
               <p style={{ margin: '8px 0 0 0', color: '#db2777', fontSize: '0.9rem' }}>Algorithmic curation of the top perfect suppliers.</p>
             </div>
@@ -728,7 +728,7 @@ function AuctionCreateContent() {
                 if (availableVendors.length === 0 || currentMatchIndex >= availableVendors.length) {
                   return (
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '4rem', marginBottom: '16px' }}>🎉</div>
+                      <div style={{ fontSize: '4rem', marginBottom: '16px' }}></div>
                       <h3 style={{ color: '#0f172a', margin: '0 0 8px 0' }}>No more matches!</h3>
                       <p style={{ color: '#64748b', margin: 0 }}>You've reviewed all algorithmic recommendations.</p>
                       <button onClick={() => setIsTinderModalOpen(false)} style={{ marginTop: '24px', padding: '10px 24px', background: '#ec4899', color: '#fff', border: 'none', borderRadius: '20px', fontWeight: 'bold', cursor: 'pointer' }}>Return to Event</button>

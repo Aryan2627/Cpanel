@@ -138,7 +138,7 @@ export default function VendorMessagesPage() {
           <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             
             <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: '12px', top: '10px', color: '#9ca3af', fontSize: '0.9rem' }}>🏷️</span>
+              <span style={{ position: 'absolute', left: '12px', top: '10px', color: '#9ca3af', fontSize: '0.9rem' }}>️</span>
               <input 
                 type="text" 
                 placeholder="Filter by Event ID (e.g. EVT-1004)" 
@@ -149,7 +149,7 @@ export default function VendorMessagesPage() {
             </div>
 
             <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: '12px', top: '10px', color: '#9ca3af', fontSize: '0.9rem' }}>🔍</span>
+              <span style={{ position: 'absolute', left: '12px', top: '10px', color: '#9ca3af', fontSize: '0.9rem' }}></span>
               <input 
                 type="text" 
                 placeholder="Search vendors..." 
@@ -193,7 +193,7 @@ export default function VendorMessagesPage() {
                   </p>
                   {vendor.liveEventId && (
                     <span style={{ fontSize: '0.65rem', backgroundColor: '#fef3c7', color: '#d97706', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold', border: '1px solid #fde68a' }}>
-                      🔴 Live: {vendor.liveEventId}
+                       Live: {vendor.liveEventId}
                     </span>
                   )}
                 </div>
@@ -254,7 +254,7 @@ export default function VendorMessagesPage() {
               }}>
                 {msg.isFile ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ fontSize: '1.5rem' }}>📄</div>
+                    <div style={{ fontSize: '1.5rem' }}></div>
                     <div>
                       <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>{msg.fileName}</div>
                       <div style={{ fontSize: '0.7rem', opacity: 0.8 }}>Document attached</div>
@@ -266,7 +266,7 @@ export default function VendorMessagesPage() {
               </div>
               <div style={{ marginTop: '6px', fontSize: '0.75rem', color: '#9ca3af', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 {msg.timestamp}
-                {msg.sender === 'me' && <span style={{ color: '#3b82f6' }}>✓✓</span>}
+                {msg.sender === 'me' && <span style={{ color: '#3b82f6' }}></span>}
               </div>
             </div>
           ))}
@@ -277,7 +277,7 @@ export default function VendorMessagesPage() {
         <div id="tour-chat-input" style={{ padding: '24px', borderTop: '1px solid #e5e7eb', backgroundColor: '#fff' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: '#f9fafb', padding: '8px 16px', borderRadius: '24px', border: '1px solid #e5e7eb', transition: 'border-color 0.2s, box-shadow 0.2s' }} id="chat-input-wrapper">
             <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileUpload} />
-            <button onClick={() => fileInputRef.current?.click()} style={{ background: 'none', border: 'none', fontSize: '1.25rem', color: '#9ca3af', cursor: 'pointer', padding: '4px' }} title="Attach File">📎</button>
+            <button onClick={() => fileInputRef.current?.click()} style={{ background: 'none', border: 'none', fontSize: '1.25rem', color: '#9ca3af', cursor: 'pointer', padding: '4px' }} title="Attach File"></button>
             <input 
               type="text" 
               value={newMessage}
@@ -301,7 +301,7 @@ export default function VendorMessagesPage() {
               onMouseOver={(e) => { if (newMessage.trim()) e.currentTarget.style.transform = 'scale(1.05)' }}
               onMouseOut={(e) => { if (newMessage.trim()) e.currentTarget.style.transform = 'scale(1)' }}
             >
-              ➤
+              
             </button>
           </div>
         </div>
@@ -309,7 +309,7 @@ export default function VendorMessagesPage() {
         ) : (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc', padding: '48px', textAlign: 'center' }}>
             <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
-              <span style={{ fontSize: '2.5rem' }}>💬</span>
+              <span style={{ fontSize: '2.5rem' }}></span>
             </div>
             <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', margin: '0 0 12px 0' }}>No Event Selected</h3>
             <p style={{ color: '#6b7280', fontSize: '1rem', maxWidth: '400px', lineHeight: '1.6' }}>

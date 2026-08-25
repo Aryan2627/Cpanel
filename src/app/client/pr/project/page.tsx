@@ -14,16 +14,16 @@ export default function ProjectSetupPage() {
         
         <div style={{ display: 'flex', gap: '12px' }}>
           <button style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: '#fff', color: '#374151', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', fontSize: '0.85rem' }}>
-            📎 Add Attachments
+             Add Attachments
           </button>
           <button style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: '#fff', color: '#374151', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', fontSize: '0.85rem' }}>
-            📄 Add T&Cs
+             Add T&Cs
           </button>
           <button style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: '#fff', color: '#374151', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', fontSize: '0.85rem' }}>
-            ☰ Items <span style={{ backgroundColor: '#2563eb', color: '#fff', padding: '2px 6px', borderRadius: '12px', fontSize: '0.7rem' }}>1</span>
+             Items <span style={{ backgroundColor: '#2563eb', color: '#fff', padding: '2px 6px', borderRadius: '12px', fontSize: '0.7rem' }}>1</span>
           </button>
           <button style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: '#fff', color: '#374151', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', fontSize: '0.85rem' }}>
-            💾 Save as draft
+             Save as draft
           </button>
           <button style={{ padding: '8px 24px', border: 'none', borderRadius: '4px', backgroundColor: '#2563eb', color: '#fff', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}>
             Publish
@@ -74,7 +74,7 @@ export default function ProjectSetupPage() {
           <div>
             <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '4px' }}>Event Type</div>
             <div style={{ fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ color: '#3b82f6' }}>📄</span> Technical Stage <span style={{ color: '#9ca3af', fontSize: '0.8rem' }}>&gt;</span>
+              <span style={{ color: '#3b82f6' }}></span> Technical Stage <span style={{ color: '#9ca3af', fontSize: '0.8rem' }}>&gt;</span>
             </div>
           </div>
           <div>
@@ -122,7 +122,7 @@ export default function ProjectSetupPage() {
           <div style={{ padding: '16px 24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ margin: 0, fontSize: '1.1rem', color: '#111827' }}>Line Items</h2>
             <div style={{ fontSize: '0.85rem', color: '#6b7280' }}>
-              By: <span style={{ color: '#3b82f6' }}>✎ Harit Mehta (Planner)</span>
+              By: <span style={{ color: '#3b82f6' }}> Harit Mehta (Planner)</span>
             </div>
           </div>
           
@@ -134,7 +134,7 @@ export default function ProjectSetupPage() {
                 <td style={{ padding: '16px 24px', color: '#4b5563', verticalAlign: 'top', width: '25%' }}>NOMENCLATURE</td>
                 <td style={{ padding: '16px 24px', color: '#4b5563', verticalAlign: 'top', width: '40%' }}>GEARED SLEEVE</td>
                 <td style={{ padding: '16px 24px', color: '#3b82f6', verticalAlign: 'top', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span>Long Text ✎</span>
+                  <span>Long Text </span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#374151' }}>
                     Required
                     <div style={{ width: '32px', height: '16px', backgroundColor: '#3b82f6', borderRadius: '16px', position: 'relative' }}>
@@ -142,7 +142,7 @@ export default function ProjectSetupPage() {
                     </div>
                   </div>
                 </td>
-                <td style={{ padding: '16px 24px', color: '#ef4444', verticalAlign: 'top', textAlign: 'right' }}>🗑</td>
+                <td style={{ padding: '16px 24px', color: '#ef4444', verticalAlign: 'top', textAlign: 'right' }}></td>
               </tr>
               
               {/* Row 3 */}
@@ -151,7 +151,7 @@ export default function ProjectSetupPage() {
                 <td style={{ padding: '16px 24px', color: '#4b5563', verticalAlign: 'top' }}>DRAWING NUMBER</td>
                 <td style={{ padding: '16px 24px', color: '#4b5563', verticalAlign: 'top' }}>3930942</td>
                 <td style={{ padding: '16px 24px', color: '#3b82f6', verticalAlign: 'top', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span>Long Text ✎</span>
+                  <span>Long Text </span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#374151' }}>
                     Required
                     <div style={{ width: '32px', height: '16px', backgroundColor: '#3b82f6', borderRadius: '16px', position: 'relative' }}>
@@ -159,7 +159,7 @@ export default function ProjectSetupPage() {
                     </div>
                   </div>
                 </td>
-                <td style={{ padding: '16px 24px', color: '#ef4444', verticalAlign: 'top', textAlign: 'right' }}>🗑</td>
+                <td style={{ padding: '16px 24px', color: '#ef4444', verticalAlign: 'top', textAlign: 'right' }}></td>
               </tr>
 
               {/* Row 4 */}
@@ -168,7 +168,7 @@ export default function ProjectSetupPage() {
                 <td style={{ padding: '16px 24px', color: '#4b5563', verticalAlign: 'top' }}>MAJOR ASSEMBLY</td>
                 <td style={{ padding: '16px 24px', color: '#4b5563', verticalAlign: 'top' }}>COUPLING SE125</td>
                 <td style={{ padding: '16px 24px', color: '#3b82f6', verticalAlign: 'top', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span>Long Text ✎</span>
+                  <span>Long Text </span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#374151' }}>
                     Required
                     <div style={{ width: '32px', height: '16px', backgroundColor: '#3b82f6', borderRadius: '16px', position: 'relative' }}>
@@ -176,7 +176,7 @@ export default function ProjectSetupPage() {
                     </div>
                   </div>
                 </td>
-                <td style={{ padding: '16px 24px', color: '#ef4444', verticalAlign: 'top', textAlign: 'right' }}>🗑</td>
+                <td style={{ padding: '16px 24px', color: '#ef4444', verticalAlign: 'top', textAlign: 'right' }}></td>
               </tr>
 
               {/* Row 5 */}
@@ -192,7 +192,7 @@ export default function ProjectSetupPage() {
                   (3) MATERIAL CODE AND PO NUMBER MUST MENTION IN ALL TEST REPORT.
                 </td>
                 <td style={{ padding: '16px 24px', color: '#3b82f6', verticalAlign: 'top', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span>Long Text ✎</span>
+                  <span>Long Text </span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#374151' }}>
                     Required
                     <div style={{ width: '32px', height: '16px', backgroundColor: '#d1d5db', borderRadius: '16px', position: 'relative' }}>
@@ -200,7 +200,7 @@ export default function ProjectSetupPage() {
                     </div>
                   </div>
                 </td>
-                <td style={{ padding: '16px 24px', color: '#ef4444', verticalAlign: 'top', textAlign: 'right' }}>🗑</td>
+                <td style={{ padding: '16px 24px', color: '#ef4444', verticalAlign: 'top', textAlign: 'right' }}></td>
               </tr>
               
               {/* Row 6 */}
@@ -209,7 +209,7 @@ export default function ProjectSetupPage() {
                 <td style={{ padding: '16px 24px', color: '#4b5563', verticalAlign: 'top' }}>Attach additional documents if any</td>
                 <td style={{ padding: '16px 24px', color: '#4b5563', verticalAlign: 'top' }}>Attachment</td>
                 <td style={{ padding: '16px 24px', color: '#3b82f6', verticalAlign: 'top', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span>Attachment ✎</span>
+                  <span>Attachment </span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#374151' }}>
                     Required
                     <div style={{ width: '32px', height: '16px', backgroundColor: '#d1d5db', borderRadius: '16px', position: 'relative' }}>
@@ -217,7 +217,7 @@ export default function ProjectSetupPage() {
                     </div>
                   </div>
                 </td>
-                <td style={{ padding: '16px 24px', color: '#ef4444', verticalAlign: 'top', textAlign: 'right' }}>🗑</td>
+                <td style={{ padding: '16px 24px', color: '#ef4444', verticalAlign: 'top', textAlign: 'right' }}></td>
               </tr>
             </tbody>
           </table>

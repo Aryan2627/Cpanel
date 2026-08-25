@@ -691,7 +691,7 @@ export default function EventsPage() {
                               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dbeafe'}
                               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#eff6ff'}
                             >
-                              💬 Counter Offer
+                               Counter Offer
                             </button>
                             <button 
                               onClick={() => handleAward(bid)}

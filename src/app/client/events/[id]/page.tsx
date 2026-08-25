@@ -546,7 +546,7 @@ export default function BuyerEventDetailsPage() {
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
                                 <div style={{ fontSize: '0.8rem', color: bid.trustScore > 4 ? '#10b981' : bid.trustScore < 3 ? '#ef4444' : '#f59e0b', fontWeight: 700, backgroundColor: bid.trustScore > 4 ? '#ecfdf5' : bid.trustScore < 3 ? '#fef2f2' : '#fffbeb', padding: '4px 8px', borderRadius: '6px', border: `1px solid ${bid.trustScore > 4 ? '#a7f3d0' : bid.trustScore < 3 ? '#fecaca' : '#fde68a'}` }}>
-                                  ★ {bid.trustScore} Trust
+                                   {bid.trustScore} Trust
                                 </div>
                                 {showBankruptcyPredictor && bid.financialHealth === 'Critical' && (
                                   <div style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 700, backgroundColor: '#fef2f2', padding: '4px 8px', borderRadius: '6px', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -578,7 +578,7 @@ export default function BuyerEventDetailsPage() {
                             <td style={{ padding: '20px 24px', textAlign: 'right', borderTopRightRadius: '12px', borderBottomRightRadius: '12px', border: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderLeft: 'none' }}>
                               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' }}>
                                 <button onClick={() => openChat(bid)} style={{ padding: '10px 16px', backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#dbeafe'; e.currentTarget.style.transform = 'scale(1.05)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#eff6ff'; e.currentTarget.style.transform = 'scale(1)'; }}>
-                                  💬 Negotiate
+                                   Negotiate
                                 </button>
                                 {(!showBankruptcyPredictor || bid.financialHealth !== 'Critical') && (
                                   <button onClick={() => handleAward(bid)} style={{ 
@@ -596,7 +596,7 @@ export default function BuyerEventDetailsPage() {
                                     boxShadow: isBest ? '0 4px 10px rgba(16,185,129,0.4)' : '0 1px 2px rgba(0,0,0,0.05)', 
                                     transition: 'all 0.2s' 
                                   }} onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = isBest ? '0 6px 15px rgba(16,185,129,0.5)' : '0 4px 6px -1px rgba(0,0,0,0.1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = isBest ? '0 4px 10px rgba(16,185,129,0.4)' : '0 1px 2px rgba(0,0,0,0.05)'; }}>
-                                    {isBest ? '🏆 Award Best Bid' : 'Award Vendor'}
+                                    {isBest ? ' Award Best Bid' : 'Award Vendor'}
                                   </button>
                                 )}
                                 {showBankruptcyPredictor && bid.financialHealth === 'Critical' && (

@@ -82,10 +82,10 @@ export default function ClientDashboard() {
       return (
         <div id="tour-kpi-cards" className="kpi-grid" style={{ width: '100%' }}>
           {[
-            { title: 'Total Purchase Requests', value: stats.intakes, color: 'var(--primary-color)', icon: '🛒' },
-            { title: 'Active Products', value: stats.products, color: 'var(--success-color)', icon: '📦' },
-            { title: 'Registered Users', value: stats.users, color: '#8b5cf6', icon: '👥' },
-            { title: 'Active Teams', value: stats.teams, color: 'var(--warning-color)', icon: '🏢' },
+            { title: 'Total Purchase Requests', value: stats.intakes, color: 'var(--primary-color)', icon: '' },
+            { title: 'Active Products', value: stats.products, color: 'var(--success-color)', icon: '' },
+            { title: 'Registered Users', value: stats.users, color: '#8b5cf6', icon: '' },
+            { title: 'Active Teams', value: stats.teams, color: 'var(--warning-color)', icon: '' },
           ].map((kpi, i) => (
             <div key={i} className="kpi-card">
               <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '5rem', opacity: 0.05 }}>
