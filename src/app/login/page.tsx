@@ -1,4 +1,5 @@
-﻿import { useState } from 'react';
+﻿'use client';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Login() {
@@ -170,3 +171,4 @@ export default function Login() {
     </div>
   );
 }
+
