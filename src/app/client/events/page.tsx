@@ -336,8 +336,6 @@ export default function EventsPage() {
           </div>
         ))}
       </div>
-        ))}
-      </div>
 
       {/* Main Container */}
       <div style={{ backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
