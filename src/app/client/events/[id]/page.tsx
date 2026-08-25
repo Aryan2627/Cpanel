@@ -462,6 +462,7 @@ export default function BuyerEventDetailsPage() {
                     <thead>
                       <tr>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Vendor</th>
+                        {event?.type === 'Rank based' && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Rank</th>}
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Score</th>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Total Amount ({event.baseCurrency || 'USD'})</th>
                         {enableESG && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Carbon Footprint</th>}
@@ -483,6 +484,11 @@ export default function BuyerEventDetailsPage() {
                                   Generative Market Baseline
                                 </div>
                               </td>
+                              {event?.type === 'Rank based' && (
+                                <td style={{ padding: '20px 24px', fontWeight: 800, color: '#9333ea', fontSize: '1.2rem', borderTop: '1px solid #e9d5ff', borderBottom: '1px solid #e9d5ff' }}>
+                                  -
+                                </td>
+                              )}
                               <td style={{ padding: '20px 24px', borderTop: '1px solid #e9d5ff', borderBottom: '1px solid #e9d5ff' }}>
                                 <span style={{ padding: '6px 12px', borderRadius: '16px', fontSize: '0.85rem', fontWeight: 700, backgroundColor: '#d8b4fe', color: '#581c87', boxShadow: '0 2px 4px rgba(147,51,234,0.2)' }}>
                                   {bid.score > 0 ? `${bid.score}/100` : 'N/A'}

@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     });
 
     if (!event) return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-    if (event.feedbackMode !== 'Rank Based') {
+    if (event.feedbackMode !== 'Rank Based' && event.type !== 'Rank based') {
       return NextResponse.json({ rank: null, message: 'Event is not rank based' });
     }
 

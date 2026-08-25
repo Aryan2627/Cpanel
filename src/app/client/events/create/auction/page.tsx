@@ -51,6 +51,8 @@ function AuctionCreateContent() {
   
   // State for Event Duration
   const [durationValue, setDurationValue] = useState('');
+  const [minBidStep, setMinBidStep] = useState('');
+  const [ceilingPrice, setCeilingPrice] = useState('');
   const [durationUnit, setDurationUnit] = useState('Days');
 
   const [lineItems, setLineItems] = useState<any[]>([{ id: Date.now(), values: {}, evaluatorId: '' }]);
@@ -622,6 +624,8 @@ function AuctionCreateContent() {
                           { 
                             name: stage1Name, 
                             mode: 'Technical Validation',
+                            minBidStep: Number(minBidStep) || 0,
+                            ceilingPrice: Number(ceilingPrice) || 0,
                             templateFields: selectedTemplateObj ? JSON.parse(selectedTemplateObj.fields).map((f: any) => ({
                               ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
                             })) : [] 
@@ -629,6 +633,8 @@ function AuctionCreateContent() {
                           { 
                             name: stage2Name, 
                             mode: eventMode,
+                            minBidStep: Number(minBidStep) || 0,
+                            ceilingPrice: Number(ceilingPrice) || 0,
                             templateFields: selectedStage2TemplateObj ? JSON.parse(selectedStage2TemplateObj.fields).map((f: any) => ({
                               ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
                             })) : [] 
@@ -638,6 +644,8 @@ function AuctionCreateContent() {
                           { 
                             name: template, 
                             mode: eventMode,
+                            minBidStep: Number(minBidStep) || 0,
+                            ceilingPrice: Number(ceilingPrice) || 0,
                             templateFields: selectedTemplateObj ? JSON.parse(selectedTemplateObj.fields).map((f: any) => ({
                               ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
                             })) : [] 
