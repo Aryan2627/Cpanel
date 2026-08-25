@@ -14,6 +14,8 @@ export default function PurchaseIntake() {
   const [departments, setDepartments] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [currentUser, setCurrentUser] = useState('Current User');
+
   useEffect(() => {
     const saved = localStorage.getItem('customDropdowns');
     if (saved) {
@@ -23,6 +25,16 @@ export default function PurchaseIntake() {
         if (parsed.departments) setDepartments(parsed.departments);
       } catch (e) {}
     }
+    
+    // Fetch current user name
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.name) {
+          setCurrentUser(data.name);
+        }
+      })
+      .catch(err => console.error('Failed to fetch user', err));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,7 +50,7 @@ export default function PurchaseIntake() {
     await addIntake({
       refId: newId,
       title: title || 'New Request',
-      reqName: 'Current User',
+      reqName: currentUser,
       status: 'Draft',
       type: category || 'Standalone NFA',
       buyer: '-',
