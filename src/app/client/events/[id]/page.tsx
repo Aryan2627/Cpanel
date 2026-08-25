@@ -62,7 +62,7 @@ export default function BuyerEventDetailsPage() {
   
   const [isCounterOfferMode, setIsCounterOfferMode] = useState(false);
   const [awardModalBid, setAwardModalBid] = useState<any>(null);
-  const [awardQuantities, setAwardQuantities] = useState<Record<string, number>>({});
+  const [awardQuantities, setAwardQuantities] = useState<Record<string, any>>({});
   const [sourceIntakes, setSourceIntakes] = useState<any[]>([]);
   const [counterOfferPrice, setCounterOfferPrice] = useState('');
   const [counterOfferExpiry, setCounterOfferExpiry] = useState('24h');
@@ -720,7 +720,12 @@ export default function BuyerEventDetailsPage() {
 
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <button onClick={() => setAwardModalBid(null)} style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-              <button onClick={() => { proceedWithAward(awardModalBid, awardQuantities); setAwardModalBid(null); }} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#2563eb', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Confirm & Generate PO</button>
+              <button onClick={() => { 
+                const cleanedQts = {}; 
+                Object.entries(awardQuantities).forEach(([k,v]) => cleanedQts[k] = parseInt(v) || 0);
+                proceedWithAward(awardModalBid, cleanedQts); 
+                setAwardModalBid(null); 
+              }} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#2563eb', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Confirm & Generate PO</button>
             </div>
           </div>
         </div>
