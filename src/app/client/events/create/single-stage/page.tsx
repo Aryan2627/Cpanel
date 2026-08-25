@@ -481,44 +481,46 @@ function SingleStageCreateContent() {
                           <div key={f.id}>
                             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', color: '#475569', marginBottom: '8px' }}>{f.name}</label>
                             {f.type === 'product' ? (
-                              <select
-                                value={creatorData[f.key] || ''}
-                                onChange={(e) => {
-                                  const selectedName = e.target.value;
-                                  const prod = products.find(p => p.name === selectedName);
-                                  
-                                  if (prod) {
-                                    const newData: Record<string, string> = { ...creatorData, [f.key]: selectedName };
+                              <React.Fragment>
+                                <input
+                                  type="text"
+                                  list={`products-list-${f.key}`}
+                                  placeholder="Type to search products..."
+                                  value={creatorData[f.key] || ''}
+                                  onChange={(e) => {
+                                    const selectedName = e.target.value;
+                                    const prod = products.find(p => p.name === selectedName);
                                     
-                                    // Auto-fill related fields
-                                    uniqueCreatorFields.forEach((otherField: any) => {
-                                      if (otherField.key === f.key) return; // Skip self
-                                      
-                                      const n = otherField.name.toLowerCase();
-                                      if (n === 'uom' || n === 'unit of measure' || n === 'unit') {
-                                        newData[otherField.key as string] = prod.uom || '';
-                                      } else if (n === 'category') {
-                                        newData[otherField.key as string] = prod.category || '';
-                                      } else if (n === 'description' || n === 'desc') {
-                                        newData[otherField.key as string] = prod.description || '';
-                                      } else if (n === 'product code' || n === 'item code') {
-                                        newData[otherField.key as string] = prod.code || '';
-                                      }
-                                    });
-                                    setCreatorData(newData);
-                                  } else {
-                                    setCreatorData({ ...creatorData, [f.key]: selectedName });
-                                  }
-                                }}
-                                style={{ ...glassInputStyle, appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
-                                onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'}
-                                onBlur={e => e.currentTarget.style.boxShadow = 'none'}
-                              >
-                                <option value="" disabled>Select a product...</option>
-                                {products.map(p => (
-                                  <option key={p.id} value={p.name}>{p.name}</option>
-                                ))}
-                              </select>
+                                    if (prod) {
+                                      const newData = { ...creatorData, [f.key]: selectedName };
+                                      uniqueCreatorFields.forEach((otherField) => {
+                                        if (otherField.key === f.key) return; // Skip self
+                                        const n = otherField.name.toLowerCase();
+                                        if (n === 'uom' || n === 'unit of measure' || n === 'unit') {
+                                          newData[otherField.key] = prod.uom || '';
+                                        } else if (n === 'category') {
+                                          newData[otherField.key] = prod.category || '';
+                                        } else if (n === 'description' || n === 'desc') {
+                                          newData[otherField.key] = prod.description || '';
+                                        } else if (n === 'product code' || n === 'item code') {
+                                          newData[otherField.key] = prod.code || '';
+                                        }
+                                      });
+                                      setCreatorData(newData);
+                                    } else {
+                                      setCreatorData({ ...creatorData, [f.key]: selectedName });
+                                    }
+                                  }}
+                                  style={glassInputStyle}
+                                  onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'}
+                                  onBlur={e => e.currentTarget.style.boxShadow = 'none'}
+                                />
+                                <datalist id={`products-list-${f.key}`}>
+                                  {products.map(p => (
+                                    <option key={p.id} value={p.name}>{p.name}</option>
+                                  ))}
+                                </datalist>
+                              </React.Fragment>
                             ) : f.type === 'location' ? (
                               <LocationAutocomplete
                                 value={creatorData[f.key] || ''}
