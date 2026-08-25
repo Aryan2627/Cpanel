@@ -210,13 +210,13 @@ export default function IntakeTablePage() {
   const getStatusBadge = (status: string) => {
     switch(status) {
       case 'Approved':
-        return <span style={{ backgroundColor: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CheckCircle2 size={12}/> Approved</span>;
+        return <span style={{ color: '#166534', fontWeight: 500 }}>Approved</span>;
       case 'Draft':
-        return <span style={{ backgroundColor: '#f1f5f9', color: '#475569', padding: '4px 12px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '4px' }}><FileEdit size={12}/> Draft</span>;
+        return <span style={{ color: '#475569', fontWeight: 500 }}>Draft</span>;
       case 'In Progress':
-        return <span style={{ backgroundColor: '#fef9c3', color: '#854d0e', padding: '4px 12px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Clock size={12}/> Pending</span>;
+        return <span style={{ color: '#854d0e', fontWeight: 500 }}>Pending</span>;
       default:
-        return <span style={{ backgroundColor: '#f3f4f6', color: '#374151', padding: '4px 12px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 500 }}>{status}</span>;
+        return <span style={{ color: '#374151', fontWeight: 500 }}>{status}</span>;
     }
   };
 
@@ -266,77 +266,55 @@ export default function IntakeTablePage() {
       </div>
 
       {/* Main Table Container */}
-      <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+      <div style={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px' }}>
         
         {/* Toolbar */}
-        <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
-          
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            {selectedIds.size > 0 ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '0.875rem', color: '#475569', fontWeight: 500 }}>{selectedIds.size} selected</span>
-                <div style={{ height: '24px', width: '1px', backgroundColor: '#cbd5e1' }}></div>
-                <button style={{ padding: '6px 12px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '0.875rem', color: '#475569', cursor: 'pointer', fontWeight: 500 }}>Bulk Approve</button>
+        <div style={{ padding: '16px', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '16px' }}>
+          {selectedIds.size > 0 ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '0.875rem', color: '#475569' }}>{selectedIds.size} selected</span>
+              <button style={{ padding: '6px 12px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem', cursor: 'pointer' }}>Bulk Approve</button>
+            </div>
+          ) : (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '0.875rem', color: '#64748b' }}>Search:</span>
+                <input 
+                  type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Title, ID..."
+                  style={{ padding: '6px 8px', border: '1px solid #cbd5e1', borderRadius: '4px', width: '200px', fontSize: '0.875rem' }} 
+                />
               </div>
-            ) : (
-              <>
-                {/* Search */}
-                <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', borderRadius: '6px', overflow: 'hidden', backgroundColor: '#fff' }}>
-                  <select 
-                    value={searchField} onChange={(e) => setSearchField(e.target.value)}
-                    style={{ padding: '8px 12px', border: 'none', borderRight: '1px solid #e2e8f0', outline: 'none', backgroundColor: '#f8fafc', color: '#475569', cursor: 'pointer', fontSize: '0.875rem' }}
-                  >
-                    <option value="All">All Fields</option>
-                    <option value="Ref ID">Ref ID</option>
-                    <option value="Title">Title</option>
-                    <option value="Requester Name">Requester Name</option>
-                  </select>
-                  <div style={{ display: 'flex', alignItems: 'center', padding: '0 12px' }}>
-                    <Search size={16} color="#94a3b8" />
-                    <input 
-                      type="text" placeholder={`Search...`} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                      style={{ padding: '8px', border: 'none', outline: 'none', width: '220px', fontSize: '0.875rem' }} 
-                    />
-                  </div>
-                </div>
-
-                {/* Filter */}
-                <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', borderRadius: '6px', overflow: 'hidden', backgroundColor: '#fff' }}>
-                  <div style={{ padding: '8px 12px', backgroundColor: '#f8fafc', borderRight: '1px solid #e2e8f0', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem' }}>
-                    <Filter size={14} /> Status
-                  </div>
-                  <select 
-                    value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
-                    style={{ padding: '8px 12px', border: 'none', outline: 'none', backgroundColor: '#fff', color: '#475569', cursor: 'pointer', fontSize: '0.875rem' }}
-                  >
-                    <option value="All">All</option>
-                    <option value="Draft">Draft</option>
-                    <option value="In Progress">Pending</option>
-                    <option value="Approved">Approved</option>
-                  </select>
-                </div>
-              </>
-            )}
-          </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '0.875rem', color: '#64748b' }}>Status:</span>
+                <select 
+                  value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+                  style={{ padding: '6px 8px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem' }}
+                >
+                  <option value="All">All</option>
+                  <option value="Draft">Draft</option>
+                  <option value="In Progress">Pending</option>
+                  <option value="Approved">Approved</option>
+                </select>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Table */}
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
             <thead>
-              <tr style={{ backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0' }}>
-                <th style={{ padding: '16px 24px', width: '40px' }}>
-                  <input type="checkbox" checked={isAllSelected} onChange={handleSelectAll} style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#2563eb' }} />
+              <tr style={{ borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
+                <th style={{ padding: '12px 16px', width: '40px' }}>
+                  <input type="checkbox" checked={isAllSelected} onChange={handleSelectAll} style={{ cursor: 'pointer' }} />
                 </th>
                 {['Ref ID', 'Title', 'Requester Name', 'Status', 'Type', 'Qty', 'Requested At'].map((col) => {
                   const key = col === 'Type' ? 'type' : col === 'Requester Name' ? 'reqName' : col === 'Requested At' ? 'reqAt' : col === 'Qty' ? 'quantity' : col === 'Ref ID' ? 'refId' : col.toLowerCase();
                   const isStatus = col === 'Status';
                   return (
-                    <th id={isStatus ? 'tour-intake-status' : undefined} key={col} onClick={() => handleSort(key)} style={{ padding: '16px 24px', fontWeight: 600, color: '#475569', cursor: 'pointer', userSelect: 'none' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {col}
-                        <ArrowUpDown size={14} color="#cbd5e1" />
-                      </div>
+                    <th id={isStatus ? 'tour-intake-status' : undefined} key={col} onClick={() => handleSort(key)} style={{ padding: '12px 16px', fontWeight: 600, color: '#334155', cursor: 'pointer', userSelect: 'none' }}>
+                      {col}
                     </th>
                   )
                 })}
@@ -346,18 +324,18 @@ export default function IntakeTablePage() {
               {paginatedIntakes.length > 0 ? (
                 paginatedIntakes.map((row, idx) => (
                   <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: selectedIds.has(row.refId) ? '#eff6ff' : '#fff', transition: 'background-color 0.2s' }}>
-                    <td style={{ padding: '16px 24px' }}>
-                      <input type="checkbox" checked={selectedIds.has(row.refId)} onChange={() => handleSelectRow(row.refId)} style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#2563eb' }} />
+                    <td style={{ padding: '12px 16px' }}>
+                      <input type="checkbox" checked={selectedIds.has(row.refId)} onChange={() => handleSelectRow(row.refId)} style={{ cursor: 'pointer', width: '16px', height: '16px',  }} />
                     </td>
-                    <td style={{ padding: '16px 24px', color: '#475569', fontWeight: 500 }}>{row.refId}</td>
-                    <td style={{ padding: '16px 24px', fontWeight: 500 }}>
+                    <td style={{ padding: '12px 16px', color: '#475569', fontWeight: 500 }}>{row.refId}</td>
+                    <td style={{ padding: '12px 16px', fontWeight: 500 }}>
                       <span onClick={() => setSelectedIntake(row)} style={{ color: '#2563eb', cursor: 'pointer' }}>{row.title}</span>
                     </td>
-                    <td style={{ padding: '16px 24px', color: '#64748b' }}>{row.reqName}</td>
-                    <td style={{ padding: '16px 24px' }}>{getStatusBadge(row.status)}</td>
-                    <td style={{ padding: '16px 24px', color: '#64748b' }}>{row.type}</td>
-                    <td style={{ padding: '16px 24px', color: '#64748b', fontWeight: 500 }}>{row.quantity || 1}</td>
-                    <td style={{ padding: '16px 24px', color: '#64748b' }}>{row.reqAt}</td>
+                    <td style={{ padding: '12px 16px', color: '#64748b' }}>{row.reqName}</td>
+                    <td style={{ padding: '12px 16px' }}>{getStatusBadge(row.status)}</td>
+                    <td style={{ padding: '12px 16px', color: '#64748b' }}>{row.type}</td>
+                    <td style={{ padding: '12px 16px', color: '#64748b', fontWeight: 500 }}>{row.quantity || 1}</td>
+                    <td style={{ padding: '12px 16px', color: '#64748b' }}>{row.reqAt}</td>
                   </tr>
                 ))
               ) : (
@@ -384,7 +362,7 @@ export default function IntakeTablePage() {
 
         {/* Pagination */}
         {filteredAndSortedIntakes.length > 0 && (
-          <div style={{ padding: '16px 24px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff' }}>
+          <div style={{ padding: '12px 16px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff' }}>
             <div style={{ fontSize: '0.875rem', color: '#64748b' }}>
               Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredAndSortedIntakes.length)} to {Math.min(currentPage * itemsPerPage, filteredAndSortedIntakes.length)} of {filteredAndSortedIntakes.length} results
             </div>
@@ -457,7 +435,7 @@ export default function IntakeTablePage() {
               </div>
             </div>
             
-            <div style={{ padding: '16px 24px', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '12px' }}>
+            <div style={{ padding: '12px 16px', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '12px' }}>
               <Link href={`/client/events/create/single-stage?intakeRef=${selectedIntake.refId}&title=${encodeURIComponent(selectedIntake.title || '')}`} style={{ flex: 1, padding: '10px', textAlign: 'center', backgroundColor: '#2563eb', color: '#fff', borderRadius: '6px', fontWeight: 600, textDecoration: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
                 Convert to Sourcing Event <ArrowRight size={16} />
               </Link>
@@ -507,7 +485,7 @@ export default function IntakeTablePage() {
               )}
             </div>
             
-            <div style={{ padding: '16px 24px', borderTop: '1px solid #e2e8f0', backgroundColor: '#f8fafc', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+            <div style={{ padding: '12px 16px', borderTop: '1px solid #e2e8f0', backgroundColor: '#f8fafc', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
               <button onClick={() => setIsImportModalOpen(false)} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#475569', fontWeight: 500, cursor: 'pointer' }}>Cancel</button>
             </div>
           </div>
