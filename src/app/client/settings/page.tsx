@@ -124,16 +124,16 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* God-Tier Features Configuration */}
+        {/* Advanced Enterprise Modules */}
         <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05)', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '4px', background: 'linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981)' }}></div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
             <Sparkles size={24} color="#8b5cf6" />
-            <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Next-Gen Enterprise Features</h3>
+            <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Advanced Enterprise Modules</h3>
           </div>
           <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '32px', lineHeight: '1.5' }}>
-            Toggle advanced AI, Blockchain, and IoT procurement modules. These features represent the absolute bleeding edge of supply chain technology.
+            Configure advanced AI, blockchain, and IoT procurement modules to enhance supply chain operations and analytics.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '20px' }}>
