@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     });
 
     if (!vendor) {
-      console.log([vendor-auth] Vendor not found for: );
+      console.log(`[vendor-auth] Vendor not found for: ${identifier}`);
       return NextResponse.json({ error: 'Vendor not found with that email or phone' }, { status: 404, headers: corsHeaders });
     }
 
@@ -95,8 +95,8 @@ export async function POST(request: Request) {
           from: fromAddress,
           to: identifier,
           subject: 'Your VendorPortal Login Code',
-          text: \Your login code is \. It expires in 10 minutes.\,
-          html: \<b>Your login code is \</b><br>It expires in 10 minutes.\
+          text: `Your login code is ${generatedOtp}. It expires in 10 minutes.`,
+          html: `<b>Your login code is ${generatedOtp}</b><br>It expires in 10 minutes.`
         });
 
         previewUrl = nodemailer.getTestMessageUrl(info);
@@ -105,13 +105,13 @@ export async function POST(request: Request) {
         if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
           const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
           await client.messages.create({
-            body: \Your VendorPortal login code is \\,
+            body: `Your VendorPortal login code is ${generatedOtp}`,
             from: process.env.TWILIO_PHONE_NUMBER,
             to: identifier
           });
         } else {
-          console.log(\[DEV MODE SMS] To: \, OTP: \\);
-          previewUrl = \sms-mock://\\;
+          console.log(`[DEV MODE SMS] To: ${identifier}, OTP: ${generatedOtp}`);
+          previewUrl = `sms-mock://${generatedOtp}`;
         }
       }
 

@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import nodemailer from 'nodemailer';
 import twilio from 'twilio';
@@ -92,18 +92,18 @@ export async function POST(req: Request) {
         from: fromAddress,
         to: inputId,
         subject: 'Your ProcGen Login Code',
-        text: \Your login code is \. It expires in 10 minutes.\,
-        html: \
+        text: `Your login code is ${otp}. It expires in 10 minutes.`,
+        html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
             <h2 style="color: #1e3a8a; margin-top: 0;">ProcGen Authentication</h2>
             <p>You requested to sign in to ProcGen.</p>
             <p>Your 6-digit login code is:</p>
             <div style="background-color: #f8fafc; padding: 16px; border-radius: 8px; font-size: 24px; font-weight: bold; letter-spacing: 4px; text-align: center; color: #3b82f6; margin: 20px 0;">
-              \
+              ${otp}
             </div>
             <p style="color: #64748b; font-size: 14px;">This code expires in 10 minutes. If you did not request this code, please ignore this email.</p>
           </div>
-        \
+        `
       });
       previewUrl = nodemailer.getTestMessageUrl(info);
     } else {
@@ -111,13 +111,13 @@ export async function POST(req: Request) {
       if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
         const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
         await client.messages.create({
-          body: \Your ProcGen login code is \\,
+          body: `Your ProcGen login code is ${otp}`,
           from: process.env.TWILIO_PHONE_NUMBER,
           to: inputId
         });
       } else {
-        console.log(\[DEV MODE SMS] To: \, OTP: \\);
-        previewUrl = \sms-mock://\\;
+        console.log(`[DEV MODE SMS] To: ${inputId}, OTP: ${otp}`);
+        previewUrl = `sms-mock://${otp}`;
       }
     }
 
