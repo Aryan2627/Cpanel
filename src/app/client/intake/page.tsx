@@ -309,8 +309,8 @@ export default function IntakeTablePage() {
                 <th style={{ padding: '12px 16px', width: '40px' }}>
                   <input type="checkbox" checked={isAllSelected} onChange={handleSelectAll} style={{ cursor: 'pointer' }} />
                 </th>
-                {['Ref ID', 'Title', 'Requester Name', 'Status', 'Type', 'Qty', 'Requested At'].map((col) => {
-                  const key = col === 'Type' ? 'type' : col === 'Requester Name' ? 'reqName' : col === 'Requested At' ? 'reqAt' : col === 'Qty' ? 'quantity' : col === 'Ref ID' ? 'refId' : col.toLowerCase();
+                {['Ref ID', 'Title', 'Requester Name', 'Status', 'Qty', 'Requested At'].map((col) => {
+                  const key = col === 'Requester Name' ? 'reqName' : col === 'Requested At' ? 'reqAt' : col === 'Qty' ? 'quantity' : col === 'Ref ID' ? 'refId' : col.toLowerCase();
                   const isStatus = col === 'Status';
                   return (
                     <th id={isStatus ? 'tour-intake-status' : undefined} key={col} onClick={() => handleSort(key)} style={{ padding: '12px 16px', fontWeight: 600, color: '#334155', cursor: 'pointer', userSelect: 'none' }}>
@@ -333,7 +333,6 @@ export default function IntakeTablePage() {
                     </td>
                     <td style={{ padding: '12px 16px', color: '#64748b' }}>{row.reqName}</td>
                     <td style={{ padding: '12px 16px' }}>{getStatusBadge(row.status)}</td>
-                    <td style={{ padding: '12px 16px', color: '#64748b' }}>{row.type}</td>
                     <td style={{ padding: '12px 16px', color: '#64748b', fontWeight: 500 }}>{row.quantity || 1}</td>
                     <td style={{ padding: '12px 16px', color: '#64748b' }}>{row.reqAt}</td>
                   </tr>
