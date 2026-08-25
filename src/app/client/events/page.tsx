@@ -291,7 +291,7 @@ export default function EventsPage() {
           <button 
             onClick={() => setIsCreateMenuOpen(!isCreateMenuOpen)}
             style={{ 
-              backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: '6px', 
+              backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: '4px', 
               padding: '8px 16px', fontWeight: '500', display: 'flex', alignItems: 'center', 
               gap: '8px', cursor: 'pointer', fontSize: '0.875rem', boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.2)'
             }}
@@ -303,7 +303,7 @@ export default function EventsPage() {
           </button>
           
           {isCreateMenuOpen && (
-            <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', zIndex: 50, minWidth: '200px', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', zIndex: 50, minWidth: '200px', overflow: 'hidden' }}>
               <div onClick={() => router.push('/client/events/create/single-stage')} style={{ padding: '12px 16px', fontSize: '0.875rem', color: '#0f172a', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background-color 0.2s' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}>
                 <FileCheck size={16} color="#64748b" /> Single Stage Event
               </div>
@@ -317,7 +317,7 @@ export default function EventsPage() {
 
       {/* KPI Cards */}
       {fetchError && (
-        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', padding: '16px', borderRadius: '8px', marginBottom: '24px', color: '#b91c1c', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', padding: '16px', borderRadius: '4px', marginBottom: '24px', color: '#b91c1c', display: 'flex', alignItems: 'center', gap: '12px' }}>
           <AlertCircle size={20} />
           <div>
             <strong>Error fetching live events from database:</strong> {fetchError.includes('HTML') || fetchError.includes('504') ? 'The database server might be sleeping or timing out (common on free tiers). Please wait a moment and refresh.' : fetchError}
@@ -326,24 +326,21 @@ export default function EventsPage() {
       )}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {[
-          { label: 'Total Events', value: totalEvents, icon: BarChart3, color: '#3b82f6', bg: '#eff6ff' },
-          { label: 'Live Events', value: liveEvents, icon: Activity, color: '#10b981', bg: '#ecfdf5' },
-          { label: 'History Events', value: historicalEvents, icon: Clock, color: '#8b5cf6', bg: '#f5f3ff' },
+          { label: 'Total Events', value: totalEvents },
+          { label: 'Live Events', value: liveEvents },
+          { label: 'History Events', value: historicalEvents },
         ].map((stat, i) => (
-          <div key={i} style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: stat.bg, color: stat.color }}>
-              <stat.icon size={24} />
-            </div>
-            <div>
-              <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>{stat.label}</p>
-              <h3 style={{ margin: '4px 0 0 0', color: '#0f172a', fontSize: '1.5rem', fontWeight: 600 }}>{stat.value}</h3>
-            </div>
+          <div key={i} style={{ backgroundColor: '#fff', padding: '16px', borderRadius: '4px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
+            <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: 500 }}>{stat.label}</p>
+            <h3 style={{ margin: '8px 0 0 0', color: '#0f172a', fontSize: '1.5rem', fontWeight: 600 }}>{stat.value}</h3>
           </div>
+        ))}
+      </div>
         ))}
       </div>
 
       {/* Main Container */}
-      <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+      <div style={{ backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
         
         {/* Navigation Tabs */}
         <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', padding: '0 16px' }}>
@@ -367,7 +364,7 @@ export default function EventsPage() {
         <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           
           {/* Search */}
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', overflow: 'hidden', width: '300px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '4px', overflow: 'hidden', width: '300px' }}>
             <div style={{ padding: '0 12px' }}><Search size={16} color="#94a3b8" /></div>
             <input 
               type="text" 
@@ -379,7 +376,7 @@ export default function EventsPage() {
           </div>
 
           {/* Stage Filters */}
-          <div style={{ display: 'flex', backgroundColor: '#f1f5f9', borderRadius: '6px', padding: '4px' }}>
+          <div style={{ display: 'flex', backgroundColor: '#f1f5f9', borderRadius: '4px', padding: '4px' }}>
             {['All Stages', 'Live'].map(filter => (
               <button
                 key={filter}
@@ -402,7 +399,7 @@ export default function EventsPage() {
         <div style={{ padding: '24px', backgroundColor: '#f8fafc' }}>
           {filteredEvents.length > 0 ? (
             filteredEvents.map((event) => (
-              <div key={event.id} style={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', transition: 'transform 0.2s, box-shadow 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)' }} onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.02)'; e.currentTarget.style.transform = 'none' }}>
+              <div key={event.id} style={{ backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #e2e8f0', marginBottom: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }} >
                 
                 {/* Event Header */}
                 <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -420,20 +417,19 @@ export default function EventsPage() {
                        style={{ 
                          padding: '8px 16px', 
                          border: 'none', 
-                         borderRadius: '6px', 
-                         background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', 
+                         borderRadius: '4px', 
+                         background: '#0f172a', 
                          color: '#fff', 
                          cursor: 'pointer', 
                          fontSize: '0.875rem', 
                          fontWeight: 600,
-                         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                         transition: 'all 0.2s ease',
+                         boxShadow: 'none',
                          display: 'flex',
                          alignItems: 'center',
                          gap: '6px'
                        }}
-                       onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 8px -1px rgba(0, 0, 0, 0.15)' }}
-                       onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                       
+                       
                      >
                        <Eye size={14} color="#cbd5e1" /> View Details
                      </button>
@@ -490,22 +486,21 @@ export default function EventsPage() {
                         <button 
                           onClick={() => handleViewBids(event.id)} 
                           style={{ 
-                            background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', 
-                            border: '1px solid rgba(255,255,255,0.1)', 
+                            background: '#4f46e5', 
+                            border: 'none', 
                             color: '#ffffff', 
                             cursor: 'pointer', 
                             fontWeight: 600, 
                             padding: '6px 14px', 
-                            borderRadius: '99px',
-                            boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)',
+                            borderRadius: '4px',
+                            boxShadow: 'none',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '6px',
-                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                             fontSize: '0.8rem'
                           }}
-                          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 16px rgba(79, 70, 229, 0.35)' }}
-                          onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(79, 70, 229, 0.25)' }}
+                          
+                          
                         >
                           View Bids <Eye size={14} />
                         </button>
@@ -520,7 +515,7 @@ export default function EventsPage() {
                         <button 
                           onClick={() => { if(stage.name.includes('Live RFQ')) handleViewBids(event.id) }}
                           style={{ 
-                            display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', borderRadius: '6px', fontWeight: 600, fontSize: '0.8125rem', border: 'none',
+                            display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', borderRadius: '4px', fontWeight: 600, fontSize: '0.8125rem', border: 'none',
                             backgroundColor: stage.actionType === 'warning' ? '#fee2e2' : stage.actionType === 'success' ? '#dcfce7' : '#eff6ff',
                             color: stage.actionType === 'warning' ? '#b91c1c' : stage.actionType === 'success' ? '#15803d' : '#1d4ed8',
                             cursor: 'pointer', transition: 'opacity 0.2s'
@@ -532,7 +527,7 @@ export default function EventsPage() {
                           {stage.actionText}
                           <span style={{ 
                             backgroundColor: stage.actionType === 'warning' ? '#f87171' : stage.actionType === 'success' ? '#22c55e' : '#3b82f6', 
-                            color: '#fff', padding: '2px 6px', borderRadius: '12px', fontSize: '0.7rem' 
+                            color: '#fff', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' 
                           }}>
                             {stage.actionBadge}
                           </span>
@@ -544,7 +539,7 @@ export default function EventsPage() {
               </div>
             ))
           ) : (
-            <div style={{ padding: '64px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+            <div style={{ padding: '64px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '4px', border: '1px dashed #cbd5e1' }}>
               <Activity size={48} color="#cbd5e1" style={{ marginBottom: '16px' }} />
               <h3 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '1.125rem' }}>No events found</h3>
               <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>Try adjusting your search filters or create a new event.</p>
@@ -556,7 +551,7 @@ export default function EventsPage() {
       {/* Event Details Modal */}
       {selectedEventForDetails && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.2s ease-out' }} onClick={() => setSelectedEventForDetails(null)}>
-          <div style={{ backgroundColor: '#fff', borderRadius: '12px', width: '600px', maxWidth: '90%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', overflow: 'hidden', animation: 'slideUp 0.3s ease-out' }} onClick={e => e.stopPropagation()}>
+          <div style={{ backgroundColor: '#fff', borderRadius: '4px', width: '600px', maxWidth: '90%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', overflow: 'hidden', animation: 'slideUp 0.3s ease-out' }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #e2e8f0', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)' }}>
               <div>
                 <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}><ShieldCheck color="#3b82f6" /> Event Details</h2>
@@ -566,17 +561,17 @@ export default function EventsPage() {
             </div>
             <div style={{ padding: '24px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
-                <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
                   <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Event Title</p>
                   <p style={{ margin: 0, fontSize: '1rem', color: '#0f172a', fontWeight: 500 }}>{selectedEventForDetails.title}</p>
                 </div>
-                <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
                   <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Account / Department</p>
                   <p style={{ margin: 0, fontSize: '1rem', color: '#0f172a', fontWeight: 500 }}>{selectedEventForDetails.account}</p>
                 </div>
               </div>
               
-              <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+              <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '4px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
                 <p style={{ margin: '0 0 8px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Purpose & Scope</p>
                 <p style={{ margin: 0, fontSize: '0.9rem', color: '#334155', lineHeight: '1.5' }}>
                   This sourcing event is intended for the procurement of {selectedEventForDetails.itemsCount} items. 
@@ -626,7 +621,7 @@ export default function EventsPage() {
               </div>
             </div>
             <div style={{ padding: '16px 24px', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={() => setSelectedEventForDetails(null)} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#475569', fontWeight: 500, cursor: 'pointer' }}>Close</button>
+              <button onClick={() => setSelectedEventForDetails(null)} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '4px', color: '#475569', fontWeight: 500, cursor: 'pointer' }}>Close</button>
             </div>
           </div>
         </div>
@@ -635,7 +630,7 @@ export default function EventsPage() {
       {/* View Bids Modal */}
       {selectedEventId && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.2s ease-out' }}>
-          <div style={{ backgroundColor: '#fff', borderRadius: '12px', width: '700px', maxWidth: '90%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', overflow: 'hidden', animation: 'slideUp 0.3s ease-out' }}>
+          <div style={{ backgroundColor: '#fff', borderRadius: '4px', width: '700px', maxWidth: '90%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', overflow: 'hidden', animation: 'slideUp 0.3s ease-out' }}>
             
             {/* Modal Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
@@ -691,7 +686,7 @@ export default function EventsPage() {
                                 }
                               }}
                               style={{ 
-                                padding: '8px 12px', backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '6px', 
+                                padding: '8px 12px', backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '4px', 
                                 cursor: 'pointer', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px',
                                 transition: 'all 0.2s'
                               }}
@@ -703,7 +698,7 @@ export default function EventsPage() {
                             <button 
                               onClick={() => handleAward(bid)}
                               style={{ 
-                                padding: '8px 16px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', 
+                                padding: '8px 16px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', 
                                 cursor: 'pointer', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px',
                                 boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
                               }}
