@@ -283,23 +283,7 @@ function SingleStageCreateContent() {
             
             
           </div>
-              {/* Constraints */}
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Min Bid Step</label>
-                <input 
-                  type="number" min="0" value={minBidStep} onChange={e => setMinBidStep(e.target.value)}
-                  placeholder="e.g. 50"
-                  style={{ width: '100%', padding: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', borderRadius: '12px', background: 'rgba(255,255,255,0.9)', outline: 'none', fontSize: '0.95rem', fontWeight: '500', color: '#0f172a' }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Max Allowed Price (Ceiling)</label>
-                <input 
-                  type="number" min="0" value={ceilingPrice} onChange={e => setCeilingPrice(e.target.value)}
-                  placeholder="e.g. 10000"
-                  style={{ width: '100%', padding: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', borderRadius: '12px', background: 'rgba(255,255,255,0.9)', outline: 'none', fontSize: '0.95rem', fontWeight: '500', color: '#0f172a' }}
-                />
-              </div>
+
           
           <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.8)', padding: '6px', borderRadius: '30px', gap: '4px', border: '1px solid rgba(226,232,240,0.8)' }}>
             <button 
