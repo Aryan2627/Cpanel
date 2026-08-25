@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useIntake } from '../../../../context/IntakeContext';
@@ -31,7 +31,6 @@ export default function PurchaseIntake() {
     setIsSubmitting(true);
     setSubmitted(true);
     
-    // Add to context
     const now = new Date();
     const formattedDate = `${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}, ${now.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}`;
     const newId = `IR-210${Math.floor(Math.random() * 10) + 4}`;
@@ -48,117 +47,152 @@ export default function PurchaseIntake() {
       quantity: Number(quantity) || 1,
     });
 
-    // Redirect back to the intake table immediately after await finishes
     router.push('/client/intake');
   };
 
   if (submitted) {
     return (
-      <div className="surface" style={{ textAlign: 'center', padding: '60px' }}>
-        <div style={{ color: 'var(--success-color)', fontSize: '3rem', marginBottom: '16px' }}>✓</div>
-        <h2>Purchase Requisition Submitted</h2>
-        <p style={{ color: 'var(--text-secondary)', marginTop: '8px' }}>Generating PR number and awaiting approval...</p>
+      <div style={{ maxWidth: '600px', margin: '40px auto', padding: '40px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+        <h2 style={{ margin: '0 0 16px 0', color: '#0f172a' }}>Request Submitted</h2>
+        <p style={{ margin: 0, color: '#64748b' }}>Your purchase request is being processed.</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Create Purchase Request</h1>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '24px 0', fontFamily: 'system-ui, sans-serif' }}>
+      <div style={{ marginBottom: '24px' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#0f172a', margin: '0 0 8px 0' }}>Create Purchase Request</h1>
+        <p style={{ margin: 0, color: '#64748b', fontSize: '0.95rem' }}>Fill out the details below to submit a new intake request.</p>
       </div>
       
-      <form onSubmit={handleSubmit} className="surface">
-        <h3 style={{ marginBottom: '20px', color: 'var(--accent-color)' }}>General Information</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-          <div className="form-group">
-            <label className="form-label">Request Title <span style={{color: '#ef4444'}}>*</span></label>
-            <input type="text" className="form-input" required value={title} onChange={(e) => setTitle(e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Category <span style={{color: '#ef4444'}}>*</span></label>
-            <select className="form-input" required value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="">Select Category...</option>
-              {categories.map((cat, idx) => (
-                <option key={idx} value={cat}>{cat}</option>
-              ))}
-              {categories.length === 0 && (
-                <>
-                  <option value="IT Hardware">IT Hardware</option>
-                  <option value="Software / SaaS">Software / SaaS</option>
-                  <option value="Professional Services">Professional Services</option>
-                </>
-              )}
-            </select>
-          </div>
-          <div className="form-group">
-            <label className="form-label">Department <span style={{color: '#ef4444'}}>*</span></label>
-            <select className="form-input" required>
-              <option value="">Select Department...</option>
-              {departments.map((dept, idx) => (
-                <option key={idx} value={dept}>{dept}</option>
-              ))}
-              {departments.length === 0 && (
-                <option value="General">General</option>
-              )}
-            </select>
-          </div>
-          <div className="form-group">
-            <label className="form-label">Budget / Estimated Price <span style={{color: '#ef4444'}}>*</span></label>
-            <input 
-              type="number" 
-              className="form-input" 
-              min="0"
-              step="0.01"
-              required 
-              onKeyDown={(e) => {
-                if (['-', '+', 'e', 'E'].includes(e.key)) {
-                  e.preventDefault();
-                }
-              }}
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Requested Quantity <span style={{color: '#ef4444'}}>*</span></label>
-            <input 
-              type="number" 
-              className="form-input" 
-              min="1" 
-              required 
-              value={quantity} 
-              onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))} 
-              onKeyDown={(e) => {
-                if (['-', '+', 'e', 'E', '.'].includes(e.key)) {
-                  e.preventDefault();
-                }
-              }}
-            />
+      <form onSubmit={handleSubmit} style={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        
+        {/* Section 1 */}
+        <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0f172a', margin: '0 0 20px 0' }}>General Details</h3>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500, color: '#334155' }}>Request Title <span style={{ color: '#ef4444' }}>*</span></label>
+              <input 
+                type="text" 
+                required 
+                value={title} 
+                onChange={(e) => setTitle(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem', boxSizing: 'border-box' }}
+              />
+            </div>
+            
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500, color: '#334155' }}>Category <span style={{ color: '#ef4444' }}>*</span></label>
+              <select 
+                required 
+                value={category} 
+                onChange={(e) => setCategory(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem', boxSizing: 'border-box', backgroundColor: '#fff' }}
+              >
+                <option value="">Select a category...</option>
+                {categories.map((cat, idx) => <option key={idx} value={cat}>{cat}</option>)}
+                {categories.length === 0 && (
+                  <>
+                    <option value="IT Hardware">IT Hardware</option>
+                    <option value="Software / SaaS">Software / SaaS</option>
+                    <option value="Professional Services">Professional Services</option>
+                  </>
+                )}
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: '20px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500, color: '#334155' }}>Department <span style={{ color: '#ef4444' }}>*</span></label>
+                <select 
+                  required 
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem', boxSizing: 'border-box', backgroundColor: '#fff' }}
+                >
+                  <option value="">Select department...</option>
+                  {departments.map((dept, idx) => <option key={idx} value={dept}>{dept}</option>)}
+                  {departments.length === 0 && <option value="General">General</option>}
+                </select>
+              </div>
+              
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500, color: '#334155' }}>Budget (Estimated) <span style={{ color: '#ef4444' }}>*</span></label>
+                <input 
+                  type="number" 
+                  min="0" step="0.01" required 
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem', boxSizing: 'border-box' }}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        <h3 style={{ margin: '30px 0 20px', color: 'var(--accent-color)' }}>Item Details & Delivery</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-           <div className="form-group">
-            <label className="form-label">Item Name / Description <span style={{color: '#ef4444'}}>*</span></label>
-            <textarea className="form-input" rows={3} required></textarea>
-          </div>
-          <div className="form-group">
-            <label className="form-label">Delivery Address <span style={{color: '#ef4444'}}>*</span></label>
-            <textarea className="form-input" rows={3} required></textarea>
-          </div>
-          <div className="form-group">
-            <label className="form-label">Required Date <span style={{color: '#ef4444'}}>*</span></label>
-            <input type="date" className="form-input" required />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Attachments (Images, PDF, Excel)</label>
-            <input type="file" className="form-input" multiple />
+        {/* Section 2 */}
+        <div style={{ padding: '24px' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0f172a', margin: '0 0 20px 0' }}>Item Details</h3>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500, color: '#334155' }}>Item Description <span style={{ color: '#ef4444' }}>*</span></label>
+              <textarea 
+                required rows={3}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem', boxSizing: 'border-box', fontFamily: 'inherit' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '20px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500, color: '#334155' }}>Quantity <span style={{ color: '#ef4444' }}>*</span></label>
+                <input 
+                  type="number" min="1" required value={quantity} onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500, color: '#334155' }}>Required Date <span style={{ color: '#ef4444' }}>*</span></label>
+                <input 
+                  type="date" required 
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem', boxSizing: 'border-box' }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500, color: '#334155' }}>Delivery Address <span style={{ color: '#ef4444' }}>*</span></label>
+              <textarea 
+                required rows={2}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem', boxSizing: 'border-box', fontFamily: 'inherit' }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500, color: '#334155' }}>Attachments</label>
+              <input 
+                type="file" multiple 
+                style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px dashed #cbd5e1', fontSize: '0.9rem', boxSizing: 'border-box', backgroundColor: '#f8fafc' }}
+              />
+            </div>
           </div>
         </div>
         
-        <div style={{ marginTop: '30px', display: 'flex', gap: '16px', justifyContent: 'flex-end' }}>
-          <button type="button" className="btn btn-secondary" onClick={() => router.back()}>Cancel</button>
-          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>Submit for Approval</button>
+        {/* Footer */}
+        <div style={{ padding: '20px 24px', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <button 
+            type="button" 
+            onClick={() => router.back()}
+            style={{ padding: '10px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#fff', color: '#334155', fontWeight: 500, cursor: 'pointer' }}
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+            style={{ padding: '10px 20px', border: 'none', borderRadius: '6px', backgroundColor: '#2563eb', color: '#fff', fontWeight: 500, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
+          >
+            Submit Request
+          </button>
         </div>
       </form>
     </div>
