@@ -258,7 +258,7 @@ export default function VendorManagement() {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
             <thead>
               <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                <th style={{ padding: '16px 24px', width: '40px' }}><input type="checkbox" style={{ accentColor: '#2563eb', cursor: 'pointer', width: '16px', height: '16px' }} /></th>
+                <th style={{ padding: '16px 24px', width: '40px' }}><input type="checkbox" style={{ cursor: 'pointer', width: '16px', height: '16px' }} /></th>
                 <th style={{ padding: '16px 24px', fontWeight: 600 }}>Vendor Name</th>
                 <th style={{ padding: '16px 24px', fontWeight: 600 }}>Vendor Code</th>
                 <th style={{ padding: '16px 24px', fontWeight: 600 }}>Contact Info</th>
@@ -279,18 +279,18 @@ export default function VendorManagement() {
                 </tr>
               ) : filteredVendors.length > 0 ? filteredVendors.map((vendor) => (
                 <tr className="vendor-row" onClick={() => router.push(`/client/vendors/${vendor.id}`)} key={vendor.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'all 0.2s ease', cursor: 'pointer' }}>
-                  <td style={{ padding: '20px 24px' }} onClick={e => e.stopPropagation()}>
-                    <input type="checkbox" style={{ accentColor: '#2563eb', cursor: 'pointer', width: '16px', height: '16px' }} />
+                  <td style={{ padding: '12px 16px' }} onClick={e => e.stopPropagation()}>
+                    <input type="checkbox" style={{ cursor: 'pointer', width: '16px', height: '16px' }} />
                   </td>
-                  <td style={{ padding: '20px 24px' }}>
+                  <td style={{ padding: '12px 16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4338ca', fontWeight: 'bold', fontSize: '1.1rem', boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.5)' }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '4px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569', fontWeight: 600, fontSize: '0.9rem' }}>
                         {(vendor.name || '?').charAt(0).toUpperCase()}
                       </div>
                       <span style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.95rem' }}>{vendor.name || 'Unnamed Vendor'}</span>
                     </div>
                   </td>
-                  <td style={{ padding: '20px 24px', color: '#475569', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', fontSize: '0.85rem' }}>
+                  <td style={{ padding: '12px 16px', color: '#475569', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', fontSize: '0.85rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#f1f5f9', padding: '4px 8px', borderRadius: '6px', width: 'fit-content' }}>
                       {vendor.vendorCode}
                       <button 
@@ -302,7 +302,7 @@ export default function VendorManagement() {
                       </button>
                     </div>
                   </td>
-                  <td style={{ padding: '20px 24px' }}>
+                  <td style={{ padding: '12px 16px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', fontSize: '0.875rem' }}>
                         <div style={{ backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '4px', display: 'flex' }}><Mail size={14} color="#64748b" /></div>
@@ -330,15 +330,15 @@ export default function VendorManagement() {
                       </div>
                     </div>
                   </td>
-                  <td style={{ padding: '20px 24px', color: '#475569', fontWeight: 500 }}>
+                  <td style={{ padding: '12px 16px', color: '#475569', fontWeight: 500 }}>
                     <span style={{ backgroundColor: '#f1f5f9', padding: '4px 10px', borderRadius: '6px', fontSize: '0.85rem' }}>{vendor.type}</span>
                   </td>
-                  <td style={{ padding: '20px 24px', color: '#475569' }}>
+                  <td style={{ padding: '12px 16px', color: '#475569' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
                       <MapPin size={16} color="#94a3b8" /> {vendor.city}
                     </div>
                   </td>
-                  <td style={{ padding: '20px 24px', color: '#475569' }}>
+                  <td style={{ padding: '12px 16px', color: '#475569' }}>
                     {vendor.trustScore ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, color: vendor.trustScore > 4 ? '#10b981' : vendor.trustScore < 3 ? '#ef4444' : '#f59e0b', backgroundColor: vendor.trustScore > 4 ? '#ecfdf5' : vendor.trustScore < 3 ? '#fef2f2' : '#fef3c7', padding: '4px 10px', borderRadius: '12px', width: 'fit-content' }}>
                         <Star size={14} fill={vendor.trustScore > 4 ? '#10b981' : vendor.trustScore < 3 ? '#ef4444' : '#f59e0b'} /> {vendor.trustScore}
@@ -348,7 +348,7 @@ export default function VendorManagement() {
                     )}
                   </td>
                   {showBankruptcyPredictor && (
-                    <td style={{ padding: '20px 24px', color: '#475569' }}>
+                    <td style={{ padding: '12px 16px', color: '#475569' }}>
                       {vendor.financialHealth ? (
                         <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700, backgroundColor: vendor.financialHealth === 'Excellent' ? '#ecfdf5' : vendor.financialHealth === 'Stable' ? '#fef3c7' : '#fef2f2', color: vendor.financialHealth === 'Excellent' ? '#10b981' : vendor.financialHealth === 'Stable' ? '#f59e0b' : '#ef4444', display: 'flex', alignItems: 'center', gap: '6px', width: 'fit-content' }}>
                           {vendor.financialHealth === 'Critical' && <AlertTriangle size={12} />}
@@ -359,7 +359,7 @@ export default function VendorManagement() {
                       )}
                     </td>
                   )}
-                  <td style={{ padding: '20px 24px' }}>
+                  <td style={{ padding: '12px 16px' }}>
                     {getStatusBadge(vendor.status)}
                   </td>
                 </tr>
@@ -405,11 +405,11 @@ export default function VendorManagement() {
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>Vendor Profile <span style={{ color: '#ef4444' }}>*</span></label>
                 <div style={{ display: 'flex', gap: '16px' }}>
                   <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', border: formData.type === 'Manufacturer/Trader' ? '2px solid #2563eb' : '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer', backgroundColor: formData.type === 'Manufacturer/Trader' ? '#eff6ff' : '#fff' }}>
-                    <input type="radio" checked={formData.type === 'Manufacturer/Trader'} onChange={() => setFormData({...formData, type: 'Manufacturer/Trader'})} style={{ accentColor: '#2563eb' }} />
+                    <input type="radio" checked={formData.type === 'Manufacturer/Trader'} onChange={() => setFormData({...formData, type: 'Manufacturer/Trader'})} style={{  }} />
                     <span style={{ fontSize: '0.9375rem', color: formData.type === 'Manufacturer/Trader' ? '#1d4ed8' : '#475569', fontWeight: 500 }}>Manufacturer</span>
                   </label>
                   <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', border: formData.type === 'Broker' ? '2px solid #2563eb' : '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer', backgroundColor: formData.type === 'Broker' ? '#eff6ff' : '#fff' }}>
-                    <input type="radio" checked={formData.type === 'Broker'} onChange={() => setFormData({...formData, type: 'Broker'})} style={{ accentColor: '#2563eb' }} />
+                    <input type="radio" checked={formData.type === 'Broker'} onChange={() => setFormData({...formData, type: 'Broker'})} style={{  }} />
                     <span style={{ fontSize: '0.9375rem', color: formData.type === 'Broker' ? '#1d4ed8' : '#475569', fontWeight: 500 }}>Broker</span>
                   </label>
                 </div>
@@ -437,7 +437,7 @@ export default function VendorManagement() {
 
             </div>
 
-            <div style={{ padding: '20px 24px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '12px', backgroundColor: '#f8fafc' }}>
+            <div style={{ padding: '12px 16px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '12px', backgroundColor: '#f8fafc' }}>
               <button onClick={() => setIsInviteOpen(false)} style={{ padding: '10px 20px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#ffffff', color: '#475569', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
               <button onClick={handleSubmit} disabled={isSubmitting} style={{ padding: '10px 24px', border: 'none', borderRadius: '6px', backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 600, cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 {isSubmitting ? 'Sending...' : <><Mail size={16} /> Send Invite</>}
