@@ -482,6 +482,24 @@ function SingleStageCreateContent() {
             {(selectedTechnicalTemplateObj || selectedRfqTemplateObj || selectedAuctionTemplateObj) && (
               <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid #f1f5f9' }}>
                 <h4 style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a', marginBottom: '16px' }}>Template Configuration</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid #f1f5f9' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', color: '#475569', marginBottom: '8px' }}>Min Bid Step (Optional)</label>
+                    <input 
+                      type="number" min="0" value={minBidStep} onChange={e => setMinBidStep(e.target.value)}
+                      placeholder="e.g. 50"
+                      style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', background: 'rgba(255, 255, 255, 0.9)', outline: 'none', fontSize: '0.95rem', transition: 'all 0.2s', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', color: '#475569', marginBottom: '8px' }}>Max Allowed Price / Ceiling (Optional)</label>
+                    <input 
+                      type="number" min="0" value={ceilingPrice} onChange={e => setCeilingPrice(e.target.value)}
+                      placeholder="e.g. 10000"
+                      style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', background: 'rgba(255, 255, 255, 0.9)', outline: 'none', fontSize: '0.95rem', transition: 'all 0.2s', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)' }}
+                    />
+                  </div>
+                </div>
                 {(() => {
                   try {
                     let fields: any[] = [];
