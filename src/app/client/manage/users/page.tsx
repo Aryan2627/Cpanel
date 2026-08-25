@@ -24,6 +24,21 @@ export default function UsersPage() {
       .catch(console.error);
   };
 
+  const handleDeleteUser = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this user?')) return;
+    try {
+      const res = await fetch(`/api/users?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setUsers(users.filter(u => u.id !== id));
+      } else {
+        alert('Failed to delete user');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error deleting user');
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
     
@@ -155,13 +170,14 @@ export default function UsersPage() {
                 <th style={{ padding: '16px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Phone</th>
                 <th style={{ padding: '16px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Role</th>
                 <th style={{ padding: '16px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Status</th>
+                <th style={{ padding: '16px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} style={{ padding: '24px', textAlign: 'center' }}>Loading users...</td></tr>
+                <tr><td colSpan={6} style={{ padding: '24px', textAlign: 'center' }}>Loading users...</td></tr>
               ) : filteredUsers.length === 0 ? (
-                <tr><td colSpan={5} style={{ padding: '24px', textAlign: 'center', color: '#6b7280' }}>No users found.</td></tr>
+                <tr><td colSpan={6} style={{ padding: '24px', textAlign: 'center', color: '#6b7280' }}>No users found.</td></tr>
               ) : (
                 filteredUsers.map((user) => (
                   <tr key={user.id} style={{ backgroundColor: '#fff', borderBottom: '1px solid #e5e7eb' }}>
@@ -178,6 +194,11 @@ export default function UsersPage() {
                       </span>
                     </td>
                     <td style={{ padding: '16px', color: '#4b5563' }}>{user.status}</td>
+                    <td style={{ padding: '16px', color: '#4b5563' }}>
+                      <button onClick={() => handleDeleteUser(user.id)} style={{ padding: '6px 12px', border: '1px solid #ef4444', backgroundColor: '#fee2e2', color: '#dc2626', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '500' }}>
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))
               )}
