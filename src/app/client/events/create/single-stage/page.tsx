@@ -153,6 +153,17 @@ function SingleStageCreateContent() {
               ? `Procurement of ${parsed[0].name}` 
               : `Event from PR: ${searchParams.get('prs')}`;
             setTitle(eventTitle);
+            
+            if (parsed[0] && parsed[0].name) {
+              setCreatorData(prev => ({
+                ...prev,
+                'Product Name': parsed[0].name,
+                'Product Code': parsed[0].code || '',
+                'Category': 'IT/Hardware',
+                'UOM': parsed[0].uom || 'EA'
+              }));
+            }
+            
             localStorage.removeItem('prToEventItems');
           }
         } catch(e) {}
