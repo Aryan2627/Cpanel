@@ -166,7 +166,7 @@ export default function PRPage() {
       </div>
 
       {/* Main Container */}
-      <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+      <div style={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px' }}>
         
         {/* Functional Tab Bar */}
         <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', padding: '0 16px' }}>
@@ -251,18 +251,15 @@ export default function PRPage() {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
             <thead>
-              <tr style={{ backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0' }}>
-                <th style={{ padding: '16px', width: '40px' }}>
-                  <input type="checkbox" onChange={handleSelectAll} checked={selectedRows.size === filteredData.length && filteredData.length > 0} style={{ accentColor: '#2563eb', width: '16px', height: '16px', cursor: 'pointer' }} />
+              <tr style={{ borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
+                <th style={{ padding: '12px 16px', width: '40px' }}>
+                  <input type="checkbox" onChange={handleSelectAll} checked={selectedRows.size === filteredData.length && filteredData.length > 0} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
                 </th>
-                <th style={{ padding: '16px', width: '40px' }}></th>
-                <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>PR NO (Ref ID)</th>
-                <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Title / Material</th>
-                <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Quantity</th>
-                <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Requester</th>
-                <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Priority</th>
-                <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>FUND CENTER</th>
-                <th style={{ padding: '16px', fontWeight: 600, color: '#475569' }}>Storage Loc</th>
+                <th style={{ padding: '12px 16px', width: '40px' }}></th>
+                <th style={{ padding: '12px 16px', fontWeight: 600, color: '#334155' }}>PR NO (Ref ID)</th>
+                <th style={{ padding: '12px 16px', fontWeight: 600, color: '#334155' }}>Title / Material</th>
+                <th style={{ padding: '12px 16px', fontWeight: 600, color: '#334155' }}>Quantity</th>
+                <th style={{ padding: '12px 16px', fontWeight: 600, color: '#334155' }}>Requester</th>
               </tr>
             </thead>
             <tbody>
@@ -271,26 +268,23 @@ export default function PRPage() {
                   <React.Fragment key={row.refId}>
                     {/* Main Row */}
                     <tr style={{ borderBottom: expandedRows.has(row.refId) ? 'none' : '1px solid #e2e8f0', backgroundColor: selectedRows.has(row.refId) ? '#eff6ff' : '#fff', transition: 'background-color 0.2s' }}>
-                      <td style={{ padding: '16px' }}>
-                        <input type="checkbox" checked={selectedRows.has(row.refId)} onChange={() => handleSelectRow(row.refId)} style={{ accentColor: '#2563eb', width: '16px', height: '16px', cursor: 'pointer' }} />
+                      <td style={{ padding: '12px 16px' }}>
+                        <input type="checkbox" checked={selectedRows.has(row.refId)} onChange={() => handleSelectRow(row.refId)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
                       </td>
-                      <td style={{ padding: '16px', cursor: 'pointer' }} onClick={() => toggleExpand(row.refId)}>
+                      <td style={{ padding: '12px 16px', cursor: 'pointer' }} onClick={() => toggleExpand(row.refId)}>
                         {expandedRows.has(row.refId) ? <ChevronDown size={18} color="#64748b" /> : <ChevronRight size={18} color="#64748b" />}
                       </td>
-                      <td style={{ padding: '16px', color: '#2563eb', fontWeight: 500 }}>{row.refId}</td>
-                      <td style={{ padding: '16px', color: '#333', fontWeight: 500 }}>{row.title}</td>
-                      <td style={{ padding: '16px', color: '#64748b' }}>{row.quantity || 1}</td>
-                      <td style={{ padding: '16px', color: '#64748b' }}>{row.reqName}</td>
-                      <td style={{ padding: '16px' }}>{getPriorityBadge(row.priority)}</td>
-                      <td style={{ padding: '16px', color: '#64748b', fontFamily: 'monospace' }}>{row.fundCenter}</td>
-                      <td style={{ padding: '16px', color: '#64748b' }}>{row.storageLocation}</td>
+                      <td style={{ padding: '12px 16px', color: '#2563eb', fontWeight: 500 }}>{row.refId}</td>
+                      <td style={{ padding: '12px 16px', color: '#333', fontWeight: 500 }}>{row.title}</td>
+                      <td style={{ padding: '12px 16px', color: '#64748b' }}>{row.quantity || 1}</td>
+                      <td style={{ padding: '12px 16px', color: '#64748b' }}>{row.reqName}</td>
                     </tr>
                     
                     {/* Expanded Nested Row */}
                     {expandedRows.has(row.refId) && (
                       <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                         <td colSpan={2}></td>
-                        <td colSpan={7} style={{ padding: '0 16px 16px 0' }}>
+                        <td colSpan={4} style={{ padding: '0 16px 16px 0' }}>
                           <div style={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '12px', marginTop: '-8px' }}>
                             <table style={{ width: '100%', fontSize: '0.8125rem' }}>
                               <thead>
@@ -322,7 +316,7 @@ export default function PRPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={9} style={{ padding: '48px', textAlign: 'center' }}>
+                  <td colSpan={6} style={{ padding: '48px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '56px', height: '56px', backgroundColor: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Server size={28} color="#94a3b8" />
@@ -376,7 +370,7 @@ export default function PRPage() {
                     
                     <div 
                       onClick={() => setProjectType('new')}
-                      style={{ border: projectType === 'new' ? '2px solid #2563eb' : '1px solid #e2e8f0', borderRadius: '8px', padding: '16px', cursor: 'pointer', backgroundColor: projectType === 'new' ? '#eff6ff' : '#fff', transition: 'all 0.2s' }}
+                      style={{ border: projectType === 'new' ? '2px solid #2563eb' : '1px solid #e2e8f0', borderRadius: '8px', padding: '12px 16px', cursor: 'pointer', backgroundColor: projectType === 'new' ? '#eff6ff' : '#fff', transition: 'all 0.2s' }}
                     >
                       <div style={{ width: '40px', height: '40px', backgroundColor: projectType === 'new' ? '#bfdbfe' : '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px', color: projectType === 'new' ? '#1d4ed8' : '#64748b' }}><Plus size={20} /></div>
                       <h4 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '0.9375rem' }}>Start New Project</h4>
@@ -385,7 +379,7 @@ export default function PRPage() {
 
                     <div 
                       onClick={() => setProjectType('draft')}
-                      style={{ border: projectType === 'draft' ? '2px solid #2563eb' : '1px solid #e2e8f0', borderRadius: '8px', padding: '16px', cursor: 'pointer', backgroundColor: projectType === 'draft' ? '#eff6ff' : '#fff', transition: 'all 0.2s' }}
+                      style={{ border: projectType === 'draft' ? '2px solid #2563eb' : '1px solid #e2e8f0', borderRadius: '8px', padding: '12px 16px', cursor: 'pointer', backgroundColor: projectType === 'draft' ? '#eff6ff' : '#fff', transition: 'all 0.2s' }}
                     >
                       <div style={{ width: '40px', height: '40px', backgroundColor: projectType === 'draft' ? '#bfdbfe' : '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px', color: projectType === 'draft' ? '#1d4ed8' : '#64748b' }}><FileText size={20} /></div>
                       <h4 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '0.9375rem' }}>Add to Draft</h4>
@@ -401,16 +395,16 @@ export default function PRPage() {
                   <h3 style={{ fontSize: '1rem', color: '#0f172a', margin: '0 0 16px 0' }}>Configure Bidding Stages</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     
-                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '8px', cursor: auction ? 'not-allowed' : 'pointer', backgroundColor: auction ? '#f8fafc' : '#fff', opacity: auction ? 0.6 : 1 }}>
-                      <input type="checkbox" checked={techStage} onChange={() => setTechStage(!techStage)} disabled={auction} style={{ marginTop: '2px', accentColor: '#2563eb', width: '16px', height: '16px' }} />
+                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', cursor: auction ? 'not-allowed' : 'pointer', backgroundColor: auction ? '#f8fafc' : '#fff', opacity: auction ? 0.6 : 1 }}>
+                      <input type="checkbox" checked={techStage} onChange={() => setTechStage(!techStage)} disabled={auction} style={{ marginTop: '2px', width: '16px', height: '16px' }} />
                       <div>
                         <h4 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '0.9375rem' }}>Technical Stage</h4>
                         <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748b' }}>Require vendors to submit technical proposals before pricing.</p>
                       </div>
                     </label>
 
-                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '8px', cursor: auction ? 'not-allowed' : 'pointer', backgroundColor: auction ? '#f8fafc' : '#fff', opacity: auction ? 0.6 : 1 }}>
-                      <input type="checkbox" checked={rfq} onChange={() => setRfq(!rfq)} disabled={auction} style={{ marginTop: '2px', accentColor: '#2563eb', width: '16px', height: '16px' }} />
+                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', cursor: auction ? 'not-allowed' : 'pointer', backgroundColor: auction ? '#f8fafc' : '#fff', opacity: auction ? 0.6 : 1 }}>
+                      <input type="checkbox" checked={rfq} onChange={() => setRfq(!rfq)} disabled={auction} style={{ marginTop: '2px', width: '16px', height: '16px' }} />
                       <div>
                         <h4 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '0.9375rem' }}>RFQ (Request for Quotation)</h4>
                         <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748b' }}>Standard sealed bidding process for pricing.</p>
@@ -422,8 +416,8 @@ export default function PRPage() {
                       <div style={{ position: 'relative', display: 'inline-block', backgroundColor: '#fff', padding: '0 8px', color: '#94a3b8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', left: '50%', transform: 'translateX(-50%)' }}>OR</div>
                     </div>
 
-                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '8px', cursor: (techStage || rfq) ? 'not-allowed' : 'pointer', backgroundColor: (techStage || rfq) ? '#f8fafc' : '#fff', opacity: (techStage || rfq) ? 0.6 : 1 }}>
-                      <input type="checkbox" checked={auction} onChange={handleAuctionToggle} disabled={techStage || rfq} style={{ marginTop: '2px', accentColor: '#2563eb', width: '16px', height: '16px' }} />
+                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', cursor: (techStage || rfq) ? 'not-allowed' : 'pointer', backgroundColor: (techStage || rfq) ? '#f8fafc' : '#fff', opacity: (techStage || rfq) ? 0.6 : 1 }}>
+                      <input type="checkbox" checked={auction} onChange={handleAuctionToggle} disabled={techStage || rfq} style={{ marginTop: '2px', width: '16px', height: '16px' }} />
                       <div>
                         <h4 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '0.9375rem' }}>Reverse Auction</h4>
                         <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748b' }}>Dynamic, real-time competitive bidding event.</p>
