@@ -66,6 +66,28 @@ export default function BuyerEventDetailsPage() {
   const [sourceIntakes, setSourceIntakes] = useState<any[]>([]);
   const [counterOfferPrice, setCounterOfferPrice] = useState('');
   const [counterOfferExpiry, setCounterOfferExpiry] = useState('24h');
+
+  const [isEditingTime, setIsEditingTime] = useState(false);
+  const [newEndTime, setNewEndTime] = useState('');
+  
+  const handleUpdateTime = async () => {
+    if (!newEndTime) return;
+    try {
+      const res = await fetch(`/api/events/${params.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endTime: newEndTime })
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setEvent({ ...event, endTime: updated.endTime });
+        setIsEditingTime(false);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const [counterOfferReason, setCounterOfferReason] = useState('Market intel suggests this is the ceiling');
   
   const [showBankruptcyPredictor, setShowBankruptcyPredictor] = useState(true);
