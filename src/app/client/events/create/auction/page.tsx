@@ -470,7 +470,7 @@ function AuctionCreateContent() {
                                     
                                     if (prod) {
                                       const newData = { ...creatorData, [f.key]: selectedName };
-                                      uniqueCreatorFields.forEach((otherField) => {
+                                      creatorFields.forEach((otherField: any) => {
                                         if (otherField.key === f.key) return; // Skip self
                                         const n = otherField.name.toLowerCase();
                                         if (n === 'uom' || n === 'unit of measure' || n === 'unit') {
