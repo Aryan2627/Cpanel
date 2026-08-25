@@ -492,18 +492,18 @@ function SingleStageCreateContent() {
                                     const prod = products.find(p => p.name === selectedName);
                                     
                                     if (prod) {
-                                      const newData = { ...creatorData, [f.key]: selectedName };
+                                      const newData: Record<string, string> = { ...creatorData, [f.key]: selectedName };
                                       uniqueCreatorFields.forEach((otherField: any) => {
                                         if (otherField.key === f.key) return; // Skip self
                                         const n = otherField.name.toLowerCase();
                                         if (n === 'uom' || n === 'unit of measure' || n === 'unit') {
-                                          newData[otherField.key] = prod.uom || '';
+                                          newData[otherField.key as string] = prod.uom || '';
                                         } else if (n === 'category') {
-                                          newData[otherField.key] = prod.category || '';
+                                          newData[otherField.key as string] = prod.category || '';
                                         } else if (n === 'description' || n === 'desc') {
-                                          newData[otherField.key] = prod.description || '';
+                                          newData[otherField.key as string] = prod.description || '';
                                         } else if (n === 'product code' || n === 'item code') {
-                                          newData[otherField.key] = prod.code || '';
+                                          newData[otherField.key as string] = prod.code || '';
                                         }
                                       });
                                       setCreatorData(newData);
