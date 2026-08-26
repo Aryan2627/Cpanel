@@ -306,9 +306,7 @@ export default function IntakeTablePage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
-                <th style={{ padding: '12px 16px', width: '40px' }}>
-                  <input type="checkbox" checked={isAllSelected} onChange={handleSelectAll} style={{ cursor: 'pointer' }} />
-                </th>
+                
                 {['Ref ID', 'Title', 'Requester Name', 'Status', 'Qty', 'Requested At'].map((col) => {
                   const key = col === 'Requester Name' ? 'reqName' : col === 'Requested At' ? 'reqAt' : col === 'Qty' ? 'quantity' : col === 'Ref ID' ? 'refId' : col.toLowerCase();
                   const isStatus = col === 'Status';
@@ -323,10 +321,7 @@ export default function IntakeTablePage() {
             <tbody>
               {paginatedIntakes.length > 0 ? (
                 paginatedIntakes.map((row, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: selectedIds.has(row.refId) ? '#eff6ff' : '#fff', transition: 'background-color 0.2s' }}>
-                    <td style={{ padding: '12px 16px' }}>
-                      <input type="checkbox" checked={selectedIds.has(row.refId)} onChange={() => handleSelectRow(row.refId)} style={{ cursor: 'pointer', width: '16px', height: '16px',  }} />
-                    </td>
+                  <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'background-color 0.2s' }}>
                     <td style={{ padding: '12px 16px', color: '#475569', fontWeight: 500 }}>{row.refId}</td>
                     <td style={{ padding: '12px 16px', fontWeight: 500 }}>
                       <span onClick={() => setSelectedIntake(row)} style={{ color: '#2563eb', cursor: 'pointer' }}>{row.title}</span>
