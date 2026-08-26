@@ -63,28 +63,51 @@ function SingleStageCreateContent() {
   const [isAuctionTemplateOpen, setIsAuctionTemplateOpen] = useState(false);
 
   // State for dynamic creator fields
+  
+  const getMultipliedFields = (baseFields: any[], items: any[], isPR: boolean) => {
+    if (!items || items.length === 0) return baseFields;
+    if (!isPR && items.length === 1 && !items[0].values['Item Name']) return baseFields;
+    
+    const flatFields: any[] = [];
+    items.forEach((item: any, idx: number) => {
+      const itemName = item.values['Item Name'] || `Item ${idx+1}`;
+      baseFields.forEach((f: any) => {
+        const newField = { ...f, key: `${item.id}_${f.key}`, originalKey: f.key, _sourceItemId: item.id };
+        if (items.length > 1 || isPR) {
+          newField.name = `${itemName} - ${f.name}`;
+        }
+        flatFields.push(newField);
+      });
+    });
+    return flatFields;
+  };
+
   const [creatorData, setCreatorData] = useState<Record<string, string>>({});
   useEffect(() => {
-    if (fromPR) {
-       let allFields = [];
+    if (fromPR && lineItems.length > 0) {
+       let allFields: any[] = [];
        try {
            if (selectedTechnicalTemplateObj) allFields = [...allFields, ...JSON.parse(selectedTechnicalTemplateObj.fields)];
            if (selectedRfqTemplateObj) allFields = [...allFields, ...JSON.parse(selectedRfqTemplateObj.fields)];
            if (selectedAuctionTemplateObj) allFields = [...allFields, ...JSON.parse(selectedAuctionTemplateObj.fields)];
            
-           const creatorFields = allFields.filter(f => f.role === 'Creator');
+           const mFields = getMultipliedFields(allFields, lineItems, fromPR);
+           const creatorFields = mFields.filter((f: any) => f.role === 'Creator');
            if (creatorFields.length > 0) {
                setCreatorData(prev => {
                    const newData = { ...prev };
                    let changed = false;
-                   creatorFields.forEach(f => {
-                       if (f.type === 'product' && prev['Product Name'] && !newData[f.key]) { newData[f.key] = prev['Product Name']; changed = true; }
+                   creatorFields.forEach((f: any) => {
+                       const item = lineItems.find(i => i.id === f._sourceItemId);
+                       if (!item) return;
+                       
+                       if (f.type === 'product' && !newData[f.key]) { newData[f.key] = item.values['Item Name']; changed = true; }
                        else {
-                           const ln = (f.name || '').toLowerCase();
-                           if ((ln.includes('quantity') || ln === 'qty') && prev['Quantity'] && !newData[f.key]) { newData[f.key] = prev['Quantity']; changed = true; }
-                           if ((ln.includes('uom') || ln.includes('unit')) && prev['UOM'] && !newData[f.key]) { newData[f.key] = prev['UOM']; changed = true; }
-                           if (ln.includes('code') && prev['Product Code'] && !newData[f.key]) { newData[f.key] = prev['Product Code']; changed = true; }
-                           if (ln.includes('category') && prev['Category'] && !newData[f.key]) { newData[f.key] = prev['Category']; changed = true; }
+                           const ln = (f.originalKey || f.name || '').toLowerCase();
+                           if ((ln.includes('quantity') || ln === 'qty') && !newData[f.key]) { newData[f.key] = item.values['Quantity']; changed = true; }
+                           if ((ln.includes('uom') || ln.includes('unit')) && !newData[f.key]) { newData[f.key] = item.values['UOM']; changed = true; }
+                           if (ln.includes('code') && !newData[f.key]) { newData[f.key] = item.values['Product Code']; changed = true; }
+                           if (ln.includes('category') && !newData[f.key]) { newData[f.key] = item.values['Category']; changed = true; }
                        }
                    });
                    return changed ? newData : prev;
@@ -92,7 +115,7 @@ function SingleStageCreateContent() {
            }
        } catch(e) {}
     }
-  }, [selectedTechnicalTemplateObj, selectedRfqTemplateObj, selectedAuctionTemplateObj, fromPR]);
+  }, [selectedTechnicalTemplateObj, selectedRfqTemplateObj, selectedAuctionTemplateObj, fromPR, lineItems]);
 
   
   // State for Event Duration
@@ -490,7 +513,8 @@ function SingleStageCreateContent() {
                     if (selectedRfqTemplateObj) fields = [...fields, ...JSON.parse(selectedRfqTemplateObj.fields)];
                     if (selectedAuctionTemplateObj) fields = [...fields, ...JSON.parse(selectedAuctionTemplateObj.fields)];
                     
-                    const creatorFields = fields.filter((f: any) => f.role === 'Creator');
+                    const mFields = getMultipliedFields(fields, lineItems, fromPR);
+                    const creatorFields = mFields.filter((f: any) => f.role === 'Creator');
                     // Remove duplicates based on key
                     const uniqueCreatorFields = Array.from(new Map(creatorFields.map(f => [f.key, f])).values());
                     
@@ -515,15 +539,15 @@ function SingleStageCreateContent() {
                                     if (prod) {
                                       const newData: Record<string, string> = { ...creatorData, [f.key]: selectedName };
                                       uniqueCreatorFields.forEach((otherField: any) => {
-                                        if (otherField.key === f.key) return; // Skip self
-                                        const n = otherField.name.toLowerCase();
-                                        if (n === 'uom' || n === 'unit of measure' || n === 'unit') {
+                                        if (otherField.key === f.key || otherField._sourceItemId !== f._sourceItemId) return;
+                                        const n = (otherField.originalKey || otherField.name).toLowerCase();
+                                        if (n.includes('uom') || n.includes('unit')) { 
                                           newData[otherField.key as string] = prod.uom || '';
-                                        } else if (n === 'category') {
+                                        } else if (n.includes('category')) { 
                                           newData[otherField.key as string] = prod.category || '';
-                                        } else if (n === 'description' || n === 'desc') {
+                                        } else if (n.includes('desc')) { 
                                           newData[otherField.key as string] = prod.description || '';
-                                        } else if (n === 'product code' || n === 'item code') {
+                                        } else if (n.includes('code')) { 
                                           newData[otherField.key as string] = prod.code || '';
                                         }
                                       });
@@ -649,7 +673,7 @@ function SingleStageCreateContent() {
                       type: 'Technical',
                       name: technicalTemplate,
                       mode: 'Technical Validation',
-                      templateFields: selectedTechnicalTemplateObj ? JSON.parse(selectedTechnicalTemplateObj.fields).map((f: any) => ({
+                      templateFields: selectedTechnicalTemplateObj ? getMultipliedFields(JSON.parse(selectedTechnicalTemplateObj.fields), lineItems, fromPR).map((f: any) => ({
                         ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
                       })) : []
                     });
@@ -659,7 +683,7 @@ function SingleStageCreateContent() {
                       type: 'RFQ',
                       name: rfqTemplate,
                       mode: eventMode,
-                      minBidStep: Number(minBidStep) || 0, ceilingPrice: Number(ceilingPrice) || 0, templateFields: selectedRfqTemplateObj ? JSON.parse(selectedRfqTemplateObj.fields).map((f: any) => ({
+                      minBidStep: Number(minBidStep) || 0, ceilingPrice: Number(ceilingPrice) || 0, templateFields: selectedRfqTemplateObj ? getMultipliedFields(JSON.parse(selectedRfqTemplateObj.fields), lineItems, fromPR).map((f: any) => ({
                         ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
                       })) : []
                     });
@@ -669,7 +693,7 @@ function SingleStageCreateContent() {
                       type: 'Auction',
                       name: auctionTemplate,
                       mode: 'Live Auction',
-                      minBidStep: Number(minBidStep) || 0, ceilingPrice: Number(ceilingPrice) || 0, templateFields: selectedAuctionTemplateObj ? JSON.parse(selectedAuctionTemplateObj.fields).map((f: any) => ({
+                      minBidStep: Number(minBidStep) || 0, ceilingPrice: Number(ceilingPrice) || 0, templateFields: selectedAuctionTemplateObj ? getMultipliedFields(JSON.parse(selectedAuctionTemplateObj.fields), lineItems, fromPR).map((f: any) => ({
                         ...f, defaultValue: f.role === 'Creator' ? (creatorData[f.key] || 0) : undefined
                       })) : []
                     });
