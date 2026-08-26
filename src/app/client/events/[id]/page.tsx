@@ -967,6 +967,7 @@ export default function BuyerEventDetailsPage() {
                         onChange={(e) => setSurrogateData({...surrogateData, [f.key]: e.target.value})}
                         placeholder={f.description}
                         style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem' }}
+                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
                       />
                     )}
                   </div>

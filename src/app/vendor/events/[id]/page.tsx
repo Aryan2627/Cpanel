@@ -218,6 +218,7 @@ export default function VendorLiveBidding() {
                           style={{ width: '100%', padding: '12px', backgroundColor: '#020617', border: '1px solid #334155', borderRadius: '8px', color: '#fff', fontSize: '1rem', fontWeight: 500, outline: 'none', transition: 'border-color 0.2s' }}
                           onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                           onBlur={(e) => e.target.style.borderColor = '#334155'}
+                          onWheel={(e) => (e.target as HTMLInputElement).blur()}
                         />
                       )}
                     </td>
