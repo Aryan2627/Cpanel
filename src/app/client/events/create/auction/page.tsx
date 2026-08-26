@@ -417,7 +417,7 @@ function AuctionCreateContent() {
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Event Duration</label>
                 <div style={{ display: 'flex', alignItems: 'center', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)' }}>
                   <input 
-                    type="number" min="0" value={durationValue} onChange={e => setDurationValue(e.target.value)}
+                    type="number" min="0" value={durationValue} onChange={e => setDurationValue(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
                     placeholder=""
                     style={{ width: '80px', padding: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', borderRight: 'none', borderRadius: '12px 0 0 12px', background: 'rgba(255,255,255,0.9)', outline: 'none', fontSize: '0.95rem', fontWeight: '500', color: '#0f172a' }}
                     onFocus={e => e.currentTarget.style.borderColor = '#3b82f6'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.8)'}
@@ -444,7 +444,7 @@ function AuctionCreateContent() {
                   <div>
                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', color: '#475569', marginBottom: '8px' }}>Min Bid Step (Optional)</label>
                     <input 
-                      type="number" min="0" value={minBidStep} onChange={e => setMinBidStep(e.target.value)}
+                      type="number" min="0" value={minBidStep} onChange={e => setMinBidStep(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
                       placeholder="e.g. 50"
                       style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', background: 'rgba(255, 255, 255, 0.9)', outline: 'none', fontSize: '0.95rem', transition: 'all 0.2s', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)' }}
                     />
@@ -452,7 +452,7 @@ function AuctionCreateContent() {
                   <div>
                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '500', color: '#475569', marginBottom: '8px' }}>Max Allowed Price / Ceiling (Optional)</label>
                     <input 
-                      type="number" min="0" value={ceilingPrice} onChange={e => setCeilingPrice(e.target.value)}
+                      type="number" min="0" value={ceilingPrice} onChange={e => setCeilingPrice(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
                       placeholder="e.g. 10000"
                       style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', background: 'rgba(255, 255, 255, 0.9)', outline: 'none', fontSize: '0.95rem', transition: 'all 0.2s', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)' }}
                     />
