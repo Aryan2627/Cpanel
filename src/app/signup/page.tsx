@@ -27,18 +27,13 @@ export default function Signup() {
         throw new Error(data.error || 'Failed to register');
       }
 
-      // Automatically log them in after registration
-      const signInResult = await signIn('credentials', {
-        redirect: false,
+      // Log them in — use redirect:true so NextAuth sets the session cookie properly
+      await signIn('credentials', {
+        redirect: true,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        callbackUrl: '/client/intake'
       });
-
-      if (signInResult?.error) {
-        throw new Error(signInResult.error);
-      }
-
-      router.push('/client/intake');
     } catch (err: any) {
       setError(err.message);
     } finally {

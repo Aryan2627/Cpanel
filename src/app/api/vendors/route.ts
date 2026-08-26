@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getTenantId } from '../../../lib/tenant';
 import { prisma } from '../../../lib/prisma';
 
 export const runtime = 'nodejs';
@@ -6,6 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
+    const orgId = await getTenantId();
     const { searchParams } = new URL(request.url);
     const eventId = searchParams.get('eventId');
 
@@ -41,6 +43,7 @@ export async function GET(request: Request) {
     }
 
     const vendors = await prisma.vendor.findMany({
+      where: { organizationId: orgId },
       where: whereClause,
       orderBy: { createdAt: 'desc' }
     });

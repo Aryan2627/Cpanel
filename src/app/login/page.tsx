@@ -16,16 +16,15 @@ export default function Login() {
 
     try {
       const res = await signIn('credentials', {
-        redirect: false,
+        redirect: true,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        callbackUrl: '/client/intake'
       });
-
+      
       if (res?.error) {
         throw new Error('Invalid email or password');
       }
-
-      router.push('/client/intake');
     } catch (err: any) {
       setError(err.message);
     } finally {

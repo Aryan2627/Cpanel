@@ -6,7 +6,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    const orgId = await getTenantId();
     const pos = await prisma.purchaseOrder.findMany({
+      where: { organizationId: orgId },
       orderBy: { createdAt: 'desc' }
     });
     return NextResponse.json(pos);

@@ -6,7 +6,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    const orgId = await getTenantId();
     const approvals = await prisma.approvalRequest.findMany({
+      where: { organizationId: orgId },
       orderBy: { createdAt: 'desc' }
     });
     

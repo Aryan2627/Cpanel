@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getTenantId } from '../../../lib/tenant';
 import { prisma } from '../../../lib/prisma';
 
 export const runtime = 'nodejs';
@@ -6,7 +7,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    const orgId = await getTenantId();
     const templates = await prisma.template.findMany({
+      where: { organizationId: orgId },
       orderBy: { createdAt: 'desc' }
     });
     return NextResponse.json(templates);

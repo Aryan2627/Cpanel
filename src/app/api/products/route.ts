@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getTenantId } from '../../../lib/tenant';
 import { prisma } from '../../../lib/prisma';
 
 export const runtime = 'nodejs';
@@ -8,6 +9,7 @@ export async function GET() {
   console.log("DATABASE_URL is:", process.env.DATABASE_URL);
   try {
     const products = await prisma.product.findMany({
+      where: { organizationId: orgId },
       orderBy: { createdAt: 'desc' }
     });
     return NextResponse.json(products);
