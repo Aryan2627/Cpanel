@@ -51,17 +51,18 @@ export default function VendorLiveBidding() {
       const initData: any = {};
       let hasCalc = false;
       templateFields.forEach((f: any) => {
-        if (f.role === 'Calculation' && f.formula) {
+        if (f.role?.toLowerCase() === 'calculation' && f.formula) {
            hasCalc = true;
            const groupId = f._sourceItemId || 'default';
            const groupFields = templateFields.filter((tf: any) => (tf._sourceItemId || 'default') === groupId);
            try {
              let expr = f.formula;
-             groupFields.forEach((gf: any) => {
+             const sortedFields = [...groupFields].sort((a, b) => (b.originalKey || b.key).length - (a.originalKey || a.key).length);
+             sortedFields.forEach((gf: any) => {
                const vName = gf.originalKey || gf.key;
                if (expr.includes(vName)) {
                  let v = 0;
-                 if (gf.role === 'Creator') v = Number(gf.defaultValue) || 0;
+                 if (gf.role?.toLowerCase() === 'creator') v = Number(gf.defaultValue) || 0;
                  expr = expr.replace(new RegExp(`\\b${vName}\\b`, 'g'), v.toString());
                }
              });
@@ -77,11 +78,27 @@ export default function VendorLiveBidding() {
 
   const calculateTotal = () => {
     let total = 0;
+    
+    // Group fields by line item
+    const groupedFields = new Map<any, any[]>();
     templateFields.forEach((f: any) => {
-      if (f.type === 'number' && fieldData[f.key]) {
-        total += parseFloat(fieldData[f.key]) || 0;
-      }
+        const g = f._sourceItemId || 'default';
+        if (!groupedFields.has(g)) groupedFields.set(g, []);
+        groupedFields.get(g)!.push(f);
     });
+    
+    // For each group, sum ONLY Calculation fields if they exist. Otherwise sum Participant numeric fields.
+    groupedFields.forEach(fields => {
+      const calcFields = fields.filter(f => f.role?.toLowerCase() === 'calculation' && f.type === 'number');
+      const targetFields = calcFields.length > 0 ? calcFields : fields.filter(f => f.role?.toLowerCase() === 'participant' && f.type === 'number');
+      
+      targetFields.forEach(f => {
+        if (fieldData[f.key]) {
+          total += parseFloat(fieldData[f.key]) || 0;
+        }
+      });
+    });
+    
     return total;
   };
 
@@ -152,7 +169,7 @@ export default function VendorLiveBidding() {
       
       // Auto-calculate formula fields
       templateFields.forEach((f: any) => {
-        if (f.role === 'Calculation' && f.formula) {
+        if (f.role?.toLowerCase() === 'calculation' && f.formula) {
            const groupId = f._sourceItemId || 'default';
            const groupFields = templateFields.filter((tf: any) => (tf._sourceItemId || 'default') === groupId);
            
@@ -162,7 +179,7 @@ export default function VendorLiveBidding() {
                const vName = gf.originalKey || gf.key;
                if (expr.includes(vName)) {
                  let v = 0;
-                 if (gf.role === 'Creator') v = Number(gf.defaultValue) || 0;
+                 if (gf.role?.toLowerCase() === 'creator') v = Number(gf.defaultValue) || 0;
                  else v = Number(next[gf.key]) || 0;
                  expr = expr.replace(new RegExp(`\\b${vName}\\b`, 'g'), v.toString());
                }
@@ -302,11 +319,11 @@ export default function VendorLiveBidding() {
                             <option key={opt.trim()} value={opt.trim()}>{opt.trim()}</option>
                           ))}
                         </select>
-                      ) : f.role === 'Creator' ? (
+                      ) : f.role?.toLowerCase() === 'creator' ? (
                         <div style={{ width: '100%', padding: '12px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid #334155', borderRadius: '8px', color: '#94a3b8', fontSize: '1rem', fontWeight: 500, cursor: 'not-allowed' }}>
                           {f.type === 'number' ? Number(f.defaultValue || 0).toLocaleString() : (f.defaultValue || '-')}
                         </div>
-                      ) : f.role === 'Calculation' ? (
+                      ) : f.role?.toLowerCase() === 'calculation' ? (
                         <div style={{ width: '100%', padding: '12px', backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px', color: '#38bdf8', fontSize: '1rem', fontWeight: 700 }}>
                           {Number(fieldData[f.key] || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
