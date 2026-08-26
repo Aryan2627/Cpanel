@@ -9,6 +9,7 @@ function AuctionCreateContent() {
   const searchParams = useSearchParams();
   const initialTitle = searchParams.get('title') || '';
   const fromPR = searchParams.get('fromPR') === 'true';
+  const [lineItems, setLineItems] = useState<any[]>([{ id: Date.now(), values: {}, evaluatorId: '' }]);
   
   const [title, setTitle] = useState(initialTitle);
   const { intakes } = useIntake();
@@ -108,7 +109,6 @@ function AuctionCreateContent() {
   const [ceilingPrice, setCeilingPrice] = useState('');
   const [durationUnit, setDurationUnit] = useState('Days');
 
-  const [lineItems, setLineItems] = useState<any[]>([{ id: Date.now(), values: {}, evaluatorId: '' }]);
   const [users, setUsers] = useState<any[]>([]);
 
   useEffect(() => {

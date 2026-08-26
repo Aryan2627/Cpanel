@@ -43,6 +43,7 @@ function SingleStageCreateContent() {
 
   // Multi-Stage State
   const fromPR = searchParams.get('fromPR') === 'true';
+  const [lineItems, setLineItems] = useState<any[]>([{ id: Date.now(), values: {}, evaluatorId: '' }]);
   const techParam = searchParams.get('tech') === 'true';
   const rfqParam = searchParams.get('rfq') === 'true';
   const auctionParam = searchParams.get('auction') === 'true';
@@ -124,7 +125,6 @@ function SingleStageCreateContent() {
   const [ceilingPrice, setCeilingPrice] = useState('');
   const [durationUnit, setDurationUnit] = useState('Days');
 
-  const [lineItems, setLineItems] = useState<any[]>([{ id: Date.now(), values: {}, evaluatorId: '' }]);
   const [users, setUsers] = useState<any[]>([]);
 
   useEffect(() => {
