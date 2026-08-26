@@ -92,6 +92,7 @@ function SingleStageCreateContent() {
 
   const [vendorSearch, setVendorSearch] = useState('');
   const [isVendorDropdownOpen, setIsVendorDropdownOpen] = useState(false);
+  const [tempSelectedVendorIds, setTempSelectedVendorIds] = useState<Set<string>>(new Set());
   const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
   const [selectedVendors, setSelectedVendors] = useState<any[]>([]);
   const [vendors, setVendors] = useState<any[]>([]);
