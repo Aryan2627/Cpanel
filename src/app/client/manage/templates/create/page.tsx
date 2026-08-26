@@ -144,28 +144,22 @@ export default function CreateTemplatePage() {
   return (
     <div style={{ backgroundColor: '#f1f5f9', minHeight: '100%', margin: '-24px', padding: '24px', fontFamily: 'system-ui, sans-serif' }}>
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', backgroundColor: '#fff', padding: '16px 24px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', backgroundColor: '#fff', padding: '16px 24px', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', margin: '0 0 4px 0' }}>Advanced Template Builder</h1>
-          <p style={{ color: '#64748b', margin: 0, fontSize: '0.9rem' }}>Design smart procurement forms with live preview</p>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', margin: '0 0 4px 0' }}>Create Template</h1>
+          <p style={{ color: '#64748b', margin: 0, fontSize: '0.9rem' }}>Define fields for your procurement template</p>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
-          <button 
-            onClick={handleGenerateAI}
-            disabled={isGeneratingAI}
-            style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, boxShadow: '0 4px 6px -1px rgba(168, 85, 247, 0.2)' }}
-          >
-            <Wand2 size={18} /> {isGeneratingAI ? 'Generating...' : 'Auto-Generate with AI'}
-          </button>
+          
           <button 
             onClick={() => router.push('/client/manage/templates')}
-            style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #cbd5e1', backgroundColor: '#fff', color: '#475569', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }}
+            style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #cbd5e1', backgroundColor: '#fff', color: '#475569', borderRadius: '4px', cursor: 'pointer', fontWeight: 500 }}
           >
             <X size={18} /> Cancel
           </button>
           <button 
             onClick={handleSave}
-            style={{ padding: '10px 24px', display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.2)' }}
+            style={{ padding: '10px 24px', display: 'flex', alignItems: 'center', gap: '8px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 500 }}
           >
             <Save size={18} /> Save Template
           </button>
@@ -175,15 +169,10 @@ export default function CreateTemplatePage() {
       <div style={{ display: 'flex', gap: '24px', height: 'calc(100vh - 180px)' }}>
         
         {/* LEFT PANE: BUILDER */}
-        <div style={{ flex: '1', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+        <div style={{ flex: '1', backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
           <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b' }}>Template Configuration</h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <input type="checkbox" id="esg-toggle" checked={enableESG} onChange={e => setEnableESG(e.target.checked)} style={{ cursor: 'pointer' }} />
-              <label htmlFor="esg-toggle" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', fontWeight: 600, color: '#16a34a', cursor: 'pointer' }}>
-                <Leaf size={16} /> Enable ESG Carbon Calculation
-              </label>
-            </div>
+            <h2 style={{ margin: 0, fontSize: '1rem', color: '#1e293b', fontWeight: 600 }}>Template Configuration</h2>
+            
           </div>
           
           <div style={{ padding: '24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -196,7 +185,7 @@ export default function CreateTemplatePage() {
                   value={templateName}
                   onChange={e => setTemplateName(e.target.value)}
                   placeholder="e.g. Server Infrastructure RFP"
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem', outline: 'none' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.95rem', outline: 'none' }}
                 />
               </div>
               <div>
@@ -206,7 +195,7 @@ export default function CreateTemplatePage() {
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                   placeholder="Internal description..."
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem', outline: 'none' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.95rem', outline: 'none' }}
                 />
               </div>
             </div>
@@ -231,7 +220,7 @@ export default function CreateTemplatePage() {
                 <h3 style={{ margin: 0, fontSize: '1rem', color: '#1e293b' }}>Form Fields</h3>
                 <button 
                   onClick={addField}
-                  style={{ padding: '6px 16px', display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, fontSize: '0.85rem' }}
+                  style={{ padding: '6px 16px', display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '4px', cursor: 'pointer', fontWeight: 500, fontSize: '0.85rem' }}
                 >
                   <Plus size={16} /> Add Field
                 </button>
@@ -239,12 +228,12 @@ export default function CreateTemplatePage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {fields.length === 0 ? (
-                  <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+                  <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8', backgroundColor: '#f8fafc', borderRadius: '4px', border: '1px dashed #cbd5e1' }}>
                     No fields added yet.
                   </div>
                 ) : (
                   fields.map((f, index) => (
-                    <div key={f.id} style={{ display: 'flex', gap: '12px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '16px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', position: 'relative' }}>
+                    <div key={f.id} style={{ display: 'flex', gap: '12px', backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #e2e8f0', padding: '16px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', position: 'relative' }}>
                       
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: '#94a3b8' }}>
                         <button onClick={() => moveField(index, 'up')} disabled={index === 0} style={{ background: 'none', border: 'none', cursor: index === 0 ? 'not-allowed' : 'pointer', color: index === 0 ? '#e2e8f0' : '#64748b', padding: 0 }}><ArrowUp size={16} /></button>
@@ -258,15 +247,15 @@ export default function CreateTemplatePage() {
                         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1.5fr 1.5fr 1fr', gap: '12px', alignItems: 'end' }}>
                           <div>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', marginBottom: '4px' }}>Field Label</label>
-                            <input type="text" value={f.name} onChange={e => handleFieldChange(f.id, 'name', e.target.value)} placeholder="e.g. Warranty Cost" style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none' }} />
+                            <input type="text" value={f.name} onChange={e => handleFieldChange(f.id, 'name', e.target.value)} placeholder="e.g. Warranty Cost" style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none' }} />
                           </div>
                           <div>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', marginBottom: '4px' }}>Unique Key</label>
-                            <input type="text" value={f.key} onChange={e => handleFieldChange(f.id, 'key', e.target.value)} placeholder="warranty_cost" style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', fontFamily: 'monospace' }} />
+                            <input type="text" value={f.key} onChange={e => handleFieldChange(f.id, 'key', e.target.value)} placeholder="warranty_cost" style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', fontFamily: 'monospace' }} />
                           </div>
                           <div>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', marginBottom: '4px' }}>Input Type</label>
-                            <select value={f.type || 'number'} onChange={e => handleFieldChange(f.id, 'type', e.target.value)} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', backgroundColor: '#fff' }}>
+                            <select value={f.type || 'number'} onChange={e => handleFieldChange(f.id, 'type', e.target.value)} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', backgroundColor: '#fff' }}>
                               <option value="number">Number</option>
                               <option value="text">Text</option>
                               <option value="percentage">Percentage</option>
@@ -281,7 +270,7 @@ export default function CreateTemplatePage() {
                           </div>
                           <div>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', marginBottom: '4px' }}>Filled By</label>
-                            <select value={f.role} onChange={e => handleFieldChange(f.id, 'role', e.target.value)} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', backgroundColor: '#fff' }}>
+                            <select value={f.role} onChange={e => handleFieldChange(f.id, 'role', e.target.value)} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none', backgroundColor: '#fff' }}>
                               <option value="Participant">Participant</option>
                               <option value="Creator">Buyer</option>
                               <option value="Calculation">Calculation</option>
