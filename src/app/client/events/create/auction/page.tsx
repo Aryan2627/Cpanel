@@ -48,6 +48,35 @@ function AuctionCreateContent() {
 
   // State for dynamic creator fields
   const [creatorData, setCreatorData] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (fromPR) {
+       let allFields = [];
+       try {
+           if (selectedTemplateObj) allFields = [...allFields, ...JSON.parse(selectedTemplateObj.fields)];
+           if (selectedStage2TemplateObj) allFields = [...allFields, ...JSON.parse(selectedStage2TemplateObj.fields)];
+           
+           const creatorFields = allFields.filter(f => f.role === 'Creator');
+           if (creatorFields.length > 0) {
+               setCreatorData(prev => {
+                   const newData = { ...prev };
+                   let changed = false;
+                   creatorFields.forEach(f => {
+                       if (f.type === 'product' && prev['Product Name'] && !newData[f.key]) { newData[f.key] = prev['Product Name']; changed = true; }
+                       else {
+                           const ln = (f.name || '').toLowerCase();
+                           if ((ln.includes('quantity') || ln === 'qty') && prev['Quantity'] && !newData[f.key]) { newData[f.key] = prev['Quantity']; changed = true; }
+                           if ((ln.includes('uom') || ln.includes('unit')) && prev['UOM'] && !newData[f.key]) { newData[f.key] = prev['UOM']; changed = true; }
+                           if (ln.includes('code') && prev['Product Code'] && !newData[f.key]) { newData[f.key] = prev['Product Code']; changed = true; }
+                           if (ln.includes('category') && prev['Category'] && !newData[f.key]) { newData[f.key] = prev['Category']; changed = true; }
+                       }
+                   });
+                   return changed ? newData : prev;
+               });
+           }
+       } catch(e) {}
+    }
+  }, [selectedTemplateObj, selectedStage2TemplateObj, fromPR]);
+
   
   // State for Event Duration
   const [durationValue, setDurationValue] = useState('');
@@ -148,7 +177,8 @@ function AuctionCreateContent() {
                 'Product Name': parsed[0].name,
                 'Product Code': parsed[0].code || '',
                 'Category': 'IT/Hardware',
-                'UOM': parsed[0].uom || 'EA'
+                'UOM': parsed[0].uom || 'EA',
+                'Quantity': parsed[0].qty?.toString() || '1'
               }));
             }
             
@@ -473,8 +503,9 @@ function AuctionCreateContent() {
                               <React.Fragment>
                                 <input
                                   type="text"
-                                  list={`products-list-${f.key}`}
-                                  placeholder="Type to search products..."
+                                  list={!fromPR ? `products-list-${f.key}` : undefined}
+                                  readOnly={fromPR}
+                                  placeholder={fromPR ? "Auto-filled from PR" : "Type to search products..."}
                                   value={creatorData[f.key] || ''}
                                   onChange={(e) => {
                                     const selectedName = e.target.value;
@@ -500,9 +531,9 @@ function AuctionCreateContent() {
                                       setCreatorData({ ...creatorData, [f.key]: selectedName });
                                     }
                                   }}
-                                  style={glassInputStyle}
-                                  onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'}
-                                  onBlur={e => e.currentTarget.style.boxShadow = 'none'}
+                                  style={fromPR ? { ...glassInputStyle, background: '#f1f5f9', cursor: 'not-allowed', color: '#64748b' } : glassInputStyle}
+                                  onFocus={e => !fromPR && (e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)')}
+                                  onBlur={e => !fromPR && (e.currentTarget.style.boxShadow = 'none')}
                                 />
                                 <datalist id={`products-list-${f.key}`}>
                                   {products.map(p => (
