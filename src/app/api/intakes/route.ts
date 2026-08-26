@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     console.log("Adding Intake:", data);
     const newIntake = await prisma.intake.create({
       data: {
-        refId: data.refId || `INT-${Date.now()}`,
+        refId: data.refId || `IR-${Date.now()}`,
         title: data.title,
         reqName: data.reqName,
         status: data.status || 'Draft',

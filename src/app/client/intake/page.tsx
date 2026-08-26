@@ -121,7 +121,7 @@ export default function IntakeTablePage() {
 
         for (const row of data) {
           const intake = {
-            refId: `INT-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            refId: `IR-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
             title: row['Request Title'] || 'Untitled Intake',
             reqName: 'System Import',
             status: 'Draft',

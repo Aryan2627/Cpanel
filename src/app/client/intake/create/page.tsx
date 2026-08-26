@@ -45,7 +45,7 @@ export default function PurchaseIntake() {
     
     const now = new Date();
     const formattedDate = `${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}, ${now.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}`;
-    const newId = `IR-210${Math.floor(Math.random() * 10) + 4}`;
+    const newId = `IR-${Math.floor(1000 + Math.random() * 9000)}`;
 
     await addIntake({
       refId: newId,
