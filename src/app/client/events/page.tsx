@@ -259,15 +259,16 @@ export default function EventsPage() {
 
   // KPI calculations
   const totalEvents = allEvents.length;
-  const liveEvents = allEvents.filter(e => e.stages.some((s: any) => s.timeText.includes('Live') || s.timeText.includes('Ends in'))).length;
   
-  // Historical Events definition is exactly what goes into the HISTORY tab
+  // Historical Events definition exactly matches what goes into the HISTORY tab
   const historicalEvents = allEvents.filter(e => {
     if (e.endTime) {
       return new Date() > new Date(e.endTime);
     }
     return e.stages.every((s: any) => s.timeText && (s.timeText.includes('Ended') || s.timeText.includes('History') || s.timeText.includes('Overdue')));
   }).length;
+
+  const liveEvents = totalEvents - historicalEvents;
 
   return (
     <div style={{ backgroundColor: '#f8fafc', color: '#333', minHeight: '100%', padding: '24px', fontFamily: 'system-ui, sans-serif' }}>
