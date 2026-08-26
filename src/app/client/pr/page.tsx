@@ -33,8 +33,7 @@ export default function PRPage() {
     return intakes.map((row, i) => {
       // Mock sub-items for accordion
       const items = [
-        { id: `${row.refId}-L1`, name: 'Dell XPS 15 Laptops', qty: 5, uom: 'EA', status: 'Pending' },
-        { id: `${row.refId}-L2`, name: 'Logitech MX Master 3S', qty: 5, uom: 'EA', status: 'Pending' }
+        { id: `${row.refId}-L1`, name: row.title || 'Product Request', qty: row.quantity || 1, uom: 'EA', status: 'Pending' }
       ];
       // Randomly assign priority based on index to ensure variety
       const priority = i % 3 === 0 ? 'High' : i % 2 === 0 ? 'Medium' : 'Low';
