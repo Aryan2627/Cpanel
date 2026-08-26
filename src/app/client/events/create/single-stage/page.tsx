@@ -105,7 +105,8 @@ function SingleStageCreateContent() {
                        if (f.type === 'product' && !newData[f.key]) { newData[f.key] = item.values['Item Name']; changed = true; }
                        else {
                            const ln = (f.originalKey || f.name || '').toLowerCase();
-                           if ((ln.includes('quantity') || ln === 'qty') && !newData[f.key]) { newData[f.key] = item.values['Quantity']; changed = true; }
+                           if ((ln.includes('product') || ln.includes('item')) && !newData[f.key]) { newData[f.key] = item.values['Item Name']; changed = true; }
+                           else if ((ln.includes('quantity') || ln === 'qty') && !newData[f.key]) { newData[f.key] = item.values['Quantity']; changed = true; }
                            if ((ln.includes('uom') || ln.includes('unit')) && !newData[f.key]) { newData[f.key] = item.values['UOM']; changed = true; }
                            if (ln.includes('code') && !newData[f.key]) { newData[f.key] = item.values['Product Code']; changed = true; }
                            if (ln.includes('category') && !newData[f.key]) { newData[f.key] = item.values['Category']; changed = true; }
