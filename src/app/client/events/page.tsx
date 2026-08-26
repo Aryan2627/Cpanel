@@ -33,8 +33,7 @@ const Countdown = ({ endTime }: { endTime: string | Date }) => {
 export default function EventsPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('LIVE');
-  const [activeStageFilter, setActiveStageFilter] = useState('All Stages');
-  const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
+    const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [fetchError, setFetchError] = useState<string | null>(null);
 
@@ -155,18 +154,11 @@ export default function EventsPage() {
         event.title.toLowerCase().includes(query) || 
         event.refId.toLowerCase().includes(query) ||
         event.account.toLowerCase().includes(query);
-
-      let matchesStage = true;
       let isHistorical = false;
-      
       if (event.endTime) {
         isHistorical = new Date() > new Date(event.endTime);
       } else {
         isHistorical = event.stages.every((s: any) => s.timeText && (s.timeText.includes('Ended') || s.timeText.includes('History') || s.timeText.includes('Overdue')));
-      }
-
-      if (activeStageFilter === 'Live') {
-        matchesStage = event.endTime ? !isHistorical : event.stages.some((s: any) => s.timeText && s.timeText.includes('Live'));
       }
 
       let matchesTab = true;
@@ -176,9 +168,9 @@ export default function EventsPage() {
         matchesTab = isHistorical;
       }
 
-      return matchesSearch && matchesStage && matchesTab;
+      return matchesSearch && matchesTab;
     });
-  }, [searchQuery, activeStageFilter, activeTab, allEvents]);
+  }, [searchQuery, activeTab, allEvents]);
 
   const handleViewBids = async (eventId: string) => {
     // The API expects refId for the lookup, and eventId here is already the refId.
@@ -359,37 +351,17 @@ export default function EventsPage() {
         </div>
 
         {/* Filters Area */}
-        <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          
-          {/* Search */}
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '4px', overflow: 'hidden', width: '300px' }}>
-            <div style={{ padding: '0 12px' }}><Search size={16} color="#94a3b8" /></div>
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center' }}>
+          {/* Enhanced Search */}
+          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', overflow: 'hidden', width: '100%', maxWidth: '500px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', transition: 'border-color 0.2s' }}>
+            <div style={{ padding: '0 14px' }}><Search size={18} color="#64748b" /></div>
             <input 
               type="text" 
-              placeholder="Search by Title, Ref ID, or Account..." 
+              placeholder="Search events by Title, Ref ID, or Account..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ border: 'none', padding: '8px 12px 8px 0', outline: 'none', width: '100%', fontSize: '0.875rem', backgroundColor: 'transparent' }} 
+              style={{ border: 'none', padding: '12px 16px 12px 0', outline: 'none', width: '100%', fontSize: '0.95rem', backgroundColor: 'transparent', color: '#0f172a' }} 
             />
-          </div>
-
-          {/* Stage Filters */}
-          <div style={{ display: 'flex', backgroundColor: '#f1f5f9', borderRadius: '4px', padding: '4px' }}>
-            {['All Stages', 'Live'].map(filter => (
-              <button
-                key={filter}
-                onClick={() => setActiveStageFilter(filter)}
-                style={{
-                  padding: '6px 12px', border: 'none', borderRadius: '4px', fontSize: '0.8125rem', fontWeight: 500, cursor: 'pointer',
-                  backgroundColor: activeStageFilter === filter ? '#fff' : 'transparent',
-                  color: activeStageFilter === filter ? '#0f172a' : '#64748b',
-                  boxShadow: activeStageFilter === filter ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
-                  transition: 'all 0.2s'
-                }}
-              >
-                {filter}
-              </button>
-            ))}
           </div>
         </div>
 
