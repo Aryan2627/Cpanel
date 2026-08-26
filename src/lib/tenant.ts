@@ -1,41 +1,52 @@
-﻿import { prisma } from './prisma';
-import { getServerSession } from "next-auth";
-import { authOptions } from "./auth";
-import { cookies } from "next/headers";
+﻿import { getToken } from "next-auth/jwt";
+import { headers } from "next/headers";
+import { prisma } from "./prisma";
 
 /**
- * Returns the logged-in user's organizationId based on their NextAuth session.
- * 
- * SECURITY: If no valid session is found, returns a sentinel value that will
- * never match any real organizationId in the DB, preventing data leakage.
- * 
- * Falls back to the "Default Organization" ONLY if it exists AND if there is
- * no NextAuth session at all (backward compatibility for the old OTP-based
- * login system, which also sets organizationId on users).
+ * Reads the organizationId from the NextAuth JWT cookie directly.
+ * Uses getToken (reads JWT from cookie) instead of getServerSession,
+ * which is more reliable in Next.js App Router environments.
  */
 export async function getTenantId(): Promise<string> {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (session?.user && (session.user as any).organizationId) {
-      return (session.user as any).organizationId;
+    const headersList = await headers();
+    const cookieHeader = headersList.get("cookie") || "";
+
+    // Build a minimal request-like object that getToken can read
+    const mockReq = {
+      headers: { cookie: cookieHeader },
+      cookies: Object.fromEntries(
+        cookieHeader
+          .split(";")
+          .map((c) => c.trim().split("="))
+          .filter(([k]) => k)
+          .map(([k, ...v]) => [k.trim(), v.join("=").trim()])
+      ),
+    };
+
+    const token = await getToken({
+      req: mockReq as any,
+      secret:
+        process.env.NEXTAUTH_SECRET ||
+        "fallback-secret-for-development-do-not-use-in-production",
+    });
+
+    if (token?.organizationId) {
+      return token.organizationId as string;
     }
   } catch (e) {
-    // getServerSession can throw in some edge cases; fall through to legacy
+    // getToken can throw in edge cases — fall through to safe fallback
   }
 
-  // Legacy fallback: check if the ONLY organization in the DB is the default
-  // one (i.e. this is still a single-tenant deployment). If multiple orgs
-  // exist it means multi-tenancy is active and we must NOT leak data.
+  // Safe fallback: if only 1 org exists (single-tenant mode), return it.
+  // If multiple orgs exist, we MUST NOT leak data — return sentinel ID.
   const orgCount = await prisma.organization.count();
-  
-  if (orgCount === 1) {
-    // Single-tenant mode - safe to return the only org
+
+  if (orgCount <= 1) {
     const org = await prisma.organization.findFirst();
     if (org) return org.id;
   }
 
-  // Multi-tenant mode with no valid session - return a sentinel ID that
-  // will never match any real org, so all queries return empty results.
-  return '__unauthenticated__';
+  // Multi-tenant, unauthenticated — no data leakage
+  return "__unauthenticated__";
 }
