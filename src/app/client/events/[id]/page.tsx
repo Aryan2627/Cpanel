@@ -77,22 +77,96 @@ export default function BuyerEventDetailsPage() {
   const [surrogateData, setSurrogateData] = useState<Record<string, string>>({});
   const [isSubmittingSurrogate, setIsSubmittingSurrogate] = useState(false);
 
-  const parsedParticipants = useMemo(() => {
+  
+  useEffect(() => {
+    if (isSurrogateOpen && templateFields.length > 0) {
+      const initData: any = {};
+      let hasCalc = false;
+      templateFields.forEach((f: any) => {
+        if (f.role?.toLowerCase() === 'calculation' && f.formula) {
+           hasCalc = true;
+           const groupId = f._sourceItemId || 'default';
+           const groupFields = templateFields.filter((tf: any) => (tf._sourceItemId || 'default') === groupId);
+           try {
+             let expr = f.formula;
+             const sortedFields = [...groupFields].sort((a, b) => (b.originalKey || b.key).length - (a.originalKey || a.key).length);
+             sortedFields.forEach((gf: any) => {
+               const vName = gf.originalKey || gf.key;
+               if (expr.includes(vName)) {
+                 let v = 0;
+                 if (gf.role?.toLowerCase() === 'creator') v = Number(gf.defaultValue) || 0;
+                 expr = expr.replace(new RegExp(`\\b${vName}\\b`, 'g'), v.toString());
+               }
+             });
+             // eslint-disable-next-line no-new-func
+             const result = new Function('return ' + expr)();
+             initData[f.key] = (Number(result) || 0).toString();
+           } catch(e) {}
+        }
+      });
+      if (hasCalc) setSurrogateData(initData);
+      else setSurrogateData({});
+    }
+  }, [isSurrogateOpen, templateFields]);
+
+const parsedParticipants = useMemo(() => {
     if (!event || !event.participants) return [];
     try { return JSON.parse(event.participants); } catch(e) { return []; }
   }, [event]);
   
-  const handleSurrogateSubmit = async () => {
+    const handleSurrogateChange = (key: string, val: string) => {
+    setSurrogateData(prev => {
+      const next = { ...prev, [key]: val };
+      
+      templateFields.forEach((f: any) => {
+        if (f.role?.toLowerCase() === 'calculation' && f.formula) {
+           const groupId = f._sourceItemId || 'default';
+           const groupFields = templateFields.filter((tf: any) => (tf._sourceItemId || 'default') === groupId);
+           try {
+             let expr = f.formula;
+             const sortedFields = [...groupFields].sort((a, b) => (b.originalKey || b.key).length - (a.originalKey || a.key).length);
+             sortedFields.forEach((gf: any) => {
+               const vName = gf.originalKey || gf.key;
+               if (expr.includes(vName)) {
+                 let v = 0;
+                 if (gf.role?.toLowerCase() === 'creator') v = Number(gf.defaultValue) || 0;
+                 else v = Number(next[gf.key]) || 0;
+                 expr = expr.replace(new RegExp(`\\b${vName}\\b`, 'g'), v.toString());
+               }
+             });
+             // eslint-disable-next-line no-new-func
+             const result = new Function('return ' + expr)();
+             next[f.key] = (Number(result) || 0).toString();
+           } catch(e) {}
+        }
+      });
+      return next;
+    });
+  };
+
+const handleSurrogateSubmit = async () => {
     if (!surrogateVendor) return alert("Please select a vendor.");
     setIsSubmittingSurrogate(true);
     try {
       const vendorDetail = parsedParticipants.find((p: any) => p.email === surrogateVendor) || { name: surrogateVendor.split('@')[0] };
       
       let calculatedAmount = 0;
+      const groupedFields = new Map<any, any[]>();
       templateFields.forEach((f: any) => {
-        if (f.type === 'number') {
-          calculatedAmount += parseFloat(surrogateData[f.key]) || 0;
-        }
+          const g = f._sourceItemId || 'default';
+          if (!groupedFields.has(g)) groupedFields.set(g, []);
+          groupedFields.get(g)!.push(f);
+      });
+      
+      groupedFields.forEach(fields => {
+        const calcFields = fields.filter(f => f.role?.toLowerCase() === 'calculation' && f.type === 'number');
+        const targetFields = calcFields.length > 0 ? calcFields : fields.filter(f => f.role?.toLowerCase() === 'participant' && f.type === 'number');
+        
+        targetFields.forEach(f => {
+          if (surrogateData[f.key]) {
+            calculatedAmount += parseFloat(surrogateData[f.key]) || 0;
+          }
+        });
       });
 
       const res = await fetch('/api/bids', {
@@ -956,7 +1030,7 @@ export default function BuyerEventDetailsPage() {
                     {f.type === 'textarea' ? (
                       <textarea 
                         value={surrogateData[f.key] || ''}
-                        onChange={(e) => setSurrogateData({...surrogateData, [f.key]: e.target.value})}
+                        onChange={(e) => handleSurrogateChange(f.key, e.target.value)}
                         placeholder={f.description}
                         style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem', minHeight: '60px' }}
                       />
@@ -964,7 +1038,7 @@ export default function BuyerEventDetailsPage() {
                       <input 
                         type={f.type === 'number' ? 'number' : 'text'}
                         value={surrogateData[f.key] || ''}
-                        onChange={(e) => setSurrogateData({...surrogateData, [f.key]: e.target.value})}
+                        onChange={(e) => handleSurrogateChange(f.key, e.target.value)}
                         placeholder={f.description}
                         style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem' }}
                         onWheel={(e) => (e.target as HTMLInputElement).blur()}
