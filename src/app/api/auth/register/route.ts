@@ -23,7 +23,6 @@ export async function POST(req: Request) {
     const org = await prisma.organization.create({
       data: {
         name: companyName,
-        domain: email.split('@')[1] || null,
         features: JSON.stringify({ plan: "Starter", createdAt: new Date().toISOString() })
       }
     });
