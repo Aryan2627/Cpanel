@@ -3,7 +3,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useIntake } from '@/context/IntakeContext';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
-import { CheckCircle2, AlertCircle, FileCheck, Users, Clock, Settings, Search, LayoutTemplate, Plus, ShieldCheck, ChevronDown, Rocket, X, GripVertical } from 'lucide-react';
+import { CheckCircle2, AlertCircle, FileCheck, Users, Clock, Settings, Search, LayoutTemplate, Plus, ShieldCheck, ChevronDown, X, GripVertical } from 'lucide-react';
 
 function SingleStageCreateContent() {
   const router = useRouter();
@@ -272,7 +272,6 @@ function SingleStageCreateContent() {
         {/* Sticky Header */}
         <div style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255, 255, 255, 0.75)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.6)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 20px -2px rgba(0,0,0,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
-            <div style={{ background: '#3b82f6', color: '#fff', padding: '8px', borderRadius: '8px', display: 'flex' }}><Rocket size={20} /></div>
             <input 
               type="text" 
               placeholder="Enter Event Title" 
