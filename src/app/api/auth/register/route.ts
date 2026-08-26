@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import bcrypt from 'bcryptjs';
 
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       data: {
         name: companyName,
         domain: email.split('@')[1] || null,
-        plan: "Starter"
+        features: JSON.stringify({ plan: "Starter", createdAt: new Date().toISOString() })
       }
     });
 
