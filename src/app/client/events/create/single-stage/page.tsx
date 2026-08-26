@@ -305,8 +305,9 @@ function SingleStageCreateContent() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
               
               {/* Event Type */}
-              <div style={{ position: 'relative' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Evaluation Type</label>
+                <div style={{ position: 'relative' }}>
                 <div 
                   onClick={() => setIsEventTypeOpen(!isEventTypeOpen)}
                   style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
@@ -323,6 +324,7 @@ function SingleStageCreateContent() {
                   </div>
                 )}
               </div>
+                </div>
               
               {/* Multi-Stage Configuration */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', gridColumn: 'span 2' }}>

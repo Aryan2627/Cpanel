@@ -282,8 +282,9 @@ function AuctionCreateContent() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
               
               {/* Event Type */}
-              <div style={{ position: 'relative' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Evaluation Type</label>
+                <div style={{ position: 'relative' }}>
                 <div 
                   onClick={() => setIsEventTypeOpen(!isEventTypeOpen)}
                   style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
@@ -300,6 +301,7 @@ function AuctionCreateContent() {
                   </div>
                 )}
               </div>
+                </div>
               
               {/* Multi-Stage Toggle */}
               <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
