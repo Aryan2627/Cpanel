@@ -1,17 +1,15 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// GET all approval requests
 export async function GET() {
   try {
     const approvals = await prisma.approvalRequest.findMany({
       orderBy: { createdAt: 'desc' }
     });
     
-    // We need to fetch the event details for these approvals
     const eventIds = approvals.map(a => a.eventId);
     const events = await prisma.event.findMany({
       where: { id: { in: eventIds } }
@@ -24,17 +22,23 @@ export async function GET() {
       const workflow = workflows.find(w => w.id === approval.workflowId);
       
       let approvers = [];
-      try {
-        approvers = workflow ? JSON.parse(workflow.approvers) : [];
-      } catch (e) {}
+      try { approvers = workflow ? JSON.parse(workflow.approvers) : []; } catch (e) {}
+
+      let history = [];
+      try { if (approval.history) history = JSON.parse(approval.history); } catch (e) {}
+      
+      const isPoApproval = history.length > 0 && history[0].type === 'PO_APPROVAL';
+      const poId = isPoApproval ? history[0].poId : null;
 
       return {
         ...approval,
-        eventTitle: event?.title || 'Unknown Event',
+        eventTitle: isPoApproval ? `Purchase Order for: ${event?.title || 'Unknown'}` : (event?.title || 'Unknown Event'),
         eventRef: event?.refId || '-',
         category: workflow?.category || '-',
         currentApproverEmail: approvers[approval.currentStep] || 'Unknown',
-        totalSteps: approvers.length
+        totalSteps: approvers.length,
+        isPoApproval,
+        poId
       };
     });
 
@@ -44,11 +48,10 @@ export async function GET() {
   }
 }
 
-// POST to act on an approval (Approve or Reject)
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const { approvalId, action, comment, userEmail } = data; // action: 'approve' or 'reject'
+    const { approvalId, action, comment, userEmail } = data; 
 
     if (!approvalId || !action) {
       return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
@@ -69,6 +72,9 @@ export async function POST(request: Request) {
 
     let history: any[] = [];
     try { if (approval.history) history = JSON.parse(approval.history); } catch (e) {}
+    
+    const isPoApproval = history.length > 0 && history[0].type === 'PO_APPROVAL';
+    const poId = isPoApproval ? history[0].poId : null;
 
     history.push({
       action,
@@ -78,18 +84,22 @@ export async function POST(request: Request) {
     });
 
     if (action === 'reject') {
-      // If rejected, entire workflow is rejected, event goes back to Draft or Rejected
       await prisma.approvalRequest.update({
         where: { id: approvalId },
         data: { status: 'Rejected', history: JSON.stringify(history) }
       });
       
-      await prisma.event.update({
-        where: { id: approval.eventId },
-        data: { status: 'Rejected' } // Assuming 'Rejected' is a valid status, or map to 'Draft'
-      });
-
-      console.log(`[Email Mock] Sent REJECTION email to event owner.`);
+      if (isPoApproval && poId) {
+         await prisma.purchaseOrder.update({
+            where: { id: poId },
+            data: { status: 'Rejected', erpStatus: 'Voided' }
+         });
+      } else {
+         await prisma.event.update({
+           where: { id: approval.eventId },
+           data: { status: 'Rejected' }
+         });
+      }
       return NextResponse.json({ success: true, status: 'Rejected' });
     } 
     
@@ -97,28 +107,33 @@ export async function POST(request: Request) {
       const nextStep = approval.currentStep + 1;
       
       if (nextStep >= approvers.length) {
-        // Fully approved!
+        // Fully approved
         await prisma.approvalRequest.update({
           where: { id: approvalId },
           data: { status: 'Approved', currentStep: nextStep, history: JSON.stringify(history) }
         });
         
-        await prisma.event.update({
-          where: { id: approval.eventId },
-          data: { status: 'Active' } // Event is now active and floated to suppliers
-        });
+        if (isPoApproval && poId) {
+           await prisma.purchaseOrder.update({
+              where: { id: poId },
+              data: { status: 'Pending Vendor', erpStatus: 'Pending Sync' } // Unblocks ERP sync and Vendor release
+           });
+           
+           // Theoretically we could trigger the ERP fetch here, but async is fine for demo
+        } else {
+           await prisma.event.update({
+             where: { id: approval.eventId },
+             data: { status: 'Active' }
+           });
+        }
         
-        console.log(`[Email Mock] Sent FULLY APPROVED email to event owner.`);
         return NextResponse.json({ success: true, status: 'Approved' });
       } else {
-        // Move to next approver
         await prisma.approvalRequest.update({
           where: { id: approvalId },
           data: { currentStep: nextStep, history: JSON.stringify(history) }
         });
-        
         const nextApprover = approvers[nextStep];
-        console.log(`[Email Mock] Sent APPROVAL REQUIRED email to ${nextApprover}.`);
         return NextResponse.json({ success: true, status: 'Pending', nextApprover });
       }
     }

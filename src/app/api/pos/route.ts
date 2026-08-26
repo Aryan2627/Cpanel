@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 
 export const runtime = 'nodejs';
@@ -18,17 +18,57 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
+    
+    // SoD (Segregation of Duties) Check - If PO > 500,000 INR
+    const requiresApproval = parseFloat(data.total || 0) > 500000;
+    
+    const finalStatus = requiresApproval ? 'Pending Approval' : (data.status || 'Pending Vendor');
+    const finalErpStatus = requiresApproval ? 'Blocked - Pending Finance Approval' : 'Pending Sync';
+
     const po = await prisma.purchaseOrder.create({
       data: {
         poNumber: data.poNumber,
         title: data.title,
-        status: data.status || 'Draft',
+        status: finalStatus,
         vendorId: data.vendorId,
         eventId: data.eventId,
-        total: data.total || 0,
-        details: data.details || null
+        total: parseFloat(data.total || 0),
+        details: data.details || null,
+        erpStatus: finalErpStatus
       }
     });
+
+    if (requiresApproval) {
+      let workflow = await prisma.workflow.findFirst({ where: { category: 'Finance PO Approval' }});
+      if (!workflow) {
+        workflow = await prisma.workflow.create({
+          data: {
+            name: 'High Value PO Approval',
+            category: 'Finance PO Approval',
+            approvers: JSON.stringify(['finance_director@company.com']),
+            isActive: true
+          }
+        });
+      }
+
+      await prisma.approvalRequest.create({
+        data: {
+          eventId: po.eventId, // Link to the same event
+          workflowId: workflow.id,
+          status: 'Pending',
+          currentStep: 0,
+          history: JSON.stringify([{ 
+            action: 'Created', 
+            by: 'System (SoD Policy)', 
+            date: new Date().toISOString(),
+            poId: po.id, // Embedding PO ID here so the approval engine knows it's a PO approval
+            type: 'PO_APPROVAL'
+          }])
+        }
+      });
+
+      return NextResponse.json(po, { status: 201 });
+    }
 
     // Asynchronously push to ERP Sync Service (Microservice)
     fetch('http://localhost:3001/pos', {

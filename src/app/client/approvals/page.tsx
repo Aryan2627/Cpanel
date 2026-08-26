@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, Clock, AlertTriangle, ChevronRight, FileText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -8,7 +8,6 @@ export default function ApprovalsPage() {
   const [approvals, setApprovals] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Hardcoded current user email for demo purposes (normally from auth)
   const currentUserEmail = 'admin@company.com';
 
   useEffect(() => {
@@ -29,7 +28,7 @@ export default function ApprovalsPage() {
 
   const handleAction = async (approvalId: string, action: 'approve' | 'reject') => {
     if (action === 'reject') {
-      const confirm = window.confirm('Are you sure you want to reject this request? This will cancel the event.');
+      const confirm = window.confirm('Are you sure you want to reject this request? This will cancel the event/PO.');
       if (!confirm) return;
     }
 
@@ -45,7 +44,6 @@ export default function ApprovalsPage() {
       });
 
       if (res.ok) {
-        // Refresh approvals list
         fetchApprovals();
       } else {
         alert(`Failed to ${action} request.`);
@@ -67,7 +65,7 @@ export default function ApprovalsPage() {
             </div>
             My Approvals
           </h1>
-          <p style={{ color: '#64748b', marginTop: '8px' }}>Review and approve pending Sourcing Events.</p>
+          <p style={{ color: '#64748b', marginTop: '8px' }}>Review and approve pending Sourcing Events and High-Value POs.</p>
         </div>
         
         <div style={{ padding: '12px 24px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', textAlign: 'center' }}>
@@ -91,9 +89,6 @@ export default function ApprovalsPage() {
             const isApproved = approval.status === 'Approved';
             const isRejected = approval.status === 'Rejected';
             
-            // For demo purposes, we allow action if it's pending. 
-            // In a real app, we'd check if `approval.currentApproverEmail === currentUserEmail`.
-            
             return (
               <div key={approval.id} style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', display: 'flex', transition: 'transform 0.2s' }}>
                 <div style={{ width: '6px', backgroundColor: isApproved ? '#10b981' : isRejected ? '#ef4444' : '#f59e0b' }} />
@@ -102,7 +97,9 @@ export default function ApprovalsPage() {
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                       <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', backgroundColor: '#f1f5f9', color: '#475569', letterSpacing: '0.05em' }}>{approval.eventRef}</span>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 600, padding: '4px 8px', borderRadius: '4px', backgroundColor: '#e0e7ff', color: '#4f46e5' }}>{approval.category}</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600, padding: '4px 8px', borderRadius: '4px', backgroundColor: approval.isPoApproval ? '#fce7f3' : '#e0e7ff', color: approval.isPoApproval ? '#be185d' : '#4f46e5' }}>
+                        {approval.isPoApproval ? 'PO Finance Approval' : approval.category}
+                      </span>
                     </div>
                     <h2 style={{ margin: '0 0 4px 0', fontSize: '1.25rem', color: '#0f172a' }}>{approval.eventTitle}</h2>
                     <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -117,7 +114,7 @@ export default function ApprovalsPage() {
                       {isRejected && <span style={{ color: '#ef4444', fontSize: '0.875rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}><XCircle size={16} /> Rejected</span>}
                     </div>
 
-                    {isPending && (
+                    {isPending ? (
                       <div style={{ display: 'flex', gap: '12px' }}>
                         <button 
                           onClick={() => handleAction(approval.id, 'reject')}
@@ -132,14 +129,12 @@ export default function ApprovalsPage() {
                           Approve
                         </button>
                       </div>
-                    )}
-                    
-                    {!isPending && (
+                    ) : (
                       <button 
-                        onClick={() => router.push(`/client/events/${approval.eventId}`)}
+                        onClick={() => router.push(approval.isPoApproval ? `/client/po/${approval.poId}` : `/client/events/${approval.eventId}`)}
                         style={{ padding: '6px 12px', background: 'none', border: 'none', color: '#3b82f6', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                       >
-                        View Event <ChevronRight size={16} />
+                        {approval.isPoApproval ? 'View Purchase Order' : 'View Event'} <ChevronRight size={16} />
                       </button>
                     )}
                   </div>

@@ -304,7 +304,11 @@ export default function BuyerEventDetailsPage() {
       });
       if (poRes.ok) {
         const poData = await poRes.json();
-        alert(`Purchase Order successfully generated for ${bid.vendorName}! Redirecting...`);
+        if (poData.requiresApproval) {
+          alert(`High Value Purchase Order (>₹500,000) for ${bid.vendorName} requires Finance Approval. It has been routed to the Approvals Queue!`);
+        } else {
+          alert(`Purchase Order successfully generated for ${bid.vendorName}! Redirecting...`);
+        }
         router.push(`/client/po/${poData.id}`);
       } else {
         alert('Failed to generate PO');
@@ -368,7 +372,7 @@ export default function BuyerEventDetailsPage() {
         });
       }
       
-      alert('Successfully generated Purchase Orders for the Split Award!');
+      alert('Split Award Complete! Note: Any Purchase Orders exceeding ₹500,000 have been automatically routed to the Finance Director for mandatory compliance approval before being sent to the vendor.');
       setIsSplitAwardOpen(false);
       router.push('/client/po');
     } catch(err) {
