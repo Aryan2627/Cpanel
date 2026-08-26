@@ -8,6 +8,7 @@ function AuctionCreateContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTitle = searchParams.get('title') || '';
+  const fromPR = searchParams.get('fromPR') === 'true';
   
   const [title, setTitle] = useState(initialTitle);
   const { intakes } = useIntake();
