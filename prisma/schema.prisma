@@ -11,7 +11,7 @@ datasource db {
 model Organization {
   id        String   @id @default(uuid())
   name      String
-  domain    String?  @unique
+  domain    String?
   theme     String? // JSON string for colors, logos
   features  String? // JSON string for feature toggles
   createdAt DateTime @default(now())
