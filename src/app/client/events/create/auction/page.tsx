@@ -537,58 +537,36 @@ function AuctionCreateContent() {
           </div>
 
 
+          
           {/* Card 3: Participants */}
           <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.02)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}><Users size={20} color="#8b5cf6" /> Participants</h3>
-              {showTinderMatchmaking && (
+              <div style={{ display: 'flex', gap: '12px' }}>
+                {showTinderMatchmaking && (
+                  <button 
+                    onClick={() => setIsTinderModalOpen(true)}
+                    style={{ background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)', color: '#fff', border: 'none', borderRadius: '24px', padding: '8px 16px', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 6px rgba(236, 72, 153, 0.3)', transition: 'transform 0.2s' }}
+                    onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}
+                  >
+                     Smart Match AI
+                  </button>
+                )}
                 <button 
-                  onClick={() => setIsTinderModalOpen(true)}
-                  style={{ background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)', color: '#fff', border: 'none', borderRadius: '24px', padding: '8px 16px', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 6px rgba(236, 72, 153, 0.3)', transition: 'transform 0.2s' }}
-                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}
+                  onClick={() => {
+                    setTempSelectedVendorIds(new Set(selectedVendors.map(v => v.id)));
+                    setIsVendorModalOpen(true);
+                  }}
+                  style={{ background: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '24px', padding: '8px 16px', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 4px rgba(139, 92, 246, 0.2)' }}
                 >
-                   Smart Match AI
+                  <Plus size={16} /> Add Participant
                 </button>
-              )}
+              </div>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ position: 'relative', maxWidth: '400px' }}>
-                <div style={{ position: 'absolute', top: '50%', left: '16px', transform: 'translateY(-50%)', color: '#94a3b8' }}><Search size={18} /></div>
-                <input 
-                  type="text" 
-                  placeholder="Search and invite vendors..." 
-                  value={vendorSearch}
-                  onChange={(e) => { setVendorSearch(e.target.value); setIsVendorDropdownOpen(true); }}
-                  onFocus={() => setIsVendorDropdownOpen(true)}
-                  style={{ ...glassInputStyle, paddingLeft: '44px' }}
-                  onFocusCapture={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.2)'} onBlurCapture={e => e.currentTarget.style.boxShadow = 'none'}
-                />
-                {isVendorDropdownOpen && vendorSearch.length > 0 && (
-                  <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: '8px', width: '100%', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, maxHeight: '250px', overflowY: 'auto' }}>
-                    {filteredVendors.length > 0 ? (
-                      filteredVendors.map(vendor => (
-                        <div 
-                          key={vendor.id} onClick={() => handleSelectVendor(vendor)}
-                          style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                          onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                        >
-                          <div>
-                            <div style={{ fontWeight: '600', color: '#0f172a', fontSize: '0.95rem' }}>{vendor.name}</div>
-                            <div style={{ color: '#64748b', fontSize: '0.85rem' }}>{vendor.email}</div>
-                          </div>
-                          <Plus size={16} color="#8b5cf6" />
-                        </div>
-                      ))
-                    ) : (
-                      <div style={{ padding: '12px 16px', color: '#64748b', fontSize: '0.9rem' }}>No vendors found matching "{vendorSearch}"</div>
-                    )}
-                  </div>
-                )}
-              </div>
-
               {selectedVendors.length > 0 ? (
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '8px' }}>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   {selectedVendors.map(vendor => (
                     <div key={vendor.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(to right, #f3e8ff, #e0e7ff)', color: '#4338ca', padding: '8px 16px', borderRadius: '24px', fontSize: '0.9rem', fontWeight: '600', border: '1px solid #c7d2fe', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', animation: 'fadeIn 0.3s ease' }}>
                       <ShieldCheck size={16} /> {vendor.name}
@@ -597,7 +575,9 @@ function AuctionCreateContent() {
                   ))}
                 </div>
               ) : (
-                <div style={{ color: '#94a3b8', fontSize: '0.9rem', fontStyle: 'italic' }}>No vendors selected yet.</div>
+                <div style={{ padding: '32px', border: '1px dashed #cbd5e1', borderRadius: '12px', textAlign: 'center', color: '#64748b' }}>
+                  No participants added yet. Click "Add Participant" to invite vendors.
+                </div>
               )}
             </div>
           </div>
