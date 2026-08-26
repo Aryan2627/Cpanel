@@ -1,16 +1,21 @@
-import { prisma } from './prisma';
+﻿import { prisma } from './prisma';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "./auth";
 
 /**
- * MOCK AUTHENTICATION & MULTI-TENANCY
- * In a real application, this would decode a JWT or NextAuth session cookie
- * and return the specific user's organizationId. 
- * 
- * For this proof of concept, we will look up the "Default Organization"
- * or create it if it doesn't exist, and return its ID.
+ * Returns the logged-in user's organizationId based on their NextAuth session.
+ * If there is no session (e.g. testing), it falls back to a default organization
+ * to ensure backward compatibility for API tests.
  */
 export async function getTenantId(): Promise<string> {
-  const orgName = "Default Organization (Acme Corp)";
+  const session = await getServerSession(authOptions);
   
+  if (session?.user && (session.user as any).organizationId) {
+    return (session.user as any).organizationId;
+  }
+
+  // Fallback for missing auth / testing
+  const orgName = "Default Organization (Acme Corp)";
   let org = await prisma.organization.findFirst({
     where: { name: orgName }
   });

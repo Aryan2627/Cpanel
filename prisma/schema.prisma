@@ -42,6 +42,7 @@ model User {
   email          String?       @unique
   phone          String?
   role           String?
+  password       String?
   erpId          String?
   status         String        @default("Active")
   createdAt      DateTime      @default(now())
