@@ -24,14 +24,18 @@ export async function GET() {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({ where: { email: payload.email as string } });
+    const user = await prisma.user.findUnique({ 
+      where: { email: payload.email as string },
+      include: { organization: true }
+    });
     
     if (user) {
       return NextResponse.json({ 
         name: user.name || user.email, 
         email: user.email, 
         role: user.role,
-        organizationId: user.organizationId 
+        organizationId: user.organizationId,
+        companyName: user.organization?.name || 'My Organization'
       });
     }
 
