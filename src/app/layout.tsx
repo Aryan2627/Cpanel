@@ -6,7 +6,7 @@ import { Providers } from "./providers";
 const outfit = Outfit({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Procurement Portal",
+  title: "ProcGen | Enterprise Sourcing",
   description: "Modern Gen-Z Procurement Platform",
 };
 
