@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getTenantId } from '../../../lib/tenant';
 import { prisma } from '../../../lib/prisma';
 
@@ -8,13 +8,14 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   try {
     const orgId = await getTenantId();
+    if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
+
     const { searchParams } = new URL(request.url);
     const eventId = searchParams.get('eventId');
 
-    let whereClause: any = {};
+    let whereClause: any = { organizationId: orgId }; // ALWAYS enforce tenant isolation
 
     if (eventId) {
-      // Find the event by its refId (e.g. EVT-1004)
       const event = await prisma.event.findUnique({
         where: { refId: eventId }
       });
@@ -22,28 +23,22 @@ export async function GET(request: Request) {
       if (event && event.participants) {
         try {
           const participants = JSON.parse(event.participants);
-          // participants might be an array of vendor objects { id, name } or strings
           const participantNames = participants.map((p: any) => typeof p === 'string' ? p : p.name);
           
           if (participantNames.length > 0) {
-            whereClause = {
-              name: { in: participantNames }
-            };
+            whereClause.name = { in: participantNames };
           } else {
-             // Event has no participants, return empty list
-             whereClause = { id: 'no-match' };
+             whereClause.id = 'no-match';
           }
         } catch (e) {
           console.error("Failed to parse participants", e);
         }
       } else {
-        // Event not found or no participants
-        whereClause = { id: 'no-match' };
+        whereClause.id = 'no-match';
       }
     }
 
     const vendors = await prisma.vendor.findMany({
-      where: { organizationId: orgId },
       where: whereClause,
       orderBy: { createdAt: 'desc' }
     });
@@ -55,9 +50,13 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const orgId = await getTenantId();
+    if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
+
     const data = await request.json();
     const vendor = await prisma.vendor.create({
       data: {
+        organizationId: orgId,
         name: data.name,
         email: data.email,
         phone: data.phone,
