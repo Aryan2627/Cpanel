@@ -19,6 +19,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const orgId = await getTenantId();
+    if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
     const data = await request.json();
     
     // SoD (Segregation of Duties) Check - If PO > 500,000 INR
@@ -29,6 +31,7 @@ export async function POST(request: Request) {
 
     const po = await prisma.purchaseOrder.create({
       data: {
+        organizationId: orgId,
         poNumber: data.poNumber,
         title: data.title,
         status: finalStatus,

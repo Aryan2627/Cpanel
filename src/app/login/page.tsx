@@ -1,7 +1,7 @@
 ﻿"use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+
 
 export default function Login() {
   const router = useRouter();
@@ -15,16 +15,20 @@ export default function Login() {
     setError('');
 
     try {
-      const res = await signIn('credentials', {
-        redirect: true,
-        email: formData.email,
-        password: formData.password,
-        callbackUrl: '/client/intake'
+      
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, password: formData.password })
       });
       
-      if (res?.error) {
-        throw new Error('Invalid email or password');
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Invalid email or password');
       }
+      
+      router.push('/client/intake');
+  
     } catch (err: any) {
       setError(err.message);
     } finally {

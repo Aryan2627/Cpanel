@@ -1,7 +1,7 @@
 ﻿"use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+
 
 export default function Signup() {
   const router = useRouter();
@@ -27,13 +27,20 @@ export default function Signup() {
         throw new Error(data.error || 'Failed to register');
       }
 
-      // Log them in — use redirect:true so NextAuth sets the session cookie properly
-      await signIn('credentials', {
-        redirect: true,
-        email: formData.email,
-        password: formData.password,
-        callbackUrl: '/client/intake'
+      
+      // Log them in via our custom endpoint
+      const loginRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, password: formData.password })
       });
+      
+      if (!loginRes.ok) {
+        throw new Error('Registration successful but auto-login failed. Please log in manually.');
+      }
+      
+      router.push('/client/intake');
+  
     } catch (err: any) {
       setError(err.message);
     } finally {

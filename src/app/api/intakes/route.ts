@@ -20,10 +20,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const orgId = await getTenantId();
+    if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
     const data = await request.json();
     console.log("Adding Intake:", data);
     const newIntake = await prisma.intake.create({
       data: {
+        organizationId: orgId,
         refId: data.refId || `IR-${Date.now()}`,
         title: data.title,
         reqName: data.reqName,

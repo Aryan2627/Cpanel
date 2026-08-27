@@ -20,6 +20,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const orgId = await getTenantId();
+    if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
     const data = await request.json();
 
     const existing = await prisma.template.findFirst({
@@ -32,6 +34,7 @@ export async function POST(request: Request) {
 
     const newTemplate = await prisma.template.create({
       data: {
+        organizationId: orgId,
         name: data.name,
         type: data.type || 'RFQ',
         fields: JSON.stringify(data.fields),

@@ -20,9 +20,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const orgId = await getTenantId();
+    if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
     const data = await request.json();
     const product = await prisma.product.create({
       data: {
+        organizationId: orgId,
         name: data.name,
         uom: data.uom,
         category: data.category,
