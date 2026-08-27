@@ -19,6 +19,27 @@ export async function POST(request: Request) {
   try {
     const orgId = await getTenantId();
     const data = await request.json();
+    
+    if (data.phone && !/^\d+$/.test(data.phone)) {
+      return NextResponse.json({ error: 'Phone number must contain only numbers' }, { status: 400 });
+    }
+
+    const orConditions = [];
+    if (data.email) orConditions.push({ email: data.email });
+    if (data.phone) orConditions.push({ phone: data.phone });
+    if (data.erpId) orConditions.push({ erpId: data.erpId, organizationId: orgId });
+
+    if (orConditions.length > 0) {
+      const existingUser = await prisma.user.findFirst({
+        where: { OR: orConditions }
+      });
+      if (existingUser) {
+        if (existingUser.email === data.email) return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
+        if (existingUser.phone === data.phone) return NextResponse.json({ error: 'Phone number already exists' }, { status: 400 });
+        if (existingUser.erpId === data.erpId) return NextResponse.json({ error: 'ERP ID already exists' }, { status: 400 });
+      }
+    }
+
     const user = await prisma.user.create({
       data: {
         organizationId: orgId,
@@ -43,6 +64,29 @@ export async function PUT(request: Request) {
     
     if (!data.id) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
+    
+    if (data.phone && !/^\d+$/.test(data.phone)) {
+      return NextResponse.json({ error: 'Phone number must contain only numbers' }, { status: 400 });
+    }
+
+    const orConditions = [];
+    if (data.email) orConditions.push({ email: data.email });
+    if (data.phone) orConditions.push({ phone: data.phone });
+    if (data.erpId) orConditions.push({ erpId: data.erpId, organizationId: orgId });
+
+    if (orConditions.length > 0) {
+      const existingUser = await prisma.user.findFirst({
+        where: { 
+          OR: orConditions,
+          id: { not: data.id }
+        }
+      });
+      if (existingUser) {
+        if (existingUser.email === data.email) return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
+        if (existingUser.phone === data.phone) return NextResponse.json({ error: 'Phone number already exists' }, { status: 400 });
+        if (existingUser.erpId === data.erpId) return NextResponse.json({ error: 'ERP ID already exists' }, { status: 400 });
+      }
     }
 
     const user = await prisma.user.update({

@@ -318,7 +318,7 @@ export default function UsersPage() {
                   <input 
                     type="tel" 
                     value={formData.phone}
-                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
                     placeholder="Enter user's phone number"
                     style={{ flex: 1, padding: '10px 12px', border: 'none', outline: 'none', fontSize: '0.9rem' }} 
                   />
