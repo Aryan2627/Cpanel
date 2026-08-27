@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getTenantId } from '../../../lib/tenant';
 import { prisma } from '../../../lib/prisma';
 
@@ -6,8 +6,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  console.log("DATABASE_URL is:", process.env.DATABASE_URL);
   try {
+    const orgId = await getTenantId();
     const products = await prisma.product.findMany({
       where: { organizationId: orgId },
       orderBy: { createdAt: 'desc' }
@@ -36,7 +36,6 @@ export async function POST(request: Request) {
         hsnCode: data.hsnCode,
         imageUrl: data.imageUrl,
         phone: data.phone,
-        // Status, createdBy, code are auto-handled by schema defaults unless provided
       }
     });
     return NextResponse.json(product, { status: 201 });
