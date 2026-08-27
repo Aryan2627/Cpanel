@@ -19,89 +19,89 @@ export default function TourButton() {
     switch (true) {
       case pathname === '/client':
         steps = [
-          { popover: { title: 'Welcome to ProcGen Dashboard', description: 'This is your central command center. Here you can get a high-level overview of all your procurement activities.', align: 'center' } },
-          { element: '.sidebar', popover: { title: 'Main Navigation', description: 'Use this sidebar to access Intakes, Sourcing Events, Purchase Orders, and Platform Settings.', side: 'right', align: 'start' } },
-          { element: '#tour-kpi-cards', popover: { title: 'Live KPIs', description: 'These cards display real-time metrics including your total spend, active events, and pending approvals.', side: 'bottom', align: 'start' } },
-          { element: '#tour-recent-events', popover: { title: 'Recent Activity', description: 'Quickly jump back into your most recent sourcing events and auctions directly from this widget.', side: 'top', align: 'start' } }
+          { popover: { title: 'Welcome to ProcGen Dashboard', description: 'This is your central command center. Here you can get a high-level overview of all your procurement activities.' } },
+          { element: '.sidebar', popover: { title: 'Main Navigation', description: 'Use this sidebar to access Intakes, Sourcing Events, Purchase Orders, and Platform Settings.' } },
+          { element: '#tour-kpi-cards', popover: { title: 'Live KPIs', description: 'These cards display real-time metrics including your total spend, active events, and pending approvals.' } },
+          { element: '#tour-recent-events', popover: { title: 'Recent Activity', description: 'Quickly jump back into your most recent sourcing events and auctions directly from this widget.' } }
         ];
         break;
         
       case pathname === '/client/intake':
       case pathname === '/client/pr':
         steps = [
-          { popover: { title: 'Intake Management', description: 'This page is where all internal purchase requests (Intakes/PRs) are tracked and managed.', align: 'center' } },
-          { element: 'button', popover: { title: 'Create New Request', description: 'Click here to submit a new material or service request to the procurement team.', side: 'bottom', align: 'start' } },
-          { element: 'table', popover: { title: 'Request Tracking', description: 'This table shows the real-time status of every request. You can see whether a request is Pending, Approved, or Rejected.', side: 'top', align: 'start' } }
+          { popover: { title: 'Intake Management', description: 'This page is where all internal purchase requests (Intakes/PRs) are tracked and managed.' } },
+          { element: '#tour-create-intake', popover: { title: 'Create New Request', description: 'Click here to submit a new material or service request to the procurement team.' } },
+          { element: 'table', popover: { title: 'Request Tracking', description: 'This table shows the real-time status of every request. You can see whether a request is Pending, Approved, or Rejected.' } }
         ];
         break;
 
       case pathname === '/client/events':
         steps = [
-          { popover: { title: 'Sourcing Events', description: 'Manage all your RFQs, RFPs, and Reverse Auctions from this unified event directory.', align: 'center' } },
-          { element: 'button', popover: { title: 'Launch New Event', description: 'Click here to create a new sourcing event. You can choose between a standard RFQ or a dynamic Reverse Auction.', side: 'bottom', align: 'start' } },
-          { element: 'table', popover: { title: 'Event Dashboard', description: 'Monitor the status of your live events, track vendor participation, and review incoming bids.', side: 'top', align: 'start' } }
+          { popover: { title: 'Sourcing Events', description: 'Manage all your RFQs, RFPs, and Reverse Auctions from this unified event directory.' } },
+          { element: 'button', popover: { title: 'Launch New Event', description: 'Click here to create a new sourcing event. You can choose between a standard RFQ or a dynamic Reverse Auction.' } },
+          { element: 'table', popover: { title: 'Event Dashboard', description: 'Monitor the status of your live events, track vendor participation, and review incoming bids.' } }
         ];
         break;
 
       case pathname.includes('/client/events/create'):
         steps = [
-          { popover: { title: 'Event Builder', description: 'Welcome to the Event Builder! This is where you configure your RFQ or Auction before sending it to vendors.', align: 'center' } },
-          { element: 'button', popover: { title: 'Workspace Toggle', description: 'Pro Tip: Click this to open a split-screen view of your pending Intakes, allowing you to drag-and-drop items directly into this event!', side: 'bottom', align: 'start' } },
-          { element: 'select', popover: { title: 'Smart Templates', description: 'Selecting a template will automatically load the specific technical questions and fields that vendors must answer.', side: 'bottom', align: 'start' } },
-          { element: 'table', popover: { title: 'Line Items Grid', description: 'Add your requested items here. You can manually add rows, or click inside the grid and press Ctrl+V to paste directly from Excel!', side: 'top', align: 'start' } },
-          { popover: { title: 'Publishing', description: 'Once you invite vendors and configure your dates, hit publish to instantly notify all invited suppliers.', align: 'center' } }
+          { popover: { title: 'Event Builder', description: 'Welcome to the Event Builder! This is where you configure your RFQ or Auction before sending it to vendors.' } },
+          { element: 'button', popover: { title: 'Workspace Toggle', description: 'Pro Tip: Click this to open a split-screen view of your pending Intakes, allowing you to drag-and-drop items directly into this event!' } },
+          { element: 'select', popover: { title: 'Smart Templates', description: 'Selecting a template will automatically load the specific technical questions and fields that vendors must answer.' } },
+          { element: 'table', popover: { title: 'Line Items Grid', description: 'Add your requested items here. You can manually add rows, or click inside the grid and press Ctrl+V to paste directly from Excel!' } },
+          { popover: { title: 'Publishing', description: 'Once you invite vendors and configure your dates, hit publish to instantly notify all invited suppliers.' } }
         ];
         break;
 
       case pathname === '/client/po':
         steps = [
-          { popover: { title: 'Purchase Orders', description: 'This module tracks all finalized Purchase Orders generated from awarded events or direct purchases.', align: 'center' } },
-          { element: 'table', popover: { title: 'PO Ledger', description: 'View PO amounts, vendor assignments, and current fulfillment statuses. Click any row to view the detailed PDF.', side: 'top', align: 'start' } }
+          { popover: { title: 'Purchase Orders', description: 'This module tracks all finalized Purchase Orders generated from awarded events or direct purchases.' } },
+          { element: 'table', popover: { title: 'PO Ledger', description: 'View PO amounts, vendor assignments, and current fulfillment statuses. Click any row to view the detailed PDF.' } }
         ];
         break;
 
       case pathname === '/client/vendors':
         steps = [
-          { popover: { title: 'Vendor Directory', description: 'Your secure, isolated database of suppliers and partners.', align: 'center' } },
-          { element: 'button', popover: { title: 'Onboard Vendor', description: 'Click to invite a new supplier. They will receive an email to securely register and join your tenant network.', side: 'bottom', align: 'start' } },
-          { element: 'table', popover: { title: 'Performance Metrics', description: 'Track vendor compliance, onboarding status, and historical performance.', side: 'top', align: 'start' } }
+          { popover: { title: 'Vendor Directory', description: 'Your secure, isolated database of suppliers and partners.' } },
+          { element: 'button', popover: { title: 'Onboard Vendor', description: 'Click to invite a new supplier. They will receive an email to securely register and join your tenant network.' } },
+          { element: 'table', popover: { title: 'Performance Metrics', description: 'Track vendor compliance, onboarding status, and historical performance.' } }
         ];
         break;
         
       case pathname.includes('/client/vendors/messages'):
         steps = [
-          { popover: { title: 'Supplier Collaboration', description: 'Communicate directly with your suppliers in real-time, keeping all audit trails in one place.', align: 'center' } },
-          { element: 'ul', popover: { title: 'Active Conversations', description: 'Select a vendor from this list to view your chat history with them.', side: 'right', align: 'start' } },
-          { element: 'input', popover: { title: 'Instant Messaging', description: 'Type your message and press Enter. Vendors receive instant notifications in their portal.', side: 'top', align: 'center' } }
+          { popover: { title: 'Supplier Collaboration', description: 'Communicate directly with your suppliers in real-time, keeping all audit trails in one place.' } },
+          { element: 'ul', popover: { title: 'Active Conversations', description: 'Select a vendor from this list to view your chat history with them.' } },
+          { element: 'input', popover: { title: 'Instant Messaging', description: 'Type your message and press Enter. Vendors receive instant notifications in their portal.' } }
         ];
         break;
 
       case pathname === '/client/manage/products':
         steps = [
-          { popover: { title: 'Product Master', description: 'Maintain your standardized catalog of materials and services here to ensure clean data across all POs.', align: 'center' } },
-          { element: 'button', popover: { title: 'Add or Bulk Upload', description: 'You can create products manually or use the Bulk Upload tool to import thousands of items from your ERP via CSV.', side: 'bottom', align: 'start' } },
-          { element: 'table', popover: { title: 'Catalog', description: 'Use the action column to edit product details, update categories, or change HSN codes.', side: 'top', align: 'start' } }
+          { popover: { title: 'Product Master', description: 'Maintain your standardized catalog of materials and services here to ensure clean data across all POs.' } },
+          { element: 'button', popover: { title: 'Add or Bulk Upload', description: 'You can create products manually or use the Bulk Upload tool to import thousands of items from your ERP via CSV.' } },
+          { element: 'table', popover: { title: 'Catalog', description: 'Use the action column to edit product details, update categories, or change HSN codes.' } }
         ];
         break;
 
       case pathname === '/client/manage/users':
         steps = [
-          { popover: { title: 'User Access Management', description: 'Control who has access to your procurement portal and what permissions they hold.', align: 'center' } },
-          { element: 'button', popover: { title: 'Create / Edit Users', description: 'Click to add a new team member. We strictly enforce unique emails and phone numbers to prevent duplicate accounts.', side: 'bottom', align: 'start' } },
-          { element: 'table', popover: { title: 'Role-Based Access', description: 'Assign roles like Admin, Manager, or Member to restrict access to sensitive financial data.', side: 'top', align: 'start' } }
+          { popover: { title: 'User Access Management', description: 'Control who has access to your procurement portal and what permissions they hold.' } },
+          { element: 'button', popover: { title: 'Create / Edit Users', description: 'Click to add a new team member. We strictly enforce unique emails and phone numbers to prevent duplicate accounts.' } },
+          { element: 'table', popover: { title: 'Role-Based Access', description: 'Assign roles like Admin, Manager, or Member to restrict access to sensitive financial data.' } }
         ];
         break;
 
       case pathname === '/client/manage/workflows':
         steps = [
-          { popover: { title: 'Platform Configurations', description: 'This powerful module lets you customize dropdown menus and lists across the entire platform without needing a developer.', align: 'center' } },
-          { element: 'h3', popover: { title: 'Dynamic Variables', description: 'Add new Categories, Departments, or UOMs here, and they instantly become available in forms for all your users.', side: 'bottom', align: 'start' } }
+          { popover: { title: 'Platform Configurations', description: 'This powerful module lets you customize dropdown menus and lists across the entire platform without needing a developer.' } },
+          { element: 'h3', popover: { title: 'Dynamic Variables', description: 'Add new Categories, Departments, or UOMs here, and they instantly become available in forms for all your users.' } }
         ];
         break;
 
       default:
         steps = [
-          { popover: { title: 'Explore the Platform', description: 'Welcome to ProcGen! Use the navigation menu on the left to explore different modules. Click this question mark anytime you need a guided tour of the page you are on.', align: 'center' } }
+          { popover: { title: 'Explore the Platform', description: 'Welcome to ProcGen! Use the navigation menu on the left to explore different modules. Click this question mark anytime you need a guided tour of the page you are on.' } }
         ];
     }
 
@@ -115,7 +115,7 @@ export default function TourButton() {
         steps: steps.map(step => {
           // If the step has an element but it doesn't exist on the DOM, convert it to a center popover so it doesn't break
           if (step.element && !document.querySelector(step.element)) {
-            return { popover: { ...step.popover, align: 'center', side: 'bottom' } };
+            return { popover: { ...step.popover } };
           }
           return step;
         })
