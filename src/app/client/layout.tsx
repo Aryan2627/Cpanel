@@ -45,35 +45,35 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, []);
 
   const manageSubItems = [
-    { name: 'User Directory', path: '/client/manage/users' },
-    { name: 'Product Catalog', path: '/client/manage/products' },
-    { name: 'Form Templates', path: '/client/manage/templates' }
+    { name: 'Users', path: '/client/manage/users' },
+    { name: 'Products', path: '/client/manage/products' },
+    { name: 'Templates', path: '/client/manage/templates' }
   ];
+
   if (showWorkflows) {
     manageSubItems.push(
-      { name: 'Data Field Mapping', path: '/client/manage/workflows' },
-      { name: 'Approval Chains', path: '/client/manage/approvals' }
+      { name: 'Dropdowns & Fields', path: '/client/manage/workflows' },
+      { name: 'Approval Rules', path: '/client/manage/approvals' }
     );
   }
 
   const navItems = [
-    { name: 'Command Center', path: '/client' },
-    { name: 'Approval Queue', path: '/client/approvals' },
-    { name: 'Intake Requests', path: '/client/intake' },
-    { name: 'Requisitions Hub', path: '/client/pr' },
-    { name: 'Sourcing Events', path: '/client/events' },
+    { name: 'Dashboard', path: '/client' },
+    { name: 'Approvals', path: '/client/approvals' },
+    { name: 'Purchase Requests', path: '/client/intake' },
+    { name: 'Requisitions', path: '/client/pr' },
+    { name: 'Tenders & Auctions', path: '/client/events' },
     { 
-      name: 'Supplier Network', 
+      name: 'Vendors', 
       path: '#',
       subItems: [
-        { name: 'Global Directory', path: '/client/vendors' },
-        { name: 'Secure Messaging', path: '/client/vendors/messages' }
+        { name: 'Supplier List', path: '/client/vendors' },
+        { name: 'Chat / Messages', path: '/client/vendors/messages' }
       ]
     },
-    { name: 'PO Ledger', path: '/client/po' },
-
+    { name: 'Purchase Orders', path: '/client/po' },
     { 
-      name: 'System Config', 
+      name: 'Master Data', 
       path: '#',
       subItems: manageSubItems
     },
@@ -81,11 +81,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       name: 'Settings', 
       path: '#',
       subItems: [
-        { name: 'General Settings', path: '/client/settings' },
-        { name: 'ERP Integrations', path: '/client/settings/erp' }
+        { name: 'General', path: '/client/settings' }
       ]
     },
-    { name: 'My Profile', path: '/client/profile' },
+    { name: 'Profile', path: '/client/profile' },
   ];
 
   return (
