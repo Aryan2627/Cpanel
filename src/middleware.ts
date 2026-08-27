@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // Support both legacy tokens and the new proc-session JWT token
   const token = request.cookies.get('auth_token')?.value;
+  const procSession = request.cookies.get('proc-session')?.value;
   const nextAuthSession = request.cookies.get('next-auth.session-token')?.value 
     || request.cookies.get('__Secure-next-auth.session-token')?.value;
 
@@ -11,8 +13,8 @@ export function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/client') ||
     request.nextUrl.pathname.startsWith('/vendor');
 
-  // Allow if either our JWT cookie OR NextAuth session exists
-  if (isProtectedRoute && !token && !nextAuthSession) {
+  // Allow if any of the valid session cookies exist
+  if (isProtectedRoute && !token && !procSession && !nextAuthSession) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
