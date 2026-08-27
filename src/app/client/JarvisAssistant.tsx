@@ -11,7 +11,12 @@ export default function JarvisAssistant() {
   const [transcript, setTranscript] = useState('');
   const [jarvisResponse, setJarvisResponse] = useState('');
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+  const [position, setPosition] = useState({ x: typeof window !== "undefined" ? window.innerWidth - 90 : 1000, y: 20 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [pulseScale, setPulseScale] = useState(1);
+  const positionRef = useRef(position);
+  useEffect(() => { positionRef.current = position; }, [position]);
   const [isLockdown, setIsLockdown] = useState(false);
   const [shouldCrash, setShouldCrash] = useState(false);
   const [textInput, setTextInput] = useState('');
@@ -227,10 +232,19 @@ export default function JarvisAssistant() {
 
       {/* Holographic Orb */}
       <div 
-        onClick={toggleListening}
+        
+        onMouseDown={(e) => {
+          setIsDragging(true);
+          setDragOffset({ x: e.clientX - position.x, y: e.clientY - position.y });
+          e.stopPropagation();
+        }}
+        onClick={(e) => {
+          if (!isDragging) toggleListening();
+        }}
+  
         title="Toggle Jarvis (Ctrl + J)"
         style={{
-          position: 'fixed', top: '20px', right: '30px',
+          position: 'fixed', top: `${position.y}px`, left: `${position.x}px`,
           width: '60px', height: '60px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer', zIndex: 999999,
@@ -268,8 +282,8 @@ export default function JarvisAssistant() {
       {/* Slide-out Terminal Overlay */}
       <div style={{
         position: 'fixed',
-        top: '90px',
-        right: isTerminalOpen ? '30px' : '-400px',
+        top: `${typeof window !== "undefined" ? Math.min(position.y + 70, window.innerHeight - 300) : position.y + 70}px`,
+        left: isTerminalOpen ? `${typeof window !== "undefined" ? Math.min(position.x - 360 > 0 ? position.x - 360 : position.x + 70, window.innerWidth - 380) : position.x - 360}px` : '-1000px',
         width: '350px',
         backgroundColor: 'rgba(10, 15, 30, 0.85)',
         backdropFilter: 'blur(20px) saturate(150%)',
