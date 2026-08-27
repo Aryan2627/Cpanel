@@ -6,7 +6,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  console.log("DATABASE_URL IS:", process.env.DATABASE_URL);
   try {
     const orgId = await getTenantId();
     const users = await prisma.user.findMany({ where: { organizationId: orgId } });
@@ -32,6 +31,32 @@ export async function POST(request: Request) {
       }
     });
     return NextResponse.json(user, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const orgId = await getTenantId();
+    const data = await request.json();
+    
+    if (!data.id) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
+
+    const user = await prisma.user.update({
+      where: { id: data.id, organizationId: orgId },
+      data: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        role: data.role,
+        erpId: data.erpId,
+        status: data.status,
+      }
+    });
+    return NextResponse.json(user, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

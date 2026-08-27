@@ -5,6 +5,8 @@ import Link from 'next/link';
 export default function UsersPage() {
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
 
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +24,21 @@ export default function UsersPage() {
         setLoading(false);
       })
       .catch(console.error);
+  };
+
+  const handleEditUser = (user: any) => {
+    setFormData({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      role: user.role || '',
+      erpId: user.erpId || '',
+      status: user.status || 'Active',
+      department: user.department || ''
+    });
+    setEditingUserId(user.id);
+    setIsEditMode(true);
+    setIsCreateModalOpen(true);
   };
 
   const handleDeleteUser = async (id: string) => {
@@ -153,7 +170,7 @@ export default function UsersPage() {
           
           <div>
             <button 
-              onClick={() => setIsCreateModalOpen(true)}
+              onClick={() => { setIsEditMode(false); setEditingUserId(null); setFormData({ name: "", email: "", phone: "", role: "", erpId: "", status: "Active", department: "" }); setIsCreateModalOpen(true); }}
               style={{ padding: '8px 16px', border: 'none', borderRadius: '4px', backgroundColor: '#2563eb', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: '500' }}>
               + Create User
             </button>
@@ -195,6 +212,7 @@ export default function UsersPage() {
                     </td>
                     <td style={{ padding: '16px', color: '#4b5563' }}>{user.status}</td>
                     <td style={{ padding: '16px', color: '#4b5563' }}>
+                      <button onClick={() => handleEditUser(user)} style={{ padding: "6px 12px", border: "1px solid #d1d5db", backgroundColor: "#fff", color: "#374151", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem", fontWeight: "500", marginRight: "8px" }}>Edit</button>
                       <button onClick={() => handleDeleteUser(user.id)} style={{ padding: '6px 12px', border: '1px solid #ef4444', backgroundColor: '#fee2e2', color: '#dc2626', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '500' }}>
                         Delete
                       </button>
@@ -224,7 +242,7 @@ export default function UsersPage() {
             animation: 'slideLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
           }}>
             <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#111827', fontWeight: '700' }}>Create New User</h2>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#111827', fontWeight: '700' }}>{isEditMode ? "Edit User" : "Create New User"}</h2>
               <button onClick={() => setIsCreateModalOpen(false)} style={{ background: '#e2e8f0', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', color: '#475569', cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#cbd5e1'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}></button>
             </div>
             

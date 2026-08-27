@@ -177,6 +177,7 @@ export default function ProductsPage() {
               <th style={{ padding: '16px 24px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Status</th>
               <th style={{ padding: '16px 24px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Created By</th>
               <th style={{ padding: '16px 24px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Created On</th>
+                <th style={{ padding: '16px 24px', fontWeight: '600', color: '#111827', borderBottom: '1px solid #e5e7eb' }}>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -205,6 +206,9 @@ export default function ProductsPage() {
                   </td>
                   <td style={{ padding: '16px 24px', color: '#4b5563' }}>{prod.createdBy}</td>
                   <td style={{ padding: '16px 24px', color: '#4b5563' }}>{new Date(prod.createdAt).toLocaleDateString()}</td>
+                    <td style={{ padding: '16px 24px' }}>
+                      <Link href={`/client/manage/products/edit/${prod.id}`} style={{ color: '#2563eb', textDecoration: 'none', fontWeight: '500' }}>Edit</Link>
+                    </td>
                 </tr>
               ))
             )}
