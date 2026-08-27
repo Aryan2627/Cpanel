@@ -80,15 +80,28 @@ export default function UsersPage() {
       return;
     }
     try {
-      await fetch('/api/users', {
-        method: 'POST',
+      const url = '/api/users';
+      const method = isEditMode ? 'PUT' : 'POST';
+      const bodyData = isEditMode ? { ...formData, id: editingUserId } : formData;
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(bodyData)
       });
+
+      if (!res.ok) { 
+        const errData = await res.json(); 
+        throw new Error(errData.error || 'Failed to save'); 
+      }
+
       setIsCreateModalOpen(false);
       setFormData({ name: '', email: '', phone: '', role: '', erpId: '', status: 'Active', department: '' });
+      setIsEditMode(false);
+      setEditingUserId(null);
       fetchUsers();
-    } catch (err) {
+    } catch (err: any) {
+      alert(err.message);
       console.error(err);
     }
   };
