@@ -1,4 +1,6 @@
 "use client";
+import "./tailwind.css";
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Bot, Zap, CheckCircle2, AlertCircle, Sparkles, User, ShieldCheck, Terminal, Target, TrendingDown, Settings2, Plus, X, Activity, Cpu } from 'lucide-react';
 
