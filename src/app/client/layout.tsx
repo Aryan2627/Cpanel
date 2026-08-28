@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { IntakeProvider } from '../../context/IntakeContext';
 import TourButton from './TourButton';
@@ -10,6 +10,7 @@ import JarvisAssistant from './JarvisAssistant';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [openMenu, setOpenMenu] = useState<string | null>(
     pathname.includes('/client/manage') ? 'Manage' : pathname.includes('/client/settings') ? 'Settings' : null
   );
@@ -85,7 +86,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         { name: 'General', path: '/client/settings' }
       ]
     },
-    { name: 'Profile', path: '/client/profile' },
+    
   ];
 
   return (
@@ -224,10 +225,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               border: '1px solid #e2e8f0',
               boxShadow: '0 2px 4px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,1)',
               transition: 'all 0.2s ease',
-              cursor: 'default'
+              cursor: 'pointer'
             }}
             onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f1f5f9'}
             onMouseLeave={e => e.currentTarget.style.backgroundColor = '#f8fafc'}
+              onClick={() => router.push('/client/profile')}
             >
               <div style={{ 
                 width: '32px', 
