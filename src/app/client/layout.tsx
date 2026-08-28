@@ -63,6 +63,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     { name: 'Purchase Requests', path: '/client/intake' },
     { name: 'Requisitions', path: '/client/pr' },
     { name: 'Tenders & Auctions', path: '/client/events' },
+    { name: 'AI Negotiators', path: '/client/ai-agents' },
     { 
       name: 'Vendors', 
       path: '#',
