@@ -1,4 +1,6 @@
-"use client";
+﻿const fs = require('fs');
+
+const content = `"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { Bot, Zap, CheckCircle2, AlertCircle, Sparkles, User, ShieldCheck, Terminal, Target, TrendingDown, Settings2, Plus, X } from 'lucide-react';
 
@@ -164,13 +166,13 @@ export default function AIAgentsPage() {
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-violet-900/5 to-transparent pointer-events-none"></div>
             
             {messages.map((m, i) => (
-              <div key={i} className={`flex gap-4 relative z-10 ${m.sender === 'ai' ? 'flex-row-reverse' : ''}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md ${m.sender === 'ai' ? 'bg-gradient-to-br from-violet-600 to-fuchsia-600' : 'bg-slate-700 dark:bg-white/10 border border-white/5'}`}>
+              <div key={i} className={\`flex gap-4 relative z-10 \${m.sender === 'ai' ? 'flex-row-reverse' : ''}\`}>
+                <div className={\`w-10 h-10 rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-md \${m.sender === 'ai' ? 'bg-gradient-to-br from-violet-600 to-fuchsia-600' : 'bg-slate-700 dark:bg-white/10 border border-white/5'}\`}>
                   {m.sender === 'ai' ? <Bot size={20} /> : <span className="font-bold">V</span>}
                 </div>
-                <div className={`max-w-[85%] md:max-w-[75%] p-4 rounded-2xl shadow-sm ${m.sender === 'ai' ? 'bg-violet-600 text-white rounded-tr-sm shadow-[0_5px_15px_rgba(139,92,246,0.3)]' : 'bg-white dark:bg-[#151515] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/5 rounded-tl-sm'}`}>
+                <div className={\`max-w-[85%] md:max-w-[75%] p-4 rounded-2xl shadow-sm \${m.sender === 'ai' ? 'bg-violet-600 text-white rounded-tr-sm shadow-[0_5px_15px_rgba(139,92,246,0.3)]' : 'bg-white dark:bg-[#151515] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/5 rounded-tl-sm'}\`}>
                   <p className="text-sm leading-relaxed">{m.text}</p>
-                  <p className={`text-[10px] mt-2 font-mono ${m.sender === 'ai' ? 'text-violet-200 text-right' : 'text-slate-500 text-left'}`}>{m.time}</p>
+                  <p className={\`text-[10px] mt-2 font-mono \${m.sender === 'ai' ? 'text-violet-200 text-right' : 'text-slate-500 text-left'}\`}>{m.time}</p>
                 </div>
               </div>
             ))}
@@ -351,3 +353,6 @@ export default function AIAgentsPage() {
     </div>
   );
 }
+`;
+fs.writeFileSync('src/app/client/ai-agents/page.tsx', content, 'utf8');
+console.log("Enhanced AI Agents page completely");
