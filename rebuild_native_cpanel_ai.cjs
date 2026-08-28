@@ -1,4 +1,6 @@
-"use client";
+﻿const fs = require('fs');
+
+const content = `"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { Bot, Zap, CheckCircle2, AlertCircle, Sparkles, User, ShieldCheck, Terminal, Target, TrendingDown, Settings2, Plus, X, Activity, Cpu } from 'lucide-react';
 
@@ -86,7 +88,7 @@ export default function AIAgentsPage() {
             <p style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>Monitor and deploy autonomous negotiation agents.</p>
           </div>
         </div>
-        <button onClick={() => setShowDeployModal(true)} style={{ background: 'var(--primary-color)', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', transition: 'background 0.2s' }}>
+        <button onClick={() => setShowDeployModal(true)} style={{ background: 'var(--primary-color)', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'var(--primary-hover)'} onMouseOut={e => e.currentTarget.style.background = 'var(--primary-color)'}>
           <Plus size={18} /> Deploy Agent
         </button>
       </div>
@@ -325,3 +327,7 @@ export default function AIAgentsPage() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/app/client/ai-agents/page.tsx', content, 'utf8');
+console.log("Rebuilt Native Cpanel AI Agents!");
