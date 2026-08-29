@@ -225,6 +225,20 @@ const handleSurrogateSubmit = async () => {
   
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
+  const parsedStages = useMemo(() => {
+    if (!event || !event.stages) return [];
+    try { return JSON.parse(event.stages); } catch(e) { return []; }
+  }, [event]);
+
+  const templateFields = useMemo(() => {
+    if (parsedStages.length > 0 && parsedStages[activeTabIndex] && parsedStages[activeTabIndex].templateFields) {
+      return parsedStages[activeTabIndex].templateFields;
+    }
+    return [];
+  }, [parsedStages, activeTabIndex]);
+
+
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem('godTierFeatures');
@@ -454,18 +468,6 @@ const handleSurrogateSubmit = async () => {
       console.error(err);
     }
   };
-
-  const parsedStages = useMemo(() => {
-    if (!event || !event.stages) return [];
-    try { return JSON.parse(event.stages); } catch(e) { return []; }
-  }, [event]);
-
-  const templateFields = useMemo(() => {
-    if (parsedStages.length > 0 && parsedStages[activeTabIndex] && parsedStages[activeTabIndex].templateFields) {
-      return parsedStages[activeTabIndex].templateFields;
-    }
-    return [];
-  }, [parsedStages, activeTabIndex]);
 
   const enableESG = templateFields.some((f: any) => f.enableESG);
 
