@@ -324,7 +324,7 @@ const handleSurrogateSubmit = async () => {
     ])
     .then(([eventData, bidsData]) => {
       setEvent(eventData);
-      setBids(bidsData);
+      setBids(Array.isArray(bidsData) ? bidsData : []);
       setLoading(false);
     })
     .catch(err => {
