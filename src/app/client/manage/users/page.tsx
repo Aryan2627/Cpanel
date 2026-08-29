@@ -79,6 +79,16 @@ export default function UsersPage() {
       alert("Name, Email, Phone, and Role are required.");
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+    const phoneRegex = /^\+?[0-9]{10,15}$/;
+    if (!phoneRegex.test(formData.phone.replace(/[\s-()]/g, ''))) {
+      alert('Please enter a valid phone number (10-15 digits).');
+      return;
+    }
     try {
       const url = '/api/users';
       const method = isEditMode ? 'PUT' : 'POST';
