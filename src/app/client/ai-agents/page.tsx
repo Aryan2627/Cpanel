@@ -78,6 +78,7 @@ export default function AIAgentsPage() {
   const [activeId, setActiveId] = useState('n1');
   const [inputText, setInputText] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
+  const [isPredicting, setIsPredicting] = useState(false);
   const [showDeployModal, setShowDeployModal] = useState(false);
   const [started, setStarted] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
@@ -457,12 +458,12 @@ export default function AIAgentsPage() {
               <p style={{ color: 'var(--text-secondary)', margin: '0 0 24px 0' }}>Select a product to analyze its historical quotation cycle and generate AI-driven target pricing before floating an event.</p>
               
               <div style={{ display: 'flex', gap: '16px' }}>
-                <select style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'var(--bg-color)', color: 'var(--text-primary)', fontSize: '16px', outline: 'none' }}>
+                <select value={activeId} onChange={(e) => setActiveId(e.target.value)} style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'var(--bg-color)', color: 'var(--text-primary)', fontSize: '16px', outline: 'none' }}>
                   {sessions.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
-                <button style={{ padding: '12px 24px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', color: '#fff', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles size={18} /> Analyze Product
-                </button>
+                <button onClick={() => { setIsPredicting(true); setTimeout(() => setIsPredicting(false), 2000); }} style={{ padding: '12px 24px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', color: '#fff', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {isPredicting ? <Sparkles size={18} className="pulse-anim" /> : <Sparkles size={18} />} {isPredicting ? 'Analyzing Market...' : 'Analyze PR'}
+                  </button>
               </div>
             </div>
 
@@ -563,9 +564,9 @@ export default function AIAgentsPage() {
                 </div>
               </div>
 
-              <button style={{ width: '100%', padding: '16px', borderRadius: '12px', border: 'none', background: '#0f172a', color: '#fff', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}>
-                Apply & Float New Event <Zap size={16} fill="#eab308" color="#eab308" />
-              </button>
+              <button onClick={() => window.location.href = '/client/events/create/auction?pr=' + activeSession?.id} style={{ width: '100%', padding: '16px', borderRadius: '12px', border: 'none', background: '#0f172a', color: '#fff', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}>
+                  Apply & Float New Event <Zap size={16} fill="#eab308" color="#eab308" />
+                </button>
             </div>
 
           </div>
