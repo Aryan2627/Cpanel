@@ -163,8 +163,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Password is required' }, { status: 400, headers: corsHeaders });
       }
 
-      if (vendor.status !== 'Onboarding in Progress') {
-        return NextResponse.json({ error: 'Password login is only available for vendors onboarding in progress.' }, { status: 403, headers: corsHeaders });
+      if (vendor.status !== 'Onboarding in Progress' && vendor.status !== 'Pending Onboarding' && vendor.status !== 'Approval Pending') {
+        return NextResponse.json({ error: 'Password login is only available during the onboarding phase.' }, { status: 403, headers: corsHeaders });
       }
 
       const expectedPassword = vendor.email.substring(0, 3).toLowerCase() + '@26';
