@@ -141,6 +141,118 @@ export default function Signup() {
                 />
               </div>
 
+                            <div>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>Company Category / Industry</label>
+                <select 
+                  value={formData.industry}
+                  onChange={(e) => setFormData({...formData, industry: e.target.value})}
+                  required
+                  className="input-field"
+                  style={{ backgroundColor: '#fff' }}
+                >
+                  <option value="">Select your industry...</option>
+                  <option value="Manufacturing">Manufacturing</option>
+                  <option value="Automotive">Automotive</option>
+                  <option value="Pharmaceuticals">Pharmaceuticals</option>
+                  <option value="Chemicals">Chemicals</option>
+                  <option value="Oil & Gas">Oil & Gas</option>
+                  <option value="Petrochemicals">Petrochemicals</option>
+                  <option value="Steel & Metals">Steel & Metals</option>
+                  <option value="Mining">Mining</option>
+                  <option value="Construction">Construction</option>
+                  <option value="Infrastructure">Infrastructure</option>
+                  <option value="Real Estate">Real Estate</option>
+                  <option value="Cement">Cement</option>
+                  <option value="Power & Energy">Power & Energy</option>
+                  <option value="Renewable Energy">Renewable Energy</option>
+                  <option value="Electrical & Electronics">Electrical & Electronics</option>
+                  <option value="Telecommunications">Telecommunications</option>
+                  <option value="Information Technology (IT)">Information Technology (IT)</option>
+                  <option value="Software / SaaS">Software / SaaS</option>
+                  <option value="IT Hardware">IT Hardware</option>
+                  <option value="Semiconductors">Semiconductors</option>
+                  <option value="Consumer Electronics">Consumer Electronics</option>
+                  <option value="FMCG">FMCG</option>
+                  <option value="Food & Beverage">Food & Beverage</option>
+                  <option value="Agriculture">Agriculture</option>
+                  <option value="Textiles">Textiles</option>
+                  <option value="Apparel & Fashion">Apparel & Fashion</option>
+                  <option value="Leather & Footwear">Leather & Footwear</option>
+                  <option value="Paper & Packaging">Paper & Packaging</option>
+                  <option value="Printing">Printing</option>
+                  <option value="Plastics & Rubber">Plastics & Rubber</option>
+                  <option value="Glass">Glass</option>
+                  <option value="Ceramics">Ceramics</option>
+                  <option value="Furniture">Furniture</option>
+                  <option value="Home & Building Materials">Home & Building Materials</option>
+                  <option value="Retail">Retail</option>
+                  <option value="Wholesale & Distribution">Wholesale & Distribution</option>
+                  <option value="E-commerce">E-commerce</option>
+                  <option value="Logistics">Logistics</option>
+                  <option value="Transportation">Transportation</option>
+                  <option value="Warehousing">Warehousing</option>
+                  <option value="Shipping & Maritime">Shipping & Maritime</option>
+                  <option value="Aviation">Aviation</option>
+                  <option value="Railways">Railways</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Hospitals">Hospitals</option>
+                  <option value="Medical Devices">Medical Devices</option>
+                  <option value="Biotechnology">Biotechnology</option>
+                  <option value="Education">Education</option>
+                  <option value="Hospitality">Hospitality</option>
+                  <option value="Hotels & Resorts">Hotels & Resorts</option>
+                  <option value="Restaurants & Catering">Restaurants & Catering</option>
+                  <option value="Travel & Tourism">Travel & Tourism</option>
+                  <option value="Banking & Financial Services">Banking & Financial Services</option>
+                  <option value="Insurance">Insurance</option>
+                  <option value="Real Estate Services">Real Estate Services</option>
+                  <option value="Professional Services">Professional Services</option>
+                  <option value="Consulting">Consulting</option>
+                  <option value="Legal Services">Legal Services</option>
+                  <option value="Accounting & Audit">Accounting & Audit</option>
+                  <option value="Marketing & Advertising">Marketing & Advertising</option>
+                  <option value="Media & Entertainment">Media & Entertainment</option>
+                  <option value="Government & Public Sector">Government & Public Sector</option>
+                  <option value="Defense & Aerospace">Defense & Aerospace</option>
+                  <option value="Security Services">Security Services</option>
+                  <option value="Facility Management">Facility Management</option>
+                  <option value="Cleaning & Housekeeping">Cleaning & Housekeeping</option>
+                  <option value="Human Resources / Staffing">Human Resources / Staffing</option>
+                  <option value="Engineering Services">Engineering Services</option>
+                  <option value="Industrial Equipment">Industrial Equipment</option>
+                  <option value="Machinery & Equipment">Machinery & Equipment</option>
+                  <option value="Industrial Automation">Industrial Automation</option>
+                  <option value="Robotics">Robotics</option>
+                  <option value="HVAC">HVAC</option>
+                  <option value="Fire & Safety">Fire & Safety</option>
+                  <option value="Water & Waste Management">Water & Waste Management</option>
+                  <option value="Environmental Services">Environmental Services</option>
+                  <option value="Energy & Utilities">Energy & Utilities</option>
+                  <option value="Telecom Infrastructure">Telecom Infrastructure</option>
+                  <option value="Printing & Office Supplies">Printing & Office Supplies</option>
+                  <option value="Packaging & Materials">Packaging & Materials</option>
+                  <option value="Furniture & Office Infrastructure">Furniture & Office Infrastructure</option>
+                  <option value="Chemicals & Industrial Consumables">Chemicals & Industrial Consumables</option>
+                  <option value="Lubricants & Oils">Lubricants & Oils</option>
+                  <option value="Tools & Hardware">Tools & Hardware</option>
+                  <option value="Safety Equipment / PPE">Safety Equipment / PPE</option>
+                  <option value="Laboratory Equipment & Supplies">Laboratory Equipment & Supplies</option>
+                  <option value="Medical Supplies">Medical Supplies</option>
+                  <option value="Agricultural Equipment">Agricultural Equipment</option>
+                  <option value="Renewable Energy Equipment">Renewable Energy Equipment</option>
+                  <option value="Solar">Solar</option>
+                  <option value="Wind Energy">Wind Energy</option>
+                  <option value="Battery & Energy Storage">Battery & Energy Storage</option>
+                  <option value="EV & EV Components">EV & EV Components</option>
+                  <option value="Aerospace Components">Aerospace Components</option>
+                  <option value="Marine & Shipbuilding">Marine & Shipbuilding</option>
+                  <option value="Railway Equipment">Railway Equipment</option>
+                  <option value="Defense Manufacturing">Defense Manufacturing</option>
+                  <option value="Luxury Goods">Luxury Goods</option>
+                  <option value="Jewellery">Jewellery</option>
+                </select>
+              </div>
+
               <div>
                 <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>Your Name</label>
                 <input 
