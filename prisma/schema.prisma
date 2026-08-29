@@ -14,6 +14,7 @@ model Organization {
   domain    String?
   theme     String? // JSON string for colors, logos
   features  String? // JSON string for feature toggles
+  industry  String?
   createdAt DateTime @default(now())
 
   // Relations

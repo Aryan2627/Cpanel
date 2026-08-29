@@ -36,13 +36,39 @@ export async function POST(req: Request) {
       org = await prisma.organization.create({
         data: {
           name: companyName,
+          industry: industry || null,
           features: JSON.stringify({ plan: "Starter", createdAt: new Date().toISOString() })
         }
       });
       isNewOrg = true;
     }
 
-    // Hash the password
+    
+      // Auto-match existing vendors that share this industry
+      if (isNewOrg && industry) {
+        const matchingVendors = await prisma.vendor.findMany({
+          where: { dealsIn: industry },
+          distinct: ['email'] // Avoid duplicate emails from different orgs
+        });
+        
+        for (const mv of matchingVendors) {
+          if (mv.email) {
+            await prisma.vendor.create({
+              data: {
+                organizationId: org.id,
+                name: mv.name,
+                email: mv.email,
+                phone: mv.phone,
+                dealsIn: industry,
+                status: 'Pending Onboarding',
+                type: 'Supplier'
+              }
+            });
+          }
+        }
+      }
+
+      // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create the user attached to the organization
