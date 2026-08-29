@@ -401,7 +401,7 @@ export default function VendorManagement() {
       {/* Invite Modal Slide-out Drawer */}
       {isInviteOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.4)', zIndex: 100, display: 'flex', justifyContent: 'flex-end', animation: 'fadeIn 0.2s' }}>
-          <div style={{ width: '500px', backgroundColor: '#ffffff', height: '100%', boxShadow: '-10px 0 25px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', animation: 'slideInRight 0.3s forwards' }}>
+          <div style={{ width: '700px', backgroundColor: '#ffffff', height: '100%', boxShadow: '-10px 0 25px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', animation: 'slideInRight 0.3s forwards' }}>
             
             <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
               <div>
@@ -483,15 +483,59 @@ export default function VendorManagement() {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
           <div style={{ backgroundColor: '#fff', padding: '32px', borderRadius: '16px', width: '500px', maxWidth: '90%' }}>
             <h2 style={{ margin: '0 0 16px 0', fontSize: '20px', color: '#0f172a' }}>Review Vendor Application</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-              <div><strong>Company Name:</strong> {selectedVendorForApproval.name}</div>
-              <div><strong>Email:</strong> {selectedVendorForApproval.email}</div>
-              <div><strong>Phone:</strong> {selectedVendorForApproval.phone}</div>
-              <div><strong>Company Code:</strong> {selectedVendorForApproval.companyCode}</div>
-              <div><strong>Trade License:</strong> {selectedVendorForApproval.tradeLicense}</div>
-              <div><strong>Tax ID:</strong> {selectedVendorForApproval.taxId}</div>
-              <div><strong>City:</strong> {selectedVendorForApproval.city}</div>
-              <div><strong>Type:</strong> {selectedVendorForApproval.type}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px', maxHeight: '60vh', overflowY: 'auto', paddingRight: '8px' }}>
+              
+              <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>1. Basic & Contact Info</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px' }}>
+                  <div><strong>Company:</strong> {selectedVendorForApproval.name}</div>
+                  <div><strong>Entity Type:</strong> {selectedVendorForApproval.onboardingData?.entityType || '-'}</div>
+                  <div><strong>Email:</strong> {selectedVendorForApproval.email}</div>
+                  <div><strong>Phone:</strong> {selectedVendorForApproval.phone}</div>
+                  <div style={{ gridColumn: '1 / -1' }}><strong>Address:</strong> {selectedVendorForApproval.onboardingData?.registeredAddress || '-'}</div>
+                </div>
+              </div>
+
+              <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>2. Tax & Registration</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px' }}>
+                  <div><strong>PAN:</strong> {selectedVendorForApproval.onboardingData?.pan || '-'}</div>
+                  <div><strong>GSTIN:</strong> {selectedVendorForApproval.onboardingData?.gstin || '-'}</div>
+                  <div><strong>CIN:</strong> {selectedVendorForApproval.onboardingData?.cin || '-'}</div>
+                  <div><strong>MSME:</strong> {selectedVendorForApproval.onboardingData?.msme || '-'}</div>
+                  <div><strong>Trade License:</strong> {selectedVendorForApproval.tradeLicense || '-'}</div>
+                </div>
+              </div>
+
+              <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>3. Business Profile</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
+                  <div><strong>Category:</strong> {selectedVendorForApproval.onboardingData?.productCategory || '-'}</div>
+                  <div><strong>Products Offered:</strong> {selectedVendorForApproval.onboardingData?.productsOffered || '-'}</div>
+                  <div><strong>Certifications:</strong> {selectedVendorForApproval.onboardingData?.certifications || '-'}</div>
+                  <div><strong>Experience:</strong> {selectedVendorForApproval.onboardingData?.previousExperience || '-'}</div>
+                </div>
+              </div>
+
+              <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>4. Bank Details</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px', fontSize: '14px' }}>
+                  <div><strong>Account Name:</strong> {selectedVendorForApproval.onboardingData?.bankAccountName || '-'}</div>
+                  <div><strong>Account Number:</strong> {selectedVendorForApproval.onboardingData?.bankAccountNumber || '-'}</div>
+                  <div><strong>IFSC:</strong> {selectedVendorForApproval.onboardingData?.bankIfsc || '-'}</div>
+                </div>
+              </div>
+
+              <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>5. Documents</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px', fontSize: '14px' }}>
+                  <div><strong>PAN Card:</strong> {selectedVendorForApproval.onboardingData?.documents?.pan ? <a href={selectedVendorForApproval.onboardingData.documents.pan} target="_blank" rel="noreferrer" style={{color: '#2563eb'}}>View Document</a> : '-'}</div>
+                  <div><strong>GST Cert:</strong> {selectedVendorForApproval.onboardingData?.documents?.gst ? <a href={selectedVendorForApproval.onboardingData.documents.gst} target="_blank" rel="noreferrer" style={{color: '#2563eb'}}>View Document</a> : '-'}</div>
+                  <div><strong>Incorporation Cert:</strong> {selectedVendorForApproval.onboardingData?.documents?.incorporation ? <a href={selectedVendorForApproval.onboardingData.documents.incorporation} target="_blank" rel="noreferrer" style={{color: '#2563eb'}}>View Document</a> : '-'}</div>
+                  <div><strong>Bank Proof:</strong> {selectedVendorForApproval.onboardingData?.documents?.bank ? <a href={selectedVendorForApproval.onboardingData.documents.bank} target="_blank" rel="noreferrer" style={{color: '#2563eb'}}>View Document</a> : '-'}</div>
+                </div>
+              </div>
+
             </div>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <button onClick={() => setSelectedVendorForApproval(null)} style={{ padding: '10px 16px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>

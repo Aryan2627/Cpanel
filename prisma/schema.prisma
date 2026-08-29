@@ -46,6 +46,7 @@ model User {
   password       String?
   erpId          String?
   status         String        @default("Active")
+  onboardingData Json?
   createdAt      DateTime      @default(now())
 }
 

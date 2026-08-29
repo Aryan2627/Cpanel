@@ -23,7 +23,20 @@ export async function POST(request: Request) {
     }
 
     const data = await request.json();
-    const { companyCode, tradeLicense, taxId, city, phone, type } = data;
+    const { 
+      companyCode, tradeLicense, taxId, city, phone, type,
+      entityType, registeredAddress, contactPerson, pan, gstin, cin, msme,
+      productsOffered, productCategory, bankAccountName, bankAccountNumber, bankIfsc,
+      companyProfile, certifications, previousExperience,
+      documents
+    } = data;
+
+    const onboardingData = {
+      entityType, registeredAddress, contactPerson, pan, gstin, cin, msme,
+      productsOffered, productCategory, bankAccountName, bankAccountNumber, bankIfsc,
+      companyProfile, certifications, previousExperience,
+      documents
+    };
 
     const vendor = await prisma.vendor.update({
       where: { id: decoded.id },
@@ -34,7 +47,8 @@ export async function POST(request: Request) {
         city,
         phone,
         type,
-        status: 'Approval Pending'
+        status: 'Approval Pending',
+        onboardingData
       }
     });
 
