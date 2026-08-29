@@ -25,7 +25,7 @@ type Session = {
 };
 
 export default function AIAgentsPage() {
-  const [viewMode, setViewMode] = useState<'negotiator' | 'predictor'>('negotiator');
+  const [viewMode, setViewMode] = useState<'negotiator' | 'predictor'>('predictor');
   
   const [sessions, setSessions] = useState<Session[]>([
     {
@@ -239,20 +239,7 @@ export default function AIAgentsPage() {
             <p style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>Monitor autonomous agents and predict market pricing.</p>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '12px', background: 'var(--surface-color)', padding: '6px', borderRadius: '12px', border: '1px solid var(--surface-border)' }}>
-          <button 
-            onClick={() => setViewMode('negotiator')}
-            style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: viewMode === 'negotiator' ? 'var(--primary-color)' : 'transparent', color: viewMode === 'negotiator' ? '#fff' : 'var(--text-secondary)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', transition: 'all 0.2s' }}
-          >
-            <Activity size={16} /> Live Nodes
-          </button>
-          <button 
-            onClick={() => setViewMode('predictor')}
-            style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: viewMode === 'predictor' ? 'var(--primary-color)' : 'transparent', color: viewMode === 'predictor' ? '#fff' : 'var(--text-secondary)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', transition: 'all 0.2s' }}
-          >
-            <LineChart size={16} /> Predictor (Pre-Event)
-          </button>
-        </div>
+        
       </div>
 
       {viewMode === 'negotiator' ? (
