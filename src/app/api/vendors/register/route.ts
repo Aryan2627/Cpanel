@@ -29,7 +29,7 @@ export async function POST(request: Request) {
               name: companyName, // Map companyName to Vendor name
               email: email,
               dealsIn: industry,
-              status: 'Pending Onboarding',
+              status: 'Onboarding in Progress',
               type: 'Supplier'
             }
           });
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
             name: companyName,
             email: email,
             dealsIn: industry,
-            status: 'Pending Onboarding',
+            status: 'Onboarding in Progress',
             type: 'Supplier'
           }
         });
