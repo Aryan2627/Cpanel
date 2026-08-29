@@ -92,13 +92,13 @@ export default function AIAgentsPage() {
   }, [activeSession?.messages, activeSession?.logs, analyzing]);
 
   useEffect(() => {
-    fetch('/api/products')
+    fetch('/api/intakes')
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0) {
           const dbSessions = data.map((p: any, i: number) => ({
             id: p.id || `n${i}`,
-            name: p.name || 'Unknown Product',
+            name: (p.refId ? p.refId + ' - ' : '') + (p.title || 'Unknown PR'),
             status: 'Live',
             model: 'α-Strike v4 (Nemotron)',
             target: 40000 + (i * 5000),
@@ -106,7 +106,7 @@ export default function AIAgentsPage() {
             vendorInitial: 45000 + (i * 5000),
             concessions: ['Net-15 Payment Terms', 'Volume Discount'],
             messages: [
-              { sender: 'vendor', text: `We've reviewed the specs for ${p.name}. We can do $${(45000 + i * 5000).toLocaleString()} for the shipment, but that's our bottom line.`, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
+              { sender: 'vendor', text: `We've reviewed the specs for PR ${p.refId || p.title}. We can do $${(45000 + i * 5000).toLocaleString()} for the shipment, but that's our bottom line.`, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
             ],
             closed: false,
             logs: [],
