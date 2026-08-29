@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 
 type Intake = {
   refId: string;
@@ -22,6 +23,7 @@ const IntakeContext = createContext<IntakeContextType | undefined>(undefined);
 
 export function IntakeProvider({ children }: { children: ReactNode }) {
   const [intakes, setIntakes] = useState<Intake[]>([]);
+  const pathname = usePathname();
 
   useEffect(() => {
     // Fetch initial data from API
@@ -33,7 +35,7 @@ export function IntakeProvider({ children }: { children: ReactNode }) {
         }
       })
       .catch(err => console.error('Failed to fetch intakes:', err));
-  }, []);
+  }, [pathname]);
 
   const addIntake = async (intake: Intake) => {
     try {
