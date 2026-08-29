@@ -19,6 +19,9 @@ type Session = {
   sentiment: string;
   sentimentColor: string;
   prevVendor?: string;
+  prevAmount?: number;
+  insight?: string;
+  trend?: number;
 };
 
 export default function AIAgentsPage() {
@@ -500,7 +503,7 @@ export default function AIAgentsPage() {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 4px 0' }}>Awarded PO Price</p>
-                    <p style={{ margin: 0, color: 'var(--success-color)', fontWeight: 'bold', fontSize: '18px' }}>${(activeSession?.target || 40000).toLocaleString()}</p>
+                    <p style={{ margin: 0, color: 'var(--success-color)', fontWeight: 'bold', fontSize: '18px' }}>${(activeSession?.prevAmount || 40000).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                   </div>
                 </div>
 
@@ -519,7 +522,7 @@ export default function AIAgentsPage() {
                       <tr style={{ borderBottom: '1px solid var(--surface-border)' }}>
                         <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: '500' }}>{activeSession?.prevVendor || 'Global Steel Corp'}</td>
                         <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>${(activeSession?.vendorInitial || 45000).toLocaleString()}</td>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: 'bold' }}>${(activeSession?.target || 40000).toLocaleString()}</td>
+                        <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: 'bold' }}>${(activeSession?.prevAmount || 40000).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                         <td style={{ padding: '12px 16px', textAlign: 'center' }}>
                           <span style={{ background: 'rgba(16,185,129,0.1)', color: 'var(--success-color)', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>AWARDED</span>
                         </td>
@@ -543,26 +546,26 @@ export default function AIAgentsPage() {
               </div>
               
               <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '24px' }}>
-                Based on historical PO data for <strong>{activeSession?.name}</strong>, combined with current macroeconomic inflation indicators, the AI recommends adjusting your guardrails before floating the new event.
+                {activeSession?.insight || "Based on historical PO data, combined with current macroeconomic inflation indicators, the AI recommends adjusting your guardrails before floating the new event."}
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
                 <div style={{ background: 'var(--bg-color)', padding: '16px', borderRadius: '12px', border: '1px solid var(--surface-border)' }}>
                   <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.05em' }}>Recommended Target Price</span>
                   <p style={{ margin: '4px 0 0', fontSize: '24px', fontWeight: 'bold', color: 'var(--success-color)' }}>
-                    ${((activeSession?.target || 40000) * 0.98).toLocaleString()}
+                    ${(activeSession?.target || 40000).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                   </p>
                   <p style={{ margin: '4px 0 0', fontSize: '11px', color: 'var(--success-color)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <TrendingDown size={12} /> -2.0% from last cycle
+                    <TrendingDown size={12} style={{ transform: (activeSession?.trend || 0) > 0 ? 'rotate(180deg)' : 'none' }} /> {(activeSession?.trend || -2.0) > 0 ? '+' : ''}{activeSession?.trend || -2.0}% from last cycle
                   </p>
                 </div>
                 <div style={{ background: 'var(--bg-color)', padding: '16px', borderRadius: '12px', border: '1px solid var(--surface-border)' }}>
                   <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.05em' }}>Recommended Hard Limit</span>
                   <p style={{ margin: '4px 0 0', fontSize: '24px', fontWeight: 'bold', color: 'var(--warning-color)' }}>
-                    ${((activeSession?.limit || 42000) * 0.99).toLocaleString()}
+                    ${(activeSession?.limit || 42000).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                   </p>
                   <p style={{ margin: '4px 0 0', fontSize: '11px', color: 'var(--warning-color)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <TrendingDown size={12} /> -1.0% from last cycle
+                    <Settings2 size={12} /> +5.0% buffer above target
                   </p>
                 </div>
               </div>
