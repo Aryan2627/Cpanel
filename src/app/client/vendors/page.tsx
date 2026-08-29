@@ -300,7 +300,7 @@ export default function VendorManagement() {
                   </td>
                 </tr>
               ) : filteredVendors.length > 0 ? filteredVendors.map((vendor) => (
-                <tr className="vendor-row" onClick={() => { if (vendor.status === 'Approval Pending') { setSelectedVendorForApproval(vendor); } else { router.push(`/client/vendors/${vendor.id}`); } }} key={vendor.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'all 0.2s ease', cursor: 'pointer' }}>
+                <tr className="vendor-row" onClick={() => { if (vendor.status === 'Approval Pending') { setSelectedVendorForApproval(vendor); } else if (vendor.status === 'Onboarding in Progress' || vendor.status === 'Pending Onboarding') { alert('This vendor is still filling out their onboarding form. You can approve them once they submit it.'); } else { router.push(`/client/vendors/${vendor.id}`); } }} key={vendor.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'all 0.2s ease', cursor: 'pointer' }}>
                   <td style={{ padding: '12px 16px' }} onClick={e => e.stopPropagation()}>
                     <input type="checkbox" style={{ cursor: 'pointer', width: '16px', height: '16px' }} />
                   </td>
