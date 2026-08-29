@@ -106,33 +106,67 @@ export default function AIAgentsPage() {
         const dbSessions = intakes.map((p: any, i: number) => {
           let historicalPO = null;
           if (Array.isArray(pos)) {
+            // Find PO where details (array of PR IDs) includes this PR's refId
             historicalPO = pos.find(po => po.details && po.details.includes(p.refId));
           }
           
           let prevVendor = 'No Historical Vendor';
-          let prevAmount = 40000 + (i * 5000); 
+          // Fix fallback logic. If we have a historical PO, use its total. Otherwise use a small fallback or 0.
+          let prevAmount = historicalPO ? (parseFloat(historicalPO.total) || 0) : 0; 
+          
           if (historicalPO) {
              prevVendor = historicalPO.vendorId || 'Unknown Vendor';
-             prevAmount = historicalPO.total || prevAmount;
           }
+
+          // Semantic AI Intelligence & Market Refinement
+          const prTitle = (p.title || '').toLowerCase();
+          let trend = -2.0;
+          let insight = "Market is softening; push for a standard 2% cost reduction.";
+          let sentiment = "Softening (-2.0%)";
+          let sentimentColor = "var(--success-color)";
+          
+          if (prTitle.includes('laptop') || prTitle.includes('hardware') || p.type === 'Hardware') {
+             trend = -5.0; // Deflationary
+             insight = "Global chip surplus detected. IT Hardware market is highly deflationary right now. Aggressive 5% reduction recommended.";
+             sentiment = "Deflationary (-5.0%)";
+          } else if (prTitle.includes('steel') || prTitle.includes('material') || prTitle.includes('burger') || prTitle.includes('pizza')) {
+             trend = 3.5; // Inflationary
+             insight = "Supply chain constraints and raw material indices are up 3.5%. Focus on holding price rather than deep cuts.";
+             sentiment = "Inflationary (+3.5%)";
+             sentimentColor = "#ef4444";
+          } else if (prTitle.includes('service') || prTitle.includes('consult')) {
+             trend = 0.0; // Stable
+             insight = "Labor rates are stable. Negotiate on value-adds and concessions rather than base rate.";
+             sentiment = "Stable (0.0%)";
+             sentimentColor = "var(--text-secondary)";
+          }
+
+          // Calculate AI targets based on historical amount (if no history, fallback to a dummy baseline like 1000)
+          const baseLineForMath = prevAmount > 0 ? prevAmount : 1000;
+          const targetPrice = baseLineForMath * (1 + (trend / 100));
+          const limitPrice = targetPrice * 1.05; // Hard limit 5% above target
+          const vendorInitialEstimate = baseLineForMath * 1.15;
 
           return {
             id: p.id || `n${i}`,
             name: (p.refId ? p.refId + ' - ' : '') + (p.title || 'Unknown PR'),
             status: 'Live',
             model: 'I3-Strike v4 (Nemotron)',
-            target: prevAmount, 
-            limit: prevAmount * 1.05, 
-            vendorInitial: prevAmount * 1.15,
+            target: targetPrice, 
+            limit: limitPrice, 
+            vendorInitial: vendorInitialEstimate,
             prevVendor: prevVendor,
+            prevAmount: prevAmount,
+            insight: insight,
+            trend: trend,
             concessions: ['Net-15 Payment Terms', 'Volume Discount'],
             messages: [
-              { sender: 'vendor', text: `We've reviewed the specs for PR ${p.refId || p.title}. We can do \${(prevAmount * 1.15).toLocaleString()} for the shipment, but that's our bottom line.`, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
+              { sender: 'vendor', text: `We've reviewed the specs for PR ${p.refId || p.title}. We can do ${vendorInitialEstimate.toLocaleString()} for the shipment, but that's our bottom line.`, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
             ],
             closed: false,
             logs: [],
-            sentiment: 'Softening (-4.2%)',
-            sentimentColor: 'var(--success-color)'
+            sentiment: sentiment,
+            sentimentColor: sentimentColor
           };
         });
         setSessions(dbSessions);
@@ -490,7 +524,7 @@ export default function AIAgentsPage() {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 4px 0' }}>Awarded PO Price</p>
-                    <p style={{ margin: 0, color: 'var(--success-color)', fontWeight: 'bold', fontSize: '18px' }}>{(activeSession?.prevAmount || 40000).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                    <p style={{ margin: 0, color: 'var(--success-color)', fontWeight: 'bold', fontSize: '18px' }}>{(activeSession?.prevAmount != null && activeSession?.prevAmount !== 0 ? activeSession.prevAmount : 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                   </div>
                 </div>
 
@@ -509,7 +543,7 @@ export default function AIAgentsPage() {
                       <tr style={{ borderBottom: '1px solid var(--surface-border)' }}>
                         <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: '500' }}>{activeSession?.prevVendor || 'Global Steel Corp'}</td>
                         <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>{(activeSession?.vendorInitial || 45000).toLocaleString()}</td>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: 'bold' }}>{(activeSession?.prevAmount || 40000).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: 'bold' }}>{(activeSession?.prevAmount != null && activeSession?.prevAmount !== 0 ? activeSession.prevAmount : 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                         <td style={{ padding: '12px 16px', textAlign: 'center' }}>
                           <span style={{ background: 'rgba(16,185,129,0.1)', color: 'var(--success-color)', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>AWARDED</span>
                         </td>
@@ -540,7 +574,7 @@ export default function AIAgentsPage() {
                 <div style={{ background: 'var(--bg-color)', padding: '16px', borderRadius: '12px', border: '1px solid var(--surface-border)' }}>
                   <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.05em' }}>Recommended Target Price</span>
                   <p style={{ margin: '4px 0 0', fontSize: '24px', fontWeight: 'bold', color: 'var(--success-color)' }}>
-                    {(activeSession?.target || 40000).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                    {(activeSession?.target || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                   </p>
                   <p style={{ margin: '4px 0 0', fontSize: '11px', color: 'var(--success-color)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <TrendingDown size={12} style={{ transform: (activeSession?.trend || 0) > 0 ? 'rotate(180deg)' : 'none' }} /> {(activeSession?.trend || -2.0) > 0 ? '+' : ''}{activeSession?.trend || -2.0}% from last cycle
@@ -549,7 +583,7 @@ export default function AIAgentsPage() {
                 <div style={{ background: 'var(--bg-color)', padding: '16px', borderRadius: '12px', border: '1px solid var(--surface-border)' }}>
                   <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.05em' }}>Recommended Hard Limit</span>
                   <p style={{ margin: '4px 0 0', fontSize: '24px', fontWeight: 'bold', color: 'var(--warning-color)' }}>
-                    {(activeSession?.limit || 42000).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                    {(activeSession?.limit || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                   </p>
                   <p style={{ margin: '4px 0 0', fontSize: '11px', color: 'var(--warning-color)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <Settings2 size={12} /> +5.0% buffer above target
