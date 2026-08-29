@@ -524,22 +524,7 @@ export default function AIAgentsPage() {
                           <span style={{ background: 'rgba(16,185,129,0.1)', color: 'var(--success-color)', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>AWARDED</span>
                         </td>
                       </tr>
-                      <tr style={{ borderBottom: '1px solid var(--surface-border)' }}>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: '500' }}>Apex Materials</td>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>${((activeSession?.vendorInitial || 45000) + 1500).toLocaleString()}</td>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>Walked Away at ${(activeSession?.limit || 42000).toLocaleString()}</td>
-                        <td style={{ padding: '12px 16px', textAlign: 'center' }}>
-                          <span style={{ background: 'rgba(239,68,68,0.1)', color: 'rgba(239,68,68,0.8)', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>LOST</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: '500' }}>IronWorks LLC</td>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>${((activeSession?.vendorInitial || 45000) + 4000).toLocaleString()}</td>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>Auto-Rejected (Over Limit)</td>
-                        <td style={{ padding: '12px 16px', textAlign: 'center' }}>
-                          <span style={{ background: 'rgba(239,68,68,0.1)', color: 'rgba(239,68,68,0.8)', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>LOST</span>
-                        </td>
-                      </tr>
+                      
                     </tbody>
                   </table>
                 </div>
