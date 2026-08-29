@@ -51,6 +51,22 @@ export default function BuyerEventDetailsPage() {
   
   const [event, setEvent] = useState<any>(null);
   const [bids, setBids] = useState<any[]>([]);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const parsedStages = useMemo(() => {
+    if (!event || !event.stages) return [];
+    try { return JSON.parse(event.stages); } catch(e) { return []; }
+  }, [event]);
+  const parsedParticipants = useMemo(() => {
+    if (!event || !event.participants) return [];
+    try { return JSON.parse(event.participants); } catch(e) { return []; }
+  }, [event]);
+  const templateFields = useMemo(() => {
+    if (parsedStages.length > 0 && parsedStages[activeTabIndex] && parsedStages[activeTabIndex].templateFields) {
+      return parsedStages[activeTabIndex].templateFields;
+    }
+    return [];
+  }, [parsedStages, activeTabIndex]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -108,11 +124,6 @@ export default function BuyerEventDetailsPage() {
       else setSurrogateData({});
     }
   }, [isSurrogateOpen, templateFields]);
-
-const parsedParticipants = useMemo(() => {
-    if (!event || !event.participants) return [];
-    try { return JSON.parse(event.participants); } catch(e) { return []; }
-  }, [event]);
   
     const handleSurrogateChange = (key: string, val: string) => {
     setSurrogateData(prev => {
@@ -222,20 +233,6 @@ const handleSurrogateSubmit = async () => {
   
   const [showBankruptcyPredictor, setShowBankruptcyPredictor] = useState(true);
   const [showGhostBidding, setShowGhostBidding] = useState(false);
-  
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
-
-  const parsedStages = useMemo(() => {
-    if (!event || !event.stages) return [];
-    try { return JSON.parse(event.stages); } catch(e) { return []; }
-  }, [event]);
-
-  const templateFields = useMemo(() => {
-    if (parsedStages.length > 0 && parsedStages[activeTabIndex] && parsedStages[activeTabIndex].templateFields) {
-      return parsedStages[activeTabIndex].templateFields;
-    }
-    return [];
-  }, [parsedStages, activeTabIndex]);
 
 
 
