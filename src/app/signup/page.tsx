@@ -77,13 +77,8 @@ export default function Signup() {
         <div className="login-left">
           <div className="abstract-shape"></div>
           
-          <div className="brand-logo">
-            <svg width="40" height="40" viewBox="0 0 100 100" fill="none">
-              <path d="M 35 25 C 50 10, 80 15, 80 40" stroke="#3b82f6" strokeWidth="8" strokeLinecap="round" />
-              <path d="M 65 75 C 50 90, 20 85, 20 60" stroke="#2563eb" strokeWidth="8" strokeLinecap="round" />
-              <path d="M 25 35 L 35 45 L 75 45 M 35 55 L 70 55 M 40 65 L 65 65" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            PROCGEN
+          <div className="brand-logo" style={{ background: '#fff', padding: '12px 24px', borderRadius: '12px', width: 'fit-content' }}>
+            <img src="/logo.webp" alt="ProcGen Logo" style={{ height: '48px', objectFit: 'contain' }} />
           </div>
 
           <h1 className="hero-text">Intelligent B2B<br />Sourcing.</h1>
