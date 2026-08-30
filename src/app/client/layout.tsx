@@ -98,13 +98,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           <div className="sidebar-logo">
             {/* ProcGen Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-               <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M 35 25 C 50 10, 80 15, 80 40" stroke="#3b82f6" strokeWidth="8" strokeLinecap="round" />
-                  <path d="M 65 75 C 50 90, 20 85, 20 60" stroke="#2563eb" strokeWidth="8" strokeLinecap="round" />
-                  <path d="M 25 35 L 35 45 L 75 45 M 35 55 L 70 55 M 40 65 L 65 65" stroke="#0f172a" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="55" cy="75" r="5" fill="#0f172a" />
-                </svg>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 'bold', color: '#ffffff', letterSpacing: '-0.05em' }}>PROCGEN</h2>
+              <img src="/logo.png" alt="ProcGen Logo" className="w-10 h-10 object-contain drop-shadow-[0_0_15px_rgba(0,255,255,0.4)]" style={{ filter: "contrast(1.2) drop-shadow(0 0 10px rgba(0, 255, 255, 0.3))" }} />
+              <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#ffffff', letterSpacing: '-0.05em' }}>ProcGen</h2>
             </div>
           </div>
 
