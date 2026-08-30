@@ -94,6 +94,21 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     );
   }
 
+  
+  const licenseSubItems = [
+    { name: 'License Summary', path: '/client/license/summary' },
+    { name: 'Product Summary', path: '/client/license/products' },
+    { name: 'Publisher Summary', path: '/client/license/publishers' },
+    { name: 'All Licenses', path: '/client/license/all' },
+    { name: 'Apply Allocations and Exemptions', path: '/client/license/allocations' },
+    { name: 'Recommended License Changes', path: '/client/license/recommendations' },
+    { name: 'Points Rule Sets', path: '/client/license/points' },
+    { name: 'LICENSE EXPIRY', path: '#', isHeader: true },
+    { name: 'License and Maintenance Expiry', path: '/client/license/expiry/maintenance' },
+    { name: 'License Contract Expiry', path: '/client/license/expiry/contracts' },
+    { name: 'Licenses with Payments Due', path: '/client/license/expiry/payments' }
+  ];
+
   const navItems = [
     { name: 'Dashboard', path: '/client' },
     { name: 'Approvals', path: '/client/approvals' },
@@ -116,7 +131,14 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       subItems: manageSubItems
     },
     { 
-      name: 'Settings', 
+      
+      { 
+        name: 'License Management', 
+        path: '#',
+        subItems: licenseSubItems
+      },
+      { 
+        name: 'Settings', 
       path: '#',
       subItems: [
         { name: 'General', path: '/client/settings' }
