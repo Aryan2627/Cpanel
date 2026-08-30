@@ -1,13 +1,27 @@
 ﻿const fs = require('fs');
-let code = fs.readFileSync('prisma/schema.prisma', 'utf8');
+let schema = fs.readFileSync('prisma/schema.prisma', 'utf8');
 
-if (!code.includes('onboardingData')) {
-    code = code.replace(
-        'createdAt      DateTime      @default(now())',
-        'onboardingData Json?\n  createdAt      DateTime      @default(now())'
-    );
-    fs.writeFileSync('prisma/schema.prisma', code, 'utf8');
-    console.log("Added onboardingData Json? to Vendor model.");
-} else {
-    console.log("onboardingData already exists.");
-}
+const orgModelMarker = `model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  domain    String?
+  theme     String? // JSON string for colors, logos
+  features  String? // JSON string for feature toggles
+  industry  String?
+  createdAt DateTime @default(now())`;
+
+const newOrgFields = `model Organization {
+  id            String   @id @default(uuid())
+  name          String
+  domain        String?
+  theme         String? // JSON string for colors, logos
+  features      String? // JSON string for feature toggles
+  industry      String?
+  licenseStatus String   @default("Active") // Active, Expired, Grace Period
+  licensePlan   String   @default("Enterprise")
+  licenseExpiry DateTime?
+  createdAt     DateTime @default(now())`;
+
+schema = schema.replace(orgModelMarker, newOrgFields);
+fs.writeFileSync('prisma/schema.prisma', schema, 'utf8');
+console.log("Updated schema.prisma with License fields");

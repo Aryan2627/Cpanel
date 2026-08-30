@@ -8,6 +8,8 @@ import {
 export default function SettingsPage() {
   const [workflowsEnabled, setWorkflowsEnabled] = useState(false);
   const [exportIntakeEnabled, setExportIntakeEnabled] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
   
   // God-tier features state
   const [features, setFeatures] = useState({

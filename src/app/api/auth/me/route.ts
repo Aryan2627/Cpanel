@@ -35,7 +35,10 @@ export async function GET() {
         email: user.email, 
         role: user.role,
         organizationId: user.organizationId,
-        companyName: user.organization?.name || 'My Organization'
+        companyName: user.organization?.name || 'My Organization',
+        licenseStatus: user.organization?.licenseStatus || 'Active',
+        licensePlan: user.organization?.licensePlan || 'Enterprise',
+        licenseExpiry: user.organization?.licenseExpiry || null
       });
     }
 
