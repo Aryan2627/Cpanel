@@ -151,7 +151,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       <div className="app-container">
         
         {/* Sidebar Navigation */}
-        <nav className="sidebar" style={{ width: isSidebarOpen ? "270px" : "0px", minWidth: isSidebarOpen ? "270px" : "0px", overflow: "hidden", transition: "all 0.3s ease", padding: isSidebarOpen ? undefined : "0", borderRight: isSidebarOpen ? undefined : "none", opacity: isSidebarOpen ? 1 : 0 }}>
+        <nav className="sidebar" style={{ width: isSidebarOpen ? "270px" : "0px", minWidth: isSidebarOpen ? "270px" : "0px", overflow: isSidebarOpen ? "visible" : "hidden", transition: "all 0.3s ease", padding: isSidebarOpen ? undefined : "0", borderRight: isSidebarOpen ? undefined : "none", opacity: isSidebarOpen ? 1 : 0 }}>
           <div className="sidebar-logo">
             {/* ProcGen Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -162,7 +162,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
           <ul className="sidebar-nav">
             {navItems.map((item) => (
-              <li key={item.name} onMouseEnter={() => setHoverMenu(item.name)} onMouseLeave={() => setHoverMenu(null)}>
+              <li key={item.name} onMouseEnter={() => setHoverMenu(item.name)} onMouseLeave={() => setHoverMenu(null)} style={{ position: "relative" }}>
                 {item.subItems ? (
                   <div>
                     <div 
@@ -174,7 +174,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                       <span style={{ fontSize: '0.8rem', transform: (openMenu === item.name || hoverMenu === item.name) ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
                     </div>
                     {(openMenu === item.name || hoverMenu === item.name) && (
-                      <ul style={{ listStyle: 'none', padding: '4px 0 4px 16px', margin: 0 }}>
+                      <ul style={{ position: 'absolute', top: 0, left: '100%', minWidth: '280px', backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.6)', padding: '12px', zIndex: 9999, listStyle: 'none', margin: '0 0 0 10px', maxHeight: '80vh', overflowY: 'auto' }}>
                         {item.subItems.map(subItem => (
                           <li key={subItem.name}>
                             <Link 
