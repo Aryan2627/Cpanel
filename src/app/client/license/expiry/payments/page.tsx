@@ -24,7 +24,7 @@ export default function Page() {
         <td style={{ padding: '16px 8px' }}>INV-PROC-8832</td>
         <td style={{ padding: '16px 8px', color: '#6b7280' }}>ProcGen Enterprise Annual Renewal</td>
         <td style={{ padding: '16px 8px', color: '#dc2626' }}>Nov 15, 2026</td>
-        <td style={{ padding: '16px 8px', textAlign: 'right', fontWeight: 500 }}>$12,500.00</td>
+        <td style={{ padding: '16px 8px', textAlign: 'right', fontWeight: 500 }}>₹10,50,000.00</td>
         <td style={{ padding: '16px 8px', textAlign: 'right' }}>
           <button style={{ padding: '8px 16px', backgroundColor: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer' }}>Generate PO</button>
         </td>

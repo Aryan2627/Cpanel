@@ -20,7 +20,7 @@ export default function Page() {
     </div>
     <div style={{ flex: 1, minWidth: '200px' }}>
       <div style={{ fontSize: '0.9rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Annual Spend</div>
-      <div style={{ fontSize: '2.5rem', fontWeight: 300 }}>$12,500</div>
+      <div style={{ fontSize: '2.5rem', fontWeight: 300 }}>₹10,50,000</div>
     </div>
   </div>
 

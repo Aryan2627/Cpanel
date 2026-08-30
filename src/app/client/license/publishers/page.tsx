@@ -16,7 +16,7 @@ export default function Page() {
         <div style={{ color: '#6b7280', fontSize: '0.9rem' }}>Core Platform Provider</div>
       </div>
       <div style={{ textAlign: 'right' }}>
-        <div style={{ fontSize: '1.2rem' }}>$12,500/yr</div>
+        <div style={{ fontSize: '1.2rem' }}>₹10,50,000/yr</div>
         <div style={{ color: '#059669', fontSize: '0.9rem' }}>Active Subscription</div>
       </div>
     </div>

@@ -146,7 +146,7 @@ export default function SettingsPage() {
             </div>
             <button 
               onClick={async () => {
-                if (confirm("Are you sure you want to generate a $12,500 PO to renew your license?")) {
+                if (confirm("Are you sure you want to generate a ₹10,50,000 PO to renew your license?")) {
                    try {
                      const res = await fetch('/api/license/renew', { 
                        method: 'POST', 

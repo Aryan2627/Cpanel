@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { getServerSession } from 'next-auth';
 
@@ -48,8 +48,8 @@ export async function POST(request: Request) {
           id: 1,
           name: `${org.licensePlan} Plan - Annual License Renewal`,
           quantity: 1,
-          unitPrice: 12500,
-          total: 12500
+          unitPrice: 1050000,
+          total: 1050000
         }
       ],
       notes: "Auto-generated PO for platform license renewal."
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
         title: `ProcGen ${org.licensePlan} Annual License`,
         status: 'Draft',
         vendorId: vendor.id,
-        total: 12500,
+        total: 1050000,
         details: poDetails,
         source: 'System Generation'
       }
