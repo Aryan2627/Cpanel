@@ -166,15 +166,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 {item.subItems ? (
                   <div>
                     <div 
-                      onClick={() => toggleMenu(item.name)}
-                      className={(openMenu === item.name || hoverMenu === item.name) ? 'active' : ''}
+                      
+                      className={hoverMenu === item.name ? 'active' : ''}
                       style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', color: '#94a3b8', fontWeight: 500, borderRadius: '12px', marginBottom: '8px', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
                     >
                       {item.name}
                       
                     </div>
-                    {(openMenu === item.name || hoverMenu === item.name) && (
-                      <ul style={{ position: 'absolute', bottom: 0, left: '100%', minWidth: '280px', backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.6)', padding: '12px', zIndex: 9999, listStyle: 'none', margin: '0 0 0 10px', maxHeight: '80vh', overflowY: 'auto' }}>
+                    {hoverMenu === item.name && (
+                      <ul style={{ position: 'absolute', bottom: 0, left: '100%', minWidth: '280px', backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.6)', padding: '12px', zIndex: 9999, listStyle: 'none', transform: 'translateX(10px)', maxHeight: '80vh', overflowY: 'auto' }}>
                         {item.subItems.map(subItem => (
                           <li key={subItem.name}>
                             <Link 
