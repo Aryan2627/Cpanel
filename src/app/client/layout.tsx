@@ -98,7 +98,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           <div className="sidebar-logo">
             {/* ProcGen Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <img src="/logo.png" alt="ProcGen Logo" className="w-10 h-10 object-contain drop-shadow-[0_0_15px_rgba(0,255,255,0.4)]" style={{ filter: "contrast(1.2) drop-shadow(0 0 10px rgba(0, 255, 255, 0.3))" }} />
+              <img src="/logo.png" alt="ProcGen Logo" style={{ width: '40px', height: '40px', objectFit: 'contain', filter: 'contrast(1.2) drop-shadow(0 0 10px rgba(0, 255, 255, 0.3))' }} />
               <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#ffffff', letterSpacing: '-0.05em' }}>ProcGen</h2>
             </div>
           </div>
