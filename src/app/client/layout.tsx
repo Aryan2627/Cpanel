@@ -171,7 +171,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                       style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', color: '#94a3b8', fontWeight: 500, borderRadius: '12px', marginBottom: '8px', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
                     >
                       {item.name}
-                      <span style={{ fontSize: '0.8rem', transform: (openMenu === item.name || hoverMenu === item.name) ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
+                      
                     </div>
                     {(openMenu === item.name || hoverMenu === item.name) && (
                       <ul style={{ position: 'absolute', bottom: 0, left: '100%', minWidth: '280px', backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.6)', padding: '12px', zIndex: 9999, listStyle: 'none', margin: '0 0 0 10px', maxHeight: '80vh', overflowY: 'auto' }}>
