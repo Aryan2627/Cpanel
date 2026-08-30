@@ -131,8 +131,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       subItems: manageSubItems
     },
     { 
-      
-      { 
         name: 'License Management', 
         path: '#',
         subItems: licenseSubItems

@@ -1,20 +1,20 @@
 ﻿const fs = require('fs');
+let code = fs.readFileSync('src/app/client/layout.tsx', 'utf8');
 
-const file = 'src/app/vendor/events/[id]/page.tsx';
-let code = fs.readFileSync(file, 'utf8');
+// The broken snippet is:
+//     { 
+//       
+//       { 
+//         name: 'License Management', 
 
-// Find Total Footer and the stray div
-const badBlock = `          </div>
+const brokenSnippet = `    { 
+      
+      { 
+        name: 'License Management',`;
 
-          <div style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)',`;
+const fixedSnippet = `    { 
+        name: 'License Management',`;
 
-const fixedBlock = `
-          <div style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)',`;
-
-if (code.includes(badBlock)) {
-    code = code.replace(badBlock, fixedBlock);
-    fs.writeFileSync(file, code, 'utf8');
-    console.log('Fixed stray div');
-} else {
-    console.log('Stray div block not found');
-}
+code = code.replace(brokenSnippet, fixedSnippet);
+fs.writeFileSync('src/app/client/layout.tsx', code, 'utf8');
+console.log("Fixed syntax error");
