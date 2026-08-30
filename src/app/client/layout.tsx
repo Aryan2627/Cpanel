@@ -27,6 +27,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   });
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [hoverMenu, setHoverMenu] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string; companyName?: string; licenseStatus?: string; licensePlan?: string; organizationId?: string } | null>(null);
 
   useEffect(() => {
@@ -161,18 +162,18 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
           <ul className="sidebar-nav">
             {navItems.map((item) => (
-              <li key={item.name}>
+              <li key={item.name} onMouseEnter={() => setHoverMenu(item.name)} onMouseLeave={() => setHoverMenu(null)}>
                 {item.subItems ? (
                   <div>
                     <div 
                       onClick={() => toggleMenu(item.name)}
-                      className={openMenu === item.name ? 'active' : ''}
+                      className={(openMenu === item.name || hoverMenu === item.name) ? 'active' : ''}
                       style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', color: '#94a3b8', fontWeight: 500, borderRadius: '12px', marginBottom: '8px', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
                     >
                       {item.name}
-                      <span style={{ fontSize: '0.8rem', transform: openMenu === item.name ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
+                      <span style={{ fontSize: '0.8rem', transform: (openMenu === item.name || hoverMenu === item.name) ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
                     </div>
-                    {openMenu === item.name && (
+                    {(openMenu === item.name || hoverMenu === item.name) && (
                       <ul style={{ listStyle: 'none', padding: '4px 0 4px 16px', margin: 0 }}>
                         {item.subItems.map(subItem => (
                           <li key={subItem.name}>
