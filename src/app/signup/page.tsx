@@ -77,7 +77,7 @@ export default function Signup() {
         <div className="login-left">
           <div className="abstract-shape"></div>
           
-          <div className="brand-logo" style={{ background: '#fff', padding: '12px 24px', borderRadius: '12px', width: 'fit-content' }}>
+          <div className="brand-logo">
             <img src="/logo.webp" alt="ProcGen Logo" style={{ height: '48px', objectFit: 'contain' }} />
           </div>
 
