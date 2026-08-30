@@ -1,17 +1,19 @@
 
 'use client';
 import React from 'react';
-import { Settings2 } from 'lucide-react';
 
-export default function PointsRuleSets() {
+export default function Page() {
   return (
-    <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'system-ui' }}>
-      <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#0f172a', marginBottom: '32px' }}>Points Rule Sets</h1>
-      <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '32px', maxWidth: '600px' }}>
-        <Settings2 size={40} color="#3b82f6" style={{ marginBottom: '16px' }} />
-        <h2>Metric Configuration Engine</h2>
-        <p style={{ color: '#64748b', lineHeight: 1.6 }}>Configure complex licensing metrics such as IBM Processor Value Units (PVU), Oracle Core Factors, or Microsoft CAL multiplexing rules.</p>
-        <button style={{ marginTop: '16px', padding: '10px 20px', backgroundColor: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>+ Create New Rule Set</button>
+    <div style={{ padding: '40px', backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', color: '#111827' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 600, margin: '0 0 8px 0' }}>Points Rule Sets</h1>
+        <p style={{ fontSize: '1.1rem', color: '#6b7280', margin: '0 0 40px 0' }}>Manage custom licensing metrics and calculations.</p>
+        
+  <p style={{ fontSize: '1rem', lineHeight: '1.6', color: '#374151', marginBottom: '32px', maxWidth: '600px' }}>
+    Use this section to configure complex calculation metrics like IBM PVU or Oracle Core Factors. Select a publisher to load their default rule templates.
+  </p>
+  <button style={{ padding: '12px 24px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '1rem', cursor: 'pointer' }}>Create Rule Set</button>
+  
       </div>
     </div>
   );

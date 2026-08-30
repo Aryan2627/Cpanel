@@ -1,25 +1,35 @@
 
 'use client';
 import React from 'react';
-import { Wrench } from 'lucide-react';
 
-export default function MaintenanceExpiry() {
+export default function Page() {
   return (
-    <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'system-ui' }}>
-      <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>License & Maintenance Expiry</h1>
-      <p style={{ color: '#64748b', marginBottom: '32px' }}>Track support cutoffs for perpetual software.</p>
-      
-      <div style={{ borderLeft: '4px solid #e2e8f0', marginLeft: '24px', paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
-         <div style={{ position: 'relative' }}>
-           <div style={{ position: 'absolute', left: '-42px', top: '0', backgroundColor: '#ef4444', color: '#fff', width: '32px', height: '32px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Wrench size={16} /></div>
-           <h3 style={{ margin: '0 0 4px 0' }}>Oracle Database Enterprise - Support Expiring</h3>
-           <p style={{ margin: 0, color: '#ef4444', fontWeight: 600 }}>Expires in 12 Days (Nov 15, 2026)</p>
-         </div>
-         <div style={{ position: 'relative' }}>
-           <div style={{ position: 'absolute', left: '-42px', top: '0', backgroundColor: '#f59e0b', color: '#fff', width: '32px', height: '32px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Wrench size={16} /></div>
-           <h3 style={{ margin: '0 0 4px 0' }}>VMware vSphere Standard - Maintenance</h3>
-           <p style={{ margin: 0, color: '#f59e0b', fontWeight: 600 }}>Expires in 45 Days (Dec 18, 2026)</p>
-         </div>
+    <div style={{ padding: '40px', backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', color: '#111827' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 600, margin: '0 0 8px 0' }}>Maintenance Expiry</h1>
+        <p style={{ fontSize: '1.1rem', color: '#6b7280', margin: '0 0 40px 0' }}>Upcoming support and maintenance cutoffs.</p>
+        
+  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+    <li style={{ padding: '24px 0', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between' }}>
+      <div>
+        <div style={{ fontSize: '1.1rem', fontWeight: 500 }}>Oracle Database Enterprise</div>
+        <div style={{ color: '#6b7280', fontSize: '0.95rem' }}>Support contract expires soon.</div>
+      </div>
+      <div style={{ color: '#dc2626', fontWeight: 500, textAlign: 'right' }}>
+        Nov 15, 2026<br/><span style={{ fontSize: '0.85rem' }}>12 Days</span>
+      </div>
+    </li>
+    <li style={{ padding: '24px 0', display: 'flex', justifyContent: 'space-between' }}>
+      <div>
+        <div style={{ fontSize: '1.1rem', fontWeight: 500 }}>VMware vSphere Standard</div>
+        <div style={{ color: '#6b7280', fontSize: '0.95rem' }}>Maintenance expires soon.</div>
+      </div>
+      <div style={{ color: '#d97706', fontWeight: 500, textAlign: 'right' }}>
+        Dec 18, 2026<br/><span style={{ fontSize: '0.85rem' }}>45 Days</span>
+      </div>
+    </li>
+  </ul>
+  
       </div>
     </div>
   );

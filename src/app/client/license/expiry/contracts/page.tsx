@@ -1,25 +1,20 @@
 
 'use client';
 import React from 'react';
-import { FileText } from 'lucide-react';
 
-export default function ContractExpiry() {
+export default function Page() {
   return (
-    <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'system-ui' }}>
-      <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#0f172a', marginBottom: '32px' }}>Contract Expiry</h1>
-      
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-        {['Next 30 Days', '30-90 Days', '90+ Days'].map(col => (
-          <div key={col} style={{ backgroundColor: '#f1f5f9', borderRadius: '12px', padding: '16px' }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '1rem', color: '#475569' }}>{col}</h3>
-            {col === 'Next 30 Days' && (
-              <div style={{ backgroundColor: '#fff', padding: '16px', borderRadius: '8px', borderLeft: '4px solid #ef4444', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}><FileText size={16} /> Microsoft Enterprise Agreement</div>
-                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>MSA-2023-991 • Expires Nov 30</div>
-              </div>
-            )}
-          </div>
-        ))}
+    <div style={{ padding: '40px', backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', color: '#111827' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 600, margin: '0 0 8px 0' }}>Contract Expiry</h1>
+        <p style={{ fontSize: '1.1rem', color: '#6b7280', margin: '0 0 40px 0' }}>Master Service Agreements (MSAs) expiring soon.</p>
+        
+  <div style={{ padding: '24px', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fca5a5' }}>
+    <h3 style={{ margin: '0 0 8px 0', color: '#991b1b', fontSize: '1.1rem' }}>Microsoft Enterprise Agreement</h3>
+    <div style={{ color: '#7f1d1d', marginBottom: '16px' }}>MSA-2023-991 • Expires Nov 30 (Next 30 Days)</div>
+    <button style={{ padding: '8px 16px', backgroundColor: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Review Contract</button>
+  </div>
+  
       </div>
     </div>
   );

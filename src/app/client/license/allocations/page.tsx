@@ -1,35 +1,33 @@
 
 'use client';
 import React from 'react';
-import { Users, ArrowRightLeft } from 'lucide-react';
 
-export default function Allocations() {
+export default function Page() {
   return (
-    <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'system-ui' }}>
-      <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#0f172a', marginBottom: '32px' }}>Apply Allocations & Exemptions</h1>
-      
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 1fr', gap: '16px', alignItems: 'center' }}>
-        <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', minHeight: '400px' }}>
-          <h3 style={{ margin: '0 0 16px 0' }}>Available Pool</h3>
-          <div style={{ padding: '12px', backgroundColor: '#f1f5f9', borderRadius: '8px', marginBottom: '8px', cursor: 'pointer' }}>Office 365 E5 (20 seats available)</div>
-          <div style={{ padding: '12px', backgroundColor: '#f1f5f9', borderRadius: '8px', marginBottom: '8px', cursor: 'pointer' }}>Adobe Photoshop (5 seats available)</div>
-        </div>
+    <div style={{ padding: '40px', backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', color: '#111827' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 600, margin: '0 0 8px 0' }}>Apply Allocations</h1>
+        <p style={{ fontSize: '1.1rem', color: '#6b7280', margin: '0 0 40px 0' }}>Assign available licenses to users or departments.</p>
         
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <button style={{ width: '48px', height: '48px', borderRadius: '24px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-            <ArrowRightLeft size={24} />
-          </button>
-        </div>
-
-        <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', minHeight: '400px' }}>
-          <h3 style={{ margin: '0 0 16px 0' }}>Target Users / Groups</h3>
-          <div style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #f1f5f9' }}>
-             <Users size={20} color="#64748b" /> Engineering Dept
-          </div>
-          <div style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #f1f5f9' }}>
-             <Users size={20} color="#64748b" /> Marketing Dept
-          </div>
-        </div>
+  <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap' }}>
+    <div style={{ flex: 1, minWidth: '300px' }}>
+      <h2 style={{ fontSize: '1.1rem', fontWeight: 500, marginBottom: '16px' }}>1. Select License</h2>
+      <select style={{ width: '100%', padding: '12px', fontSize: '1rem', border: '1px solid #d1d5db', borderRadius: '6px', marginBottom: '16px', backgroundColor: '#fff' }}>
+        <option>Office 365 E5 (20 available)</option>
+        <option>Adobe Photoshop (5 available)</option>
+      </select>
+    </div>
+    
+    <div style={{ flex: 1, minWidth: '300px' }}>
+      <h2 style={{ fontSize: '1.1rem', fontWeight: 500, marginBottom: '16px' }}>2. Select Target</h2>
+      <select style={{ width: '100%', padding: '12px', fontSize: '1rem', border: '1px solid #d1d5db', borderRadius: '6px', marginBottom: '24px', backgroundColor: '#fff' }}>
+        <option>Engineering Department</option>
+        <option>Marketing Department</option>
+      </select>
+    </div>
+  </div>
+  <button style={{ padding: '12px 32px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '1rem', cursor: 'pointer' }}>Assign License</button>
+  
       </div>
     </div>
   );

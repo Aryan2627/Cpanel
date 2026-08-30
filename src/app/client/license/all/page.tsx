@@ -1,23 +1,22 @@
 
 'use client';
 import React from 'react';
-import { List, Download } from 'lucide-react';
 
-export default function AllLicenses() {
+export default function Page() {
   return (
-    <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'system-ui' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>All Licenses Ledger</h1>
-        <button style={{ padding: '10px 20px', backgroundColor: '#3b82f6', color: '#fff', borderRadius: '8px', border: 'none', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600 }}>
-          <Download size={18} /> Export Inventory
-        </button>
-      </div>
-      
-      <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', textAlign: 'center', color: '#64748b' }}>
-        <List size={48} color="#cbd5e1" style={{ margin: '0 auto 16px auto' }} />
-        <h3>Master Inventory Grid</h3>
-        <p>This grid displays the 14,204 active license records in your database.</p>
-        <p style={{ fontSize: '0.85rem' }}>* Pagination and infinite scroll enabled.</p>
+    <div style={{ padding: '40px', backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', color: '#111827' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 600, margin: '0 0 8px 0' }}>All Licenses</h1>
+        <p style={{ fontSize: '1.1rem', color: '#6b7280', margin: '0 0 40px 0' }}>Search and manage your entire software inventory.</p>
+        
+  <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
+    <input type="text" placeholder="Search licenses..." style={{ flex: 1, padding: '12px 16px', fontSize: '1rem', border: '1px solid #d1d5db', borderRadius: '6px' }} />
+    <button style={{ padding: '12px 24px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '1rem', cursor: 'pointer' }}>Search</button>
+  </div>
+  <div style={{ padding: '60px 20px', textAlign: 'center', color: '#6b7280', border: '1px dashed #d1d5db', borderRadius: '8px' }}>
+    Search above to load the license grid.
+  </div>
+  
       </div>
     </div>
   );
