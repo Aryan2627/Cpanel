@@ -3,35 +3,15 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function ClientDashboard() {
-  const [stats, setStats] = useState({
-    users: 0,
-    teams: 0,
-    products: 0,
-    intakes: 0
-  });
+  const [stats, setStats] = useState({ users: 0, vendors: 0, pos: 0, intakes: 0, totalSpend: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [usersRes, teamsRes, productsRes, intakesRes] = await Promise.all([
-          fetch('/api/users'),
-          fetch('/api/teams'),
-          fetch('/api/products'),
-          fetch('/api/intakes')
-        ]);
-        
-        const users = await usersRes.json();
-        const teams = await teamsRes.json();
-        const products = await productsRes.json();
-        const intakes = await intakesRes.json();
-
-        setStats({
-          users: Array.isArray(users) ? users.length : 0,
-          teams: Array.isArray(teams) ? teams.length : 0,
-          products: Array.isArray(products) ? products.length : 0,
-          intakes: Array.isArray(intakes) ? intakes.length : 0,
-        });
+        const res = await fetch('/api/dashboard/stats');
+        const data = await res.json();
+        setStats(data);
       } catch (error) {
         console.error("Failed to fetch dashboard stats", error);
       } finally {
@@ -83,9 +63,9 @@ export default function ClientDashboard() {
         <div id="tour-kpi-cards" className="kpi-grid" style={{ width: '100%' }}>
           {[
             { title: 'Total Purchase Requests', value: stats.intakes, color: 'var(--primary-color)', icon: '' },
-            { title: 'Active Products', value: stats.products, color: 'var(--success-color)', icon: '' },
-            { title: 'Registered Users', value: stats.users, color: '#8b5cf6', icon: '' },
-            { title: 'Active Teams', value: stats.teams, color: 'var(--warning-color)', icon: '' },
+            { title: 'Active Vendors', value: stats.vendors, color: 'var(--success-color)', icon: '' },
+            { title: 'Active Purchase Orders', value: stats.pos, color: '#8b5cf6', icon: '' },
+            { title: 'Total PO Spend', value: '₹' + (stats.totalSpend || 0).toLocaleString(), color: 'var(--warning-color)', icon: '' },
           ].map((kpi, i) => (
             <div key={i} className="kpi-card">
               <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '5rem', opacity: 0.05 }}>
