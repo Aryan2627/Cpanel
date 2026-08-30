@@ -174,7 +174,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                       <span style={{ fontSize: '0.8rem', transform: (openMenu === item.name || hoverMenu === item.name) ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
                     </div>
                     {(openMenu === item.name || hoverMenu === item.name) && (
-                      <ul style={{ position: 'absolute', top: 0, left: '100%', minWidth: '280px', backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.6)', padding: '12px', zIndex: 9999, listStyle: 'none', margin: '0 0 0 10px', maxHeight: '80vh', overflowY: 'auto' }}>
+                      <ul style={{ position: 'absolute', bottom: 0, left: '100%', minWidth: '280px', backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.6)', padding: '12px', zIndex: 9999, listStyle: 'none', margin: '0 0 0 10px', maxHeight: '80vh', overflowY: 'auto' }}>
                         {item.subItems.map(subItem => (
                           <li key={subItem.name}>
                             <Link 
