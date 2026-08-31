@@ -34,6 +34,9 @@ function SingleStageCreateContent() {
   
   // States for Event Type and Templates
   const [eventType, setEventType] = useState('Rank based');
+  const [japStartPrice, setJapStartPrice] = useState('');
+  const [japDropAmount, setJapDropAmount] = useState('');
+  const [japTickInterval, setJapTickInterval] = useState('');
   const [isEventTypeOpen, setIsEventTypeOpen] = useState(false);
   
   const [template, setTemplate] = useState('Select Templates');
@@ -385,18 +388,36 @@ function SingleStageCreateContent() {
                   style={{ ...glassInputStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
                 >
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: '500' }}>
-                    {eventType === 'Rank based' ? '' : ''} {eventType}
+                    {eventType === 'Japanese Reverse Auction' ? 'Japanese Reverse Auction (The "Survival" Drop)' : eventType}
                   </span>
                   <ChevronDown size={16} color="#94a3b8" />
                 </div>
                 {isEventTypeOpen && (
                   <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, overflow: 'hidden' }}>
                     <div onClick={() => { setEventType('Rank based'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}> Rank based</div>
-                    <div onClick={() => { setEventType('Price based'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333', borderTop: '1px solid #f1f5f9' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}> Price based</div>
+                    <div onClick={() => { setEventType('Japanese Reverse Auction'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333', borderTop: '1px solid #f1f5f9' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}> Japanese Reverse Auction (The "Survival" Drop)</div>
+                      <div onClick={() => { setEventType('Price based'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333', borderTop: '1px solid #f1f5f9' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}> Price based</div>
+                  </div>
+                  )}
+                </div>
+              </div>
+
+                {eventType === 'Japanese Reverse Auction' && (
+                  <div style={{ gridColumn: '1 / -1', padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', gap: '16px', marginTop: '16px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#0f172a', marginBottom: '8px' }}>Start Price (Max)</label>
+                      <input type="number" value={japStartPrice} onChange={e => setJapStartPrice(e.target.value)} placeholder="e.g. 10000" style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#fff' }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#0f172a', marginBottom: '8px' }}>Drop Amount (Step)</label>
+                      <input type="number" value={japDropAmount} onChange={e => setJapDropAmount(e.target.value)} placeholder="e.g. 200" style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#fff' }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#0f172a', marginBottom: '8px' }}>Time Interval (mins)</label>
+                      <input type="number" value={japTickInterval} onChange={e => setJapTickInterval(e.target.value)} placeholder="e.g. 5" style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#fff' }} />
+                    </div>
                   </div>
                 )}
-              </div>
-                </div>
               
               {/* Multi-Stage Configuration */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', gridColumn: 'span 2' }}>
@@ -774,7 +795,7 @@ function SingleStageCreateContent() {
             onClick={async () => {
               const isValidDuration = durationValue && parseInt(durationValue) > 0;
                 const isValidNfa = nfaText && nfaText.trim().length > 0;
-                if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && isValidDuration && isValidNfa && coiAgreed) {
+                if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && isValidDuration && isValidJap && isValidNfa && coiAgreed) {
                 try {
                   // Calculate endTime if duration is provided
                   let calculatedEndTime = null;
@@ -858,8 +879,8 @@ function SingleStageCreateContent() {
               }
             }}
             style={{ 
-              background: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && nfaText && nfaText.trim().length > 0 && coiAgreed) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
-              color: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && nfaText && nfaText.trim().length > 0 && coiAgreed) ? '#ffffff' : '#94a3b8', 
+              background: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && (eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval)) && nfaText && nfaText.trim().length > 0 && coiAgreed) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
+              color: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && (eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval)) && nfaText && nfaText.trim().length > 0 && coiAgreed) ? '#ffffff' : '#94a3b8', 
               border: 'none', borderRadius: '30px', 
               padding: '16px 32px', fontWeight: '600', fontSize: '1.05rem', 
               cursor: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) ? 'pointer' : 'not-allowed',
