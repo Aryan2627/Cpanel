@@ -680,7 +680,8 @@ function SingleStageCreateContent() {
           </div>
           <button 
             onClick={async () => {
-              if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) {
+              const isValidDuration = durationValue && parseInt(durationValue) > 0;
+                if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && isValidDuration) {
                 try {
                   // Calculate endTime if duration is provided
                   let calculatedEndTime = null;
@@ -756,12 +757,13 @@ function SingleStageCreateContent() {
                 if (enableRFQ && rfqTemplate === 'Select Templates') missing.push("an RFQ Template");
                 if (enableAuction && auctionTemplate === 'Select Templates') missing.push("an Auction Template");
                 if (!enableTechnical && !enableRFQ && !enableAuction) missing.push("at least one stage enabled");
+                  if (!durationValue || parseInt(durationValue) <= 0) missing.push("Event Duration");
                 alert(`Please provide: ${missing.join(', ')}`);
               }
             }}
             style={{ 
-              background: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
-              color: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) ? '#ffffff' : '#94a3b8', 
+              background: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
+              color: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0) ? '#ffffff' : '#94a3b8', 
               border: 'none', borderRadius: '30px', 
               padding: '16px 32px', fontWeight: '600', fontSize: '1.05rem', 
               cursor: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) ? 'pointer' : 'not-allowed',
