@@ -707,14 +707,14 @@ function SingleStageCreateContent() {
           
           
 {/* Legal & Approvals */}
-          <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', marginBottom: '32px' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', marginBottom: '32px' }}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 Legal & Approvals
               </h2>
             </div>
             
-            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ padding: '24px', paddingBottom: '32px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
               
               {/* Workflow Selector */}
               <div>
@@ -784,6 +784,7 @@ function SingleStageCreateContent() {
                 <input type="checkbox" checked={coiAgreed} onChange={(e) => setCoiAgreed(e.target.checked)} style={{ width: '20px', height: '20px' }} />
                 <span style={{ fontSize: '0.95rem', color: '#334155', fontWeight: '500' }}>I declare that there is no Conflict of Interest (COI) in conducting this sourcing event.</span>
               </label>
+              <div style={{ height: '16px', width: '100%' }}></div>
               
             </div>
           </div>
@@ -791,7 +792,7 @@ function SingleStageCreateContent() {
           {/* NFA Modal */}
           {isNfaModalOpen && (
             <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-              <div style={{ background: '#fff', borderRadius: '16px', width: '600px', maxWidth: '90%', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+              <div style={{ background: '#fff', borderRadius: '16px', width: '600px', maxWidth: '90%', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
                 <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
                   <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Note For Approval (NFA)</h3>
                   <button onClick={() => setIsNfaModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: '1.5rem' }}>&times;</button>
@@ -817,7 +818,7 @@ function SingleStageCreateContent() {
           {/* T&C Modal */}
           {isTcModalOpen && (
             <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-              <div style={{ background: '#fff', borderRadius: '16px', width: '600px', maxWidth: '90%', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+              <div style={{ background: '#fff', borderRadius: '16px', width: '600px', maxWidth: '90%', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
                 <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
                   <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Terms & Conditions</h3>
                   <button onClick={() => setIsTcModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: '1.5rem' }}>&times;</button>
@@ -1021,7 +1022,7 @@ function SingleStageCreateContent() {
 
       {isTinderModalOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: '#fff', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', position: 'relative' }}>
+          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', position: 'relative' }}>
             <button onClick={() => setIsTinderModalOpen(false)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}>
               <X size={20} color="#0f172a" />
             </button>
