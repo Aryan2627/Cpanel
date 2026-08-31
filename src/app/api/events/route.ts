@@ -38,19 +38,31 @@ export async function POST(request: Request) {
     let pendingWorkflow = null;
     let workflowApprovers = [];
 
-    // Check if there is an active workflow for this category (we use 'type' as category for events here)
-    const workflows = await prisma.workflow.findMany({ 
-      where: { isActive: true, category: data.type, organizationId: orgId } 
-    });
-    if (workflows.length > 0) {
-      pendingWorkflow = workflows[0];
-      try {
-        workflowApprovers = JSON.parse(pendingWorkflow.approvers);
-        if (workflowApprovers.length > 0) {
-          eventStatus = 'Pending Approval';
+    // Handle explicit workflowId if provided, else fallback to category
+      if (data.workflowId) {
+        const selectedWf = await prisma.workflow.findUnique({
+          where: { id: data.workflowId }
+        });
+        if (selectedWf && selectedWf.organizationId === orgId) {
+          pendingWorkflow = selectedWf;
         }
-      } catch(e) {}
-    }
+      } else {
+        const workflows = await prisma.workflow.findMany({ 
+          where: { isActive: true, category: data.type, organizationId: orgId } 
+        });
+        if (workflows.length > 0) {
+          pendingWorkflow = workflows[0];
+        }
+      }
+
+      if (pendingWorkflow) {
+        try {
+          workflowApprovers = JSON.parse(pendingWorkflow.approvers);
+          if (workflowApprovers.length > 0) {
+            eventStatus = 'Pending Approval';
+          }
+        } catch(e) {}
+      }
 
     const event = await prisma.event.create({
       data: {
