@@ -22,10 +22,7 @@ const Countdown = ({ endTime }: { endTime: string | Date }) => {
   const m = Math.floor((diff / 1000 / 60) % 60);
   const s = Math.floor((diff / 1000) % 60);
   
-  let timeStr = '';
-  if (d > 0) timeStr = `${d}d ${h}h remaining`;
-  else if (h > 0) timeStr = `${h}h ${m}m remaining`;
-  else timeStr = `${m}m ${s}s remaining`;
+  let timeStr = `${d > 0 ? d + 'd ' : ''}${h > 0 || d > 0 ? h + 'h ' : ''}${m}m ${s}s remaining`;
   
   return <span style={{ color: '#3b82f6', fontWeight: 600 }}>{timeStr}</span>;
 };
