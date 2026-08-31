@@ -125,6 +125,7 @@ function SingleStageCreateContent() {
   const [minBidStep, setMinBidStep] = useState('');
   const [ceilingPrice, setCeilingPrice] = useState('');
   const [durationUnit, setDurationUnit] = useState('Days');
+  const [coiAgreed, setCoiAgreed] = useState(false);
   const [nfaText, setNfaText] = useState('');
   const [isNfaModalOpen, setIsNfaModalOpen] = useState(false);
   const [tcText, setTcText] = useState('');
@@ -763,7 +764,7 @@ function SingleStageCreateContent() {
             onClick={async () => {
               const isValidDuration = durationValue && parseInt(durationValue) > 0;
                 const isValidNfa = nfaText && nfaText.trim().length > 0;
-                if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && isValidDuration && isValidNfa) {
+                if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && isValidDuration && isValidNfa && coiAgreed) {
                 try {
                   // Calculate endTime if duration is provided
                   let calculatedEndTime = null;
@@ -841,12 +842,13 @@ function SingleStageCreateContent() {
                 if (!enableTechnical && !enableRFQ && !enableAuction) missing.push("at least one stage enabled");
                   if (!durationValue || parseInt(durationValue) <= 0) missing.push("Event Duration");
                   if (!nfaText || !nfaText.trim()) missing.push("NFA Details");
+                  if (!coiAgreed) missing.push("Conflict of Interest Declaration");
                 alert(`Please provide: ${missing.join(', ')}`);
               }
             }}
             style={{ 
-              background: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && nfaText && nfaText.trim().length > 0) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
-              color: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && nfaText && nfaText.trim().length > 0) ? '#ffffff' : '#94a3b8', 
+              background: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && nfaText && nfaText.trim().length > 0 && coiAgreed) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
+              color: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && nfaText && nfaText.trim().length > 0 && coiAgreed) ? '#ffffff' : '#94a3b8', 
               border: 'none', borderRadius: '30px', 
               padding: '16px 32px', fontWeight: '600', fontSize: '1.05rem', 
               cursor: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) ? 'pointer' : 'not-allowed',

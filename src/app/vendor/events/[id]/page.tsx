@@ -8,6 +8,19 @@ export default function VendorLiveBidding() {
   const router = useRouter();
   const params = useParams();
   const [timeLeft, setTimeLeft] = useState('00:14:59');
+  const [hasAcceptedNDA, setHasAcceptedNDA] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem(`nda_accepted_${params.id}`)) {
+      setHasAcceptedNDA(true);
+    }
+  }, [params.id]);
+
+  const acceptNDA = () => {
+    localStorage.setItem(`nda_accepted_${params.id}`, 'true');
+    setHasAcceptedNDA(true);
+  };
+
   
   const [event, setEvent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -199,7 +212,23 @@ export default function VendorLiveBidding() {
   if (error) return <div style={{ color: '#ef4444', padding: '40px' }}>Error: {error}</div>;
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#020617', color: '#f8fafc', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#020617', color: '#f8fafc', fontFamily: 'Inter, sans-serif', position: 'relative' }}>
+      {!hasAcceptedNDA && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '15vh', background: 'rgba(2, 6, 23, 0.6)' }}>
+          <div style={{ background: '#0f172a', padding: '48px', borderRadius: '24px', border: '1px solid #1e293b', maxWidth: '600px', width: '90%', textAlign: 'center', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <ShieldCheck size={64} color="#3b82f6" style={{ margin: '0 auto 24px auto' }} />
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', margin: '0 0 16px 0', color: '#f8fafc' }}>Non-Disclosure Agreement</h2>
+            <p style={{ color: '#94a3b8', fontSize: '1rem', lineHeight: '1.6', marginBottom: '32px' }}>
+              This sourcing event contains strictly confidential and proprietary information. By proceeding, you legally agree to keep all pricing, specifications, and buyer details confidential as per the standard Master NDA.
+            </p>
+            <button onClick={acceptNDA} style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: '#fff', border: 'none', padding: '16px 32px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: '600', cursor: 'pointer', width: '100%', transition: 'all 0.2s', boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.3)' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
+              I Agree & Accept NDA
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div style={{ filter: hasAcceptedNDA ? 'none' : 'blur(16px)', pointerEvents: hasAcceptedNDA ? 'auto' : 'none', transition: 'filter 0.5s ease', height: '100%', opacity: hasAcceptedNDA ? 1 : 0.4 }}>
       
       {/* Live Header */}
       <header style={{ padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0f172a', borderBottom: '1px solid #1e293b' }}>
@@ -440,6 +469,7 @@ export default function VendorLiveBidding() {
           }
         `}
       </style>
+      </div>
     </div>
   );
 }

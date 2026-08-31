@@ -112,6 +112,7 @@ function AuctionCreateContent() {
   const [minBidStep, setMinBidStep] = useState('');
   const [ceilingPrice, setCeilingPrice] = useState('');
   const [durationUnit, setDurationUnit] = useState('Days');
+  const [coiAgreed, setCoiAgreed] = useState(false);
   const [nfaText, setNfaText] = useState('');
   const [isNfaModalOpen, setIsNfaModalOpen] = useState(false);
   const [tcText, setTcText] = useState('');
@@ -785,7 +786,7 @@ function AuctionCreateContent() {
               const isValidDuration = durationValue && parseInt(durationValue) > 0;
                 const isValidNfa = nfaText && nfaText.trim().length > 0;
                     const isValidJap = eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval);
-                if (title && selectedVendors.length > 0 && template !== 'Select Templates' && isValidDuration && isValidJap && isValidNfa) {
+                if (title && selectedVendors.length > 0 && template !== 'Select Templates' && isValidDuration && isValidJap && isValidNfa && coiAgreed) {
                 try {
                   // Calculate endTime if duration is provided
                   let calculatedEndTime = null;
@@ -871,13 +872,14 @@ function AuctionCreateContent() {
                 if (isMultiStage && stage2Template === 'Select Templates') missing.push("a Template for Stage 2");
                   if (!durationValue || parseInt(durationValue) <= 0) missing.push("Event Duration");
                   if (!nfaText || !nfaText.trim()) missing.push("NFA Details");
+                  if (!coiAgreed) missing.push("Conflict of Interest Declaration");
                   if (eventType === 'Japanese Reverse Auction' && (!japStartPrice || !japDropAmount || !japTickInterval)) missing.push("Japanese Auction Settings (Start Price, Drop, Interval)");
                 alert(`Please provide: ${missing.join(', ')}`);
               }
             }}
             style={{ 
-              background: (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && (eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval)) && nfaText && nfaText.trim().length > 0) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
-              color: (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && (eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval)) && nfaText && nfaText.trim().length > 0) ? '#ffffff' : '#94a3b8', 
+              background: (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && (eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval)) && nfaText && nfaText.trim().length > 0 && coiAgreed) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
+              color: (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && (eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval)) && nfaText && nfaText.trim().length > 0 && coiAgreed) ? '#ffffff' : '#94a3b8', 
               border: 'none', borderRadius: '30px', 
               padding: '16px 32px', fontWeight: '600', fontSize: '1.05rem', 
               cursor: (title && selectedVendors.length > 0 && template !== 'Select Templates' && (!isMultiStage || stage2Template !== 'Select Templates')) ? 'pointer' : 'not-allowed',
