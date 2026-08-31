@@ -24,7 +24,7 @@ export default function SettingsPage() {
     bankruptcyPredictor: true, // Currently built and active
     iotAutoSourcing: false,
     vendorLootDrop: false,
-    jarvisAssistant: false,
+    jarvisAssistant: true,
     sentinelDebug: true
   });
 

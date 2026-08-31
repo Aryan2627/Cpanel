@@ -218,7 +218,7 @@ export default function JarvisAssistant() {
     throw new Error("CRITICAL_FAULT: Manual Override Exception Triggered by Jarvis Protocol.");
   }
 
-  if (!isEnabled) return null;
+  
 
   return (
     <>
