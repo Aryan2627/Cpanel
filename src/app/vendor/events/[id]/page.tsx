@@ -214,7 +214,7 @@ export default function VendorLiveBidding() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#020617', color: '#f8fafc', fontFamily: 'Inter, sans-serif', position: 'relative' }}>
       {!hasAcceptedNDA && (
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '15vh', background: 'rgba(2, 6, 23, 0.6)' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(2, 6, 23, 0.4)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
           <div style={{ background: '#0f172a', padding: '48px', borderRadius: '24px', border: '1px solid #1e293b', maxWidth: '600px', width: '90%', textAlign: 'center', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
             <ShieldCheck size={64} color="#3b82f6" style={{ margin: '0 auto 24px auto' }} />
             <h2 style={{ fontSize: '1.75rem', fontWeight: 'bold', margin: '0 0 16px 0', color: '#f8fafc' }}>Non-Disclosure Agreement</h2>
@@ -228,7 +228,7 @@ export default function VendorLiveBidding() {
         </div>
       )}
 
-      <div style={{ filter: hasAcceptedNDA ? 'none' : 'blur(16px)', pointerEvents: hasAcceptedNDA ? 'auto' : 'none', transition: 'filter 0.5s ease', height: '100%', opacity: hasAcceptedNDA ? 1 : 0.4 }}>
+      <div style={{ pointerEvents: hasAcceptedNDA ? 'auto' : 'none', height: '100%' }}>
       
       {/* Live Header */}
       <header style={{ padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0f172a', borderBottom: '1px solid #1e293b' }}>
