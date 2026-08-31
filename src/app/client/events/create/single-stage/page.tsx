@@ -127,6 +127,16 @@ function SingleStageCreateContent() {
   const [durationUnit, setDurationUnit] = useState('Days');
   const [coiAgreed, setCoiAgreed] = useState(false);
   const [nfaText, setNfaText] = useState('');
+
+  const [workflows, setWorkflows] = useState<any[]>([]);
+  const [systemUsers, setSystemUsers] = useState<any[]>([]);
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState('');
+
+  useEffect(() => {
+    fetch('/api/workflows').then(r => r.json()).then(data => { if (Array.isArray(data)) setWorkflows(data); });
+    fetch('/api/users').then(r => r.json()).then(data => { if (Array.isArray(data)) setSystemUsers(data); });
+  }, []);
+  
   const [isNfaModalOpen, setIsNfaModalOpen] = useState(false);
   const [tcText, setTcText] = useState('');
   const [isTcModalOpen, setIsTcModalOpen] = useState(false);
@@ -816,6 +826,7 @@ function SingleStageCreateContent() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                      workflowId: selectedWorkflowId || undefined,
                       title,
                       type: 'Single-Stage',
                       account: 'Acme Corp',
