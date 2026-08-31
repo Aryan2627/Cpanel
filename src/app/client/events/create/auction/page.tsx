@@ -7,6 +7,11 @@ import { CheckCircle2, AlertCircle, FileCheck, Users, Clock, Settings, Search, L
 function AuctionCreateContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  useEffect(() => {
+    if (searchParams?.get('type') === 'japanese') {
+      setEventType('Japanese Reverse Auction');
+    }
+  }, [searchParams]);
   const initialTitle = searchParams.get('title') || '';
   const fromPR = searchParams.get('fromPR') === 'true';
   const [lineItems, setLineItems] = useState<any[]>([{ id: Date.now(), values: {}, evaluatorId: '' }]);
@@ -372,7 +377,7 @@ function AuctionCreateContent() {
                 {isEventTypeOpen && (
                   <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 20, overflow: 'hidden' }}>
                     <div onClick={() => { setEventType('Rank based'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}> Rank based</div>
-                    <div onClick={() => { setEventType('Japanese Reverse Auction'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333', borderTop: '1px solid #f1f5f9' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}> Japanese Reverse Auction (Auto-Drop)</div>
+                    <div onClick={() => { setEventType('Japanese Reverse Auction'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333', borderTop: '1px solid #f1f5f9' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}> Japanese Reverse Auction (The "Survival" Drop)</div>
                     <div onClick={() => { setEventType('Price based'); setIsEventTypeOpen(false); }} style={{ padding: '12px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', color: '#333', borderTop: '1px solid #f1f5f9' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}> Price based</div>
                   </div>
                 )}
