@@ -794,6 +794,7 @@ function SingleStageCreateContent() {
           <button 
             onClick={async () => {
               const isValidDuration = durationValue && parseInt(durationValue) > 0;
+              const isValidJap = eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval);
                 const isValidNfa = nfaText && nfaText.trim().length > 0;
                 if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && isValidDuration && isValidJap && isValidNfa && coiAgreed) {
                 try {
