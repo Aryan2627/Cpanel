@@ -83,7 +83,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, []);
 
   const manageSubItems = [
-    { name: 'Approval Workflows', path: '/client/manage/workflows' },
     { name: 'Users', path: '/client/manage/users' },
     { name: 'Products', path: '/client/manage/products' },
     { name: 'Templates', path: '/client/manage/templates' }
@@ -113,6 +112,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const navItems = [
     { name: 'Dashboard', path: '/client' },
     { name: 'Approvals', path: '/client/approvals' },
+    { name: 'Approval Workflows', path: '/client/manage/workflows' },
     { name: 'Purchase Requests', path: '/client/intake' },
     { name: 'Requisitions', path: '/client/pr' },
     { name: 'Tenders & Auctions', path: '/client/events' },
