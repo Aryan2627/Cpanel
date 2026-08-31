@@ -125,6 +125,10 @@ function SingleStageCreateContent() {
   const [minBidStep, setMinBidStep] = useState('');
   const [ceilingPrice, setCeilingPrice] = useState('');
   const [durationUnit, setDurationUnit] = useState('Days');
+  const [nfaText, setNfaText] = useState('');
+  const [isNfaModalOpen, setIsNfaModalOpen] = useState(false);
+  const [tcText, setTcText] = useState('');
+  const [isTcModalOpen, setIsTcModalOpen] = useState(false);
 
   const [users, setUsers] = useState<any[]>([]);
 
@@ -672,7 +676,84 @@ function SingleStageCreateContent() {
           <div style={{ height: '80px' }}></div> {/* Spacer */}
         </div>
 
-        {/* Sticky Glass Footer - Launch Actions */}
+        
+          {/* Legal & Approvals */}
+          <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', marginBottom: '32px' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Legal & Approvals
+              </h2>
+            </div>
+            <div style={{ padding: '24px', display: 'flex', gap: '24px' }}>
+              <button 
+                onClick={() => setIsNfaModalOpen(true)}
+                style={{ flex: 1, padding: '16px', borderRadius: '12px', border: nfaText ? '2px solid #10b981' : '2px dashed #cbd5e1', background: nfaText ? '#ecfdf5' : '#f8fafc', color: nfaText ? '#059669' : '#334155', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+              >
+                {nfaText ? '✓ NFA Added (Edit)' : '+ Add Note For Approval (Mandatory)'}
+              </button>
+              <button 
+                onClick={() => setIsTcModalOpen(true)}
+                style={{ flex: 1, padding: '16px', borderRadius: '12px', border: tcText ? '2px solid #3b82f6' : '2px dashed #cbd5e1', background: tcText ? '#eff6ff' : '#f8fafc', color: tcText ? '#1d4ed8' : '#334155', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+              >
+                {tcText ? '✓ T&C Added (Edit)' : '+ Add Terms & Conditions (Optional)'}
+              </button>
+            </div>
+          </div>
+          
+          {/* NFA Modal */}
+          {isNfaModalOpen && (
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+              <div style={{ background: '#fff', borderRadius: '16px', width: '600px', maxWidth: '90%', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+                <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Note For Approval (NFA)</h3>
+                  <button onClick={() => setIsNfaModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: '1.5rem' }}>&times;</button>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  <p style={{ margin: '0 0 16px 0', color: '#64748b', fontSize: '0.9rem' }}>Please provide the justification, budget codes, and approval notes for this event. This is required.</p>
+                  <textarea 
+                    value={nfaText} 
+                    onChange={e => setNfaText(e.target.value)} 
+                    rows={8} 
+                    placeholder="Enter NFA details here..."
+                    style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #cbd5e1', fontSize: '1rem', color: '#334155', resize: 'vertical' }}
+                  />
+                </div>
+                <div style={{ padding: '20px 24px', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                  <button onClick={() => setIsNfaModalOpen(false)} style={{ padding: '10px 24px', background: '#e2e8f0', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+                  <button onClick={() => setIsNfaModalOpen(false)} style={{ padding: '10px 24px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Save NFA</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* T&C Modal */}
+          {isTcModalOpen && (
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+              <div style={{ background: '#fff', borderRadius: '16px', width: '600px', maxWidth: '90%', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
+                <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a' }}>Terms & Conditions</h3>
+                  <button onClick={() => setIsTcModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: '1.5rem' }}>&times;</button>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  <p style={{ margin: '0 0 16px 0', color: '#64748b', fontSize: '0.9rem' }}>Specify any specific terms, conditions, or SLA requirements for this event. This is optional.</p>
+                  <textarea 
+                    value={tcText} 
+                    onChange={e => setTcText(e.target.value)} 
+                    rows={8} 
+                    placeholder="Enter Terms & Conditions..."
+                    style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #cbd5e1', fontSize: '1rem', color: '#334155', resize: 'vertical' }}
+                  />
+                </div>
+                <div style={{ padding: '20px 24px', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                  <button onClick={() => setIsTcModalOpen(false)} style={{ padding: '10px 24px', background: '#e2e8f0', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+                  <button onClick={() => setIsTcModalOpen(false)} style={{ padding: '10px 24px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>Save T&C</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+
+          {/* Sticky Glass Footer - Launch Actions */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(226, 232, 240, 0.8)', padding: '20px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.05)', zIndex: 50 }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ fontSize: '0.8rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Timeline Status</div>
@@ -681,7 +762,8 @@ function SingleStageCreateContent() {
           <button 
             onClick={async () => {
               const isValidDuration = durationValue && parseInt(durationValue) > 0;
-                if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && isValidDuration) {
+                const isValidNfa = nfaText && nfaText.trim().length > 0;
+                if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && isValidDuration && isValidNfa) {
                 try {
                   // Calculate endTime if duration is provided
                   let calculatedEndTime = null;
@@ -758,12 +840,13 @@ function SingleStageCreateContent() {
                 if (enableAuction && auctionTemplate === 'Select Templates') missing.push("an Auction Template");
                 if (!enableTechnical && !enableRFQ && !enableAuction) missing.push("at least one stage enabled");
                   if (!durationValue || parseInt(durationValue) <= 0) missing.push("Event Duration");
+                  if (!nfaText || !nfaText.trim()) missing.push("NFA Details");
                 alert(`Please provide: ${missing.join(', ')}`);
               }
             }}
             style={{ 
-              background: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
-              color: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0) ? '#ffffff' : '#94a3b8', 
+              background: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && nfaText && nfaText.trim().length > 0) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
+              color: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && nfaText && nfaText.trim().length > 0) ? '#ffffff' : '#94a3b8', 
               border: 'none', borderRadius: '30px', 
               padding: '16px 32px', fontWeight: '600', fontSize: '1.05rem', 
               cursor: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) ? 'pointer' : 'not-allowed',
