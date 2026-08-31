@@ -705,10 +705,8 @@ function AuctionCreateContent() {
             </div>
           </div>
           
-          <div style={{ height: '80px' }}></div> {/* Spacer */}
-        </div>
+          </div>
 
-        
           {/* Legal & Approvals */}
           <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', marginBottom: '32px' }}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -785,6 +783,7 @@ function AuctionCreateContent() {
           )}
 
 
+          <div style={{ height: '180px' }}></div> {/* Huge Spacer for Footer */}
           {/* Sticky Glass Footer - Launch Actions */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(226, 232, 240, 0.8)', padding: '20px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.05)', zIndex: 50 }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
