@@ -83,6 +83,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, []);
 
   const manageSubItems = [
+    { name: 'Approval Workflows', path: '/client/manage/workflows' },
     { name: 'Users', path: '/client/manage/users' },
     { name: 'Products', path: '/client/manage/products' },
     { name: 'Templates', path: '/client/manage/templates' }
@@ -90,7 +91,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   if (showWorkflows) {
     manageSubItems.push(
-      { name: 'Dropdowns & Fields', path: '/client/manage/workflows' },
       { name: 'Approval Rules', path: '/client/manage/approvals' }
     );
   }
