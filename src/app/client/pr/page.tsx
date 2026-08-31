@@ -42,9 +42,7 @@ export default function PRPage() {
       if (row.status === 'Approved') tabStatus = 'Completed';
       else if (row.status === 'In Progress') tabStatus = 'In Progress';
       
-      return {
-        ...row,
-        items,
+      return { ...row, refId: row.refId.replace('IR-', 'PR-'), items,
         priority,
         tabStatus,
         fundCenter: 100000 + (i * 12345) % 900000,
