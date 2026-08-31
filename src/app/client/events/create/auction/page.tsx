@@ -718,19 +718,78 @@ function AuctionCreateContent() {
                 Legal & Approvals
               </h2>
             </div>
-            <div style={{ padding: '24px', display: 'flex', gap: '24px' }}>
-              <button 
-                onClick={() => setIsNfaModalOpen(true)}
-                style={{ flex: 1, padding: '16px', borderRadius: '12px', border: nfaText ? '2px solid #10b981' : '2px dashed #cbd5e1', background: nfaText ? '#ecfdf5' : '#f8fafc', color: nfaText ? '#059669' : '#334155', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
-              >
-                {nfaText ? '✓ NFA Added (Edit)' : '+ Add Note For Approval (Mandatory)'}
-              </button>
-              <button 
-                onClick={() => setIsTcModalOpen(true)}
-                style={{ flex: 1, padding: '16px', borderRadius: '12px', border: tcText ? '2px solid #3b82f6' : '2px dashed #cbd5e1', background: tcText ? '#eff6ff' : '#f8fafc', color: tcText ? '#1d4ed8' : '#334155', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
-              >
-                {tcText ? '✓ T&C Added (Edit)' : '+ Add Terms & Conditions (Optional)'}
-              </button>
+            
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              
+              {/* Workflow Selector */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#0f172a', marginBottom: '8px' }}>Approval Workflow Name (Optional)</label>
+                <select 
+                  value={selectedWorkflowId}
+                  onChange={(e) => setSelectedWorkflowId(e.target.value)}
+                  style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#f8fafc', fontSize: '0.95rem', outline: 'none', cursor: 'pointer' }}
+                >
+                  <option value="">-- Auto-assign based on Category --</option>
+                  {workflows.map(wf => (
+                    <option key={wf.id} value={wf.id}>{wf.name}</option>
+                  ))}
+                </select>
+                
+                {/* Visual Workflow Path */}
+                {selectedWorkflowId && (
+                  <div style={{ marginTop: '16px', padding: '16px', background: '#eff6ff', borderRadius: '12px', border: '1px dashed #bfdbfe' }}>
+                    <h4 style={{ margin: '0 0 12px 0', fontSize: '0.85rem', color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Approval Path</h4>
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                      {(() => {
+                        const selectedWf = workflows.find(w => w.id === selectedWorkflowId);
+                        if (!selectedWf) return null;
+                        let approverIds = [];
+                        try { approverIds = JSON.parse(selectedWf.approvers || '[]'); } catch(e){}
+                        if (approverIds.length === 0) return <span style={{ color: '#64748b', fontSize: '0.9rem' }}>No approvers defined.</span>;
+                        
+                        return approverIds.map((userId, index) => {
+                          const userObj = systemUsers.find(u => u.id === userId);
+                          const userName = userObj ? userObj.name : 'Unknown User';
+                          return (
+                            <React.Fragment key={index}>
+                              <div style={{ background: '#fff', border: '1px solid #93c5fd', padding: '6px 12px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '600', color: '#1e40af', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                                <span style={{ background: '#dbeafe', color: '#1e3a8a', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.75rem' }}>{index + 1}</span>
+                                {userName}
+                              </div>
+                              {index < approverIds.length - 1 && (
+                                <div style={{ color: '#94a3b8', fontWeight: 'bold' }}>➔</div>
+                              )}
+                            </React.Fragment>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Buttons */}
+              <div style={{ display: 'flex', gap: '24px' }}>
+                <button 
+                  onClick={() => setIsNfaModalOpen(true)}
+                  style={{ flex: 1, padding: '16px', borderRadius: '12px', border: nfaText ? '2px solid #10b981' : '2px dashed #cbd5e1', background: nfaText ? '#ecfdf5' : '#f8fafc', color: nfaText ? '#059669' : '#334155', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+                >
+                  {nfaText ? '✓ NFA Added (Edit)' : '+ Add Note For Approval (Mandatory)'}
+                </button>
+                <button 
+                  onClick={() => setIsTcModalOpen(true)}
+                  style={{ flex: 1, padding: '16px', borderRadius: '12px', border: tcText ? '2px solid #3b82f6' : '2px dashed #cbd5e1', background: tcText ? '#eff6ff' : '#f8fafc', color: tcText ? '#1d4ed8' : '#334155', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+                >
+                  {tcText ? '✓ T&C Added (Edit)' : '+ Add Terms & Conditions (Optional)'}
+                </button>
+              </div>
+              
+              {/* Conflict of Interest Checkbox */}
+              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', background: coiAgreed ? '#eff6ff' : '#f8fafc', borderRadius: '12px', border: coiAgreed ? '2px solid #3b82f6' : '1px solid #e2e8f0', cursor: 'pointer', transition: 'all 0.2s' }}>
+                <input type="checkbox" checked={coiAgreed} onChange={(e) => setCoiAgreed(e.target.checked)} style={{ width: '20px', height: '20px' }} />
+                <span style={{ fontSize: '0.95rem', color: '#334155', fontWeight: '500' }}>I declare that there is no Conflict of Interest (COI) in conducting this sourcing event.</span>
+              </label>
+              
             </div>
           </div>
           
