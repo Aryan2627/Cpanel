@@ -20,11 +20,11 @@ const Countdown = ({ endTime }: { endTime: string | Date }) => {
   const s = Math.floor((diff / 1000) % 60);
   
   const TimeBox = ({ value, label }: { value: string, label: string }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#fff', padding: '6px 12px', borderRadius: '8px', border: '1px solid #ffedd5', boxShadow: '0 2px 4px rgba(234, 88, 12, 0.05)' }}>
-      <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#ea580c', lineHeight: 1 }}>{value}</span>
-      <span style={{ fontSize: '0.65rem', color: '#c2410c', textTransform: 'uppercase', fontWeight: 700, marginTop: '2px' }}>{label}</span>
-    </div>
-  );
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+        <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ea580c', fontVariantNumeric: 'tabular-nums' }}>{value}</span>
+        <span style={{ fontSize: '0.85rem', color: '#ea580c', fontWeight: 600 }}>{label.substring(0,1).toLowerCase()}</span>
+      </div>
+    );
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
@@ -32,15 +32,12 @@ const Countdown = ({ endTime }: { endTime: string | Date }) => {
         <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block', boxShadow: '0 0 8px #22c55e', animation: 'pulse 2s infinite' }}></span>
         Live & Receiving Bids
       </div>
-      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-        {d > 0 && <TimeBox value={d.toString()} label="Days" />}
-        {d > 0 && <span style={{ color: '#ea580c', fontWeight: 'bold' }}>:</span>}
-        <TimeBox value={h.toString().padStart(2, '0')} label="Hrs" />
-        <span style={{ color: '#ea580c', fontWeight: 'bold' }}>:</span>
-        <TimeBox value={m.toString().padStart(2, '0')} label="Min" />
-        <span style={{ color: '#ea580c', fontWeight: 'bold' }}>:</span>
-        <TimeBox value={s.toString().padStart(2, '0')} label="Sec" />
-      </div>
+      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          {d > 0 && <TimeBox value={d.toString()} label="Days" />}
+          <TimeBox value={h.toString().padStart(2, '0')} label="Hrs" />
+          <TimeBox value={m.toString().padStart(2, '0')} label="Min" />
+          <TimeBox value={s.toString().padStart(2, '0')} label="Sec" />
+        </div>
     </div>
   );
 };
