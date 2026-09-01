@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
 import twilio from 'twilio';
 
@@ -157,20 +158,61 @@ export async function POST(request: Request) {
 
       return NextResponse.json({ vendor, token }, { status: 200, headers: corsHeaders });
     }
+    else if (action === 'reset_password') {
+      const { otp, newPassword } = data;
+      if (!otp || !newPassword) {
+        return NextResponse.json({ error: 'OTP and new password are required' }, { status: 400, headers: corsHeaders });
+      }
+
+      const validToken = await prisma.verificationToken.findFirst({
+        where: {
+          identifier: identifier,
+          token: otp,
+          expires: { gt: new Date() }
+        },
+        orderBy: { expires: 'desc' }
+      });
+
+      if (!validToken) {
+        return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 401, headers: corsHeaders });
+      }
+
+      const hashedPassword = bcrypt.hashSync(newPassword, 10);
+      await prisma.vendor.update({
+        where: { id: vendor.id },
+        data: { password: hashedPassword }
+      });
+
+      await prisma.verificationToken.deleteMany({
+        where: { identifier: identifier }
+      });
+
+      return NextResponse.json({ success: true, message: 'Password updated successfully' }, { status: 200, headers: corsHeaders });
+    }
     else if (action === 'password_login') {
       const { password } = data;
       if (!password) {
         return NextResponse.json({ error: 'Password is required' }, { status: 400, headers: corsHeaders });
       }
 
-      if (vendor.status !== 'Onboarding in Progress' && vendor.status !== 'Pending Onboarding' && vendor.status !== 'Approval Pending') {
-        return NextResponse.json({ error: 'Password login is only available during the onboarding phase.' }, { status: 403, headers: corsHeaders });
-      }
 
-      const expectedPassword = vendor.email.substring(0, 3).toLowerCase() + '@26';
-      
-      if (password !== expectedPassword) {
-        return NextResponse.json({ error: 'Invalid password' }, { status: 401, headers: corsHeaders });
+
+      // Remove the strict status check so user can always login if they reset their password
+      // We check if they have a DB password set. If yes, use bcrypt. If no, use legacy logic.
+      if (vendor.password) {
+        const isMatch = bcrypt.compareSync(password, vendor.password);
+        if (!isMatch) {
+          return NextResponse.json({ error: 'Invalid password' }, { status: 401, headers: corsHeaders });
+        }
+      } else {
+        const expectedPassword = vendor.email.substring(0, 3).toLowerCase() + '@26';
+        if (password !== expectedPassword) {
+          return NextResponse.json({ error: 'Invalid password' }, { status: 401, headers: corsHeaders });
+        }
+        // Legacy requirement check
+        if (vendor.status !== 'Onboarding in Progress' && vendor.status !== 'Pending Onboarding' && vendor.status !== 'Approval Pending') {
+          return NextResponse.json({ error: 'Password login is only available during the onboarding phase.' }, { status: 403, headers: corsHeaders });
+        }
       }
 
       const token = jwt.sign(
