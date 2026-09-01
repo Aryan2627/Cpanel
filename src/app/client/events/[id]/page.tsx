@@ -597,7 +597,7 @@ const handleSurrogateSubmit = async () => {
           <div style={{ width: '100%' }}>
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
               <h2 style={{ margin: '0 0 16px 0', fontSize: '1.1rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <FileText size={18} color="#2563eb" /> Event Snapshot
+                <FileText size={18} color="#2563eb" /> Event Snapshot <span style={{ fontSize: '0.65rem', backgroundColor: '#3b82f6', color: '#fff', padding: '2px 8px', borderRadius: '12px', marginLeft: '12px' }}>V2 UI Active</span>
               </h2>
               <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap', alignItems: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
