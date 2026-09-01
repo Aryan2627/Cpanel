@@ -708,7 +708,23 @@ function SingleStageCreateContent() {
           </div>
           
           
-{/* Legal & Approvals */}
+{/* Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '32px', marginTop: '-16px' }}>
+                <button 
+                  onClick={() => setIsNfaModalOpen(true)}
+                  style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '6px', border: '1px solid #3b82f6', background: nfaText ? '#eff6ff' : '#3b82f6', color: nfaText ? '#1d4ed8' : '#ffffff', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
+                >
+                  {nfaText ? '✓ NFA Added (Edit)' : '+ NFA (Mandatory)'}
+                </button>
+                <button 
+                  onClick={() => setIsTcModalOpen(true)}
+                  style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '6px', border: '1px solid #3b82f6', background: tcText ? '#eff6ff' : '#3b82f6', color: tcText ? '#1d4ed8' : '#ffffff', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
+                >
+                  {tcText ? '✓ T&C Added (Edit)' : '+ T&C (Optional)'}
+                </button>
+              </div>
+            
+            {/* Legal & Approvals */}
           <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', marginBottom: '32px' }}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -765,21 +781,7 @@ function SingleStageCreateContent() {
                 )}
               </div>
 
-              {/* Buttons */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '16px' }}>
-                <button 
-                  onClick={() => setIsNfaModalOpen(true)}
-                  style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '6px', border: '1px solid #3b82f6', background: nfaText ? '#eff6ff' : '#3b82f6', color: nfaText ? '#1d4ed8' : '#ffffff', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
-                >
-                  {nfaText ? '✓ NFA Added (Edit)' : '+ NFA (Mandatory)'}
-                </button>
-                <button 
-                  onClick={() => setIsTcModalOpen(true)}
-                  style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '6px', border: '1px solid #3b82f6', background: tcText ? '#eff6ff' : '#3b82f6', color: tcText ? '#1d4ed8' : '#ffffff', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
-                >
-                  {tcText ? '✓ T&C Added (Edit)' : '+ T&C (Optional)'}
-                </button>
-              </div>
+              
               
               {/* Conflict of Interest Checkbox */}
               <label style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', background: coiAgreed ? '#eff6ff' : '#f8fafc', borderRadius: '12px', border: coiAgreed ? '2px solid #3b82f6' : '1px solid #e2e8f0', cursor: 'pointer', transition: 'all 0.2s' }}>
