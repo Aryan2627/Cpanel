@@ -5,8 +5,70 @@ import { useRouter } from 'next/navigation';
 export default function Login() {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [mode, setMode] = useState<'login' | 'forgot_password'>('login');
+  const [otpStep, setOtpStep] = useState<'request' | 'verify'>('request');
+  const [otp, setOtp] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  
+  const handleRequestOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email) return;
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/auth/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: formData.email })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setOtpStep('verify');
+      } else {
+        setError(data.error || 'Failed to request OTP');
+      }
+    } catch (err: any) {
+      setError('Network error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email || !otp || !newPassword) return;
+    setError('');
+    setSuccessMsg('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, otp, newPassword })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSuccessMsg('Password updated successfully! You can now login.');
+        setMode('login');
+        setOtpStep('request');
+        setOtp('');
+        setNewPassword('');
+        setFormData({...formData, password: ''});
+      } else {
+        setError(data.error || 'Failed to reset password');
+      }
+    } catch (err: any) {
+      setError('Network error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,7 +179,76 @@ export default function Login() {
               </div>
             )}
 
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {successMsg && (
+              <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#ecfdf5', borderLeft: '4px solid #10b981', color: '#065f46', borderRadius: '4px', fontSize: '0.95rem' }}>
+                {successMsg}
+              </div>
+            )}
+
+            
+            {mode === 'forgot_password' ? (
+              otpStep === 'request' ? (
+                <form onSubmit={handleRequestOTP} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <p style={{ color: '#64748b', fontSize: '0.95rem', margin: 0 }}>Enter your email to receive a password reset code.</p>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>Corporate Email</label>
+                    <input 
+                      type="email" 
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      required
+                      placeholder="name@company.com"
+                      className="input-field"
+                    />
+                  </div>
+                  <button type="submit" disabled={loading || !formData.email} className="btn-primary">
+                    {loading ? 'Sending...' : 'Send Reset Code'}
+                  </button>
+                  <div style={{ textAlign: 'center' }}>
+                    <button type="button" onClick={() => { setMode('login'); setError(''); setSuccessMsg(''); }} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '0.9rem' }}>
+                      Back to Login
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <p style={{ color: '#64748b', fontSize: '0.95rem', margin: 0 }}>We've sent a 6-digit code to {formData.email}</p>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>OTP Code</label>
+                    <input 
+                      type="text" 
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      required
+                      placeholder="000000"
+                      className="input-field"
+                      style={{ textAlign: 'center', letterSpacing: '4px', fontSize: '1.2rem' }}
+                      maxLength={6}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>New Password</label>
+                    <input 
+                      type="password" 
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      placeholder="Enter new password"
+                      className="input-field"
+                    />
+                  </div>
+                  <button type="submit" disabled={loading || otp.length < 6 || !newPassword} className="btn-primary">
+                    {loading ? 'Resetting...' : 'Reset Password'}
+                  </button>
+                  <div style={{ textAlign: 'center' }}>
+                    <button type="button" onClick={() => setOtpStep('request')} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '0.9rem' }}>
+                      Back to Email
+                    </button>
+                  </div>
+                </form>
+              )
+            ) : (
+              <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>Corporate Email</label>
                 <input 
@@ -133,7 +264,7 @@ export default function Login() {
               <div>
                 <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>
                   <span>Password</span>
-                  <a href="#" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: '500' }}>Forgot password?</a>
+                  <button type="button" onClick={() => { setMode('forgot_password'); setOtpStep('request'); setError(''); setSuccessMsg(''); }} style={{ background: 'none', border: 'none', color: '#2563eb', textDecoration: 'none', fontWeight: '500', cursor: 'pointer', padding: 0 }}>Forgot password?</button>
                 </label>
                 <input 
                   type="password" 
@@ -158,6 +289,7 @@ export default function Login() {
                 Is your company new to ProcGen? <a href="/signup" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: '600' }}>Register Organization</a>
               </div>
             </form>
+            )}
           </div>
         </div>
       </div>
