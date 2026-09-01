@@ -784,11 +784,12 @@ function SingleStageCreateContent() {
               
               
               {/* Conflict of Interest Checkbox */}
-              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', background: coiAgreed ? '#eff6ff' : '#f8fafc', borderRadius: '12px', border: coiAgreed ? '2px solid #3b82f6' : '1px solid #e2e8f0', cursor: 'pointer', transition: 'all 0.2s' }}>
-                <input type="checkbox" checked={coiAgreed} onChange={(e) => setCoiAgreed(e.target.checked)} style={{ width: '20px', height: '20px' }} />
-                <span style={{ fontSize: '0.95rem', color: '#334155', fontWeight: '500' }}>I declare that there is no Conflict of Interest (COI) in conducting this sourcing event.</span>
-              </label>
-              <div style={{ height: '16px', width: '100%' }}></div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0', marginBottom: '8px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: coiAgreed ? '#2563eb' : '#ffffff', borderRadius: '8px', border: '1px solid #2563eb', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(37,99,235,0.1)' }}>
+                  <input type="checkbox" checked={coiAgreed} onChange={(e) => setCoiAgreed(e.target.checked)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
+                  <span style={{ fontSize: '0.85rem', color: coiAgreed ? '#ffffff' : '#2563eb', fontWeight: '600' }}>I declare no Conflict of Interest (COI) in conducting this event.</span>
+                </label>
+              </div>
               
             </div>
           </div>
