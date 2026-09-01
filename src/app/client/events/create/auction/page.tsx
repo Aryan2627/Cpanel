@@ -540,19 +540,19 @@ function AuctionCreateContent() {
                   <h4 style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a', margin: 0, paddingBottom: '10px' }}>Template Configuration</h4>
                   <div style={{ display: 'flex', gap: '16px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', marginBottom: '6px' }}>Min Bid Step</label>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#2563eb', marginBottom: '6px' }}>Min Bid Step</label>
                       <input 
                         type="number" min="0" value={minBidStep} onChange={e => setMinBidStep(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
                         placeholder="e.g. 50"
-                        style={{ width: '130px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', outline: 'none', fontSize: '0.85rem' }}
+                        style={{ width: '130px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #3b82f6', background: '#eff6ff', color: '#1d4ed8', outline: 'none', fontSize: '0.85rem', fontWeight: '600', boxShadow: 'inset 0 1px 2px rgba(59,130,246,0.1)' }}
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', marginBottom: '6px' }}>Ceiling Price</label>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#2563eb', marginBottom: '6px' }}>Ceiling Price</label>
                       <input 
                         type="number" min="0" value={ceilingPrice} onChange={e => setCeilingPrice(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
                         placeholder="e.g. 10000"
-                        style={{ width: '150px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', outline: 'none', fontSize: '0.85rem' }}
+                        style={{ width: '150px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #3b82f6', background: '#eff6ff', color: '#1d4ed8', outline: 'none', fontSize: '0.85rem', fontWeight: '600', boxShadow: 'inset 0 1px 2px rgba(59,130,246,0.1)' }}
                       />
                     </div>
                   </div>
