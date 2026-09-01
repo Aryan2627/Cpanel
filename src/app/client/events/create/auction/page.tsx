@@ -774,13 +774,13 @@ function AuctionCreateContent() {
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '16px' }}>
                 <button 
                   onClick={() => setIsNfaModalOpen(true)}
-                  style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '6px', border: nfaText ? '1px solid #10b981' : '1px dashed #cbd5e1', background: nfaText ? '#ecfdf5' : '#f8fafc', color: nfaText ? '#059669' : '#334155', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s' }}
+                  style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '6px', border: '1px solid #3b82f6', background: nfaText ? '#eff6ff' : '#3b82f6', color: nfaText ? '#1d4ed8' : '#ffffff', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
                 >
                   {nfaText ? '✓ NFA Added (Edit)' : '+ NFA (Mandatory)'}
                 </button>
                 <button 
                   onClick={() => setIsTcModalOpen(true)}
-                  style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '6px', border: tcText ? '1px solid #3b82f6' : '1px dashed #cbd5e1', background: tcText ? '#eff6ff' : '#f8fafc', color: tcText ? '#1d4ed8' : '#334155', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s' }}
+                  style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '6px', border: '1px solid #3b82f6', background: tcText ? '#eff6ff' : '#3b82f6', color: tcText ? '#1d4ed8' : '#ffffff', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
                 >
                   {tcText ? '✓ T&C Added (Edit)' : '+ T&C (Optional)'}
                 </button>
