@@ -790,9 +790,9 @@ function AuctionCreateContent() {
               
               {/* Conflict of Interest Checkbox */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0', marginBottom: '8px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: coiAgreed ? '#2563eb' : '#ffffff', borderRadius: '8px', border: '1px solid #2563eb', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(37,99,235,0.1)' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: '#ffffff', borderRadius: '8px', border: '1px solid #2563eb', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(37,99,235,0.1)' }}>
                   <input type="checkbox" checked={coiAgreed} onChange={(e) => setCoiAgreed(e.target.checked)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
-                  <span style={{ fontSize: '0.85rem', color: coiAgreed ? '#ffffff' : '#2563eb', fontWeight: '600' }}>I declare no Conflict of Interest (COI) in conducting this event.</span>
+                  <span style={{ fontSize: '0.85rem', color: '#2563eb', fontWeight: '600' }}>I declare no Conflict of Interest (COI) in conducting this event.</span>
                 </label>
               </div>
               
