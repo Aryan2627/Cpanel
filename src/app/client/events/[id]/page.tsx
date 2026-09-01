@@ -602,29 +602,29 @@ const handleSurrogateSubmit = async () => {
               <h2 style={{ margin: '0 0 16px 0', fontSize: '1.1rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FileText size={18} color="#2563eb" /> Event Snapshot
               </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                <div style={{ padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '4px' }}>Total Items</div>
-                  <div style={{ fontWeight: 500, color: '#0f172a' }}>{event.itemsCount}</div>
-                </div>
-                <div style={{ padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '4px' }}>Date Created</div>
-                  <div style={{ fontWeight: 500, color: '#0f172a' }}>{new Date(event.createdAt).toLocaleDateString()}</div>
-                </div>
-                <div style={{ padding: '16px 20px', backgroundColor: '#fff7ed', borderRadius: '12px', border: '1px solid #ffedd5', gridColumn: '1 / -1' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#c2410c', marginBottom: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Clock size={16} /> Time Remaining
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                  <div style={{ flex: '1', minWidth: '150px', padding: '16px', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>Total Items</div>
+                    <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '1.25rem' }}>{event.itemsCount}</div>
                   </div>
-                  {event.endTime ? (
-                    <Countdown endTime={event.endTime} />
-                  ) : (
-                    <div style={{ fontWeight: 700, color: '#16a34a', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.2rem' }}>
-                      <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block', boxShadow: '0 0 10px #22c55e', animation: 'pulse 2s infinite' }}></span>
-                      Live / No Time Limit
+                  <div style={{ flex: '1', minWidth: '150px', padding: '16px', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>Date Created</div>
+                    <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '1.25rem' }}>{new Date(event.createdAt).toLocaleDateString()}</div>
+                  </div>
+                  <div style={{ flex: '3', minWidth: '350px', padding: '16px 20px', backgroundColor: '#fff7ed', borderRadius: '12px', border: '1px solid #ffedd5', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#c2410c', marginBottom: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Clock size={14} /> Time Remaining
                     </div>
-                  )}
+                    {event.endTime ? (
+                      <Countdown endTime={event.endTime} />
+                    ) : (
+                      <div style={{ fontWeight: 700, color: '#16a34a', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.2rem' }}>
+                        <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block', boxShadow: '0 0 10px #22c55e', animation: 'pulse 2s infinite' }}></span>
+                        Live / No Time Limit
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
             </div>
           </div>
 
