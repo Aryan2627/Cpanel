@@ -626,7 +626,7 @@ export default function BuyerEventDetailsPage() {
               <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap', alignItems: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>Total Items</div>
-                      <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '1.25rem' }}>{event.itemsCount}</div>
+                      <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '1.25rem' }}>{Array.from(new Set(templateFields.map((f: any) => f._sourceItemId).filter(Boolean))).length || 1}</div>
                     </div>
                     
                     <div style={{ width: '1px', height: '40px', backgroundColor: '#e2e8f0', display: 'block' }}></div>
