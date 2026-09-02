@@ -856,7 +856,7 @@ function AuctionCreateContent() {
           
 </div>
           {/* Sticky Glass Footer - Launch Actions */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(226, 232, 240, 0.8)', padding: '20px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.05)', zIndex: 50 }}>
+        <div style={{ position: 'sticky', bottom: 0, left: 0, right: 0, background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(226, 232, 240, 0.8)', padding: '20px 48px', paddingRight: '80px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.08)', zIndex: 50 }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ fontSize: '0.8rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Timeline Status</div>
             <div style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a' }}>Event is ready to launch</div>
