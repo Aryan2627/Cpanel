@@ -1,696 +1,291 @@
-'use client';
+﻿'use client';
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  Plus, Search, Filter, MoreHorizontal, ArrowUpRight, BarChart3, 
-  Activity, Calendar, Clock, DollarSign, ArrowRight, ShieldCheck, Zap, Upload, LayoutGrid, CheckCircle2, AlertCircle, ChevronDown, FileCheck, TrendingUp, Eye, Check, X, Edit2, Users, Award
-} from 'lucide-react';
+import { Plus, Search, Activity, Clock, AlertCircle, ChevronDown, FileCheck, TrendingUp, Eye, Check, X, Edit2, Users, Award, Gavel, CheckCircle2, MoreHorizontal } from 'lucide-react';
 
 const Countdown = ({ endTime }: { endTime: string | Date }) => {
   const [now, setNow] = useState(new Date());
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const end = new Date(endTime);
-  const diff = end.getTime() - now.getTime();
-  if (diff <= 0) return <span style={{ color: '#dc2626' }}>Ended</span>;
-  
-  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const m = Math.floor((diff / 1000 / 60) % 60);
-  const s = Math.floor((diff / 1000) % 60);
-  
-  let timeStr = `${d > 0 ? d + 'd ' : ''}${h > 0 || d > 0 ? h + 'h ' : ''}${m}m ${s}s remaining`;
-  
-  return <span style={{ color: '#3b82f6', fontWeight: 600 }}>{timeStr}</span>;
+  useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t); }, []);
+  const diff = new Date(endTime).getTime() - now.getTime();
+  if (diff <= 0) return <span style={{ color: '#dc2626', fontWeight: 700 }}>Ended</span>;
+  const d = Math.floor(diff / 86400000), h = Math.floor((diff / 3600000) % 24), m = Math.floor((diff / 60000) % 60), s = Math.floor((diff / 1000) % 60);
+  return <span style={{ color: '#2563eb', fontWeight: 700 }}>{d > 0 ? d + 'd ' : ''}{h > 0 || d > 0 ? h + 'h ' : ''}{m}m {s}s</span>;
 };
 
 export default function EventsPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('LIVE');
-    const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
+  const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [fetchError, setFetchError] = useState<string | null>(null);
-
   const [dbEvents, setDbEvents] = useState<any[]>([]);
-  
-  // Modal states for View Bids
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [selectedEventForDetails, setSelectedEventForDetails] = useState<any>(null);
-  const [bids, setBids] = useState<any[]>([]);
-  const [isBidsLoading, setIsBidsLoading] = useState(false);
-
-  // Edit Time State
-  const [editingTimeFor, setEditingTimeFor] = useState<{ eventId: string, sIdx: number } | null>(null);
+  const [editingTimeFor, setEditingTimeFor] = useState<{ eventId: string; sIdx: number } | null>(null);
   const [newTimeVal, setNewTimeVal] = useState('');
 
-  // Mock Events
-  const [mockEvents, setMockEvents] = useState<any[]>([
-    {
-      id: 'mock-1',
-      account: 'Enterprise Corp',
-      refId: 'RFX-20012',
-      itemsCount: 2,
-      title: 'Q3 Hardware Refresh',
-      stages: [
-        {
-          name: 'Technical Offer',
-          statusIcon: <AlertCircle size={18} color="#f59e0b" />,
-          timeText: 'Overdue by 1h',
-          timeColor: '#dc2626',
-          participants: '1/2',
-          participantsColor: '#3b82f6',
-          actionText: 'Send for Review',
-          actionBadge: '1',
-          actionType: 'warning'
-        }
-      ]
-    },
-    {
-      id: 'mock-2',
-      account: 'Global Industries',
-      refId: 'RFX-20009',
-      itemsCount: 5,
-      title: 'Software Licensing Renewal',
-      stages: [
-        {
-          name: 'RFQ Commercials',
-          statusIcon: <Clock size={18} color="#3b82f6" />,
-          timeText: 'Ends in 11 days',
-          timeColor: '#475569',
-          participants: '3/5',
-          participantsColor: '#10b981',
-          actionText: 'Evaluate Quotes',
-          actionBadge: '3',
-          actionType: 'primary'
-        }
-      ]
-    }
+  const [mockEvents] = useState<any[]>([
+    { id: 'mock-1', account: 'Enterprise Corp', refId: 'RFX-20012', itemsCount: 2, title: 'Q3 Hardware Refresh', stages: [{ name: 'Technical Offer', statusIcon: <AlertCircle size={16} color="#f59e0b" />, timeText: 'Overdue by 1h', timeColor: '#dc2626', participants: '1/2', participantsColor: '#3b82f6', actionText: 'Send for Review', actionBadge: '1', actionType: 'warning' }] },
+    { id: 'mock-2', account: 'Global Industries', refId: 'RFX-20009', itemsCount: 5, title: 'Software Licensing Renewal', stages: [{ name: 'RFQ Commercials', statusIcon: <Clock size={16} color="#3b82f6" />, timeText: 'Ends in 11 days', timeColor: '#475569', participants: '3/5', participantsColor: '#10b981', actionText: 'Evaluate Quotes', actionBadge: '3', actionType: 'primary' }] },
   ]);
 
   useEffect(() => {
-    fetch('/api/events')
-      .then(async res => {
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(`Server returned ${res.status}: ${text.substring(0, 100)}`);
-        }
-        // Safely check content type before parsing
-        const contentType = res.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-          return res.json();
-        } else {
-          const text = await res.text();
-          throw new Error(`Expected JSON but got HTML/text: ${text.substring(0, 50)}`);
-        }
-      })
-      .then(data => {
-        if (Array.isArray(data)) {
-          const mapped = data.map(dbEvent => ({
-            id: dbEvent.refId,
-            dbId: dbEvent.id,
-            account: dbEvent.account || 'Internal Department',
-            refId: dbEvent.refId,
-            itemsCount: dbEvent.itemsCount || 1,
-            title: dbEvent.title || 'Untitled Sourcing Event',
-            endTime: dbEvent.endTime,
-            participants: dbEvent.participants,
-            stages: [
-              {
-                name: 'Live RFQ (Database)',
-                statusIcon: <Activity size={18} color="#10b981" />,
-                timeText: 'Live now',
-                timeColor: '#10b981',
-                participants: 'View Bids',
-                participantsColor: '#2563eb',
-                actionText: 'Evaluate Bids',
-                actionBadge: 'New',
-                actionType: 'success'
-              }
-            ]
-          }));
-          setDbEvents(mapped);
-        }
-      })
-      .catch(err => {
-        console.error("Error fetching events:", err);
-        setFetchError(err.message);
-      });
+    fetch('/api/events').then(async res => {
+      if (!res.ok) throw new Error('Server ' + res.status);
+      if ((res.headers.get('content-type') || '').includes('application/json')) return res.json();
+      throw new Error('Invalid response');
+    }).then(data => {
+      if (Array.isArray(data)) {
+        setDbEvents(data.map(e => ({
+          id: e.refId, dbId: e.id, account: e.account || 'Internal', refId: e.refId, itemsCount: e.itemsCount || 1,
+          title: e.title || 'Untitled', endTime: e.endTime, participants: e.participants,
+          stages: [{ name: 'Live RFQ', statusIcon: <Activity size={16} color="#10b981" />, timeText: 'Live', timeColor: '#10b981', participants: 'View Bids', participantsColor: '#2563eb', actionText: 'Evaluate Bids', actionBadge: 'New', actionType: 'success' }]
+        })));
+      }
+    }).catch(err => setFetchError(err.message));
   }, []);
 
-  const allEvents = useMemo(() => {
-    return [...dbEvents, ...mockEvents];
-  }, [dbEvents]);
+  const allEvents = useMemo(() => [...dbEvents, ...mockEvents], [dbEvents]);
 
-  const filteredEvents = useMemo(() => {
-    return allEvents.filter(event => {
-      const query = searchQuery.toLowerCase();
-      const matchesSearch = !query || 
-        event.title.toLowerCase().includes(query) || 
-        event.refId.toLowerCase().includes(query) ||
-        event.account.toLowerCase().includes(query);
-      let isHistorical = false;
-      if (event.endTime) {
-        isHistorical = new Date() > new Date(event.endTime);
-      } else {
-        isHistorical = event.stages.every((s: any) => s.timeText && (s.timeText.includes('Ended') || s.timeText.includes('History') || s.timeText.includes('Overdue')));
-      }
+  const isHistorical = (e: any) => e.endTime ? new Date() > new Date(e.endTime) : e.stages.every((s: any) => s.timeText?.includes('Ended') || s.timeText?.includes('Overdue'));
 
-      let matchesTab = true;
-      if (activeTab === 'LIVE') {
-        matchesTab = !isHistorical;
-      } else if (activeTab === 'HISTORY') {
-        matchesTab = isHistorical;
-      }
+  const filteredEvents = useMemo(() => allEvents.filter(e => {
+    const q = searchQuery.toLowerCase();
+    const matchSearch = !q || e.title.toLowerCase().includes(q) || e.refId.toLowerCase().includes(q) || e.account.toLowerCase().includes(q);
+    const matchTab = activeTab === 'ALL' || (activeTab === 'LIVE' ? !isHistorical(e) : isHistorical(e));
+    return matchSearch && matchTab;
+  }), [searchQuery, activeTab, allEvents]);
 
-      return matchesSearch && matchesTab;
-    });
-  }, [searchQuery, activeTab, allEvents]);
+  const totalEvents = allEvents.length;
+  const histCount = allEvents.filter(e => isHistorical(e)).length;
+  const liveCount = totalEvents - histCount;
 
-  const handleViewBids = async (eventId: string) => {
-    // The API expects refId for the lookup, and eventId here is already the refId.
-    router.push(`/client/events/${eventId}`);
-  };
-
-  const handleAward = async (bid: any) => {
-    try {
-      const poRes = await fetch('/api/pos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: `PO for Event ${selectedEventId}`,
-          vendorId: bid.vendorId,
-          total: bid.amount,
-          eventId: selectedEventId,
-          status: 'Draft',
-          // eslint-disable-next-line react-hooks/purity
-          poNumber: `PO-${Date.now()}`
-        })
-      });
-
-      const contractRes = await fetch('/api/contracts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: `Master Agreement - Event ${selectedEventId}`,
-          vendorId: bid.vendorId,
-          vendorName: bid.vendorName,
-          eventId: selectedEventId,
-          total: bid.amount,
-          status: 'Draft'
-        })
-      });
-
-      if (poRes.ok && contractRes.ok) {
-        alert('Purchase Order and Draft Contract successfully generated!');
-        setSelectedEventId(null);
-        router.push('/client/contracts');
-      } else {
-        alert('Failed to generate PO or Contract');
-      }
-    } catch(err) {
-      alert('Error awarding bid');
-    }
-  };
-
-  const saveNewTime = async (eventId: string, sIdx: number, isDbEvent: boolean) => {
-    if (!newTimeVal) {
-      setEditingTimeFor(null);
-      return;
-    }
-    
-    if (isDbEvent) {
-      try {
-        const res = await fetch(`/api/events/${eventId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ endTime: new Date(newTimeVal).toISOString() })
-        });
-        if (res.ok) {
-          setDbEvents(prev => prev.map(e => {
-            if (e.id === eventId || e.refId === eventId) {
-              const newStages = [...e.stages];
-              return { ...e, endTime: new Date(newTimeVal).toISOString(), stages: newStages };
-            }
-            return e;
-          }));
-        } else {
-          alert('Failed to update event time in database');
-        }
-      } catch (err) {
-        alert('Error updating event time');
-      }
-    } else {
-      setMockEvents(prev => prev.map(e => {
-        if (e.id === eventId || e.refId === eventId) {
-          const newStages = [...e.stages];
-          return { ...e, endTime: new Date(newTimeVal).toISOString(), stages: newStages };
-        }
-        return e;
-      }));
+  const saveNewTime = async (eventId: string, isDb: boolean) => {
+    if (!newTimeVal) { setEditingTimeFor(null); return; }
+    if (isDb) {
+      const res = await fetch('/api/events/' + eventId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ endTime: new Date(newTimeVal).toISOString() }) });
+      if (res.ok) setDbEvents(prev => prev.map(e => (e.id === eventId || e.refId === eventId) ? { ...e, endTime: new Date(newTimeVal).toISOString() } : e));
+      else alert('Failed to update');
     }
     setEditingTimeFor(null);
   };
 
-  // KPI calculations
-  const totalEvents = allEvents.length;
-  
-  // Historical Events definition exactly matches what goes into the HISTORY tab
-  const historicalEvents = allEvents.filter(e => {
-    if (e.endTime) {
-      return new Date() > new Date(e.endTime);
-    }
-    return e.stages.every((s: any) => s.timeText && (s.timeText.includes('Ended') || s.timeText.includes('History') || s.timeText.includes('Overdue')));
-  }).length;
-
-  const liveEvents = totalEvents - historicalEvents;
+  const statusBadge = (type: string) => {
+    if (type === 'warning') return { bg: '#fef3c7', color: '#b45309', border: '#fde68a' };
+    if (type === 'success') return { bg: '#dcfce7', color: '#15803d', border: '#86efac' };
+    return { bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe' };
+  };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', color: '#333', minHeight: '100%', padding: '24px', fontFamily: 'system-ui, sans-serif' }}>
-      
+    <div style={{ backgroundColor: '#f0f4f8', minHeight: '100%', fontFamily: 'system-ui, sans-serif' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#0f172a', margin: 0 }}>Sourcing Events</h1>
-          <p style={{ color: '#64748b', margin: '4px 0 0 0', fontSize: '0.875rem' }}>Manage your RFQs, Auctions, and Bids in real-time.</p>
-        </div>
-        
-        <div style={{ position: 'relative' }}>
-          <button 
-            onClick={() => setIsCreateMenuOpen(!isCreateMenuOpen)}
-            style={{ 
-              backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: '4px', 
-              padding: '8px 16px', fontWeight: '500', display: 'flex', alignItems: 'center', 
-              gap: '8px', cursor: 'pointer', fontSize: '0.875rem', boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.2)'
-            }}
-          >
-            <Plus size={16} /> Create Event
-            <span style={{ borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '8px', marginLeft: '4px', display: 'flex', alignItems: 'center' }}>
-              <ChevronDown size={14} />
-            </span>
-          </button>
-          
-          {isCreateMenuOpen && (
-            <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', zIndex: 50, minWidth: '200px', overflow: 'hidden' }}>
-              <div onClick={() => router.push('/client/events/create/single-stage')} style={{ padding: '12px 16px', fontSize: '0.875rem', color: '#0f172a', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background-color 0.2s' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}>
-                <FileCheck size={16} color="#64748b" /> Single Stage Event
-              </div>
-              <div onClick={() => router.push('/client/events/create/auction')} style={{ padding: '12px 16px', fontSize: '0.875rem', color: '#0f172a', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background-color 0.2s', borderTop: '1px solid #f1f5f9' }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}>
-                <TrendingUp size={16} color="#64748b" /> Reverse Auction
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* KPI Cards */}
-      {fetchError && (
-        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', padding: '16px', borderRadius: '4px', marginBottom: '24px', color: '#b91c1c', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <AlertCircle size={20} />
+      <div style={{ background: 'linear-gradient(135deg, #0f2460 0%, #1e3a8a 55%, #1e40af 100%)', padding: '28px 32px 40px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, right: 0, width: '400px', height: '100%', background: 'radial-gradient(circle at 70% 50%, rgba(59,130,246,0.15), transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <strong>Error fetching live events from database:</strong> {fetchError.includes('HTML') || fetchError.includes('504') ? 'The database server might be sleeping or timing out (common on free tiers). Please wait a moment and refresh.' : fetchError}
-          </div>
-        </div>
-      )}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
-        {[
-          { label: 'Total Events', value: totalEvents },
-          { label: 'Live Events', value: liveEvents },
-          { label: 'History Events', value: historicalEvents },
-        ].map((stat, i) => (
-          <div key={i} style={{ backgroundColor: '#fff', padding: '16px', borderRadius: '4px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
-            <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: 500 }}>{stat.label}</p>
-            <h3 style={{ margin: '8px 0 0 0', color: '#0f172a', fontSize: '1.5rem', fontWeight: 600 }}>{stat.value}</h3>
-          </div>
-        ))}
-      </div>
-
-      {/* Main Container */}
-      <div style={{ backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-        
-        {/* Navigation Tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', padding: '0 16px' }}>
-          {['LIVE', 'HISTORY'].map(tab => (
-            <div 
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                padding: '16px 24px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600,
-                color: activeTab === tab ? '#2563eb' : '#64748b',
-                borderBottom: activeTab === tab ? '2px solid #2563eb' : '2px solid transparent',
-                transition: 'all 0.2s', letterSpacing: '0.5px'
-              }}
-            >
-              {tab}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <Gavel size={22} color="rgba(255,255,255,0.7)" />
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Sourcing Events</p>
             </div>
-          ))}
-        </div>
-
-        {/* Filters Area */}
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center' }}>
-          {/* Enhanced Search */}
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', overflow: 'hidden', width: '100%', maxWidth: '500px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', transition: 'border-color 0.2s' }}>
-            <div style={{ padding: '0 14px' }}><Search size={18} color="#64748b" /></div>
-            <input 
-              type="text" 
-              placeholder="Search events by Title, Ref ID, or Account..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ border: 'none', padding: '12px 16px 12px 0', outline: 'none', width: '100%', fontSize: '0.95rem', backgroundColor: 'transparent', color: '#0f172a' }} 
-            />
+            <h1 style={{ color: '#fff', fontSize: '1.8rem', fontWeight: 800, margin: '0 0 6px', letterSpacing: '-0.5px' }}>Tenders &amp; Auctions</h1>
+            <p style={{ color: 'rgba(255,255,255,0.55)', margin: 0, fontSize: '0.9rem' }}>Manage RFQs, reverse auctions, and vendor bids in real-time.</p>
           </div>
-        </div>
-
-        {/* Events List */}
-        <div style={{ padding: '24px', backgroundColor: '#f8fafc' }}>
-          {filteredEvents.length > 0 ? (
-            filteredEvents.map((event) => (
-              <div key={event.id} style={{ backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #e2e8f0', marginBottom: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }} >
-                
-                {/* Event Header */}
-                <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>
-                      <ShieldCheck size={14} color="#94a3b8" /> {event.account} <span style={{ color: '#cbd5e1' }}>•</span> {event.refId} <span style={{ color: '#cbd5e1' }}>•</span> {event.itemsCount} Items
-                    </div>
-                    <div style={{ fontSize: '1.25rem', fontWeight: 600, color: '#0f172a' }}>
-                      {event.title}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                     <button 
-                       onClick={() => setSelectedEventForDetails(event)}
-                       style={{ 
-                         padding: '8px 16px', 
-                         border: 'none', 
-                         borderRadius: '4px', 
-                         background: '#0f172a', 
-                         color: '#fff', 
-                         cursor: 'pointer', 
-                         fontSize: '0.875rem', 
-                         fontWeight: 600,
-                         boxShadow: 'none',
-                         display: 'flex',
-                         alignItems: 'center',
-                         gap: '6px'
-                       }}
-                       
-                       
-                     >
-                       <Eye size={14} color="#cbd5e1" /> View Details
-                     </button>
-                  </div>
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => setIsCreateMenuOpen(!isCreateMenuOpen)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#fff', color: '#1e3a8a', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+              <Plus size={16} /> Create Event <ChevronDown size={14} />
+            </button>
+            {isCreateMenuOpen && (
+              <div style={{ position: 'absolute', top: '110%', right: 0, background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 12px 32px rgba(0,0,0,0.12)', zIndex: 50, minWidth: '210px', overflow: 'hidden' }}>
+                <div onClick={() => router.push('/client/events/create/single-stage')} style={{ padding: '13px 18px', fontSize: '0.875rem', color: '#0f172a', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }} onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8fafc'} onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = '#fff'}>
+                  <FileCheck size={16} color="#2563eb" /> Single Stage Event
                 </div>
-
-                {/* Event Stages */}
-                {event.stages.map((stage: any, sIdx: number) => (
-                  <div key={sIdx} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 2fr', alignItems: 'center', padding: '16px 24px', backgroundColor: '#fafaf9', borderBottom: sIdx !== event.stages.length - 1 ? '1px solid #f1f5f9' : 'none', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' }}>
-                    
-                    {/* Stage Name */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontWeight: 500, color: '#333' }}>
-                      {stage.statusIcon}
-                      {stage.name}
-                    </div>
-
-                    {/* Time */}
-                    <div style={{ color: stage.timeColor, fontWeight: stage.timeColor === '#dc2626' ? 600 : 400, fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {editingTimeFor?.eventId === event.id && editingTimeFor?.sIdx === sIdx ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <input 
-                            type="datetime-local" 
-                            value={newTimeVal}
-                            onChange={e => setNewTimeVal(e.target.value)}
-                            style={{ padding: '2px 4px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.8rem', outline: 'none' }}
-                          />
-                          <button onClick={() => saveNewTime(event.id, sIdx, !!dbEvents.find(e => e.id === event.id))} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', padding: '2px', cursor: 'pointer', display: 'flex' }}><Check size={14} /></button>
-                          <button onClick={() => setEditingTimeFor(null)} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', padding: '2px', cursor: 'pointer', display: 'flex' }}><X size={14} /></button>
-                        </div>
-                      ) : (
-                        <>
-                          {event.endTime ? (
-                            <Countdown endTime={event.endTime} />
-                          ) : (
-                            stage.timeText
-                          )}
-                          <button 
-                            onClick={() => { setEditingTimeFor({ eventId: event.id, sIdx }); setNewTimeVal(''); }}
-                            style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.2s' }}
-                            onMouseOver={(e) => e.currentTarget.style.color = '#3b82f6'}
-                            onMouseOut={(e) => e.currentTarget.style.color = '#94a3b8'}
-                            title="Edit Event Time"
-                          >
-                            <Edit2 size={14} />
-                          </button>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Participants */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: stage.participantsColor, fontWeight: 500, fontSize: '0.875rem' }}>
-                      <Users size={16} />
-                      {stage.name.includes('Live RFQ') ? (
-                        <button 
-                          onClick={() => handleViewBids(event.id)} 
-                          style={{ 
-                            background: '#4f46e5', 
-                            border: 'none', 
-                            color: '#ffffff', 
-                            cursor: 'pointer', 
-                            fontWeight: 600, 
-                            padding: '6px 14px', 
-                            borderRadius: '4px',
-                            boxShadow: 'none',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            fontSize: '0.8rem'
-                          }}
-                          
-                          
-                        >
-                          View Bids <Eye size={14} />
-                        </button>
-                      ) : (
-                        <span>{stage.participants}</span>
-                      )}
-                    </div>
-
-                    {/* Actions */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      {stage.actionText && (
-                        <button 
-                          onClick={() => { if(stage.name.includes('Live RFQ')) handleViewBids(event.id) }}
-                          style={{ 
-                            display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', borderRadius: '4px', fontWeight: 600, fontSize: '0.8125rem', border: 'none',
-                            backgroundColor: stage.actionType === 'warning' ? '#fee2e2' : stage.actionType === 'success' ? '#dcfce7' : '#eff6ff',
-                            color: stage.actionType === 'warning' ? '#b91c1c' : stage.actionType === 'success' ? '#15803d' : '#1d4ed8',
-                            cursor: 'pointer', transition: 'opacity 0.2s'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-                          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                        >
-                          {stage.actionType === 'success' ? <Eye size={14} /> : <AlertCircle size={14} />}
-                          {stage.actionText}
-                          <span style={{ 
-                            backgroundColor: stage.actionType === 'warning' ? '#f87171' : stage.actionType === 'success' ? '#22c55e' : '#3b82f6', 
-                            color: '#fff', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' 
-                          }}>
-                            {stage.actionBadge}
-                          </span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                <div onClick={() => router.push('/client/events/create/auction')} style={{ padding: '13px 18px', fontSize: '0.875rem', color: '#0f172a', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', borderTop: '1px solid #f1f5f9' }} onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8fafc'} onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = '#fff'}>
+                  <TrendingUp size={16} color="#7c3aed" /> Reverse Auction
+                </div>
               </div>
-            ))
-          ) : (
-            <div style={{ padding: '64px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '4px', border: '1px dashed #cbd5e1' }}>
-              <Activity size={48} color="#cbd5e1" style={{ marginBottom: '16px' }} />
-              <h3 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '1.125rem' }}>No events found</h3>
-              <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>Try adjusting your search filters or create a new event.</p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Event Details Modal */}
-      {selectedEventForDetails && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.2s ease-out' }} onClick={() => setSelectedEventForDetails(null)}>
-          <div style={{ backgroundColor: '#fff', borderRadius: '4px', width: '600px', maxWidth: '90%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', overflow: 'hidden', animation: 'slideUp 0.3s ease-out' }} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #e2e8f0', background: 'linear-gradient(to right, #f8fafc, #f1f5f9)' }}>
-              <div>
-                <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}><ShieldCheck color="#3b82f6" /> Event Details</h2>
-                <p style={{ margin: '4px 0 0 0', fontSize: '0.875rem', color: '#64748b' }}>{selectedEventForDetails.refId}</p>
+      <div style={{ padding: '0 32px 40px', marginTop: '-20px', position: 'relative', zIndex: 10 }}>
+        {/* KPI Row */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '16px', marginBottom: '20px' }}>
+          {[
+            { label: 'Total Events', value: totalEvents, icon: Gavel, color: '#2563eb', bg: '#eff6ff' },
+            { label: 'Live Events', value: liveCount, icon: Activity, color: '#16a34a', bg: '#dcfce7' },
+            { label: 'Completed', value: histCount, icon: CheckCircle2, color: '#64748b', bg: '#f8fafc' },
+          ].map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <div key={i} style={{ backgroundColor: '#fff', borderRadius: '14px', border: '1px solid #e2e8f0', padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                <div>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>{s.label}</div>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.05em' }}>{s.value}</div>
+                </div>
+                <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon size={22} color={s.color} />
+                </div>
               </div>
-              <button onClick={() => setSelectedEventForDetails(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}><X size={24} /></button>
+            );
+          })}
+        </div>
+
+        {fetchError && (
+          <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '10px', padding: '14px 18px', marginBottom: '16px', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.875rem' }}>
+            <AlertCircle size={18} /> {fetchError.includes('504') ? 'DB may be sleeping — please refresh in a moment.' : fetchError}
+          </div>
+        )}
+
+        {/* Table Card */}
+        <div style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+          {/* Tabs + Search */}
+          <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '4px', padding: '4px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+              {['LIVE', 'HISTORY', 'ALL'].map(tab => (
+                <div key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '7px 18px', borderRadius: '7px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', background: activeTab === tab ? '#1e3a8a' : 'transparent', color: activeTab === tab ? '#fff' : '#64748b', transition: 'all 0.15s', letterSpacing: '0.04em' }}>
+                  {tab}
+                </div>
+              ))}
             </div>
-            <div style={{ padding: '24px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
-                <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
-                  <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Event Title</p>
-                  <p style={{ margin: 0, fontSize: '1rem', color: '#0f172a', fontWeight: 500 }}>{selectedEventForDetails.title}</p>
-                </div>
-                <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
-                  <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Account / Department</p>
-                  <p style={{ margin: 0, fontSize: '1rem', color: '#0f172a', fontWeight: 500 }}>{selectedEventForDetails.account}</p>
-                </div>
-              </div>
-              
-              <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '4px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
-                <p style={{ margin: '0 0 8px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Purpose & Scope</p>
-                <p style={{ margin: 0, fontSize: '0.9rem', color: '#334155', lineHeight: '1.5' }}>
-                  This sourcing event is intended for the procurement of {selectedEventForDetails.itemsCount} items. 
-                  It follows the standard internal purchasing guidelines and is currently managed under the template: 
-                  <strong> {selectedEventForDetails.title.includes('Auction') ? 'Reverse Auction Template' : 'Standard RFQ Template'}</strong>.
-                </p>
-              </div>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '10px', padding: '0 14px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', maxWidth: '440px' }}>
+              <Search size={16} color="#94a3b8" />
+              <input type="text" placeholder="Search by title, ref ID, or account..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '0.875rem', color: '#0f172a', padding: '10px 0', width: '100%' }} />
+            </div>
+          </div>
 
-              <div style={{ display: 'flex', gap: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Items Count</p>
-                  <p style={{ margin: 0, fontSize: '1rem', color: '#0f172a', fontWeight: 600 }}>{selectedEventForDetails.itemsCount} <span style={{fontSize:'0.8rem', color:'#64748b', fontWeight:400}}>Line Items</span></p>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Current Status</p>
-                  <p style={{ margin: 0, fontSize: '1rem', color: '#10b981', fontWeight: 600 }}>Active Phase</p>
-                </div>
-              </div>
+          {/* Event Rows */}
+          <div style={{ backgroundColor: '#f8fafc' }}>
+            {filteredEvents.length > 0 ? filteredEvents.map(event => {
+              const ended = isHistorical(event);
+              return (
+                <div key={event.id} style={{ backgroundColor: '#fff', marginBottom: '1px', borderBottom: '1px solid #f1f5f9' }}>
+                  {/* Row Header */}
+                  <div style={{ padding: '18px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: '4px solid ' + (ended ? '#cbd5e1' : '#2563eb') }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.72rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '5px' }}>
+                        <span style={{ padding: '2px 8px', borderRadius: '4px', background: '#eff6ff', color: '#2563eb' }}>{event.refId}</span>
+                        <span style={{ color: '#cbd5e1' }}>•</span>{event.account}
+                        <span style={{ color: '#cbd5e1' }}>•</span>{event.itemsCount} items
+                        {ended && <span style={{ padding: '2px 8px', borderRadius: '4px', background: '#f8fafc', color: '#64748b' }}>Closed</span>}
+                      </div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>{event.title}</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <button onClick={() => setSelectedEventForDetails(event)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, color: '#475569', cursor: 'pointer' }}>
+                        <Eye size={14} /> Details
+                      </button>
+                      <button onClick={() => router.push('/client/events/' + event.id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: '#1e3a8a', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
+                        View Bids <Eye size={14} />
+                      </button>
+                    </div>
+                  </div>
 
-              {/* Invited Vendors */}
-              <div style={{ marginTop: '20px', borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
-                <p style={{ margin: '0 0 8px 0', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Invited Vendors</p>
-                {(() => {
-                  let vendors = [];
-                  if (selectedEventForDetails.participants) {
-                    try {
-                      vendors = typeof selectedEventForDetails.participants === 'string' 
-                        ? JSON.parse(selectedEventForDetails.participants) 
-                        : selectedEventForDetails.participants;
-                    } catch(e) {}
-                  }
-                  
-                  if (vendors && vendors.length > 0) {
+                  {/* Stage Rows */}
+                  {event.stages.map((stage: any, sIdx: number) => {
+                    const sb = statusBadge(stage.actionType);
                     return (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                        {vendors.map((v: any, idx: number) => (
-                          <div key={idx} style={{ backgroundColor: '#f1f5f9', padding: '6px 12px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <Users size={14} color="#64748b" /> {v.name || v.email || 'Unknown Vendor'}
-                          </div>
-                        ))}
+                      <div key={sIdx} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 2fr', gap: '8px', alignItems: 'center', padding: '12px 24px 12px 28px', backgroundColor: '#f8fafc', borderTop: '1px solid #f1f5f9' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>
+                          {stage.statusIcon}{stage.name}
+                        </div>
+                        <div style={{ fontSize: '0.85rem', color: stage.timeColor, fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          {editingTimeFor?.eventId === event.id && editingTimeFor?.sIdx === sIdx ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <input type="datetime-local" value={newTimeVal} onChange={e => setNewTimeVal(e.target.value)} style={{ padding: '4px 8px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '0.8rem', outline: 'none' }} />
+                              <button onClick={() => saveNewTime(event.id, !!dbEvents.find(e => e.id === event.id))} style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: '5px', padding: '4px', cursor: 'pointer', display: 'flex' }}><Check size={13} /></button>
+                              <button onClick={() => setEditingTimeFor(null)} style={{ background: '#dc2626', color: '#fff', border: 'none', borderRadius: '5px', padding: '4px', cursor: 'pointer', display: 'flex' }}><X size={13} /></button>
+                            </div>
+                          ) : (
+                            <>
+                              {event.endTime ? <Countdown endTime={event.endTime} /> : stage.timeText}
+                              <button onClick={() => { setEditingTimeFor({ eventId: event.id, sIdx }); setNewTimeVal(''); }} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.15s' }} onMouseOver={e => (e.currentTarget as HTMLElement).style.color = '#2563eb'} onMouseOut={e => (e.currentTarget as HTMLElement).style.color = '#94a3b8'}><Edit2 size={13} /></button>
+                            </>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: stage.participantsColor, fontSize: '0.82rem', fontWeight: 600 }}>
+                          <Users size={14} />{stage.name.includes('Live') ? '—' : stage.participants}
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                          {stage.actionText && (
+                            <button onClick={() => { if (stage.name.includes('Live')) router.push('/client/events/' + event.id); }} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '7px', fontWeight: 700, fontSize: '0.78rem', border: '1px solid ' + sb.border, backgroundColor: sb.bg, color: sb.color, cursor: 'pointer', transition: 'opacity 0.15s' }} onMouseEnter={e => (e.currentTarget as HTMLElement).style.opacity = '0.85'} onMouseLeave={e => (e.currentTarget as HTMLElement).style.opacity = '1'}>
+                              {stage.actionText}
+                              <span style={{ background: sb.color, color: '#fff', padding: '1px 6px', borderRadius: '4px', fontSize: '0.68rem' }}>{stage.actionBadge}</span>
+                            </button>
+                          )}
+                        </div>
                       </div>
                     );
-                  }
-                  
-                  return <p style={{ margin: 0, fontSize: '0.9rem', color: '#94a3b8', fontStyle: 'italic' }}>No vendors have been specifically invited to this event.</p>;
-                })()}
+                  })}
+                </div>
+              );
+            }) : (
+              <div style={{ padding: '72px', textAlign: 'center', backgroundColor: '#fff' }}>
+                <Activity size={48} color="#cbd5e1" style={{ marginBottom: '16px' }} />
+                <h3 style={{ margin: '0 0 8px', color: '#0f172a', fontSize: '1.1rem', fontWeight: 700 }}>No events found</h3>
+                <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>Try changing your filter or create a new sourcing event.</p>
               </div>
-            </div>
-            <div style={{ padding: '16px 24px', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={() => setSelectedEventForDetails(null)} style={{ padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '4px', color: '#475569', fontWeight: 500, cursor: 'pointer' }}>Close</button>
-            </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* View Bids Modal */}
-      {selectedEventId && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.2s ease-out' }}>
-          <div style={{ backgroundColor: '#fff', borderRadius: '4px', width: '700px', maxWidth: '90%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', overflow: 'hidden', animation: 'slideUp 0.3s ease-out' }}>
-            
-            {/* Modal Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
+      {/* Details Modal */}
+      {selectedEventForDetails && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setSelectedEventForDetails(null)}>
+          <div style={{ background: '#fff', borderRadius: '20px', width: '560px', maxWidth: '92vw', boxShadow: '0 30px 60px rgba(0,0,0,0.2)', overflow: 'hidden', animation: 'slideUp 0.25s ease' }} onClick={e => e.stopPropagation()}>
+            <div style={{ background: 'linear-gradient(135deg, #0f2460, #1e3a8a)', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}><Award color="#3b82f6" /> Evaluate Bids</h2>
-                <p style={{ margin: '4px 0 0 0', fontSize: '0.875rem', color: '#64748b' }}>Event Reference: {selectedEventId}</p>
+                <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#fff' }}>Event Details</h2>
+                <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>{selectedEventForDetails.refId}</p>
               </div>
-              <button onClick={() => setSelectedEventId(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}><X size={24} /></button>
+              <button onClick={() => setSelectedEventForDetails(null)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', color: '#fff', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={18} /></button>
             </div>
-
-            {/* Modal Body */}
-            <div style={{ padding: '24px', maxHeight: '60vh', overflowY: 'auto' }}>
-              {isBidsLoading ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 0', color: '#64748b' }}>
-                  <Activity size={32} className="spin-anim" style={{ marginBottom: '16px' }} />
-                  <p style={{ margin: 0 }}>Fetching latest bids...</p>
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '14px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ margin: '0 0 4px', fontSize: '0.68rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Event Title</p>
+                  <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#0f172a' }}>{selectedEventForDetails.title}</p>
                 </div>
-              ) : bids.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '48px 0', color: '#64748b' }}>
-                  <Users size={32} color="#cbd5e1" style={{ marginBottom: '16px' }} />
-                  <p style={{ margin: 0 }}>No bids have been submitted by vendors yet.</p>
+                <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '14px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ margin: '0 0 4px', fontSize: '0.68rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Account</p>
+                  <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#0f172a' }}>{selectedEventForDetails.account}</p>
                 </div>
-              ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
-                      <th style={{ padding: '12px 8px', color: '#475569', fontWeight: 600 }}>Vendor Name</th>
-                      <th style={{ padding: '12px 8px', color: '#475569', fontWeight: 600 }}>Submission Date</th>
-                      <th style={{ padding: '12px 8px', color: '#475569', fontWeight: 600 }}>Bid Amount</th>
-                      <th style={{ padding: '12px 8px', color: '#475569', fontWeight: 600, textAlign: 'right' }}>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {bids.map((bid, i) => (
-                      <tr key={bid.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: i === 0 ? '#f0fdf4' : '#fff' }}>
-                        <td style={{ padding: '16px 8px', fontWeight: 500, color: '#0f172a' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            {bid.vendorName || 'Vendor'} 
-                            {i === 0 && <span style={{ backgroundColor: '#22c55e', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' }}>BEST PRICE</span>}
-                          </div>
-                        </td>
-                        <td style={{ padding: '16px 8px', color: '#64748b' }}>{new Date(bid.createdAt).toLocaleDateString()}</td>
-                        <td style={{ padding: '16px 8px', fontWeight: 600, color: i === 0 ? '#15803d' : '#0f172a', fontSize: '1rem' }}>
-                          ${bid.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}
-                        </td>
-                        <td style={{ padding: '16px 8px', textAlign: 'right' }}>
-                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                            <button 
-                              onClick={() => {
-                                const offer = prompt(`Enter counter-offer amount for ${bid.vendorName || 'Vendor'}:`);
-                                if (offer) {
-                                  alert(`Formal counter-offer of $${offer} has been issued to ${bid.vendorName || 'Vendor'}. They will be notified via the portal.`);
-                                }
-                              }}
-                              style={{ 
-                                padding: '8px 12px', backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '4px', 
-                                cursor: 'pointer', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                transition: 'all 0.2s'
-                              }}
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dbeafe'}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#eff6ff'}
-                            >
-                               Counter Offer
-                            </button>
-                            <button 
-                              onClick={() => handleAward(bid)}
-                              style={{ 
-                                padding: '8px 16px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', 
-                                cursor: 'pointer', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
-                              }}
-                            >
-                              <CheckCircle2 size={16} /> Award & Create PO
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+                <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '14px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ margin: '0 0 4px', fontSize: '0.68rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Items Count</p>
+                  <p style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>{selectedEventForDetails.itemsCount} <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 400 }}>line items</span></p>
+                </div>
+                <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '14px', border: '1px solid #e2e8f0' }}>
+                  <p style={{ margin: '0 0 4px', fontSize: '0.68rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</p>
+                  <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: isHistorical(selectedEventForDetails) ? '#64748b' : '#16a34a' }}>{isHistorical(selectedEventForDetails) ? 'Completed' : 'Active'}</p>
+                </div>
+              </div>
+              {(() => {
+                let vendors: any[] = [];
+                try { vendors = typeof selectedEventForDetails.participants === 'string' ? JSON.parse(selectedEventForDetails.participants) : selectedEventForDetails.participants || []; } catch(e) {}
+                if (!vendors?.length) return null;
+                return (
+                  <div>
+                    <p style={{ margin: '0 0 10px', fontSize: '0.72rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Invited Vendors</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {vendors.map((v: any, i: number) => (
+                        <span key={i} style={{ padding: '5px 12px', borderRadius: '20px', background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', fontSize: '0.8rem', fontWeight: 600 }}>{v.name || v.email || 'Vendor'}</span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+              <div style={{ display: 'flex', gap: '10px', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
+                <button onClick={() => setSelectedEventForDetails(null)} style={{ flex: 1, padding: '11px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '9px', fontWeight: 600, color: '#475569', cursor: 'pointer', fontSize: '0.875rem' }}>Close</button>
+                <button onClick={() => { setSelectedEventForDetails(null); router.push('/client/events/' + selectedEventForDetails.id); }} style={{ flex: 1, padding: '11px', background: '#1e3a8a', border: 'none', borderRadius: '9px', fontWeight: 700, color: '#fff', cursor: 'pointer', fontSize: '0.875rem', display: 'flex', justifyContent: 'center', gap: '6px', alignItems: 'center' }}>
+                  View Bids <Eye size={15} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .spin-anim { animation: spin 2s linear infinite; }
-      `}} />
+      <style dangerouslySetInnerHTML={{ __html: '@keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }' }} />
     </div>
   );
 }
