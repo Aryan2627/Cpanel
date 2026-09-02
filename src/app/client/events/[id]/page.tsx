@@ -1029,23 +1029,50 @@ const handleSurrogateSubmit = async () => {
                     <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.85rem', color: '#475569', fontWeight: 500 }}>
                       {f.name} {f.required && <span style={{ color: '#ef4444' }}>*</span>}
                     </label>
-                    {f.type === 'textarea' ? (
-                      <textarea 
-                        value={surrogateData[f.key] || ''}
-                        onChange={(e) => handleSurrogateChange(f.key, e.target.value)}
-                        placeholder={f.description}
-                        style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem', minHeight: '60px' }}
-                      />
-                    ) : (
-                      <input 
-                        type={f.type === 'number' ? 'number' : 'text'}
-                        value={surrogateData[f.key] || ''}
-                        onChange={(e) => handleSurrogateChange(f.key, e.target.value)}
-                        placeholder={f.description}
-                        style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem' }}
-                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                      />
-                    )}
+                    {f.type === 'boolean' ? (
+                        <select
+                          value={surrogateData[f.key] || ''}
+                          onChange={(e) => handleSurrogateChange(f.key, e.target.value)}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem' }}
+                        >
+                          <option value="">Select...</option>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                        </select>
+                      ) : f.type === 'file' ? (
+                        <div style={{ position: 'relative' }}>
+                          <input 
+                            type="file"
+                            onChange={(e) => {
+                              if (e.target.files && e.target.files.length > 0) {
+                                handleSurrogateChange(f.key, e.target.files[0].name);
+                              }
+                            }}
+                            style={{ width: '100%', padding: '6px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem', cursor: 'pointer' }}
+                          />
+                          {surrogateData[f.key] && (
+                             <div style={{ marginTop: '8px', fontSize: '0.85rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '500' }}>
+                               <CheckCircle2 size={14} /> Uploaded: {surrogateData[f.key]}
+                             </div>
+                          )}
+                        </div>
+                      ) : f.type === 'textarea' ? (
+                        <textarea 
+                          value={surrogateData[f.key] || ''}
+                          onChange={(e) => handleSurrogateChange(f.key, e.target.value)}
+                          placeholder={f.description}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem', minHeight: '60px' }}
+                        />
+                      ) : (
+                        <input 
+                          type={f.type === 'number' ? 'number' : 'text'}
+                          value={surrogateData[f.key] || ''}
+                          onChange={(e) => handleSurrogateChange(f.key, e.target.value)}
+                          placeholder={f.description}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem' }}
+                          onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                        />
+                      )}
                   </div>
                 ))}
               </div>

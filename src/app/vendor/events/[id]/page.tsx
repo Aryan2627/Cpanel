@@ -356,18 +356,45 @@ export default function VendorLiveBidding() {
                         <div style={{ width: '100%', padding: '12px', backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px', color: '#38bdf8', fontSize: '1rem', fontWeight: 700 }}>
                           {Number(fieldData[f.key] || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
-                      ) : (
-                        <input 
-                          type={f.type === 'number' ? 'number' : 'text'}
-                          value={fieldData[f.key] || ''}
-                          onChange={(e) => handleFieldChange(f.key, e.target.value)}
-                          placeholder={`Enter ${f.type}...`}
-                          style={{ width: '100%', padding: '12px', backgroundColor: '#020617', border: '1px solid #334155', borderRadius: '8px', color: '#fff', fontSize: '1rem', fontWeight: 500, outline: 'none', transition: 'border-color 0.2s' }}
-                          onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                          onBlur={(e) => e.target.style.borderColor = '#334155'}
-                          onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                        />
-                      )}
+                      ) : f.type === 'boolean' ? (
+                          <select
+                            value={fieldData[f.key] || ''}
+                            onChange={(e) => handleFieldChange(f.key, e.target.value)}
+                            style={{ width: '100%', padding: '12px', backgroundColor: '#020617', border: '1px solid #334155', borderRadius: '8px', color: '#fff', fontSize: '1rem', outline: 'none' }}
+                          >
+                            <option value="">Select...</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        ) : f.type === 'file' ? (
+                          <div style={{ position: 'relative' }}>
+                            <input 
+                              type="file"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files.length > 0) {
+                                  handleFieldChange(f.key, e.target.files[0].name);
+                                }
+                              }}
+                              style={{ width: '100%', padding: '9px 12px', backgroundColor: '#020617', border: '1px solid #334155', borderRadius: '8px', color: '#fff', fontSize: '0.9rem', outline: 'none', cursor: 'pointer' }}
+                            />
+                            {fieldData[f.key] && (
+                               <div style={{ marginTop: '8px', fontSize: '0.85rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '500' }}>
+                                 <ShieldCheck size={14} /> Uploaded: {fieldData[f.key]}
+                               </div>
+                            )}
+                          </div>
+                        ) : (
+                          <input 
+                            type={f.type === 'number' ? 'number' : 'text'}
+                            value={fieldData[f.key] || ''}
+                            onChange={(e) => handleFieldChange(f.key, e.target.value)}
+                            placeholder={`Enter ${f.type}...`}
+                            style={{ width: '100%', padding: '12px', backgroundColor: '#020617', border: '1px solid #334155', borderRadius: '8px', color: '#fff', fontSize: '1rem', fontWeight: 500, outline: 'none', transition: 'border-color 0.2s' }}
+                            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                            onBlur={(e) => e.target.style.borderColor = '#334155'}
+                            onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                          />
+                        )}
                     </td>
                     <td style={{ padding: '20px 24px', textAlign: 'right' }}>
                       <span style={{ display: 'inline-block', padding: '4px 10px', backgroundColor: 'rgba(51, 65, 85, 0.4)', color: '#94a3b8', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>
