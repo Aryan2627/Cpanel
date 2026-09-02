@@ -23,6 +23,17 @@ export async function POST(request: Request) {
     const orgId = await getTenantId();
     if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
     const data = await request.json();
+
+    const existing = await prisma.intake.findFirst({
+      where: {
+        organizationId: orgId,
+        title: data.title
+      }
+    });
+    if (existing) {
+      return NextResponse.json({ error: 'An intake with this title already exists.' }, { status: 400 });
+    }
+
     console.log("Adding Intake:", data);
     const newIntake = await prisma.intake.create({
       data: {

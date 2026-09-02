@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useIntake } from '../../../../context/IntakeContext';
@@ -41,25 +41,30 @@ export default function PurchaseIntake() {
     e.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
-    setSubmitted(true);
     
     const now = new Date();
     const formattedDate = `${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}, ${now.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}`;
     const newId = `IR-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    await addIntake({
-      refId: newId,
-      title: title || 'New Request',
-      reqName: currentUser,
-      status: 'Draft',
-      type: category || 'Standalone NFA',
-      buyer: '-',
-      reqAt: formattedDate,
-      updAt: formattedDate,
-      quantity: Number(quantity) || 1,
-    });
+    try {
+      await addIntake({
+        refId: newId,
+        title: title || 'New Request',
+        reqName: currentUser,
+        status: 'Draft',
+        type: category || 'Standalone NFA',
+        buyer: '-',
+        reqAt: formattedDate,
+        updAt: formattedDate,
+        quantity: Number(quantity) || 1,
+      });
 
-    router.push('/client/intake');
+      setSubmitted(true);
+      router.push('/client/intake');
+    } catch (error: any) {
+      alert(error.message || 'Failed to submit intake.');
+      setIsSubmitting(false);
+    }
   };
 
   if (submitted) {

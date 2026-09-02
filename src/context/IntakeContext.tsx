@@ -48,10 +48,12 @@ export function IntakeProvider({ children }: { children: ReactNode }) {
         const newIntake = await response.json();
         setIntakes(prev => [newIntake, ...prev]);
       } else {
-        console.error('Failed to add intake to DB');
+        const errData = await response.json();
+        throw new Error(errData.error || 'Failed to add intake to DB');
       }
     } catch (err) {
       console.error('Error adding intake:', err);
+      throw err;
     }
   };
 

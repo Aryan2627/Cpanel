@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Clock, CheckCircle2, AlertCircle, BarChart3, FileText, User, Leaf, AlertTriangle, Target, Globe, BrainCircuit, Hammer, X, Layers, SplitSquareHorizontal } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle2, AlertCircle, BarChart3, FileText, User, Users, Leaf, AlertTriangle, Target, Globe, BrainCircuit, Hammer, X, Layers, SplitSquareHorizontal } from 'lucide-react';
 
 const Countdown = ({ endTime }: { endTime: string | Date }) => {
   const [now, setNow] = useState(new Date());
@@ -624,12 +624,36 @@ const handleSurrogateSubmit = async () => {
                         <div style={{ fontWeight: 700, color: '#16a34a', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.2rem' }}>
                           <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block', boxShadow: '0 0 10px #22c55e', animation: 'pulse 2s infinite' }}></span>
                           Live / No Time Limit
-                        </div>
-                      )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+              </div>
             </div>
-          </div>
+
+            {/* Invited Vendors Card */}
+            <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <h2 style={{ margin: '0 0 16px 0', fontSize: '1.1rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Users size={18} color="#10b981" /> Invited Vendors ({parsedParticipants.length})
+              </h2>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                {parsedParticipants.length > 0 ? (
+                  parsedParticipants.map((p: any, idx: number) => (
+                    <div key={idx} style={{ padding: '8px 12px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#e0e7ff', color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.8rem' }}>
+                        {p.name?.charAt(0).toUpperCase() || 'V'}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1e293b' }}>{p.name}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{p.email}</div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ fontSize: '0.85rem', color: '#64748b' }}>No vendors invited.</div>
+                )}
+              </div>
+            </div>
 
           <div style={{ width: '100%' }}>
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
