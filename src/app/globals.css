@@ -194,7 +194,7 @@ a:hover { color: var(--primary-hover); }
 
 /* ============ PAGE HEADER ============ */
 .page-header {
-  background: linear-gradient(135deg, #0f2460 0%, #1e3a8a 50%, #1e40af 100%);
+  background: linear-gradient(135deg, #071330 0%, #0d1f4f 55%, #1a2f6b 100%);
   padding: 28px 32px;
   display: flex;
   align-items: center;
@@ -311,3 +311,4 @@ a:hover { color: var(--primary-hover); }
   .sidebar { display: none; }
   .kpi-grid { grid-template-columns: 1fr 1fr; }
 }
+

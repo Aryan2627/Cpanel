@@ -42,7 +42,7 @@ export default function ClientDashboard() {
   return (
     <div style={{ backgroundColor: '#f0f4f8', minHeight: '100%', fontFamily: 'system-ui, sans-serif' }}>
       {/* Hero Header */}
-      <div style={{ background: 'linear-gradient(135deg, #0f2460 0%, #1e3a8a 55%, #1e40af 100%)', padding: '32px 32px 48px', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: 'linear-gradient(135deg, #071330 0%, #0d1f4f 55%, #1a2f6b 100%)', padding: '32px 32px 48px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, right: 0, width: '400px', height: '100%', background: 'radial-gradient(circle at 70% 50%, rgba(59,130,246,0.15), transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
           <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>Command Center</p>
@@ -154,3 +154,4 @@ export default function ClientDashboard() {
     </div>
   );
 }
+

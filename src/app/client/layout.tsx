@@ -75,7 +75,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   if (currentUser && currentUser.licenseStatus === 'Expired') {
     return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0f2460, #1e3a8a)', color: '#fff', flexDirection: 'column', fontFamily: 'system-ui', textAlign: 'center', padding: '24px' }}>
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #071330, #0d1f4f)', color: '#fff', flexDirection: 'column', fontFamily: 'system-ui', textAlign: 'center', padding: '24px' }}>
         <Shield size={64} color="#fca5a5" style={{ marginBottom: '24px' }} />
         <h1 style={{ fontSize: '2rem', marginBottom: '12px', fontWeight: 700 }}>License Expired</h1>
         <p style={{ marginBottom: '32px', color: '#bfdbfe', fontSize: '1rem', maxWidth: '480px', lineHeight: 1.6 }}>Your ProcGen {currentUser.licensePlan} license has expired. Platform access has been locked.</p>
@@ -119,7 +119,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           width: isSidebarOpen ? '260px' : '0',
           minWidth: isSidebarOpen ? '260px' : '0',
           height: '100vh',
-          background: 'linear-gradient(180deg, #0f2460 0%, #1e3a8a 60%, #1e40af 100%)',
+          background: 'linear-gradient(175deg, #071330 0%, #0d1f4f 50%, #1a2f6b 100%)',
           display: 'flex',
           flexDirection: 'column',
           flexShrink: 0,
@@ -283,7 +283,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               </button>
               <button onClick={() => router.push('/client/profile')} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 12px 6px 6px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '50px', cursor: 'pointer', transition: 'all 0.15s' }}
                 onMouseOver={e => e.currentTarget.style.background = '#f1f5f9'} onMouseOut={e => e.currentTarget.style.background = '#f8fafc'}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e40af, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: '0.75rem' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #0d1f4f, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: '0.75rem' }}>
                   {currentUser?.companyName ? currentUser.companyName.substring(0, 2).toUpperCase() : 'PG'}
                 </div>
                 <div style={{ textAlign: 'left' }}>
@@ -311,3 +311,5 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     </IntakeProvider>
   );
 }
+
+
