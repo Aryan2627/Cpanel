@@ -152,8 +152,32 @@ export default function BuyerEventDetailsPage() {
     });
   };
 
-const handleSurrogateSubmit = async () => {
+  const handleSurrogateSubmit = async () => {
     if (!surrogateVendor) return alert("Please select a vendor.");
+
+    const missingFields: string[] = [];
+    templateFields.forEach((f: any) => {
+      const isCreator = f.role?.toLowerCase() === 'creator';
+      const isCalc = f.role?.toLowerCase() === 'calculation';
+      if (f.required && !isCreator && !isCalc) {
+        let isVisible = true;
+        if (f.dependsOn && f.dependsOn.field) {
+          isVisible = String(surrogateData[f.dependsOn.field]) === String(f.dependsOn.value);
+        }
+        if (isVisible) {
+          const val = surrogateData[f.key];
+          if (val === undefined || val === null || val === '') {
+            missingFields.push(f.name);
+          }
+        }
+      }
+    });
+
+    if (missingFields.length > 0) {
+      alert(`Please fill out the following required fields:\n- ${missingFields.join('\n- ')}`);
+      return;
+    }
+
     setIsSubmittingSurrogate(true);
     try {
       const vendorDetail = parsedParticipants.find((p: any) => p.email === surrogateVendor) || { name: surrogateVendor.split('@')[0] };
