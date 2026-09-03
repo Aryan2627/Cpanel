@@ -80,14 +80,17 @@ export default function PRPage() {
   const handleWizardSubmit = () => {
     setIsModalOpen(false);
     const selectedPRData = filteredData.filter(d => selectedRows.has(d.refId));
-    const exportedItems: any[] = [];
-    selectedPRData.forEach(pr => pr.items.forEach((item: any) => {
-      exportedItems.push({ refId: pr.refId, title: pr.title || item.name, qty: item.qty, uom: item.uom });
-    }));
-    const query = encodeURIComponent(JSON.stringify(exportedItems));
     const prs = selectedPRData.map(d => d.refId).join(',');
-    if (auction) window.location.href = `/client/events/create/auction?prs=${prs}`;
-    else window.location.href = `/client/events/create/single-stage?prs=${prs}`;
+    
+    const params = new URLSearchParams();
+    if (prs) params.append('prs', prs);
+    params.append('fromPR', 'true');
+    if (techStage) params.append('tech', 'true');
+    if (rfq) params.append('rfq', 'true');
+    if (auction) params.append('auction', 'true');
+    
+    const baseUrl = auction ? '/client/events/create/auction' : '/client/events/create/single-stage';
+    window.location.href = `${baseUrl}?${params.toString()}`;
   };
 
   const priorityStyle = (p: string): React.CSSProperties => {

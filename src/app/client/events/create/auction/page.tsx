@@ -330,7 +330,7 @@ function AuctionCreateContent() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
         
         {/* Sticky Header */}
-        <div style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255, 255, 255, 0.75)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.6)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 20px -2px rgba(0,0,0,0.05)' }}>
+        <div style={{ position: 'sticky', top: 0, zIndex: 50, background: 'linear-gradient(135deg, #071330 0%, #0d1f4f 55%, #1a2f6b 100%)', borderBottom: '1px solid rgba(255,255,255,0.1)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 20px -2px rgba(0,0,0,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', flex: 1, gap: '16px' }}>
             <input 
               type="text" 
@@ -341,10 +341,10 @@ function AuctionCreateContent() {
             />
           </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.8)', padding: '6px', borderRadius: '30px', gap: '4px', border: '1px solid rgba(226,232,240,0.8)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', padding: '6px', borderRadius: '30px', gap: '4px', border: '1px solid rgba(255,255,255,0.2)' }}>
             <button 
               onClick={() => setIsWorkspaceMode(!isWorkspaceMode)}
-              style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '24px', cursor: 'pointer', border: 'none', background: isWorkspaceMode ? '#e0f2fe' : 'transparent', color: isWorkspaceMode ? '#0369a1' : '#64748b', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '24px', cursor: 'pointer', border: 'none', background: isWorkspaceMode ? 'rgba(255,255,255,0.2)' : 'transparent', color: '#fff', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
               <LayoutTemplate size={16} /> {isWorkspaceMode ? 'Hide Workspace' : 'Workspace'}
             </button>
@@ -356,8 +356,8 @@ function AuctionCreateContent() {
         <div style={{ flex: 1, padding: '32px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
           
           {/* Card 1: Setup */}
-          <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.02)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}><Settings size={20} color="#3b82f6" /> Event Setup</h3>
+          <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}><Settings size={20} color="#1e3a8a" /> Event Setup</h3>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
               
@@ -669,9 +669,9 @@ function AuctionCreateContent() {
 
           
           {/* Card 3: Participants */}
-          <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.02)', border: '1px solid rgba(226, 232, 240, 0.8)' }}>
+          <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}><Users size={20} color="#8b5cf6" /> Participants</h3>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}><Users size={20} color="#1e3a8a" /> Participants</h3>
               <div style={{ display: 'flex', gap: '12px' }}>
                 {showTinderMatchmaking && (
                   <button 
