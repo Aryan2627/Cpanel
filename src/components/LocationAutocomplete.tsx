@@ -18,6 +18,7 @@ export default function LocationAutocomplete({ value, onChange, placeholder = "S
 
   // Sync internal state with external value if it changes externally
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQuery(value || '');
   }, [value]);
 
