@@ -1,4 +1,4 @@
-'use client';
+ï»¿'use client';
 import { useState, useRef, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -27,8 +27,10 @@ export default function IntakeTablePage() {
   const itemsPerPage = 10;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setExportEnabled(localStorage.getItem('exportIntake') === 'true');
-    const h = () => setExportEnabled(localStorage.getItem('exportIntake') === 'true');
+    const h = () => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setExportEnabled(localStorage.getItem('exportIntake') === 'true');
     window.addEventListener('settings-updated', h);
     return () => window.removeEventListener('settings-updated', h);
   }, []);
@@ -259,7 +261,7 @@ export default function IntakeTablePage() {
                         <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #0d1f4f, #2563eb)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.65rem', flexShrink: 0 }}>
                           {(item.reqName || 'U').charAt(0).toUpperCase()}
                         </div>
-                        <span style={{ fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>{item.reqName || '—'}</span>
+                        <span style={{ fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>{item.reqName || 'ï¿½'}</span>
                       </div>
                     </td>
                     <td style={{ padding: '13px 16px' }}>
@@ -307,8 +309,8 @@ export default function IntakeTablePage() {
           {filtered.length > 0 && (
             <div style={{ padding: '14px 20px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fafbfc' }}>
               <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                Showing <strong style={{ color: '#0f172a' }}>{Math.min((currentPage - 1) * itemsPerPage + 1, filtered.length)}–{Math.min(currentPage * itemsPerPage, filtered.length)}</strong> of <strong style={{ color: '#0f172a' }}>{filtered.length}</strong> results
-                {selectedIds.size > 0 && <span style={{ marginLeft: '12px', color: '#2563eb', fontWeight: 600 }}>· {selectedIds.size} selected</span>}
+                Showing <strong style={{ color: '#0f172a' }}>{Math.min((currentPage - 1) * itemsPerPage + 1, filtered.length)}ï¿½{Math.min(currentPage * itemsPerPage, filtered.length)}</strong> of <strong style={{ color: '#0f172a' }}>{filtered.length}</strong> results
+                {selectedIds.size > 0 && <span style={{ marginLeft: '12px', color: '#2563eb', fontWeight: 600 }}>ï¿½ {selectedIds.size} selected</span>}
               </div>
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
@@ -361,4 +363,5 @@ export default function IntakeTablePage() {
     </div>
   );
 }
+
 

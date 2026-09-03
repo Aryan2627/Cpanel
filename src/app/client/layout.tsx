@@ -1,4 +1,4 @@
-'use client';
+ï»¿'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
@@ -41,7 +41,7 @@ const NAV_ITEMS = [
       { name: 'All Licenses', path: '/client/license/all' },
       { name: 'Allocations', path: '/client/license/allocations' },
       { name: 'Recommendations', path: '/client/license/recommendations' },
-      { name: '— EXPIRY —', isHeader: true },
+      { name: 'ï¿½ EXPIRY ï¿½', isHeader: true },
       { name: 'Maintenance Expiry', path: '/client/license/expiry/maintenance' },
       { name: 'Contract Expiry', path: '/client/license/expiry/contracts' },
       { name: 'Payments Due', path: '/client/license/expiry/payments' },
@@ -140,7 +140,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             </div>
           </div>
 
-          {/* Nav — overflow visible so flyouts can escape, scroll handled by inner wrapper */}
+          {/* Nav ï¿½ overflow visible so flyouts can escape, scroll handled by inner wrapper */}
           <div style={{ flex: 1, overflowY: 'auto', overflowX: 'visible', padding: '14px 10px' }}>
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {NAV_ITEMS.map((item) => {
@@ -210,7 +210,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
         </nav>
 
-        {/* FLYOUT SUBMENU — rendered as fixed so it escapes overflow clipping */}
+        {/* FLYOUT SUBMENU ï¿½ rendered as fixed so it escapes overflow clipping */}
         {flyout && currentFlyoutItem && (
           <ul
             onMouseEnter={keepFlyout}
