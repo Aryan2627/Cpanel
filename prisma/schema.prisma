@@ -171,6 +171,7 @@ model Vendor {
   tags           String? // JSON string of tags
   status         String        @default("Invited")
   password       String?
+  onboardingData Json?
   createdAt      DateTime      @default(now())
 
   @@index([organizationId])
