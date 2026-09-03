@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 import { prisma } from '../../../../lib/prisma';
 import jwt from 'jsonwebtoken';
 
@@ -39,9 +40,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
     const resolvedParams = await params;
     const eventId = resolvedParams.id;
-    const event = await prisma.event.findUnique({
-      where: { id: eventId }
-    });
+    const getCachedEvent = unstable_cache(
+      async (id: string) => prisma.event.findUnique({ where: { id } }),
+      ['event-cache', eventId],
+      { revalidate: 30 }
+    );
+    const event = await getCachedEvent(eventId);
 
     if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404, headers: corsHeaders });

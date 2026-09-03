@@ -32,19 +32,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized: Invalid token signature' }, { status: 401, headers: corsHeaders });
     }
 
-    const email = decoded.email;
-    if (!email) {
+    if (!decoded.email || !decoded.id) {
       return NextResponse.json({ error: 'Invalid token payload' }, { status: 400, headers: corsHeaders });
-    }
-
-    // Get the vendorId. We use email to find the vendor since token might just have email.
-    // Ideally we should store vendorId in token, but we'll find by email first.
-    const vendor = await prisma.vendor.findFirst({
-      where: { email: { equals: email, mode: 'insensitive' } }
-    });
-
-    if (!vendor) {
-      return NextResponse.json({ error: 'Vendor profile not found' }, { status: 404, headers: corsHeaders });
     }
 
     const { searchParams } = new URL(request.url);
@@ -57,7 +46,7 @@ export async function GET(request: Request) {
     const bid = await prisma.bid.findFirst({
       where: {
         eventId: eventId,
-        vendorId: vendor.id
+        vendorId: decoded.id
       }
     });
 
@@ -83,17 +72,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized: Invalid token signature' }, { status: 401, headers: corsHeaders });
     }
 
-    const email = decoded.email;
-    if (!email) {
+    if (!decoded.email || !decoded.id) {
       return NextResponse.json({ error: 'Invalid token payload' }, { status: 400, headers: corsHeaders });
-    }
-
-    const vendor = await prisma.vendor.findFirst({
-      where: { email: { equals: email, mode: 'insensitive' } }
-    });
-
-    if (!vendor) {
-      return NextResponse.json({ error: 'Vendor profile not found' }, { status: 404, headers: corsHeaders });
     }
 
     const body = await request.json();
@@ -107,7 +87,7 @@ export async function POST(request: Request) {
     const existingBid = await prisma.bid.findFirst({
       where: {
         eventId: eventId,
-        vendorId: vendor.id
+        vendorId: decoded.id
       }
     });
 
@@ -119,16 +99,16 @@ export async function POST(request: Request) {
           amount: parseFloat(amount),
           initialAmount: existingBid.initialAmount || existingBid.amount,
           templateData: templateData ? JSON.stringify(templateData) : null,
-          vendorName: vendorName || vendor.name || 'Vendor',
-          status: 'Submitted' // You might want to update or keep status
+          vendorName: vendorName || decoded.name || 'Vendor',
+          status: 'Submitted'
         }
       });
     } else {
       bid = await prisma.bid.create({
         data: {
           eventId,
-          vendorId: vendor.id,
-          vendorName: vendorName || vendor.name || 'Vendor',
+          vendorId: decoded.id,
+          vendorName: vendorName || decoded.name || 'Vendor',
           amount: parseFloat(amount),
           initialAmount: parseFloat(amount),
           templateData: templateData ? JSON.stringify(templateData) : null,
@@ -143,6 +123,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
   }
 }
+
 export async function PUT(request: Request) {
   try {
     const data = await request.json();
