@@ -2,7 +2,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useIntake } from '@/context/IntakeContext';
-import { CheckCircle2, AlertCircle, FileCheck, Users, Clock, Settings, Search, LayoutTemplate, Plus, ShieldCheck, ChevronDown, X, GripVertical } from 'lucide-react';
+import { HelpCircle, CheckCircle2, AlertCircle, FileCheck, Users, Clock, Settings, Search, LayoutTemplate, Plus, ShieldCheck, ChevronDown, X, GripVertical } from 'lucide-react';
 
 function AuctionCreateContent() {
   const router = useRouter();
@@ -155,6 +155,7 @@ function AuctionCreateContent() {
   const [isVendorDropdownOpen, setIsVendorDropdownOpen] = useState(false);
   const [tempSelectedVendorIds, setTempSelectedVendorIds] = useState<Set<string>>(new Set());
   const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
+  const [showTour, setShowTour] = useState(false);
   const [selectedVendors, setSelectedVendors] = useState<any[]>([]);
   const [vendors, setVendors] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
@@ -977,7 +978,53 @@ function AuctionCreateContent() {
 
       </div>
 
-      {/* Tinder Smart Matchmaking Modal */}
+            {/* Interactive Tour Modal */}
+      {showTour && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowTour(false)}>
+          <div style={{ background: '#fff', width: '500px', maxWidth: '90%', borderRadius: '24px', padding: '40px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', position: 'relative' }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowTour(false)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}><X size={24} /></button>
+            <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
+              <HelpCircle size={32} />
+            </div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>How to Create an Event</h2>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px' }}>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.875rem', flexShrink: 0 }}>1</div>
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', fontWeight: 600, color: '#0f172a' }}>Enter Event Title</h4>
+                  <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748b', lineHeight: 1.5 }}>Give your sourcing event a clear, descriptive name in the dark blue header area at the top.</p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.875rem', flexShrink: 0 }}>2</div>
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', fontWeight: 600, color: '#0f172a' }}>Configure Event Stages</h4>
+                  <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748b', lineHeight: 1.5 }}>Select which stages you need (Technical Validation, Commercial RFQ, Reverse Auction) and assign the required templates.</p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.875rem', flexShrink: 0 }}>3</div>
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', fontWeight: 600, color: '#0f172a' }}>Select Vendors</h4>
+                  <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748b', lineHeight: 1.5 }}>Scroll down to invite suppliers. You can manually select them or use Jarvis AI Smart Matchmaking.</p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#10b981', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.875rem', flexShrink: 0 }}>4</div>
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', fontWeight: 600, color: '#0f172a' }}>Launch Event</h4>
+                  <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748b', lineHeight: 1.5 }}>Fill out the duration, NFA, and compliance checkbox, then click the blue Launch Event button!</p>
+                </div>
+              </div>
+            </div>
+
+            <button onClick={() => setShowTour(false)} style={{ width: '100%', padding: '16px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer' }}>Got it, let's go!</button>
+          </div>
+        </div>
+      )}
+
+        {/* Tinder Smart Matchmaking Modal */}
       
       {/* Vendor Selection Modal */}
       {isVendorModalOpen && (
