@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: { ignoreBuildErrors: true },
-  poweredByHeader: false,
+  poweredByHeader: false, experimental: { after: true },
   async headers() {
     return [
       {
@@ -26,4 +26,5 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
 

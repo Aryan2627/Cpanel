@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { unstable_after as after } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { sendVendorInvitation } from '../../../lib/email-service';
 import { getTenantId } from '../../../lib/tenant';
@@ -109,7 +110,7 @@ export async function POST(request: Request) {
     // Send email invitations if participants exist
     if (data.participants && Array.isArray(data.participants)) {
       // Execute asynchronously so we don't block the API response
-      Promise.allSettled(data.participants.map((vendor: any) => {
+      after(() => Promise.allSettled(data.participants.map((vendor: any) => {
         if (vendor.email) {
           return sendVendorInvitation(
             vendor.email, 
@@ -117,7 +118,7 @@ export async function POST(request: Request) {
             (process.env.VENDOR_PORTAL_URL || 'http://localhost:5174') + '/login' // TODO: Change to production URL
           );
         }
-      })).catch(console.error);
+      })).catch(console.error));
     }
 
     return NextResponse.json(event, { status: 201 });
@@ -125,3 +126,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
