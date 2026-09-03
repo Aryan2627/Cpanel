@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
   typescript: { ignoreBuildErrors: true },
   poweredByHeader: false,
   async headers() {
@@ -27,3 +26,4 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
