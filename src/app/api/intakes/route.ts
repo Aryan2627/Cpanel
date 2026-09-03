@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const newIntake = await prisma.intake.create({
       data: {
         organizationId: orgId,
-        refId: data.refId || `IR-${Date.now()}`,
+        refId: data.refId || `PR-${Date.now()}`,
         title: data.title,
         reqName: data.reqName,
         status: data.status || 'Draft',
@@ -73,3 +73,4 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: error.message || 'Failed to update intake' }, { status: 500 });
   }
 }
+
