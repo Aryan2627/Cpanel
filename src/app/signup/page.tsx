@@ -77,8 +77,8 @@ export default function Signup() {
         <div className="login-left">
           <div className="abstract-shape"></div>
           
-          <div className="brand-logo">
-            <img src="/logo.webp" alt="ProcGen Logo" style={{ height: '48px', objectFit: 'contain' }} />
+          <div className="brand-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img src="/logo.webp" alt="ProcGen Logo" style={{ height: '48px', objectFit: 'contain' }} />`n            <span style={{ background: '#eab308', color: '#000', padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase' }}>UAT Environment</span>
           </div>
 
           <h1 className="hero-text">Intelligent B2B<br />Sourcing.</h1>
