@@ -83,7 +83,8 @@ export async function POST(request: Request) {
       }
     });
 
-    if (eventStatus === 'Pending Approval' && pendingWorkflow) {
+    after(async () => {
+      if (eventStatus === 'Pending Approval' && pendingWorkflow) {
       await prisma.approvalRequest.create({
         data: {
           organizationId: orgId,
@@ -106,6 +107,7 @@ export async function POST(request: Request) {
         expiresAt: twentyDaysFromNow,
       }
     }).catch(err => console.error('Failed to create Jarvis memory', err));
+    });
 
     // Send email invitations if participants exist
     if (data.participants && Array.isArray(data.participants)) {
@@ -126,4 +128,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
 
