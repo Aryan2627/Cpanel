@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useIntake } from '@/context/IntakeContext';
@@ -352,7 +352,7 @@ function SingleStageCreateContent() {
               placeholder="Enter Event Title" 
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              style={{ border: 'none', outline: 'none', fontSize: '1.5rem', fontWeight: '800', color: '#fff', flex: 1, background: 'transparent', letterSpacing: '-0.5px' }}
+              style={{ border: 'none', outline: 'none', fontSize: '1.15rem', fontWeight: '600', color: '#fff', flex: 1, background: 'transparent', letterSpacing: '-0.5px' }}
             />
             
             
