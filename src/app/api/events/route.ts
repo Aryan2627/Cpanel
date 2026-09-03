@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { unstable_after as after } from 'next/server';
+import { after } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { sendVendorInvitation } from '../../../lib/email-service';
 import { getTenantId } from '../../../lib/tenant';
