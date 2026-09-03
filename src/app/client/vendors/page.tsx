@@ -1,545 +1,234 @@
-'use client';
+﻿'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  Users, UserPlus, Filter, Search, 
-  Building2, MapPin, Mail, Phone, CheckCircle2, 
-  XCircle, Clock, Check, X, ShieldAlert, BadgeCheck, ChevronDown, Star, AlertTriangle, Copy, AlertCircle
+import {
+  Users, UserPlus, Search, Building2, MapPin, Mail, Phone,
+  CheckCircle2, XCircle, Clock, X, BadgeCheck, Star,
+  AlertCircle, Copy, ShieldCheck, Plus, ArrowUpDown, Eye, Inbox
 } from 'lucide-react';
 
 export default function VendorManagement() {
   const router = useRouter();
-  const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedVendorForApproval, setSelectedVendorForApproval] = useState<any>(null);
-
-  const handleApproveVendor = async (id: string) => {
-    try {
-      const res = await fetch(`/api/vendors/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Onboarded' })
-      });
-      if (res.ok) {
-        setVendors(prev => prev.map(v => v.id === id ? { ...v, status: 'Onboarded' } : v));
-        setSelectedVendorForApproval(null);
-      }
-    } catch(err) { console.error(err); }
-  };
-
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [advancedFilters, setAdvancedFilters] = useState({ name: '', code: '', contact: '', type: '', location: '' });
-  
-  // Form State
-  const [formData, setFormData] = useState({
-    name: '', email: '', type: 'Manufacturer/Trader', vendorCode: '', 
-    dealsIn: '', tradeLicense: '', inviteVia: 'Tax ID', city: ''
-  });
-
   const [vendors, setVendors] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showBankruptcyPredictor, setShowBankruptcyPredictor] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('godTierFeatures');
-        if (saved) {
-          const features = JSON.parse(saved);
-          if (features.bankruptcyPredictor !== undefined) {
-            return features.bankruptcyPredictor;
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return true;
-  });
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  const handleCopy = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
-  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copiedId, setCopiedId] = useState<string|null>(null);
+  const [selectedVendorForApproval, setSelectedVendorForApproval] = useState<any>(null);
+  const [sortConfig, setSortConfig] = useState<{key:string;direction:'asc'|'desc'}|null>(null);
+  const [formData, setFormData] = useState({ name:'', email:'', type:'Manufacturer/Trader', vendorCode:'', dealsIn:'', city:'' });
 
   useEffect(() => {
-    fetch('/api/vendors')
-      .then(async res => {
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(`Server returned ${res.status}: ${text.substring(0, 100)}`);
-        }
-        const contentType = res.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-          return res.json();
-        } else {
-          const text = await res.text();
-          throw new Error(`Expected JSON but got HTML/text: ${text.substring(0, 50)}`);
-        }
-      })
-      .then(data => {
-        if (Array.isArray(data)) {
-          setVendors(data);
-        }
-      })
-      .catch(e => {
-        console.error("Error fetching vendors:", e);
-        setFetchError(e.message);
-      })
-      .finally(() => setIsLoading(false));
+    fetch('/api/vendors').then(r=>r.ok?r.json():Promise.reject()).then(d=>{ if(Array.isArray(d)) setVendors(d); }).catch(()=>{}).finally(()=>setIsLoading(false));
   }, []);
 
+  const handleApproveVendor = async (id: string) => {
+    const res = await fetch(`/api/vendors/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'Onboarded'})});
+    if(res.ok){setVendors(prev=>prev.map(v=>v.id===id?{...v,status:'Onboarded'}:v));setSelectedVendorForApproval(null);}
+  };
+  const handleRejectVendor = async (id: string) => {
+    const res = await fetch(`/api/vendors/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'Rejected'})});
+    if(res.ok){setVendors(prev=>prev.map(v=>v.id===id?{...v,status:'Rejected'}:v));setSelectedVendorForApproval(null);}
+  };
   const handleSubmit = async () => {
-    if (!formData.name || !formData.email) {
-      alert('Please fill out all required fields.');
-      return;
-    }
-    
+    if(!formData.name||!formData.email){alert('Name and Email required');return;}
     setIsSubmitting(true);
-    
-    try {
-      const res = await fetch('/api/vendors', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name, 
-          vendorCode: formData.vendorCode || '-',
-          companyCode: '-', 
-          email: formData.email, 
-          phone: '-',
-          type: formData.type || 'Selling firm', 
-          city: formData.city || '-', 
-          status: 'Invited'
-        })
-      });
+    const res = await fetch('/api/vendors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:formData.name,vendorCode:formData.vendorCode||'-',companyCode:'-',email:formData.email,phone:'-',type:formData.type,city:formData.city||'-',status:'Invited'})});
+    if(res.ok){const nv=await res.json();setVendors(prev=>[nv,...prev]);setIsInviteOpen(false);setFormData({name:'',email:'',type:'Manufacturer/Trader',vendorCode:'',dealsIn:'',city:''});}
+    setIsSubmitting(false);
+  };
+  const handleCopy = (text:string,id:string)=>{navigator.clipboard.writeText(text);setCopiedId(id);setTimeout(()=>setCopiedId(null),2000);};
 
-      if (res.ok) {
-        const newVendor = await res.json();
-        setVendors([newVendor, ...vendors]);
-        setIsInviteOpen(false);
-        setFormData({ name: '', email: '', type: 'Manufacturer/Trader', vendorCode: '', dealsIn: '', tradeLicense: '', inviteVia: 'Tax ID', city: '' });
-      } else {
-        alert('Failed to save vendor');
-      }
-    } catch(err) {
-      alert('Error saving vendor');
-    } finally {
-      setIsSubmitting(false);
-    }
+  const statusTabs = ['All','Onboarded','Invited','Pending Review','Rejected'];
+  const statusStyle=(s:string):React.CSSProperties=>{
+    if(s==='Onboarded') return {background:'#dcfce7',color:'#15803d',border:'1px solid #86efac'};
+    if(s==='Invited') return {background:'#eff6ff',color:'#2563eb',border:'1px solid #bfdbfe'};
+    if(s==='Pending Review') return {background:'#fef3c7',color:'#b45309',border:'1px solid #fde68a'};
+    if(s==='Rejected') return {background:'#fef2f2',color:'#dc2626',border:'1px solid #fca5a5'};
+    return {background:'#f1f5f9',color:'#475569',border:'1px solid #cbd5e1'};
   };
 
-  const getStatusBadge = (status: string) => {
-    switch(status) {
-      case 'Joined':
-          return <span style={{ padding: '4px 10px', backgroundColor: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CheckCircle2 size={12} /> Joined</span>;
-        case 'Onboarded':
-          return <span style={{ padding: '4px 10px', backgroundColor: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}><BadgeCheck size={12} /> Onboarded</span>;
-        case 'Approval Pending':
-          return <span style={{ padding: '4px 10px', backgroundColor: '#fef3c7', color: '#d97706', border: '1px solid #fde68a', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Clock size={12} /> Action Required</span>;
-        case 'Onboarding in Progress':
-          return <span style={{ padding: '4px 10px', backgroundColor: '#f3e8ff', color: '#7e22ce', border: '1px solid #e9d5ff', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Building2 size={12} /> Onboarding</span>;
-      case 'Invited':
-        return <span style={{ padding: '4px 10px', backgroundColor: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Clock size={12} /> Invited</span>;
-      case 'Blacklisted':
-        return <span style={{ padding: '4px 10px', backgroundColor: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}><ShieldAlert size={12} /> Blacklisted</span>;
-      default:
-        return <span style={{ padding: '4px 10px', backgroundColor: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>{status}</span>;
-    }
-  };
-
-  const filteredVendors = vendors.filter(v => {
-    let matches = true;
-    
-    // Universal search query
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      const matchUniversal = (v.name || '').toLowerCase().includes(q) || 
-               (v.email || '').toLowerCase().includes(q) ||
-               (v.vendorCode || '').toLowerCase().includes(q) ||
-               (v.phone || '').toLowerCase().includes(q) ||
-               (v.type || '').toLowerCase().includes(q) ||
-               (v.city || '').toLowerCase().includes(q);
-      if (!matchUniversal) matches = false;
-    }
-
-    // Advanced filters
-    if (advancedFilters.name && !(v.name || '').toLowerCase().includes(advancedFilters.name.toLowerCase())) matches = false;
-    if (advancedFilters.code && !(v.vendorCode || '').toLowerCase().includes(advancedFilters.code.toLowerCase())) matches = false;
-    if (advancedFilters.contact && !(v.email || '').toLowerCase().includes(advancedFilters.contact.toLowerCase()) && !(v.phone || '').toLowerCase().includes(advancedFilters.contact.toLowerCase())) matches = false;
-    if (advancedFilters.type && !(v.type || '').toLowerCase().includes(advancedFilters.type.toLowerCase())) matches = false;
-    if (advancedFilters.location && !(v.city || '').toLowerCase().includes(advancedFilters.location.toLowerCase())) matches = false;
-
-    return matches;
+  const filtered = vendors.filter(v=>{
+    if(filterStatus!=='All'&&v.status!==filterStatus) return false;
+    if(!searchQuery) return true;
+    const q=searchQuery.toLowerCase();
+    return (v.name||'').toLowerCase().includes(q)||(v.email||'').toLowerCase().includes(q)||(v.city||'').toLowerCase().includes(q)||(v.type||'').toLowerCase().includes(q);
   });
 
+  const kpis=[
+    {label:'Total Vendors',value:vendors.length,icon:Building2,color:'#2563eb',bg:'#eff6ff'},
+    {label:'Onboarded',value:vendors.filter(v=>v.status==='Onboarded').length,icon:BadgeCheck,color:'#16a34a',bg:'#dcfce7'},
+    {label:'Pending Review',value:vendors.filter(v=>v.status==='Pending Review').length,icon:Clock,color:'#d97706',bg:'#fef3c7'},
+    {label:'Invited',value:vendors.filter(v=>v.status==='Invited').length,icon:UserPlus,color:'#7c3aed',bg:'#faf5ff'},
+  ];
+
   return (
-    <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100%', fontFamily: 'system-ui, sans-serif', position: 'relative' }}>
-      
-      {/* Sub Header */}
-      {fetchError && (
-        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #f87171', padding: '16px', borderRadius: '8px', marginBottom: '24px', color: '#b91c1c', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <AlertCircle size={20} />
+    <div style={{backgroundColor:'#f0f4f8',minHeight:'100%',fontFamily:'system-ui,sans-serif'}}>
+      {/* Header */}
+      <div style={{background:'linear-gradient(135deg,#071330 0%,#0d1f4f 55%,#1a2f6b 100%)',padding:'28px 32px 40px',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',top:0,right:0,width:'400px',height:'100%',background:'radial-gradient(circle at 70% 50%,rgba(59,130,246,0.12),transparent 70%)',pointerEvents:'none'}} />
+        <div style={{position:'relative',zIndex:1,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
           <div>
-            <strong>Error fetching vendors:</strong> {fetchError.includes('HTML') || fetchError.includes('504') ? 'Database server might be sleeping. Please wait a moment and refresh.' : fetchError}
+            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'8px'}}><Building2 size={18} color="rgba(255,255,255,0.55)"/><p style={{color:'rgba(255,255,255,0.55)',fontSize:'0.72rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.08em',margin:0}}>Vendors</p></div>
+            <h1 style={{color:'#fff',fontSize:'1.8rem',fontWeight:800,margin:'0 0 6px',letterSpacing:'-0.5px'}}>Supplier List</h1>
+            <p style={{color:'rgba(255,255,255,0.5)',margin:0,fontSize:'0.9rem'}}>Manage your vendor network, onboard suppliers and track status.</p>
           </div>
-        </div>
-      )}
-      {/* Header Area */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-        <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#0f172a', margin: 0 }}>Vendor Management</h1>
-          <p style={{ color: '#64748b', margin: '4px 0 0 0', fontSize: '0.875rem' }}>Manage your supplier network, invite new vendors, and track onboarding.</p>
+          <button onClick={()=>setIsInviteOpen(true)} style={{display:'flex',alignItems:'center',gap:'7px',padding:'10px 20px',background:'#2563eb',border:'none',borderRadius:'10px',color:'#fff',fontWeight:700,fontSize:'0.875rem',cursor:'pointer',boxShadow:'0 4px 14px rgba(37,99,235,0.35)'}}>
+            <UserPlus size={17}/> Invite Vendor
+          </button>
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-        {[
-          { label: 'Total Vendors', value: vendors.length, icon: Building2, color: '#3b82f6', bg: '#eff6ff' },
-          { label: 'Active & Joined', value: vendors.filter(v => v.status === 'Joined').length, icon: BadgeCheck, color: '#10b981', bg: '#ecfdf5' },
-          { label: 'Pending Invites', value: vendors.filter(v => v.status === 'Invited').length, icon: Clock, color: '#f59e0b', bg: '#fef3c7' },
-          { label: 'Blacklisted', value: vendors.filter(v => v.status === 'Blacklisted').length, icon: ShieldAlert, color: '#ef4444', bg: '#fef2f2' },
-        ].map((stat, i) => (
-          <div key={i} className="kpi-card" style={{ backgroundColor: '#fff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)', transition: 'all 0.2s ease', cursor: 'default' }}>
-            <div style={{ padding: '14px', borderRadius: '12px', backgroundColor: stat.bg, color: stat.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <stat.icon size={28} strokeWidth={1.5} />
+      <div style={{padding:'0 32px 40px',marginTop:'-24px',position:'relative',zIndex:10}}>
+        {/* KPI Cards */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'16px',marginBottom:'20px'}}>
+          {kpis.map((k,i)=>{const Icon=k.icon;return(
+            <div key={i} style={{backgroundColor:'#fff',borderRadius:'16px',border:'1px solid #e2e8f0',padding:'20px 22px',boxShadow:'0 4px 12px rgba(0,0,0,0.06)',display:'flex',justifyContent:'space-between',alignItems:'flex-start',transition:'all 0.2s',cursor:'pointer'}}
+              onMouseOver={e=>{(e.currentTarget as HTMLElement).style.boxShadow='0 8px 24px rgba(0,0,0,0.1)';(e.currentTarget as HTMLElement).style.transform='translateY(-2px)';}}
+              onMouseOut={e=>{(e.currentTarget as HTMLElement).style.boxShadow='0 4px 12px rgba(0,0,0,0.06)';(e.currentTarget as HTMLElement).style.transform='translateY(0)';}}>
+              <div><div style={{fontSize:'0.68rem',fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.05em',marginBottom:'8px'}}>{k.label}</div><div style={{fontSize:'2rem',fontWeight:800,color:'#0f172a',letterSpacing:'-0.05em',lineHeight:1}}>{k.value}</div></div>
+              <div style={{width:'44px',height:'44px',borderRadius:'12px',backgroundColor:k.bg,display:'flex',alignItems:'center',justifyContent:'center'}}><Icon size={22} color={k.color}/></div>
             </div>
-            <div>
-              <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem', fontWeight: 500, letterSpacing: '0.01em' }}>{stat.label}</p>
-              <h3 style={{ margin: '6px 0 0 0', color: '#0f172a', fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.02em' }}>{stat.value}</h3>
-            </div>
-          </div>
-        ))}
-      </div>
+          );})}
+        </div>
 
-      {/* Main Container */}
-      <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-        
-        {/* Toolbar */}
-        <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
-          
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden', width: '280px' }}>
-              <div style={{ padding: '0 12px' }}><Search size={16} color="#94a3b8" /></div>
-              <input 
-                type="text" placeholder="Search universally..." 
-                value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ border: 'none', padding: '8px 12px 8px 0', outline: 'none', width: '100%', fontSize: '0.875rem' }} 
-              />
-            </div>
-            
-            <div style={{ position: 'relative' }}>
-              <button onClick={() => setIsFilterOpen(!isFilterOpen)} style={{ padding: '8px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: isFilterOpen ? '#f1f5f9' : '#fff', color: '#475569', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}>
-                <Filter size={16} /> Filter
+        {/* Table Card */}
+        <div style={{backgroundColor:'#fff',borderRadius:'16px',border:'1px solid #e2e8f0',boxShadow:'0 4px 12px rgba(0,0,0,0.05)',overflow:'hidden'}}>
+          {/* Tabs + Search */}
+          <div style={{padding:'0 20px',borderBottom:'1px solid #f1f5f9',display:'flex',alignItems:'center',gap:'2px',background:'#fafbfc',flexWrap:'wrap'}}>
+            {statusTabs.map(tab=>(
+              <button key={tab} onClick={()=>setFilterStatus(tab)} style={{padding:'14px 12px',border:'none',borderBottom:filterStatus===tab?'2px solid #1e3a8a':'2px solid transparent',background:'transparent',cursor:'pointer',fontSize:'0.78rem',fontWeight:filterStatus===tab?700:500,color:filterStatus===tab?'#1e3a8a':'#64748b',transition:'all 0.15s',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:'6px'}}>
+                {tab}<span style={{padding:'1px 6px',borderRadius:'10px',fontSize:'0.68rem',fontWeight:700,background:filterStatus===tab?'#0d1f4f':'#f1f5f9',color:filterStatus===tab?'#fff':'#94a3b8'}}>
+                  {tab==='All'?vendors.length:vendors.filter(v=>v.status===tab).length}
+                </span>
               </button>
-              
-              {isFilterOpen && (
-                <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: '8px', width: '300px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 50, padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <h3 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600, color: '#0f172a' }}>Advanced Filters</h3>
-                    <button onClick={() => setAdvancedFilters({ name: '', code: '', contact: '', type: '', location: '' })} style={{ background: 'none', border: 'none', color: '#2563eb', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 500 }}>Clear All</button>
-                  </div>
-                  
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#475569', marginBottom: '4px' }}>Vendor Name</label>
-                    <input type="text" value={advancedFilters.name} onChange={e => setAdvancedFilters({...advancedFilters, name: e.target.value})} style={{ width: '100%', padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem', outline: 'none' }} placeholder="e.g. Acme Corp" />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#475569', marginBottom: '4px' }}>Vendor Code</label>
-                    <input type="text" value={advancedFilters.code} onChange={e => setAdvancedFilters({...advancedFilters, code: e.target.value})} style={{ width: '100%', padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem', outline: 'none' }} placeholder="e.g. VEN-1001" />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#475569', marginBottom: '4px' }}>Contact Info</label>
-                    <input type="text" value={advancedFilters.contact} onChange={e => setAdvancedFilters({...advancedFilters, contact: e.target.value})} style={{ width: '100%', padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem', outline: 'none' }} placeholder="Email or Phone" />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#475569', marginBottom: '4px' }}>Type</label>
-                    <input type="text" value={advancedFilters.type} onChange={e => setAdvancedFilters({...advancedFilters, type: e.target.value})} style={{ width: '100%', padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem', outline: 'none' }} placeholder="e.g. Manufacturer" />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#475569', marginBottom: '4px' }}>Location</label>
-                    <input type="text" value={advancedFilters.location} onChange={e => setAdvancedFilters({...advancedFilters, location: e.target.value})} style={{ width: '100%', padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '0.875rem', outline: 'none' }} placeholder="e.g. New York" />
-                  </div>
-                </div>
-              )}
+            ))}
+            <div style={{flex:1}}/>
+            <div style={{display:'flex',alignItems:'center',gap:'7px',padding:'0 12px',background:'#f8fafc',border:'1px solid #e2e8f0',borderRadius:'8px',margin:'8px 0'}}>
+              <Search size={14} color="#94a3b8"/>
+              <input type="text" placeholder="Search name, email, city..." value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} style={{border:'none',outline:'none',background:'transparent',fontSize:'0.82rem',color:'#0f172a',padding:'8px 0',width:'220px'}}/>
+              {searchQuery&&<button onClick={()=>setSearchQuery('')} style={{background:'none',border:'none',cursor:'pointer',color:'#94a3b8',display:'flex',padding:0}}><X size={13}/></button>}
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button onClick={() => setIsInviteOpen(true)} style={{ padding: '8px 16px', border: 'none', borderRadius: '6px', backgroundColor: '#2563eb', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500, boxShadow: '0 2px 4px rgba(37,99,235,0.2)' }}>
-              <UserPlus size={16} /> Invite Vendor
-            </button>
-          </div>
-        </div>
-
-        {/* Data Table */}
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+          {isLoading?<div style={{padding:'60px',textAlign:'center',color:'#94a3b8'}}>Loading vendors...</div>:(
+          <table style={{width:'100%',borderCollapse:'collapse'}}>
             <thead>
-              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                <th style={{ padding: '16px 24px', width: '40px' }}><input type="checkbox" style={{ cursor: 'pointer', width: '16px', height: '16px' }} /></th>
-                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Vendor Name</th>
-                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Vendor Code</th>
-                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Contact Info</th>
-                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Type</th>
-                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Location</th>
-                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Trust Score</th>
-                {showBankruptcyPredictor && <th style={{ padding: '16px 24px', fontWeight: 600 }}>Financial Health</th>}
-                <th style={{ padding: '16px 24px', fontWeight: 600 }}>Status</th>
+              <tr style={{background:'linear-gradient(90deg,#0d1f4f,#1a2f6b)'}}>
+                {[['name','Vendor Name'],['type','Type'],['email','Email'],['city','Location'],['status','Status'],['rating','Rating']].map(([k,l])=>(
+                  <th key={k} onClick={()=>setSortConfig(prev=>prev?.key===k?{key:k,direction:prev.direction==='asc'?'desc':'asc'}:{key:k,direction:'asc'})}
+                    style={{padding:'13px 16px',textAlign:'left',color:'rgba(255,255,255,0.75)',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.07em',cursor:'pointer',whiteSpace:'nowrap'}}>
+                    <span style={{display:'flex',alignItems:'center',gap:'5px'}}>{l}<ArrowUpDown size={10} color="rgba(255,255,255,0.3)"/></span>
+                  </th>
+                ))}
+                <th style={{padding:'13px 16px',color:'rgba(255,255,255,0.75)',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase'}}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={showBankruptcyPredictor ? 8 : 7} style={{ padding: '48px', textAlign: 'center', color: '#64748b' }}>
-                    <div style={{ display: 'inline-block', width: '24px', height: '24px', border: '3px solid #cbd5e1', borderTopColor: '#2563eb', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '16px' }}></div>
-                    <p style={{ margin: 0 }}>Loading vendors...</p>
-                  </td>
-                </tr>
-              ) : filteredVendors.length > 0 ? filteredVendors.map((vendor) => (
-                <tr className="vendor-row" onClick={() => { if (vendor.status === 'Approval Pending') { setSelectedVendorForApproval(vendor); } else if (vendor.status === 'Onboarding in Progress' || vendor.status === 'Pending Onboarding') { alert('This vendor is still filling out their onboarding form. You can approve them once they submit it.'); } else { router.push(`/client/vendors/${vendor.id}`); } }} key={vendor.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'all 0.2s ease', cursor: 'pointer' }}>
-                  <td style={{ padding: '12px 16px' }} onClick={e => e.stopPropagation()}>
-                    <input type="checkbox" style={{ cursor: 'pointer', width: '16px', height: '16px' }} />
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '4px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569', fontWeight: 600, fontSize: '0.9rem' }}>
-                        {(vendor.name || '?').charAt(0).toUpperCase()}
-                      </div>
-                      <span style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.95rem' }}>{vendor.name || 'Unnamed Vendor'}</span>
+              {filtered.length>0?filtered.map((v,idx)=>(
+                <tr key={v.id} style={{borderBottom:'1px solid #f1f5f9',background:idx%2===0?'#fff':'#fafbfc',borderLeft:'3px solid transparent',transition:'all 0.12s'}}
+                  onMouseOver={e=>{(e.currentTarget as HTMLElement).style.background='#f8fafc';(e.currentTarget as HTMLElement).style.borderLeft='3px solid #3b82f6';}}
+                  onMouseOut={e=>{(e.currentTarget as HTMLElement).style.background=idx%2===0?'#fff':'#fafbfc';(e.currentTarget as HTMLElement).style.borderLeft='3px solid transparent';}}>
+                  <td style={{padding:'13px 16px'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                      <div style={{width:'34px',height:'34px',borderRadius:'10px',background:'linear-gradient(135deg,#0d1f4f,#2563eb)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.75rem',flexShrink:0}}>{(v.name||'V').charAt(0).toUpperCase()}</div>
+                      <div><div style={{fontWeight:700,color:'#0f172a',fontSize:'0.875rem'}}>{v.name}</div>
+                      <div style={{fontSize:'0.72rem',color:'#94a3b8',fontFamily:'monospace',marginTop:'2px',display:'flex',alignItems:'center',gap:'4px'}}>
+                        {v.vendorCode||'—'}
+                        {v.vendorCode&&<button onClick={()=>handleCopy(v.vendorCode,v.id)} style={{background:'none',border:'none',cursor:'pointer',color:copiedId===v.id?'#16a34a':'#94a3b8',padding:0,display:'flex'}}><Copy size={11}/></button>}
+                      </div></div>
                     </div>
                   </td>
-                  <td style={{ padding: '12px 16px', color: '#475569', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', fontSize: '0.85rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#f1f5f9', padding: '4px 8px', borderRadius: '6px', width: 'fit-content' }}>
-                      {vendor.vendorCode}
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); handleCopy(vendor.vendorCode, `code-${vendor.id}`); }}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '2px', display: 'flex', transition: 'color 0.2s' }}
-                        title="Copy Vendor Code"
-                      >
-                        {copiedId === `code-${vendor.id}` ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
-                      </button>
+                  <td style={{padding:'13px 16px'}}><span style={{background:'#f1f5f9',color:'#475569',padding:'3px 9px',borderRadius:'6px',fontSize:'0.75rem',fontWeight:600}}>{v.type||'—'}</span></td>
+                  <td style={{padding:'13px 16px',color:'#475569',fontSize:'0.82rem'}}>{v.email||'—'}</td>
+                  <td style={{padding:'13px 16px'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'5px',color:'#64748b',fontSize:'0.82rem'}}>
+                      <MapPin size={13} color="#94a3b8"/>{v.city||'—'}
                     </div>
                   </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', fontSize: '0.875rem' }}>
-                        <div style={{ backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '4px', display: 'flex' }}><Mail size={14} color="#64748b" /></div>
-                        {vendor.email}
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); handleCopy(vendor.email, `email-${vendor.id}`); }}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px', marginLeft: 'auto', display: 'flex', opacity: 0.6, transition: 'opacity 0.2s' }}
-                          title="Copy Email"
-                          className="copy-btn"
-                        >
-                          {copiedId === `email-${vendor.id}` ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
-                        </button>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', fontSize: '0.875rem' }}>
-                        <div style={{ backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '4px', display: 'flex' }}><Phone size={14} color="#64748b" /></div>
-                        {vendor.phone}
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); handleCopy(vendor.phone, `phone-${vendor.id}`); }}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px', marginLeft: 'auto', display: 'flex', opacity: 0.6, transition: 'opacity 0.2s' }}
-                          title="Copy Phone"
-                          className="copy-btn"
-                        >
-                          {copiedId === `phone-${vendor.id}` ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
-                        </button>
-                      </div>
+                  <td style={{padding:'13px 16px'}}><span style={{padding:'4px 10px',borderRadius:'20px',fontSize:'0.72rem',fontWeight:700,...statusStyle(v.status)}}>{v.status||'Unknown'}</span></td>
+                  <td style={{padding:'13px 16px'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'3px'}}>
+                      {[1,2,3,4,5].map(s=><Star key={s} size={13} color={s<=4?'#f59e0b':'#e2e8f0'} fill={s<=4?'#f59e0b':'transparent'}/>)}
+                      <span style={{marginLeft:'4px',fontSize:'0.72rem',color:'#64748b',fontWeight:600}}>4.0</span>
                     </div>
                   </td>
-                  <td style={{ padding: '12px 16px', color: '#475569', fontWeight: 500 }}>
-                    <span style={{ backgroundColor: '#f1f5f9', padding: '4px 10px', borderRadius: '6px', fontSize: '0.85rem' }}>{vendor.type}</span>
-                  </td>
-                  <td style={{ padding: '12px 16px', color: '#475569' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
-                      <MapPin size={16} color="#94a3b8" /> {vendor.city}
-                    </div>
-                  </td>
-                  <td style={{ padding: '12px 16px', color: '#475569' }}>
-                    {vendor.trustScore ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, color: vendor.trustScore > 4 ? '#10b981' : vendor.trustScore < 3 ? '#ef4444' : '#f59e0b', backgroundColor: vendor.trustScore > 4 ? '#ecfdf5' : vendor.trustScore < 3 ? '#fef2f2' : '#fef3c7', padding: '4px 10px', borderRadius: '12px', width: 'fit-content' }}>
-                        <Star size={14} fill={vendor.trustScore > 4 ? '#10b981' : vendor.trustScore < 3 ? '#ef4444' : '#f59e0b'} /> {vendor.trustScore}
-                      </div>
-                    ) : (
-                      <span style={{ color: '#94a3b8' }}>-</span>
-                    )}
-                  </td>
-                  {showBankruptcyPredictor && (
-                    <td style={{ padding: '12px 16px', color: '#475569' }}>
-                      {vendor.financialHealth ? (
-                        <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700, backgroundColor: vendor.financialHealth === 'Excellent' ? '#ecfdf5' : vendor.financialHealth === 'Stable' ? '#fef3c7' : '#fef2f2', color: vendor.financialHealth === 'Excellent' ? '#10b981' : vendor.financialHealth === 'Stable' ? '#f59e0b' : '#ef4444', display: 'flex', alignItems: 'center', gap: '6px', width: 'fit-content' }}>
-                          {vendor.financialHealth === 'Critical' && <AlertTriangle size={12} />}
-                          {vendor.financialHealth.toUpperCase()}
-                        </span>
-                      ) : (
-                        <span style={{ color: '#94a3b8' }}>-</span>
+                  <td style={{padding:'13px 16px'}}>
+                    <div style={{display:'flex',gap:'6px',flexWrap:'nowrap'}}>
+                      <button onClick={()=>router.push(`/client/vendors/${v.id}`)} style={{display:'flex',alignItems:'center',gap:'4px',padding:'5px 10px',background:'#eff6ff',border:'1px solid #bfdbfe',borderRadius:'7px',color:'#2563eb',fontWeight:700,fontSize:'0.72rem',cursor:'pointer'}}><Eye size={12}/> View</button>
+                      {v.status==='Pending Review'&&(
+                        <button onClick={()=>setSelectedVendorForApproval(v)} style={{display:'flex',alignItems:'center',gap:'4px',padding:'5px 10px',background:'#dcfce7',border:'1px solid #86efac',borderRadius:'7px',color:'#15803d',fontWeight:700,fontSize:'0.72rem',cursor:'pointer'}}><ShieldCheck size={12}/> Review</button>
                       )}
-                    </td>
-                  )}
-                  <td style={{ padding: '12px 16px' }}>
-                    {getStatusBadge(vendor.status)}
+                    </div>
                   </td>
                 </tr>
-              )) : (
-                <tr>
-                  <td colSpan={showBankruptcyPredictor ? 8 : 7} style={{ padding: '48px', textAlign: 'center', color: '#64748b' }}>
-                    <Users size={32} color="#cbd5e1" style={{ marginBottom: '16px' }} />
-                    <p style={{ margin: 0 }}>No vendors found matching your search.</p>
-                  </td>
-                </tr>
+              )):(
+                <tr><td colSpan={7} style={{padding:'64px',textAlign:'center'}}>
+                  <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'12px'}}>
+                    <div style={{width:'56px',height:'56px',borderRadius:'16px',background:'#f1f5f9',display:'flex',alignItems:'center',justifyContent:'center'}}><Building2 size={28} color="#cbd5e1"/></div>
+                    <div style={{fontWeight:700,color:'#0f172a'}}>No vendors found</div>
+                    <button onClick={()=>setIsInviteOpen(true)} style={{display:'inline-flex',alignItems:'center',gap:'6px',padding:'10px 20px',background:'#0d1f4f',color:'#fff',borderRadius:'9px',border:'none',fontWeight:700,fontSize:'0.875rem',cursor:'pointer'}}><UserPlus size={16}/> Invite First Vendor</button>
+                  </div>
+                </td></tr>
               )}
             </tbody>
           </table>
+          )}
+          {filtered.length>0&&(
+            <div style={{padding:'12px 20px',borderTop:'1px solid #f1f5f9',display:'flex',justifyContent:'space-between',alignItems:'center',background:'#fafbfc'}}>
+              <div style={{fontSize:'0.8rem',color:'#64748b'}}><strong style={{color:'#0f172a'}}>{filtered.length}</strong> of <strong style={{color:'#0f172a'}}>{vendors.length}</strong> vendors</div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Invite Modal Slide-out Drawer */}
-      {isInviteOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.4)', zIndex: 100, display: 'flex', justifyContent: 'flex-end', animation: 'fadeIn 0.2s' }}>
-          <div style={{ width: '700px', backgroundColor: '#ffffff', height: '100%', boxShadow: '-10px 0 25px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', animation: 'slideInRight 0.3s forwards' }}>
-            
-            <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
-              <div>
-                <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}><UserPlus size={20} color="#2563eb" /> Invite Vendor</h2>
-                <p style={{ margin: '4px 0 0 0', fontSize: '0.875rem', color: '#64748b' }}>Send an invitation to join the procurement network.</p>
-              </div>
-              <button onClick={() => setIsInviteOpen(false)} style={{ border: 'none', background: 'transparent', color: '#94a3b8', cursor: 'pointer' }}><X size={24} /></button>
+      {/* Invite Modal */}
+      {isInviteOpen&&(
+        <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.55)',backdropFilter:'blur(4px)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setIsInviteOpen(false)}>
+          <div style={{background:'#fff',borderRadius:'20px',width:'480px',maxWidth:'92vw',boxShadow:'0 30px 60px rgba(0,0,0,0.2)',overflow:'hidden'}} onClick={e=>e.stopPropagation()}>
+            <div style={{background:'linear-gradient(135deg,#071330,#0d1f4f)',padding:'22px 24px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <h2 style={{margin:0,fontSize:'1.1rem',fontWeight:800,color:'#fff'}}>Invite Vendor</h2>
+              <button onClick={()=>setIsInviteOpen(false)} style={{background:'rgba(255,255,255,0.1)',border:'none',cursor:'pointer',color:'#fff',width:'32px',height:'32px',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center'}}><X size={16}/></button>
             </div>
-
-            <div style={{ padding: '24px', flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              
-              <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>Company Name <span style={{ color: '#ef4444' }}>*</span></label>
-                <input type="text" placeholder="e.g. Acme Corp" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.9375rem', outline: 'none', transition: 'border-color 0.2s' }} />
+            <div style={{padding:'24px',display:'flex',flexDirection:'column',gap:'14px'}}>
+              {[['name','Company Name'],['email','Email Address'],['vendorCode','Vendor Code'],['city','City']].map(([f,l])=>(
+                <div key={f}><label style={{display:'block',fontSize:'0.75rem',fontWeight:700,color:'#64748b',marginBottom:'5px',textTransform:'uppercase',letterSpacing:'0.04em'}}>{l}</label>
+                <input value={(formData as any)[f]} onChange={e=>setFormData(p=>({...p,[f]:e.target.value}))} style={{width:'100%',padding:'10px 12px',border:'1px solid #e2e8f0',borderRadius:'8px',fontSize:'0.875rem',outline:'none',boxSizing:'border-box'}}/></div>
+              ))}
+              <div><label style={{display:'block',fontSize:'0.75rem',fontWeight:700,color:'#64748b',marginBottom:'5px',textTransform:'uppercase',letterSpacing:'0.04em'}}>Vendor Type</label>
+              <select value={formData.type} onChange={e=>setFormData(p=>({...p,type:e.target.value}))} style={{width:'100%',padding:'10px 12px',border:'1px solid #e2e8f0',borderRadius:'8px',fontSize:'0.875rem',outline:'none',background:'#fff'}}>
+                {['Manufacturer/Trader','Service Provider','Distributor','Consultant'].map(o=><option key={o}>{o}</option>)}
+              </select></div>
+              <div style={{display:'flex',gap:'10px',marginTop:'4px'}}>
+                <button onClick={()=>setIsInviteOpen(false)} style={{flex:1,padding:'11px',border:'1px solid #e2e8f0',borderRadius:'10px',background:'#fff',color:'#475569',fontWeight:600,cursor:'pointer'}}>Cancel</button>
+                <button onClick={handleSubmit} disabled={isSubmitting} style={{flex:2,padding:'11px',background:'#1e3a8a',color:'#fff',border:'none',borderRadius:'10px',fontWeight:700,cursor:'pointer'}}>{isSubmitting?'Sending...':'Send Invitation'}</button>
               </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>Email Address <span style={{ color: '#ef4444' }}>*</span></label>
-                <input type="email" placeholder="vendor@company.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.9375rem', outline: 'none', transition: 'border-color 0.2s' }} />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>Vendor Profile <span style={{ color: '#ef4444' }}>*</span></label>
-                <div style={{ display: 'flex', gap: '16px' }}>
-                  <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', border: formData.type === 'Manufacturer/Trader' ? '2px solid #2563eb' : '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer', backgroundColor: formData.type === 'Manufacturer/Trader' ? '#eff6ff' : '#fff' }}>
-                    <input type="radio" checked={formData.type === 'Manufacturer/Trader'} onChange={() => setFormData({...formData, type: 'Manufacturer/Trader'})} style={{  }} />
-                    <span style={{ fontSize: '0.9375rem', color: formData.type === 'Manufacturer/Trader' ? '#1d4ed8' : '#475569', fontWeight: 500 }}>Manufacturer</span>
-                  </label>
-                  <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', border: formData.type === 'Broker' ? '2px solid #2563eb' : '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer', backgroundColor: formData.type === 'Broker' ? '#eff6ff' : '#fff' }}>
-                    <input type="radio" checked={formData.type === 'Broker'} onChange={() => setFormData({...formData, type: 'Broker'})} style={{  }} />
-                    <span style={{ fontSize: '0.9375rem', color: formData.type === 'Broker' ? '#1d4ed8' : '#475569', fontWeight: 500 }}>Broker</span>
-                  </label>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>Vendor Code</label>
-                  <input type="text" placeholder="Optional" value={formData.vendorCode} onChange={e => setFormData({...formData, vendorCode: e.target.value})} style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.9375rem', outline: 'none' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>City <span style={{ color: '#ef4444' }}>*</span></label>
-                  <div style={{ position: 'relative' }}>
-                    <select value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.9375rem', outline: 'none', appearance: 'none', backgroundColor: '#fff', color: formData.city ? '#0f172a' : '#94a3b8' }}>
-                      <option value="" disabled>Select City</option>
-                      <option value="New York">New York</option>
-                      <option value="London">London</option>
-                      <option value="Mumbai">Mumbai</option>
-                      <option value="Tokyo">Tokyo</option>
-                    </select>
-                    <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#94a3b8' }}><ChevronDown size={16} /></span>
-                  </div>
-                </div>
-              </div>
-
             </div>
-
-            <div style={{ padding: '12px 16px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '12px', backgroundColor: '#f8fafc' }}>
-              <button onClick={() => setIsInviteOpen(false)} style={{ padding: '10px 20px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#ffffff', color: '#475569', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-              <button onClick={handleSubmit} disabled={isSubmitting} style={{ padding: '10px 24px', border: 'none', borderRadius: '6px', backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 600, cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {isSubmitting ? 'Sending...' : <><Mail size={16} /> Send Invite</>}
-              </button>
-            </div>
-
           </div>
         </div>
       )}
-      
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05) !important; }
-        .vendor-row:hover { background-color: #f8fafc !important; }
-        .vendor-row:hover .copy-btn { opacity: 1 !important; }
-      `}} />
 
-      {selectedVendorForApproval && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-          <div style={{ backgroundColor: '#fff', padding: '32px', borderRadius: '16px', width: '500px', maxWidth: '90%' }}>
-            <h2 style={{ margin: '0 0 16px 0', fontSize: '20px', color: '#0f172a' }}>Review Vendor Application</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px', maxHeight: '60vh', overflowY: 'auto', paddingRight: '8px' }}>
-              
-              <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>1. Basic & Contact Info</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px' }}>
-                  <div><strong>Company:</strong> {selectedVendorForApproval.name}</div>
-                  <div><strong>Entity Type:</strong> {selectedVendorForApproval.onboardingData?.entityType || '-'}</div>
-                  <div><strong>Email:</strong> {selectedVendorForApproval.email}</div>
-                  <div><strong>Phone:</strong> {selectedVendorForApproval.phone}</div>
-                  <div style={{ gridColumn: '1 / -1' }}><strong>Address:</strong> {selectedVendorForApproval.onboardingData?.registeredAddress || '-'}</div>
-                </div>
-              </div>
-
-              <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>2. Tax & Registration</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px' }}>
-                  <div><strong>PAN:</strong> {selectedVendorForApproval.onboardingData?.pan || '-'}</div>
-                  <div><strong>GSTIN:</strong> {selectedVendorForApproval.onboardingData?.gstin || '-'}</div>
-                  <div><strong>CIN:</strong> {selectedVendorForApproval.onboardingData?.cin || '-'}</div>
-                  <div><strong>MSME:</strong> {selectedVendorForApproval.onboardingData?.msme || '-'}</div>
-                  <div><strong>Trade License:</strong> {selectedVendorForApproval.tradeLicense || '-'}</div>
-                </div>
-              </div>
-
-              <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>3. Business Profile</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
-                  <div><strong>Category:</strong> {selectedVendorForApproval.onboardingData?.productCategory || '-'}</div>
-                  <div><strong>Products Offered:</strong> {selectedVendorForApproval.onboardingData?.productsOffered || '-'}</div>
-                  <div><strong>Certifications:</strong> {selectedVendorForApproval.onboardingData?.certifications || '-'}</div>
-                  <div><strong>Experience:</strong> {selectedVendorForApproval.onboardingData?.previousExperience || '-'}</div>
-                </div>
-              </div>
-
-              <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>4. Bank Details</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px', fontSize: '14px' }}>
-                  <div><strong>Account Name:</strong> {selectedVendorForApproval.onboardingData?.bankAccountName || '-'}</div>
-                  <div><strong>Account Number:</strong> {selectedVendorForApproval.onboardingData?.bankAccountNumber || '-'}</div>
-                  <div><strong>IFSC:</strong> {selectedVendorForApproval.onboardingData?.bankIfsc || '-'}</div>
-                </div>
-              </div>
-
-              <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>5. Documents</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px', fontSize: '14px' }}>
-                  <div><strong>PAN Card:</strong> {selectedVendorForApproval.onboardingData?.documents?.pan ? <a href={selectedVendorForApproval.onboardingData.documents.pan} target="_blank" rel="noreferrer" style={{color: '#2563eb'}}>View Document</a> : '-'}</div>
-                  <div><strong>GST Cert:</strong> {selectedVendorForApproval.onboardingData?.documents?.gst ? <a href={selectedVendorForApproval.onboardingData.documents.gst} target="_blank" rel="noreferrer" style={{color: '#2563eb'}}>View Document</a> : '-'}</div>
-                  <div><strong>Incorporation Cert:</strong> {selectedVendorForApproval.onboardingData?.documents?.incorporation ? <a href={selectedVendorForApproval.onboardingData.documents.incorporation} target="_blank" rel="noreferrer" style={{color: '#2563eb'}}>View Document</a> : '-'}</div>
-                  <div><strong>Bank Proof:</strong> {selectedVendorForApproval.onboardingData?.documents?.bank ? <a href={selectedVendorForApproval.onboardingData.documents.bank} target="_blank" rel="noreferrer" style={{color: '#2563eb'}}>View Document</a> : '-'}</div>
-                </div>
-              </div>
-
+      {/* Approval Modal */}
+      {selectedVendorForApproval&&(
+        <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.55)',backdropFilter:'blur(4px)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setSelectedVendorForApproval(null)}>
+          <div style={{background:'#fff',borderRadius:'20px',width:'480px',maxWidth:'92vw',boxShadow:'0 30px 60px rgba(0,0,0,0.2)',overflow:'hidden'}} onClick={e=>e.stopPropagation()}>
+            <div style={{background:'linear-gradient(135deg,#071330,#0d1f4f)',padding:'22px 24px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <h2 style={{margin:0,fontSize:'1.1rem',fontWeight:800,color:'#fff'}}>Review Vendor</h2>
+              <button onClick={()=>setSelectedVendorForApproval(null)} style={{background:'rgba(255,255,255,0.1)',border:'none',cursor:'pointer',color:'#fff',width:'32px',height:'32px',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center'}}><X size={16}/></button>
             </div>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button onClick={() => setSelectedVendorForApproval(null)} style={{ padding: '10px 16px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
-              <button onClick={() => handleApproveVendor(selectedVendorForApproval.id)} style={{ padding: '10px 16px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>Approve & Onboard</button>
+            <div style={{padding:'24px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'14px',padding:'16px',background:'#f8fafc',borderRadius:'12px',marginBottom:'20px'}}>
+                <div style={{width:'48px',height:'48px',borderRadius:'12px',background:'linear-gradient(135deg,#0d1f4f,#2563eb)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'1.1rem'}}>{selectedVendorForApproval.name?.charAt(0)}</div>
+                <div><div style={{fontWeight:800,color:'#0f172a',fontSize:'1rem'}}>{selectedVendorForApproval.name}</div>
+                <div style={{color:'#64748b',fontSize:'0.82rem'}}>{selectedVendorForApproval.email}</div>
+                <div style={{color:'#94a3b8',fontSize:'0.75rem'}}>{selectedVendorForApproval.type} · {selectedVendorForApproval.city}</div></div>
+              </div>
+              <div style={{display:'flex',gap:'10px'}}>
+                <button onClick={()=>handleRejectVendor(selectedVendorForApproval.id)} style={{flex:1,padding:'12px',background:'#fef2f2',border:'1px solid #fca5a5',borderRadius:'10px',color:'#dc2626',fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}><XCircle size={16}/> Reject</button>
+                <button onClick={()=>handleApproveVendor(selectedVendorForApproval.id)} style={{flex:2,padding:'12px',background:'#16a34a',color:'#fff',border:'none',borderRadius:'10px',fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}><BadgeCheck size={16}/> Approve & Onboard</button>
+              </div>
             </div>
           </div>
         </div>

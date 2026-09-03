@@ -1,629 +1,268 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { Bot, Zap, CheckCircle2, AlertCircle, Sparkles, User, ShieldCheck, Terminal, Target, TrendingDown, Settings2, Plus, X, Activity, Cpu, History, LineChart, BarChart3 } from 'lucide-react';
+import { Bot, Zap, CheckCircle2, Sparkles, Activity, Cpu, Plus, X, ArrowUpRight, ArrowDownRight, Brain } from 'lucide-react';
 
 type Message = { sender: 'ai' | 'vendor', text: string, time: string };
+type Session = { id: string; name: string; status: 'Live'|'Closed'; model: string; target: number; limit: number; vendorInitial: number; concessions: string[]; messages: Message[]; closed: boolean; logs: string[]; sentiment: string; sentimentColor: string; prevVendor?: string; prevAmount?: number; insight?: string; trend?: number; };
 
-type Session = {
-  id: string;
-  name: string;
-  status: 'Live' | 'Closed';
-  model: string;
-  target: number;
-  limit: number;
-  vendorInitial: number;
-  concessions: string[];
-  messages: Message[];
-  closed: boolean;
-  logs: string[];
-  sentiment: string;
-  sentimentColor: string;
-  prevVendor?: string;
-  prevAmount?: number;
-  insight?: string;
-  trend?: number;
-};
+const INITIAL_SESSIONS: Session[] = [
+  { id:'n1', name:'Q4 Raw Steel', status:'Live', model:'α-Strike v4 (Nemotron)', target:40000, limit:42000, vendorInitial:45000, concessions:['Net-15 Payment Terms'], messages:[{sender:'vendor',text:"We've reviewed the specs. We can do $45,000 for the Q4 shipment.",time:'10:01 AM'}], closed:false, logs:[], sentiment:'Softening (-4.2%)', sentimentColor:'#16a34a' },
+  { id:'n2', name:'Enterprise Laptops (x500)', status:'Live', model:'β-Logic v2', target:800000, limit:850000, vendorInitial:950000, concessions:['Flexible Delivery','Bulk Shipping'], messages:[{sender:'vendor',text:"For 500 ThinkPads, our best price is $950,000 including priority shipping.",time:'10:05 AM'}], closed:false, logs:[], sentiment:'High Demand (+2.1%)', sentimentColor:'#d97706' },
+  { id:'n3', name:'Office Hardware', status:'Closed', model:'γ-Rapid v1', target:13000, limit:15000, vendorInitial:16000, concessions:[], messages:[{sender:'ai',text:"CONTRACT SECURED",time:'Yesterday'}], closed:true, logs:[], sentiment:'Stable', sentimentColor:'#64748b' },
+];
 
 export default function AIAgentsPage() {
-  const [viewMode, setViewMode] = useState<'negotiator' | 'predictor'>('predictor');
-  
-  const [sessions, setSessions] = useState<Session[]>([
-    {
-      id: 'n1',
-      name: 'Q4 Raw Steel',
-      status: 'Live',
-      model: 'α-Strike v4 (Nemotron)',
-      target: 40000,
-      limit: 42000,
-      vendorInitial: 45000,
-      concessions: ['Net-15 Payment Terms'],
-      messages: [
-        { sender: 'vendor', text: "We've reviewed the specs. We can do $45,000 for the Q4 shipment, but that's our bottom line.", time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
-      ],
-      closed: false,
-      logs: [],
-      sentiment: 'Softening (-4.2%)',
-      sentimentColor: 'var(--success-color)'
-    },
-    {
-      id: 'n2',
-      name: 'Enterprise Laptops (x500)',
-      status: 'Live',
-      model: 'β-Logic v2 (Nemotron)',
-      target: 800000,
-      limit: 850000,
-      vendorInitial: 950000,
-      concessions: ['Flexible Delivery Date', 'Bulk Shipping'],
-      messages: [
-        { sender: 'vendor', text: "For 500 ThinkPads, our best price is $950,000 including priority shipping.", time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
-      ],
-      closed: false,
-      logs: [],
-      sentiment: 'High Demand (+2.1%)',
-      sentimentColor: 'var(--warning-color)'
-    },
-    {
-      id: 'n3',
-      name: 'Office Hardware',
-      status: 'Closed',
-      model: 'γ-Rapid v1',
-      target: 13000,
-      limit: 15000,
-      vendorInitial: 16000,
-      concessions: [],
-      messages: [{ sender: 'ai', text: "CONTRACT SECURED", time: 'Yesterday' }],
-      closed: true,
-      logs: [],
-      sentiment: 'Stable',
-      sentimentColor: 'var(--text-secondary)'
-    }
-  ]);
-
+  const [viewMode, setViewMode] = useState<'negotiator'|'predictor'>('predictor');
+  const [sessions, setSessions] = useState<Session[]>(INITIAL_SESSIONS);
   const [activeId, setActiveId] = useState('n1');
-  const [inputText, setInputText] = useState("");
+  const [inputText, setInputText] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
-  const [isPredicting, setIsPredicting] = useState(false);
-  const [showDeployModal, setShowDeployModal] = useState(false);
   const [started, setStarted] = useState(false);
+  const [showDeployModal, setShowDeployModal] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
-  
   const activeSession = sessions.find(s => s.id === activeId)!;
 
-  // Auto-scroll chat
-  useEffect(() => {
-    if (chatRef.current) {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
-    }
-  }, [activeSession?.messages, activeSession?.logs, analyzing]);
+  useEffect(() => { if(chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight; }, [activeSession?.messages, analyzing]);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/intakes').then(res => res.json()),
-      fetch('/api/pos').then(res => res.json())
-    ])
-    .then(([intakes, pos]) => {
-      if (intakes && intakes.length > 0) {
-        const dbSessions = intakes.map((p: any, i: number) => {
-          let historicalPO = null;
-          if (Array.isArray(pos)) {
-            // Find PO where details (array of PR IDs) includes this PR's refId
-            historicalPO = pos.find(po => po.details && po.details.includes(p.refId));
-          }
-          
-          let prevVendor = 'No Historical Vendor';
-          // Fix fallback logic. If we have a historical PO, use its total. Otherwise use a small fallback or 0.
-          let prevAmount = historicalPO ? (parseFloat(historicalPO.total) || 0) : 0; 
-          
-          if (historicalPO) {
-             prevVendor = historicalPO.vendorId || 'Unknown Vendor';
-          }
-
-// Semantic AI Intelligence & Deep Market Refinement (v2.4)
-          const prTitle = (p.title || '').toLowerCase();
-          const prDesc = (p.description || '').toLowerCase();
-          const prCombined = prTitle + ' ' + prDesc;
-          
-          let trend = -2.0;
-          let insight = "Baseline semantic analysis complete. Market indicators suggest stable supply chains; recommend pushing for a standard 2% cost reduction based on historical deflation rates.";
-          let sentiment = "Stable (-2.0%)";
-          let sentimentColor = "var(--success-color)";
-          
-          if (prCombined.includes('laptop') || prCombined.includes('hardware') || prCombined.includes('server') || p.type === 'Hardware') {
-             trend = -5.2; 
-             insight = "Deep Intelligence: Semiconductor oversupply and aggressive Q4 OEM channel inventory dumps detected. Strong leverage available. AI predicts -5.2% deflation on compute hardware. Push for aggressive volume discounts.";
-             sentiment = "Deflationary (-5.2%)";
-          } else if (prCombined.includes('software') || prCombined.includes('saas') || prCombined.includes('cloud') || p.type === 'Software') {
-             trend = 4.5; 
-             insight = "Deep Intelligence: Enterprise SaaS vendors are driving aggressive price hikes (+4.5%) due to AI compute overhead and high switching costs (vendor lock-in). AI recommends locking in multi-year agreements immediately to cap inflation.";
-             sentiment = "Inflationary (+4.5%)";
-             sentimentColor = "#ef4444";
-          } else if (prCombined.includes('steel') || prCombined.includes('raw material') || prCombined.includes('copper')) {
-             trend = 8.5; 
-             insight = "Deep Intelligence: Global macroeconomic supply chain threats detected. Copper and Steel indices show +8.5% volatility due to geopolitical tensions in primary mining regions. Urgent: secure spot pricing now.";
-             sentiment = "Highly Volatile (+8.5%)";
-             sentimentColor = "#ef4444";
-          } else if (prCombined.includes('logistics') || prCombined.includes('freight') || prCombined.includes('shipping')) {
-             trend = 2.1;
-             insight = "Deep Intelligence: Logistics index shows slight upward pressure (+2.1%) due to fluctuating bunker fuel surcharges. AI recommends negotiating fixed fuel rates for Q1/Q2.";
-             sentiment = "Mild Inflation (+2.1%)";
-             sentimentColor = "#f59e0b";
-          } else if (prCombined.includes('marketing') || prCombined.includes('agency') || prCombined.includes('design')) {
-             trend = -6.0;
-             insight = "Deep Intelligence: Creative agency margins are softening heavily (-6.0%) due to market disruption from generative AI tooling lowering their overhead costs. AI advises demanding steep rate card reductions.";
-             sentiment = "Aggressive Softening (-6.0%)";
-          } else if (prCombined.includes('consulting') || prCombined.includes('professional services')) {
-             trend = 1.5;
-             insight = "Deep Intelligence: Professional services market shows standard wage inflation (+1.5%). Supply of tier-1 analysts remains tight. AI recommends negotiating value-adds rather than pure rate cuts.";
-             sentiment = "Stable (+1.5%)";
-             sentimentColor = "#f59e0b";
-          }
-
-          // Calculate AI targets based on historical amount (if no history, fallback to a dummy baseline like 1000)
-          const baseLineForMath = prevAmount > 0 ? prevAmount : 1000;
-          const targetPrice = baseLineForMath * (1 + (trend / 100));
-          const limitPrice = targetPrice * 1.05; // Hard limit 5% above target
-          const vendorInitialEstimate = baseLineForMath * 1.15;
-
-          return {
-            id: p.id || `n${i}`,
-            name: (p.refId ? p.refId + ' - ' : '') + (p.title || 'Unknown PR'),
-            status: 'Live',
-            model: 'I3-Strike v4 (Nemotron)',
-            target: targetPrice, 
-            limit: limitPrice, 
-            vendorInitial: vendorInitialEstimate,
-            prevVendor: prevVendor,
-            prevAmount: prevAmount,
-            insight: insight,
-            trend: trend,
-            concessions: ['Net-15 Payment Terms', 'Volume Discount'],
-            messages: [
-              { sender: 'vendor', text: `We've reviewed the specs for PR ${p.refId || p.title}. We can do ${vendorInitialEstimate.toLocaleString()} for the shipment, but that's our bottom line.`, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
-            ],
-            closed: false,
-            logs: [],
-            sentiment: sentiment,
-            sentimentColor: sentimentColor
-          };
+    Promise.all([fetch('/api/intakes').then(r=>r.json()), fetch('/api/pos').then(r=>r.json())])
+      .then(([intakes, pos]) => {
+        if(!intakes||intakes.length===0) return;
+        const dbSessions: Session[] = intakes.map((p:any, i:number) => {
+          const hPO = Array.isArray(pos)?pos.find((po:any)=>po.details&&po.details.includes(p.refId)):null;
+          const prevVendor = hPO ? (hPO.vendorId||'Unknown') : 'No Historical Vendor';
+          const prevAmount = hPO ? (parseFloat(hPO.total)||0) : 0;
+          const combined = ((p.title||'')+(p.description||'')).toLowerCase();
+          let trend=-2.0, insight="Baseline analysis. Stable supply chains; recommend 2% cost reduction.", sentiment="Stable (-2.0%)", sentimentColor="#16a34a";
+          if(combined.includes('laptop')||combined.includes('hardware')){trend=-5.2;insight="Semiconductor oversupply detected. AI predicts -5.2% deflation on compute hardware.";sentiment="Deflationary (-5.2%)";}
+          else if(combined.includes('software')||combined.includes('saas')){trend=4.5;insight="SaaS vendors driving +4.5% price hikes. Lock in multi-year agreements immediately.";sentiment="Inflationary (+4.5%)";sentimentColor="#dc2626";}
+          else if(combined.includes('steel')||combined.includes('copper')){trend=8.5;insight="Supply chain threats: Copper/Steel +8.5% volatility. Secure spot pricing now.";sentiment="Highly Volatile (+8.5%)";sentimentColor="#dc2626";}
+          const base = prevAmount>0?prevAmount:1000;
+          const target = base*(1+trend/100), limit = target*1.05, vInit = base*1.15;
+          return { id:p.id||`n${i}`, name:(p.refId?p.refId+' - ':'')+( p.title||'Unknown PR'), status:'Live' as const, model:'I3-Strike v4', target, limit, vendorInitial:vInit, prevVendor, prevAmount, insight, trend, concessions:['Net-15 Payment Terms','Volume Discount'], messages:[{sender:'vendor' as const, text:`Reviewed specs for ${p.refId||p.title}. Our offer is Rs${vInit.toLocaleString('en-IN',{maximumFractionDigits:0})}.`, time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}], closed:false, logs:[], sentiment, sentimentColor };
         });
-        setSessions(dbSessions);
-        setActiveId(dbSessions[0].id);
-      }
-    })
-    .catch(err => console.error("Failed to load intel data", err));
+        setSessions(dbSessions); setActiveId(dbSessions[0].id);
+      }).catch(()=>{});
   }, []);
 
-  // Initial trigger for live sessions that only have 1 message
   useEffect(() => {
-    if (viewMode !== 'negotiator') return;
-    const session = sessions.find(s => s.id === activeId);
-    if (session && !session.closed && session.messages.length === 1 && !analyzing && !started) {
-      setStarted(true);
-      handleAgentTurn(session.messages, session);
-    }
+    if(viewMode!=='negotiator') return;
+    const s = sessions.find(x=>x.id===activeId);
+    if(s&&!s.closed&&s.messages.length===1&&!analyzing&&!started){ setStarted(true); handleAgentTurn(s.messages, s); }
   }, [activeId, viewMode, started]);
 
-  const updateSession = (id: string, updates: Partial<Session>) => {
-    setSessions(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
-  };
+  const updateSession = (id:string, u:Partial<Session>) => setSessions(prev=>prev.map(s=>s.id===id?{...s,...u}:s));
 
-  const handleAgentTurn = async (currentMessages: Message[], session: Session) => {
+  const handleAgentTurn = async (msgs: Message[], session: Session) => {
     setAnalyzing(true);
-    updateSession(session.id, { logs: ["> INITIALIZING STRATEGY ENGINE...", "> ANALYZING VENDOR MARGIN HISTORY...", "> EXECUTING LLM INFERENCE..."] });
-    
+    updateSession(session.id, {logs:['> INITIALIZING STRATEGY ENGINE...','> ANALYZING VENDOR MARGIN HISTORY...','> EXECUTING LLM INFERENCE...']});
     try {
-      const apiMessages = currentMessages.map(m => ({
-        role: m.sender === 'ai' ? 'assistant' : 'user',
-        content: m.text
-      }));
-      
-      const context = {
-        productName: session.name,
-        targetPrice: session.target,
-        maxPrice: session.limit,
-        concessions: session.concessions,
-        vendorInitialOffer: session.vendorInitial
-      };
-      
-      const res = await fetch('/api/ai/negotiate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: apiMessages, context })
-      });
-      
+      const apiMsgs = msgs.map(m=>({role:m.sender==='ai'?'assistant':'user', content:m.text}));
+      const ctx = {productName:session.name, targetPrice:session.target, maxPrice:session.limit, concessions:session.concessions, vendorInitialOffer:session.vendorInitial};
+      const res = await fetch('/api/ai/negotiate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:apiMsgs,context:ctx})});
       const data = await res.json();
-      
-      if (data.reply) {
-        let replyText = data.reply;
-        let isClosed = false;
-        
-        if (replyText.includes("CONTRACT SECURED")) {
-          isClosed = true;
-          replyText = replyText.replace("CONTRACT SECURED", "").trim();
-        }
-        
-        const aiMessage = { sender: 'ai' as const, text: replyText, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
-        
-        setSessions(prev => prev.map(s => {
-          if (s.id === session.id) {
-            return { 
-              ...s, 
-              messages: [...s.messages, aiMessage], 
-              closed: isClosed, 
-              status: isClosed ? 'Closed' : 'Live' 
-            };
-          }
-          return s;
-        }));
+      if(data.reply){
+        let rt=data.reply; let isClosed=false;
+        if(rt.includes('CONTRACT SECURED')){isClosed=true;rt=rt.replace('CONTRACT SECURED','').trim();}
+        const aiMsg:Message={sender:'ai',text:rt,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})};
+        setSessions(prev=>prev.map(s=>s.id===session.id?{...s,messages:[...s.messages,aiMsg],closed:isClosed,status:isClosed?'Closed':'Live'}:s));
       }
-    } catch (err) {
-      console.error(err);
-      const errMsg = { sender: 'ai' as const, text: "Error connecting to AI.", time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
-      updateSession(session.id, { messages: [...session.messages, errMsg] });
-    }
+    } catch { updateSession(session.id,{messages:[...session.messages,{sender:'ai',text:'Error connecting to AI.',time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}]}); }
     setAnalyzing(false);
   };
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSend = (e:React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() || analyzing || activeSession?.closed) return;
-    
-    const newMsg = { sender: 'vendor' as const, text: inputText, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
-    const updatedMessages = [...activeSession.messages, newMsg];
-    
-    updateSession(activeId, { messages: updatedMessages });
-    setInputText("");
-    
-    handleAgentTurn(updatedMessages, activeSession);
+    if(!inputText.trim()||analyzing||activeSession?.closed) return;
+    const newMsg:Message={sender:'vendor',text:inputText,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})};
+    const updated = [...activeSession.messages, newMsg];
+    updateSession(activeId,{messages:updated}); setInputText('');
+    handleAgentTurn(updated, activeSession);
   };
 
+  const liveCount = sessions.filter(s=>s.status==='Live').length;
+  const closedCount = sessions.filter(s=>s.status==='Closed').length;
+
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: '40px', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
-      {/* Cpanel Native Header */}
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'linear-gradient(135deg, var(--accent-color), #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-            <Bot size={24} />
-          </div>
+    <div style={{backgroundColor:'#f0f4f8',minHeight:'100%',fontFamily:'system-ui,sans-serif'}}>
+      <div style={{background:'linear-gradient(135deg,#071330 0%,#0d1f4f 55%,#1a2f6b 100%)',padding:'28px 32px 40px',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',top:0,right:0,width:'400px',height:'100%',background:'radial-gradient(circle at 70% 50%,rgba(59,130,246,0.12),transparent 70%)',pointerEvents:'none'}}/>
+        <div style={{position:'relative',zIndex:1,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
           <div>
-            <h1 className="page-title">AI Negotiators & Intelligence</h1>
-            <p style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>Monitor autonomous agents and predict market pricing.</p>
+            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'8px'}}><Brain size={18} color="rgba(255,255,255,0.55)"/><p style={{color:'rgba(255,255,255,0.55)',fontSize:'0.72rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.08em',margin:0}}>AI Platform</p></div>
+            <h1 style={{color:'#fff',fontSize:'1.8rem',fontWeight:800,margin:'0 0 6px',letterSpacing:'-0.5px'}}>AI Negotiator</h1>
+            <p style={{color:'rgba(255,255,255,0.5)',margin:0,fontSize:'0.9rem'}}>Autonomous AI agents negotiating procurement contracts in real-time.</p>
+          </div>
+          <div style={{display:'flex',gap:'10px',alignItems:'center'}}>
+            <div style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'12px',padding:'10px 18px',display:'flex',gap:'18px'}}>
+              {[{val:liveCount,label:'Live',color:'#4ade80'},{val:closedCount,label:'Closed',color:'#94a3b8'},{val:'12.4%',label:'Avg Savings',color:'#60a5fa'}].map((m,i)=>(
+                <div key={i} style={{textAlign:'center'}}><div style={{fontSize:'1.2rem',fontWeight:800,color:m.color}}>{m.val}</div><div style={{fontSize:'0.6rem',color:'rgba(255,255,255,0.4)',fontWeight:600,textTransform:'uppercase'}}>{m.label}</div></div>
+              ))}
+            </div>
+            <button onClick={()=>setShowDeployModal(true)} style={{display:'flex',alignItems:'center',gap:'7px',padding:'10px 18px',background:'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.2)',borderRadius:'10px',color:'#fff',fontWeight:600,fontSize:'0.82rem',cursor:'pointer'}}><Plus size={15}/> Deploy Agent</button>
           </div>
         </div>
-        
       </div>
 
-      {viewMode === 'negotiator' ? (
-        /* -------------------------- LIVE NEGOTIATOR VIEW -------------------------- */
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '24px', marginTop: '24px' }}>
-          
-          {/* Left Sidebar: Active Nodes */}
-          <div className="surface" style={{ gridColumn: 'span 3', display: 'flex', flexDirection: 'column', height: '700px' }}>
-            <h3 style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid var(--surface-border)', paddingBottom: '16px' }}>
-              <Activity size={16} color="var(--success-color)" /> Active Nodes
-            </h3>
-            
-            <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {sessions.map(s => (
-                <div 
-                  key={s.id}
-                  onClick={() => { setActiveId(s.id); setStarted(false); }}
-                  style={{ 
-                    padding: '16px', 
-                    borderRadius: '12px', 
-                    background: activeId === s.id ? (s.closed ? 'rgba(16,185,129,0.05)' : 'rgba(139, 92, 246, 0.05)') : 'var(--bg-color)', 
-                    border: activeId === s.id ? (s.closed ? '1px solid rgba(16,185,129,0.2)' : '1px solid rgba(139, 92, 246, 0.2)') : '1px solid var(--surface-border)', 
-                    borderLeft: activeId === s.id ? (s.closed ? '4px solid var(--success-color)' : '4px solid #8b5cf6') : '4px solid transparent', 
-                    cursor: 'pointer',
-                    opacity: s.closed && activeId !== s.id ? 0.6 : 1,
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                    <h4 style={{ fontWeight: 'bold', color: 'var(--text-primary)', margin: 0, fontSize: '14px' }}>{s.name}</h4>
-                    <span style={{ 
-                      fontSize: '10px', 
-                      fontWeight: 'bold', 
-                      textTransform: 'uppercase', 
-                      background: s.closed ? 'rgba(16, 185, 129, 0.1)' : 'rgba(139, 92, 246, 0.1)', 
-                      color: s.closed ? 'var(--success-color)' : '#8b5cf6', 
-                      padding: '4px 8px', 
-                      borderRadius: '12px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '4px' 
-                    }}>
-                      {!s.closed && <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#8b5cf6', animation: 'pulse 2s infinite' }}></div>}
-                      {s.status}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-secondary)', fontFamily: 'monospace', marginBottom: '12px' }}>
-                    <Cpu size={12} /> Model: {s.model}
-                  </div>
-                  {s.closed ? (
-                    <div style={{ background: '#fff', borderRadius: '6px', padding: '8px', border: '1px solid var(--surface-border)', display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Final Status</span>
-                      <span style={{ fontWeight: 'bold', color: 'var(--success-color)' }}>Secured</span>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '11px' }}>
-                      <div style={{ background: '#fff', borderRadius: '6px', padding: '8px', border: '1px solid var(--surface-border)' }}>
-                        <span style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: '4px' }}>Limit</span>
-                        <span style={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--text-primary)' }}>${s.limit.toLocaleString()}</span>
-                      </div>
-                      <div style={{ background: 'rgba(139,92,246,0.1)', borderRadius: '6px', padding: '8px', border: '1px solid rgba(139,92,246,0.2)' }}>
-                        <span style={{ display: 'block', color: '#8b5cf6', marginBottom: '4px' }}>Rounds</span>
-                        <span style={{ fontWeight: 'bold', color: '#6d28d9' }}>{Math.floor(s.messages.length / 2) + 1}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Center: Live Negotiation View */}
-          <div style={{ gridColumn: 'span 6', display: 'flex', flexDirection: 'column', height: '700px', borderRadius: '16px', border: '1px solid #1e293b', background: '#0f172a', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
-            <div style={{ background: '#020617', padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 10 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ position: 'relative' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#1e293b', border: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-                    <Bot size={20} />
-                  </div>
-                  <div style={{ position: 'absolute', bottom: 0, right: 0, width: '12px', height: '12px', background: activeSession?.closed ? '#64748b' : 'var(--success-color)', borderRadius: '50%', border: '2px solid #020617' }}></div>
-                </div>
-                <div>
-                  <h3 style={{ fontWeight: 'bold', color: '#f8fafc', fontSize: '16px', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    ProcGen Agent ({activeSession?.name || 'Unknown'})
-                    {analyzing && <Sparkles size={14} color="#8b5cf6" className="pulse-anim" />}
-                  </h3>
-                  <p style={{ fontSize: '11px', fontFamily: 'monospace', color: '#94a3b8', margin: '4px 0 0 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <ShieldCheck size={12} color="var(--success-color)" /> Authorized Limit: <span style={{ color: 'var(--success-color)' }}>${activeSession?.limit.toLocaleString() || '0'}</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div ref={chatRef} style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '24px', backgroundImage: 'radial-gradient(#1e293b 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
-              {activeSession?.messages.map((m, i) => (
-                <div key={i} className="animate-fade-in" style={{ display: 'flex', gap: '16px', flexDirection: m.sender === 'ai' ? 'row-reverse' : 'row' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#fff', background: m.sender === 'ai' ? 'linear-gradient(135deg, #8b5cf6, #d946ef)' : '#334155', border: m.sender === 'ai' ? 'none' : '1px solid #475569' }}>
-                    {m.sender === 'ai' ? <Bot size={18} /> : <span style={{ fontWeight: 'bold', fontSize: '14px', color: '#cbd5e1' }}>V</span>}
-                  </div>
-                  <div style={{ maxWidth: '80%', padding: '16px', borderRadius: '16px', borderTopLeftRadius: m.sender === 'ai' ? '16px' : '4px', borderTopRightRadius: m.sender === 'ai' ? '4px' : '16px', background: m.sender === 'ai' ? '#1e1b4b' : '#1e293b', border: m.sender === 'ai' ? '1px solid rgba(139,92,246,0.3)' : '1px solid #334155', color: '#f1f5f9', boxShadow: m.sender === 'ai' ? '0 10px 15px -3px rgba(139,92,246,0.1)' : 'none' }}>
-                    <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0, whiteSpace: 'pre-wrap' }}>{m.text}</p>
-                    <p style={{ fontSize: '10px', marginTop: '12px', fontFamily: 'monospace', textAlign: m.sender === 'ai' ? 'right' : 'left', color: m.sender === 'ai' ? '#c4b5fd' : '#94a3b8' }}>{m.time}</p>
-                  </div>
-                </div>
-              ))}
-              {analyzing && (
-                <div style={{ display: 'flex', justifyContent: 'flex-end', paddingRight: '52px', paddingLeft: '52px' }}>
-                  <div style={{ background: '#020617', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '12px', padding: '16px', width: '100%', maxWidth: '90%', boxShadow: '0 0 20px rgba(16,185,129,0.05)', position: 'relative', overflow: 'hidden' }}>
-                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '2px', background: 'linear-gradient(90deg, var(--success-color), transparent)', opacity: 0.5 }}></div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', borderBottom: '1px solid rgba(16,185,129,0.2)', paddingBottom: '8px', color: 'rgba(16,185,129,0.7)', fontSize: '11px', fontFamily: 'monospace' }}>
-                      <Terminal size={12} /> execution_trace.log
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--success-color)', fontSize: '11px', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {activeSession?.logs.map((log, i) => (
-                         <div key={i} className="animate-fade-in">{log}</div>
-                      ))}
-                      <div className="pulse-anim">_</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div style={{ padding: '20px', background: '#020617', borderTop: '1px solid #1e293b', zIndex: 10 }}>
-               {activeSession?.closed ? (
-                  <div className="animate-fade-in" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ width: '40px', height: '40px', background: 'rgba(16,185,129,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(16,185,129,0.3)' }}>
-                        <CheckCircle2 size={20} color="var(--success-color)" />
-                      </div>
-                      <div>
-                        <p style={{ fontWeight: 'bold', color: 'var(--success-color)', fontSize: '14px', letterSpacing: '0.05em', margin: 0 }}>CONTRACT SECURED</p>
-                        <p style={{ color: 'rgba(16,185,129,0.7)', fontSize: '12px', fontFamily: 'monospace', margin: '4px 0 0 0' }}>Autonomously locked via NVIDIA Nemotron.</p>
-                      </div>
-                    </div>
-                    <button style={{ background: 'var(--success-color)', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 0 15px rgba(16,185,129,0.4)' }}>
-                      Review PO
-                    </button>
-                  </div>
-               ) : (
-                  <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '12px' }}>
-                    <input 
-                      type="text" 
-                      value={inputText}
-                      onChange={(e) => setInputText(e.target.value)}
-                      placeholder={`Type as the Vendor for ${activeSession?.name}...`}
-                      disabled={analyzing}
-                      style={{ flex: 1, background: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '12px 16px', borderRadius: '8px', outline: 'none' }}
-                    />
-                    <button type="submit" disabled={analyzing} style={{ background: analyzing ? '#334155' : 'var(--accent-color)', color: '#fff', border: 'none', padding: '0 24px', borderRadius: '8px', fontWeight: 'bold', cursor: analyzing ? 'not-allowed' : 'pointer' }}>
-                      {analyzing ? 'Thinking...' : 'Send'}
-                    </button>
-                  </form>
-               )}
-            </div>
-          </div>
-
-          {/* Right Sidebar: Telemetry */}
-          <div style={{ gridColumn: 'span 3', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-             <div className="surface" style={{ position: 'relative', overflow: 'hidden' }}>
-               <h3 style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid var(--surface-border)', paddingBottom: '16px' }}>
-                 <Target size={14} color="var(--success-color)" /> Telemetry Data
-               </h3>
-               
-               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative', zIndex: 10 }}>
-                  <div style={{ background: 'var(--bg-color)', borderRadius: '12px', padding: '16px', border: '1px solid var(--surface-border)' }}>
-                    <p style={{ fontSize: '10px', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.05em' }}>Target Price</p>
-                    <p style={{ fontSize: '24px', fontFamily: 'monospace', fontWeight: '900', color: 'var(--text-primary)', margin: 0 }}>${activeSession?.target.toLocaleString()}</p>
-                  </div>
-                  <div style={{ background: 'var(--bg-color)', borderRadius: '12px', padding: '16px', border: '1px solid var(--surface-border)' }}>
-                    <p style={{ fontSize: '10px', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.05em' }}>Authorized Limit</p>
-                    <p style={{ fontSize: '24px', fontFamily: 'monospace', fontWeight: '900', color: '#94a3b8', margin: 0 }}>${activeSession?.limit.toLocaleString()}</p>
-                  </div>
-                  <div style={{ background: 'var(--bg-color)', borderRadius: '12px', padding: '16px', border: '1px solid var(--surface-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <p style={{ fontSize: '10px', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.05em' }}>Market Sentiment</p>
-                      <p style={{ fontSize: '14px', fontWeight: 'bold', color: activeSession?.sentimentColor, margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <TrendingDown size={14} /> {activeSession?.sentiment}
-                      </p>
-                    </div>
-                  </div>
-               </div>
-             </div>
-
-             <div className="surface" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-               <h3 style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid var(--surface-border)', paddingBottom: '16px' }}>
-                 <Settings2 size={14} color="#8b5cf6" /> Guardrails
-               </h3>
-               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', flex: 1 }}>
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '8px' }}>
-                      <span style={{ color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold', fontSize: '10px', letterSpacing: '0.05em' }}>Aggression</span>
-                      <span style={{ color: '#8b5cf6', fontFamily: 'monospace', fontWeight: 'bold' }}>COLLABORATIVE</span>
-                    </div>
-                    <div style={{ height: '6px', width: '100%', background: 'var(--bg-color)', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--surface-border)' }}>
-                      <div style={{ height: '100%', background: 'linear-gradient(90deg, #8b5cf6, #d946ef)', width: '40%' }}></div>
-                    </div>
-                  </div>
-                  
-                  <div style={{ marginTop: 'auto', paddingTop: '24px', borderTop: '1px solid var(--surface-border)' }}>
-                     <p style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '12px' }}>Allowed Concessions</p>
-                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                       {activeSession?.concessions.map((c, idx) => (
-                          <span key={idx} style={{ background: 'rgba(16,185,129,0.1)', color: 'var(--success-color)', padding: '6px 12px', borderRadius: '8px', fontSize: '10px', fontFamily: 'monospace', border: '1px solid rgba(16,185,129,0.2)' }}>{c}</span>
-                       ))}
-                     </div>
-                  </div>
-               </div>
-             </div>
-          </div>
+      <div style={{padding:'0 32px 40px',marginTop:'-24px',position:'relative',zIndex:10}}>
+        <div style={{display:'flex',gap:'10px',marginBottom:'20px'}}>
+          {[{key:'predictor',label:'Market Intelligence'},{key:'negotiator',label:'Live Negotiator'}].map(v=>{
+            const active=viewMode===v.key;
+            return(<button key={v.key} onClick={()=>{setViewMode(v.key as any);setStarted(false);}}
+              style={{display:'flex',alignItems:'center',gap:'8px',padding:'11px 20px',borderRadius:'12px',border:active?'none':'1px solid #e2e8f0',background:active?'linear-gradient(135deg,#0d1f4f,#1a2f6b)':'#fff',color:active?'#fff':'#64748b',fontWeight:700,fontSize:'0.875rem',cursor:'pointer',boxShadow:active?'0 4px 12px rgba(13,31,79,0.3)':'0 2px 6px rgba(0,0,0,0.04)',transition:'all 0.2s'}}>
+              {v.key==='predictor'?<Activity size={16}/>:<Bot size={16}/>} {v.label}
+            </button>);
+          })}
         </div>
-      ) : (
-        /* -------------------------- PREDICTIVE INTEL VIEW -------------------------- */
-        <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '24px', marginTop: '24px' }}>
-          
-          {/* Main Predictor Column */}
-          <div style={{ gridColumn: 'span 8', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            
-            {/* Intel Query Block */}
-            <div className="surface" style={{ padding: '32px' }}>
-              <h2 style={{ margin: '0 0 8px 0', color: 'var(--text-primary)', fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <LineChart color="#8b5cf6" /> Pre-Event Market Intelligence
-              </h2>
-              <p style={{ color: 'var(--text-secondary)', margin: '0 0 24px 0' }}>Select a product to analyze its historical quotation cycle and generate AI-driven target pricing before floating an event.</p>
-              
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <select value={activeId} onChange={(e) => setActiveId(e.target.value)} style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'var(--bg-color)', color: 'var(--text-primary)', fontSize: '16px', outline: 'none' }}>
-                  {sessions.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                </select>
-                <button onClick={() => { setIsPredicting(true); setTimeout(() => setIsPredicting(false), 2000); }} style={{ padding: '12px 24px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', color: '#fff', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {isPredicting ? <Sparkles size={18} className="pulse-anim" /> : <Sparkles size={18} />} {isPredicting ? 'Analyzing Market...' : 'Analyze PR'}
-                  </button>
+
+        {viewMode==='predictor' ? (
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(360px,1fr))',gap:'16px'}}>
+            {sessions.map(s=>{
+              const tUp=(s.trend||0)>0;
+              return(
+                <div key={s.id} style={{backgroundColor:'#fff',borderRadius:'16px',border:'1px solid #e2e8f0',overflow:'hidden',boxShadow:'0 4px 12px rgba(0,0,0,0.05)',transition:'all 0.2s'}}
+                  onMouseOver={e=>{(e.currentTarget as HTMLElement).style.boxShadow='0 8px 24px rgba(0,0,0,0.1)';(e.currentTarget as HTMLElement).style.transform='translateY(-2px)';}}
+                  onMouseOut={e=>{(e.currentTarget as HTMLElement).style.boxShadow='0 4px 12px rgba(0,0,0,0.05)';(e.currentTarget as HTMLElement).style.transform='translateY(0)';}}>
+                  <div style={{background:'linear-gradient(135deg,#0d1f4f,#1a2f6b)',padding:'16px 20px'}}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'14px'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                        <div style={{width:'38px',height:'38px',borderRadius:'10px',background:'rgba(255,255,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center'}}><Brain size={19} color="#93c5fd"/></div>
+                        <div><div style={{color:'#fff',fontWeight:800,fontSize:'0.92rem'}}>{s.name}</div><div style={{color:'rgba(255,255,255,0.4)',fontSize:'0.7rem',marginTop:'2px'}}>{s.model}</div></div>
+                      </div>
+                      <span style={{padding:'3px 9px',borderRadius:'12px',fontSize:'0.68rem',fontWeight:700,background:s.status==='Live'?'rgba(74,222,128,0.15)':'rgba(148,163,184,0.15)',color:s.status==='Live'?'#4ade80':'#94a3b8'}}>{s.status==='Live'&&<span style={{display:'inline-block',width:'6px',height:'6px',borderRadius:'50%',background:'#4ade80',marginRight:'5px',verticalAlign:'middle'}}/>}{s.status}</span>
+                    </div>
+                    <div style={{display:'flex',gap:'10px'}}>
+                      {[{l:'Target',v:`Rs${s.target.toLocaleString('en-IN',{maximumFractionDigits:0})}`,c:'#93c5fd'},{l:'Vendor Ask',v:`Rs${s.vendorInitial.toLocaleString('en-IN',{maximumFractionDigits:0})}`,c:'#fca5a5'}].map((r,i)=>(
+                        <div key={i} style={{flex:1,background:'rgba(255,255,255,0.06)',borderRadius:'8px',padding:'10px 12px'}}>
+                          <div style={{fontSize:'0.62rem',color:'rgba(255,255,255,0.4)',fontWeight:700,textTransform:'uppercase',marginBottom:'4px'}}>{r.l}</div>
+                          <div style={{fontSize:'0.95rem',fontWeight:800,color:r.c}}>{r.v}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{padding:'16px 20px'}}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
+                      <span style={{fontSize:'0.68rem',fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.04em'}}>Market Sentiment</span>
+                      <div style={{display:'flex',alignItems:'center',gap:'5px',padding:'3px 9px',borderRadius:'12px',background:tUp?'#fef2f2':'#dcfce7',border:`1px solid ${tUp?'#fca5a5':'#86efac'}`}}>
+                        {tUp?<ArrowUpRight size={12} color="#dc2626"/>:<ArrowDownRight size={12} color="#16a34a"/>}
+                        <span style={{fontSize:'0.7rem',fontWeight:700,color:tUp?'#dc2626':'#16a34a'}}>{s.sentiment}</span>
+                      </div>
+                    </div>
+                    {s.insight&&<div style={{background:'linear-gradient(135deg,#f0f7ff,#eff6ff)',border:'1px solid #bfdbfe',borderRadius:'10px',padding:'12px',fontSize:'0.78rem',color:'#1e3a8a',lineHeight:1.6,marginBottom:'12px'}}><div style={{display:'flex',alignItems:'center',gap:'5px',marginBottom:'5px',fontWeight:700,fontSize:'0.65rem',color:'#2563eb',textTransform:'uppercase'}}><Sparkles size={11}/>AI Insight</div>{s.insight}</div>}
+                    <button onClick={()=>{setViewMode('negotiator');setActiveId(s.id);setStarted(false);}} style={{width:'100%',padding:'9px',background:'#eff6ff',border:'1px solid #bfdbfe',borderRadius:'9px',color:'#2563eb',fontWeight:700,fontSize:'0.78rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}><Bot size={14}/> Launch Negotiator</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div style={{display:'grid',gridTemplateColumns:'270px 1fr 290px',gap:'16px',height:'calc(100vh - 260px)',minHeight:'500px'}}>
+            <div style={{backgroundColor:'#fff',borderRadius:'16px',border:'1px solid #e2e8f0',overflow:'hidden',display:'flex',flexDirection:'column',boxShadow:'0 4px 12px rgba(0,0,0,0.05)'}}>
+              <div style={{padding:'12px 16px',borderBottom:'1px solid #f1f5f9',background:'#fafbfc'}}><div style={{fontSize:'0.68rem',fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.05em'}}>Active Sessions</div></div>
+              <div style={{flex:1,overflowY:'auto'}}>
+                {sessions.map(s=>(
+                  <div key={s.id} onClick={()=>{setActiveId(s.id);setStarted(false);}}
+                    style={{padding:'12px 16px',borderBottom:'1px solid #f8fafc',cursor:'pointer',borderLeft:activeId===s.id?'3px solid #2563eb':'3px solid transparent',background:activeId===s.id?'#eff6ff':'transparent',transition:'all 0.12s'}}
+                    onMouseOver={e=>{if(activeId!==s.id)(e.currentTarget as HTMLElement).style.background='#f8fafc';}}
+                    onMouseOut={e=>{if(activeId!==s.id)(e.currentTarget as HTMLElement).style.background='transparent';}}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'4px'}}>
+                      <div style={{fontWeight:700,color:activeId===s.id?'#1e3a8a':'#0f172a',fontSize:'0.8rem',flex:1,paddingRight:'6px',lineHeight:1.3}}>{s.name}</div>
+                      <span style={{padding:'2px 6px',borderRadius:'8px',fontSize:'0.62rem',fontWeight:700,flexShrink:0,background:s.status==='Live'?'#dcfce7':'#f1f5f9',color:s.status==='Live'?'#15803d':'#64748b'}}>{s.status}</span>
+                    </div>
+                    <div style={{fontSize:'0.68rem',color:'#94a3b8',marginBottom:'6px'}}>{s.model}</div>
+                    <div style={{height:'3px',borderRadius:'2px',background:'#f1f5f9'}}><div style={{height:'100%',width:`${Math.min(100,((s.vendorInitial-s.target)/s.vendorInitial)*100+30)}%`,background:'linear-gradient(90deg,#2563eb,#0d1f4f)',borderRadius:'2px'}}/></div>
+                  </div>
+                ))}
+              </div>
+              <div style={{padding:'12px',borderTop:'1px solid #f1f5f9'}}><button onClick={()=>setShowDeployModal(true)} style={{width:'100%',padding:'9px',background:'linear-gradient(135deg,#0d1f4f,#1a2f6b)',border:'none',borderRadius:'9px',color:'#fff',fontWeight:700,fontSize:'0.78rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}}><Plus size={13}/> New Session</button></div>
+            </div>
+
+            <div style={{backgroundColor:'#fff',borderRadius:'16px',border:'1px solid #e2e8f0',display:'flex',flexDirection:'column',overflow:'hidden',boxShadow:'0 4px 12px rgba(0,0,0,0.05)'}}>
+              <div style={{padding:'13px 18px',borderBottom:'1px solid #f1f5f9',background:'linear-gradient(135deg,#0d1f4f,#1a2f6b)',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                  <div style={{width:'32px',height:'32px',borderRadius:'9px',background:'rgba(255,255,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center'}}><Bot size={16} color="#93c5fd"/></div>
+                  <div><div style={{color:'#fff',fontWeight:800,fontSize:'0.88rem'}}>{activeSession?.name}</div><div style={{color:'rgba(255,255,255,0.45)',fontSize:'0.68rem'}}>{activeSession?.model}</div></div>
+                </div>
+                <span style={{padding:'3px 9px',borderRadius:'10px',fontSize:'0.68rem',fontWeight:700,background:activeSession?.status==='Live'?'rgba(74,222,128,0.15)':'rgba(148,163,184,0.15)',color:activeSession?.status==='Live'?'#4ade80':'#94a3b8'}}>{activeSession?.status==='Live'&&<span style={{display:'inline-block',width:'6px',height:'6px',borderRadius:'50%',background:'#4ade80',marginRight:'4px',verticalAlign:'middle'}}/>}{activeSession?.status}</span>
+              </div>
+              <div ref={chatRef} style={{flex:1,padding:'16px',overflowY:'auto',display:'flex',flexDirection:'column',gap:'12px',background:'#f8fafc',backgroundImage:'radial-gradient(#e2e8f0 1px,transparent 1px)',backgroundSize:'24px 24px'}}>
+                {activeSession?.messages.map((msg,i)=>(
+                  <div key={i} style={{display:'flex',flexDirection:'column',alignItems:msg.sender==='vendor'?'flex-start':'flex-end'}}>
+                    <div style={{fontSize:'0.62rem',color:'#94a3b8',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.04em',marginBottom:'4px',display:'flex',alignItems:'center',gap:'5px'}}>
+                      {msg.sender==='ai'&&<><div style={{width:'18px',height:'18px',borderRadius:'5px',background:'linear-gradient(135deg,#0d1f4f,#2563eb)',display:'flex',alignItems:'center',justifyContent:'center'}}><Bot size={10} color="#fff"/></div>AI Negotiator</>}
+                      {msg.sender==='vendor'&&<><div style={{width:'18px',height:'18px',borderRadius:'5px',background:'#f1f5f9',display:'flex',alignItems:'center',justifyContent:'center'}}><Zap size={10} color="#64748b"/></div>Vendor</>}
+                    </div>
+                    <div style={{maxWidth:'78%',padding:'10px 14px',borderRadius:msg.sender==='ai'?'14px 14px 2px 14px':'14px 14px 14px 2px',background:msg.sender==='ai'?'linear-gradient(135deg,#1e3a8a,#2563eb)':msg.text==='CONTRACT SECURED'?'linear-gradient(135deg,#14532d,#16a34a)':'#fff',color:msg.sender==='ai'||msg.text==='CONTRACT SECURED'?'#fff':'#0f172a',fontSize:'0.875rem',lineHeight:1.6,border:msg.sender==='vendor'?'1px solid #e2e8f0':'none',boxShadow:'0 2px 6px rgba(0,0,0,0.06)',display:'flex',alignItems:'center',gap:'8px'}}>
+                      {msg.text==='CONTRACT SECURED'&&<CheckCircle2 size={15}/>}{msg.text}
+                    </div>
+                    <div style={{marginTop:'3px',fontSize:'0.62rem',color:'#94a3b8'}}>{msg.time}</div>
+                  </div>
+                ))}
+                {analyzing&&(
+                  <div style={{display:'flex',alignItems:'center',gap:'10px',padding:'10px 14px',background:'#fff',borderRadius:'12px',border:'1px solid #e2e8f0'}}>
+                    <div style={{width:'26px',height:'26px',borderRadius:'8px',background:'linear-gradient(135deg,#0d1f4f,#2563eb)',display:'flex',alignItems:'center',justifyContent:'center'}}><Cpu size={13} color="#fff"/></div>
+                    <div><div style={{fontSize:'0.75rem',fontWeight:700,color:'#1e3a8a',marginBottom:'3px'}}>AI Processing...</div><div style={{display:'flex',gap:'4px'}}>{[0,1,2].map(i=><div key={i} style={{width:'6px',height:'6px',borderRadius:'50%',background:'#2563eb',animation:`bounce 1.2s ${i*0.2}s infinite`}}/>)}</div></div>
+                  </div>
+                )}
+              </div>
+              <div style={{padding:'12px 16px',borderTop:'1px solid #f1f5f9',background:'#fff'}}>
+                {activeSession?.closed
+                  ?<div style={{textAlign:'center',padding:'10px',background:'#dcfce7',borderRadius:'10px',color:'#15803d',fontWeight:700,fontSize:'0.82rem',display:'flex',alignItems:'center',justifyContent:'center',gap:'7px'}}><CheckCircle2 size={15}/>Contract Secured</div>
+                  :<form onSubmit={handleSend} style={{display:'flex',gap:'8px',alignItems:'center',background:'#f8fafc',border:'1px solid #e2e8f0',borderRadius:'10px',padding:'5px 5px 5px 12px'}}>
+                    <input value={inputText} onChange={e=>setInputText(e.target.value)} placeholder="Simulate a vendor message..." style={{flex:1,border:'none',outline:'none',background:'transparent',fontSize:'0.875rem',color:'#0f172a'}}/>
+                    <button type="submit" disabled={!inputText.trim()||analyzing} style={{padding:'7px 14px',background:inputText.trim()&&!analyzing?'linear-gradient(135deg,#1e3a8a,#2563eb)':'#e2e8f0',color:inputText.trim()&&!analyzing?'#fff':'#94a3b8',border:'none',borderRadius:'8px',fontWeight:700,fontSize:'0.78rem',cursor:inputText.trim()&&!analyzing?'pointer':'not-allowed',display:'flex',alignItems:'center',gap:'5px'}}><Zap size={13}/>Send</button>
+                  </form>
+                }
               </div>
             </div>
 
-            {/* Historical Cycle Analysis */}
-            <div className="surface" style={{ padding: '32px' }}>
-              <h3 style={{ margin: '0 0 24px 0', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <History size={16} /> Previous Quotation Cycle (Last 6 Months)
-              </h3>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {/* Event Summary */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '12px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
-                  <div>
-                    <p style={{ fontSize: '12px', color: '#3b82f6', fontWeight: 'bold', margin: '0 0 4px 0' }}>EVENT: EV-2023-Q4-001</p>
-                    <p style={{ margin: 0, color: 'var(--text-primary)', fontWeight: 'bold' }}>{activeSession?.name || 'Raw Materials'}</p>
+            <div style={{backgroundColor:'#fff',borderRadius:'16px',border:'1px solid #e2e8f0',display:'flex',flexDirection:'column',overflow:'hidden',boxShadow:'0 4px 12px rgba(0,0,0,0.05)'}}>
+              <div style={{padding:'13px 16px',borderBottom:'1px solid #f1f5f9',background:'linear-gradient(135deg,#0d1f4f,#1a2f6b)',display:'flex',alignItems:'center',gap:'7px'}}><Activity size={14} color="rgba(255,255,255,0.6)"/><span style={{color:'#fff',fontWeight:800,fontSize:'0.85rem'}}>Intelligence Feed</span></div>
+              <div style={{flex:1,padding:'14px',overflowY:'auto'}}>
+                <div style={{fontSize:'0.65rem',fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.05em',marginBottom:'8px'}}>Pricing Targets</div>
+                {[{label:'Target',val:`Rs${activeSession?.target.toLocaleString('en-IN',{maximumFractionDigits:0})}`,color:'#16a34a'},{label:'Max Limit',val:`Rs${activeSession?.limit.toLocaleString('en-IN',{maximumFractionDigits:0})}`,color:'#d97706'},{label:'Vendor Ask',val:`Rs${activeSession?.vendorInitial.toLocaleString('en-IN',{maximumFractionDigits:0})}`,color:'#dc2626'}].map((r,i)=>(
+                  <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'7px 10px',borderRadius:'7px',background:i%2===0?'#f8fafc':'#fff',border:'1px solid #f1f5f9',marginBottom:'5px'}}>
+                    <span style={{fontSize:'0.75rem',color:'#64748b'}}>{r.label}</span><span style={{fontWeight:800,color:r.color,fontSize:'0.8rem'}}>{r.val}</span>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 4px 0' }}>Awarded PO Price</p>
-                    <p style={{ margin: 0, color: 'var(--success-color)', fontWeight: 'bold', fontSize: '18px' }}>{(activeSession?.prevAmount != null && activeSession?.prevAmount !== 0 ? activeSession.prevAmount : 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                  </div>
-                </div>
-
-                {/* Bidders Table */}
-                <div style={{ border: '1px solid var(--surface-border)', borderRadius: '12px', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-                    <thead>
-                      <tr style={{ background: 'var(--bg-color)', borderBottom: '1px solid var(--surface-border)', textAlign: 'left', color: 'var(--text-secondary)' }}>
-                        <th style={{ padding: '12px 16px', fontWeight: '600' }}>Vendor</th>
-                        <th style={{ padding: '12px 16px', fontWeight: '600' }}>Initial Bid</th>
-                        <th style={{ padding: '12px 16px', fontWeight: '600' }}>Final AI Negotiated Price</th>
-                        <th style={{ padding: '12px 16px', fontWeight: '600', textAlign: 'center' }}>Result</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr style={{ borderBottom: '1px solid var(--surface-border)' }}>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: '500' }}>{activeSession?.prevVendor || 'Global Steel Corp'}</td>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>{(activeSession?.vendorInitial || 45000).toLocaleString()}</td>
-                        <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: 'bold' }}>{(activeSession?.prevAmount != null && activeSession?.prevAmount !== 0 ? activeSession.prevAmount : 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                        <td style={{ padding: '12px 16px', textAlign: 'center' }}>
-                          <span style={{ background: 'rgba(16,185,129,0.1)', color: 'var(--success-color)', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>AWARDED</span>
-                        </td>
-                      </tr>
-                      
-                    </tbody>
-                  </table>
-                </div>
+                ))}
+                {activeSession?.insight&&<><div style={{fontSize:'0.65rem',fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.05em',marginTop:'14px',marginBottom:'8px',display:'flex',alignItems:'center',gap:'5px'}}><Sparkles size={11}/>Market Intel</div>
+                <div style={{background:'linear-gradient(135deg,#f0f7ff,#eff6ff)',border:'1px solid #bfdbfe',borderRadius:'10px',padding:'12px',fontSize:'0.76rem',color:'#1e3a8a',lineHeight:1.6}}>{activeSession.insight}</div></>}
+                {activeSession?.concessions?.length>0&&<><div style={{fontSize:'0.65rem',fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.05em',marginTop:'14px',marginBottom:'8px'}}>Levers</div>
+                {activeSession.concessions.map((c,i)=><div key={i} style={{display:'flex',alignItems:'center',gap:'7px',padding:'7px 10px',borderRadius:'8px',background:'#faf5ff',border:'1px solid #c4b5fd',marginBottom:'5px'}}><CheckCircle2 size={12} color="#7c3aed"/><span style={{fontSize:'0.76rem',color:'#5b21b6',fontWeight:600}}>{c}</span></div>)}</>}
+                {analyzing&&activeSession?.logs?.length>0&&<><div style={{fontSize:'0.65rem',fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.05em',marginTop:'14px',marginBottom:'8px',display:'flex',alignItems:'center',gap:'5px'}}><Cpu size={11}/>Logs</div>
+                <div style={{background:'#0f172a',borderRadius:'10px',padding:'12px',fontFamily:'monospace',fontSize:'0.68rem',color:'#4ade80',lineHeight:1.8}}>{activeSession.logs.map((l,i)=><div key={i}>{l}</div>)}<div>_</div></div></>}
               </div>
             </div>
           </div>
+        )}
+      </div>
 
-          {/* Right Predictor Sidebar */}
-          <div style={{ gridColumn: 'span 4', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            
-            {/* Pricing Recommendation */}
-            <div className="surface" style={{ padding: '24px', background: 'linear-gradient(180deg, var(--surface-color) 0%, rgba(139, 92, 246, 0.05) 100%)', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-                <Bot color="#8b5cf6" size={24} />
-                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold', color: 'var(--text-primary)' }}>AI Price Prediction</h3>
-              </div>
-              
-              <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '24px' }}>
-                {activeSession?.insight || "Based on historical PO data, combined with current macroeconomic inflation indicators, the AI recommends adjusting your guardrails before floating the new event."}
-              </p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
-                <div style={{ background: 'var(--bg-color)', padding: '16px', borderRadius: '12px', border: '1px solid var(--surface-border)' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.05em' }}>Recommended Target Price</span>
-                  <p style={{ margin: '4px 0 0', fontSize: '24px', fontWeight: 'bold', color: 'var(--success-color)' }}>
-                    {(activeSession?.target || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                  </p>
-                  <p style={{ margin: '4px 0 0', fontSize: '11px', color: 'var(--success-color)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <TrendingDown size={12} style={{ transform: (activeSession?.trend || 0) > 0 ? 'rotate(180deg)' : 'none' }} /> {(activeSession?.trend || -2.0) > 0 ? '+' : ''}{activeSession?.trend || -2.0}% from last cycle
-                  </p>
-                </div>
-                <div style={{ background: 'var(--bg-color)', padding: '16px', borderRadius: '12px', border: '1px solid var(--surface-border)' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.05em' }}>Recommended Hard Limit</span>
-                  <p style={{ margin: '4px 0 0', fontSize: '24px', fontWeight: 'bold', color: 'var(--warning-color)' }}>
-                    {(activeSession?.limit || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                  </p>
-                  <p style={{ margin: '4px 0 0', fontSize: '11px', color: 'var(--warning-color)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Settings2 size={12} /> +5.0% buffer above target
-                  </p>
-                </div>
-              </div>
-
-              <button onClick={() => window.location.href = '/client/events/create/auction?pr=' + activeSession?.id} style={{ width: '100%', padding: '16px', borderRadius: '12px', border: 'none', background: '#0f172a', color: '#fff', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}>
-                  Apply & Float New Event <Zap size={16} fill="#eab308" color="#eab308" />
-                </button>
+      {showDeployModal&&(
+        <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.6)',backdropFilter:'blur(4px)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setShowDeployModal(false)}>
+          <div style={{background:'#fff',borderRadius:'20px',width:'440px',maxWidth:'92vw',boxShadow:'0 30px 60px rgba(0,0,0,0.25)',overflow:'hidden'}} onClick={e=>e.stopPropagation()}>
+            <div style={{background:'linear-gradient(135deg,#071330,#0d1f4f)',padding:'20px 24px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px'}}><Brain size={19} color="#93c5fd"/><h2 style={{margin:0,fontSize:'1rem',fontWeight:800,color:'#fff'}}>Deploy AI Agent</h2></div>
+              <button onClick={()=>setShowDeployModal(false)} style={{background:'rgba(255,255,255,0.1)',border:'none',cursor:'pointer',color:'#fff',width:'30px',height:'30px',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center'}}><X size={15}/></button>
             </div>
-
+            <div style={{padding:'20px',display:'flex',flexDirection:'column',gap:'12px'}}>
+              <p style={{color:'#64748b',fontSize:'0.875rem',margin:0,lineHeight:1.6}}>Configure and deploy an autonomous AI negotiation agent for a purchase request.</p>
+              {[['PR Name','e.g. Q4 Steel Procurement'],['Target Price','e.g. 40000'],['Max Limit','e.g. 45000']].map(([l,p])=>(
+                <div key={l}><label style={{display:'block',fontSize:'0.72rem',fontWeight:700,color:'#64748b',marginBottom:'4px',textTransform:'uppercase',letterSpacing:'0.04em'}}>{l}</label>
+                <input placeholder={p} style={{width:'100%',padding:'9px 12px',border:'1px solid #e2e8f0',borderRadius:'8px',fontSize:'0.875rem',outline:'none',boxSizing:'border-box'}}/></div>
+              ))}
+              <div><label style={{display:'block',fontSize:'0.72rem',fontWeight:700,color:'#64748b',marginBottom:'4px',textTransform:'uppercase',letterSpacing:'0.04em'}}>AI Model</label>
+              <select style={{width:'100%',padding:'9px 12px',border:'1px solid #e2e8f0',borderRadius:'8px',fontSize:'0.875rem',outline:'none',background:'#fff'}}>
+                {['α-Strike v4 — Aggressive','β-Logic v2 — Balanced','γ-Rapid v1 — Fast Deals'].map(o=><option key={o}>{o}</option>)}
+              </select></div>
+              <div style={{display:'flex',gap:'10px',marginTop:'4px'}}>
+                <button onClick={()=>setShowDeployModal(false)} style={{flex:1,padding:'10px',border:'1px solid #e2e8f0',borderRadius:'10px',background:'#fff',color:'#475569',fontWeight:600,fontSize:'0.875rem',cursor:'pointer'}}>Cancel</button>
+                <button onClick={()=>setShowDeployModal(false)} style={{flex:2,padding:'10px',background:'linear-gradient(135deg,#0d1f4f,#2563eb)',color:'#fff',border:'none',borderRadius:'10px',fontWeight:700,fontSize:'0.875rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'7px'}}><Bot size={14}/>Deploy Agent</button>
+              </div>
+            </div>
           </div>
         </div>
       )}
-      
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes pulse-anim {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-        .pulse-anim { animation: pulse-anim 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-      `}} />
+      <style>{`@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}`}</style>
     </div>
   );
 }
