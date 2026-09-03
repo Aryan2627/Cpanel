@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useIntake } from '../../../context/IntakeContext';
@@ -119,13 +119,6 @@ export default function PRPage() {
             <p style={{ color: 'rgba(255,255,255,0.5)', margin: 0, fontSize: '0.9rem' }}>Review and convert ERP requisitions into procurement projects.</p>
           </div>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', textAlign: 'right' }}>
-              <div>Last synced</div>
-              <div style={{ color: 'rgba(255,255,255,0.65)', fontWeight: 600 }}>{lastSync}</div>
-            </div>
-            <button onClick={handleSync} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 16px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', color: '#fff', fontWeight: 600, fontSize: '0.82rem', cursor: 'pointer', backdropFilter: 'blur(8px)' }}>
-              <RefreshCcw size={15} style={{ animation: isSyncing ? 'spin 1s linear infinite' : 'none' }} /> Sync ERP
-            </button>
             <button onClick={openWizard} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 20px', background: selectedRows.size > 0 ? '#2563eb' : 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', boxShadow: selectedRows.size > 0 ? '0 4px 14px rgba(37,99,235,0.4)' : 'none', transition: 'all 0.2s' }}>
               <Plus size={17} /> Create Project {selectedRows.size > 0 && `(${selectedRows.size})`}
             </button>
@@ -282,10 +275,7 @@ export default function PRPage() {
                         <FileText size={28} color="#cbd5e1" />
                       </div>
                       <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '1rem' }}>No requisitions found</div>
-                      <div style={{ color: '#64748b', fontSize: '0.875rem' }}>Try adjusting your filters or syncing from ERP.</div>
-                      <button onClick={handleSync} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '8px', padding: '10px 20px', background: '#0d1f4f', color: '#fff', borderRadius: '9px', border: 'none', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer' }}>
-                        <RefreshCcw size={16} /> Sync ERP
-                      </button>
+                      <div style={{ color: '#64748b', fontSize: '0.875rem' }}>Try adjusting your filters.</div>
                     </div>
                   </td>
                 </tr>
