@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+﻿import nodemailer from 'nodemailer';
 
 // Configure the SMTP transport
 // We use fallback environment variables so the app doesn't crash if they are missing
@@ -27,7 +27,7 @@ export async function sendVendorInvitation(email: string, eventTitle: string, lo
 
   try {
     const info = await transporter.sendMail({
-      from: `"Procurement Portal" <${process.env.SMTP_FROM || 'noreply@yourdomain.com'}>`, // sender address
+      from: `"Procurement Portal" <${(process.env.SMTP_FROM_EMAIL || process.env.SMTP_FROM) || 'noreply@yourdomain.com'}>`, // sender address
       to: email, 
       subject: `You have been invited to bid: ${eventTitle}`, 
       text: `You have been invited to participate in a new bidding event: ${eventTitle}.\n\nPlease log in to the Supplier Portal to place your bid: ${loginLink}`,
