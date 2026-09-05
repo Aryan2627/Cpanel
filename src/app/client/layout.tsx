@@ -41,7 +41,7 @@ const NAV_ITEMS = [
       { name: 'All Licenses', path: '/client/license/all' },
       { name: 'Allocations', path: '/client/license/allocations' },
       { name: 'Recommendations', path: '/client/license/recommendations' },
-      { name: '— EXPIRY —', isHeader: true },
+      { name: '� EXPIRY �', isHeader: true },
       { name: 'Maintenance Expiry', path: '/client/license/expiry/maintenance' },
       { name: 'Contract Expiry', path: '/client/license/expiry/contracts' },
       { name: 'Payments Due', path: '/client/license/expiry/payments' },
@@ -135,12 +135,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           <div style={{ padding: '22px 20px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
             <img src="/logo.png" alt="ProcGen" style={{ width: '36px', height: '36px', objectFit: 'contain', flexShrink: 0 }} />
             <div>
-              <div style={{ color: '#fff', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.5px', lineHeight: 1 }}>ProcGen</div>
+              <div style={{ color: '#fff', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.5px', lineHeight: 1 }}>ProcGen<span style={{ marginLeft: '8px', background: '#eab308', color: '#000', padding: '2px 6px', borderRadius: '4px', fontSize: '0.6rem', fontWeight: 800 }}>UAT</span></div>
               <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.62rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Procurement Suite</div>
             </div>
           </div>
 
-          {/* Nav — overflow visible so flyouts can escape, scroll handled by inner wrapper */}
+          {/* Nav � overflow visible so flyouts can escape, scroll handled by inner wrapper */}
           <div style={{ flex: 1, overflowY: 'auto', overflowX: 'visible', padding: '14px 10px' }}>
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {NAV_ITEMS.map((item) => {
@@ -210,7 +210,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
         </nav>
 
-        {/* FLYOUT SUBMENU — rendered as fixed so it escapes overflow clipping */}
+        {/* FLYOUT SUBMENU � rendered as fixed so it escapes overflow clipping */}
         {flyout && currentFlyoutItem && (
           <ul
             onMouseEnter={keepFlyout}
@@ -311,5 +311,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     </IntakeProvider>
   );
 }
+
 
 

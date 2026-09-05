@@ -1,8 +1,10 @@
-'use client';
+﻿'use client';
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useIntake } from '@/context/IntakeContext';
-import { CheckCircle2, AlertCircle, FileCheck, Users, Clock, Settings, Search, LayoutTemplate, Plus, ShieldCheck, ChevronDown, X, GripVertical } from 'lucide-react';
+import { driver } from 'driver.js';
+import 'driver.js/dist/driver.css';
+import { HelpCircle, CheckCircle2, AlertCircle, FileCheck, Users, Clock, Settings, Search, LayoutTemplate, Plus, ShieldCheck, ChevronDown, X, GripVertical } from 'lucide-react';
 
 function AuctionCreateContent() {
   const router = useRouter();
@@ -155,6 +157,19 @@ function AuctionCreateContent() {
   const [isVendorDropdownOpen, setIsVendorDropdownOpen] = useState(false);
   const [tempSelectedVendorIds, setTempSelectedVendorIds] = useState<Set<string>>(new Set());
   const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
+    const startTour = () => {
+    const driverObj = driver({
+      showProgress: true,
+      animate: true,
+      steps: [
+        { element: '#tour-title', popover: { title: '1. Event Title', description: 'Give your auction a clear, descriptive name.', side: "bottom", align: 'start' }},
+        { element: '#tour-stages', popover: { title: '2. Configure Auction', description: 'Configure reverse auction rules, like Japanese or English pricing formats.', side: "right", align: 'start' }},
+        { element: '#tour-vendors', popover: { title: '3. Select Vendors', description: 'Scroll down to invite suppliers who will participate in the auction.', side: "top", align: 'start' }},
+        { element: '#tour-launch', popover: { title: '4. Launch Event', description: 'Fill out the duration and NFA details, then click here to launch the auction!', side: "top", align: 'end' }}
+      ]
+    });
+    driverObj.drive();
+  };
   const [selectedVendors, setSelectedVendors] = useState<any[]>([]);
   const [vendors, setVendors] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
@@ -977,7 +992,7 @@ function AuctionCreateContent() {
 
       </div>
 
-      {/* Tinder Smart Matchmaking Modal */}
+            {/* Tinder Smart Matchmaking Modal */}
       
       {/* Vendor Selection Modal */}
       {isVendorModalOpen && (

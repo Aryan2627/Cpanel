@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { after } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { sendVendorInvitation } from '../../../lib/email-service';
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
               return sendVendorInvitation(
                 vendor.email, 
                 data.title || 'New Bidding Event', 
-                (process.env.VENDOR_PORTAL_URL || 'http://localhost:5174') + '/login'
+                (process.env.VENDOR_PORTAL_URL || 'https://supply.procgen.in') + '/login'
               );
             }
           })).catch(console.error);
