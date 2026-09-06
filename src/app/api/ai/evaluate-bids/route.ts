@@ -30,22 +30,22 @@ export async function POST(request: Request) {
     }
 
     // Format data for AI
-    const eventContext = Event:  + event.title + \nType:  + event.type;
-    const bidData = bids.map(b => Vendor:  + b.vendorName + \nAmount: $ + b.amount + \nDetails:  + b.templateData).join('\n\n');
+    const eventContext =  'Event: ' + event.title + '\nType: ' + event.type;
+    const bidData = bids.map(b =>  'Vendor: ' + b.vendorName + '\nAmount: $' + b.amount + '\nDetails: ' + b.templateData).join('\n\n');
 
-    const promptBase = You are part of a corporate procurement Board of Directors. Review the following bids for an event.\n + eventContext + \n\nBIDS:\n + bidData + \n\n;
+    const promptBase =  'You are part of a corporate procurement Board of Directors. Review the following bids for an event.\n' + eventContext + '\n\nBIDS:\n' + bidData + '\n\n';
 
     const callGroq = async (role: string, instructions: string) => {
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': Bearer  + groqKey,
+          'Authorization':  'Bearer ' + groqKey,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           model: 'llama3-70b-8192',
           messages: [
-            { role: 'system', content: You are the  + role +  on a corporate procurement board.  + instructions +  Keep your analysis concise, punchy, and under 150 words. End with your final recommendation. },
+            { role: 'system', content:  'You are the ' + role + ' on a corporate procurement board. ' + instructions + ' Keep your analysis concise, punchy, and under 150 words. End with your final recommendation.' },
             { role: 'user', content: promptBase }
           ],
           temperature: 0.2
@@ -66,14 +66,14 @@ export async function POST(request: Request) {
     const consensusRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': Bearer  + groqKey,
+        'Authorization':  'Bearer ' + groqKey,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         model: 'llama3-70b-8192',
         messages: [
           { role: 'system', content: 'You are the CEO. You must read the reports from your CFO, Engineer, and Compliance Officer, and make a final, unified executive decision on which vendor wins the contract. Keep it under 100 words.' },
-          { role: 'user', content: CFO:\n + cfo + \n\nENGINEER:\n + engineer + \n\nCOMPLIANCE:\n + lawyer }
+          { role: 'user', content:  'CFO:\n' + cfo + '\n\nENGINEER:\n' + engineer + '\n\nCOMPLIANCE:\n' + lawyer }
         ],
         temperature: 0.2
       })
