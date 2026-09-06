@@ -384,7 +384,7 @@ export default function BuyerEventDetailsPage() {
     try {
       const res = await fetch('/api/ai/evaluate-bids', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventId: eventData.id })
+        body: JSON.stringify({ eventId: event?.id || event?.refId })
       });
       const data = await res.json();
       if (res.ok) { setAiResults(data.agents); }
