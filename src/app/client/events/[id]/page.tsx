@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Clock, CheckCircle2, AlertCircle, BarChart3, FileText, User, Users, Leaf, AlertTriangle, Target, Globe, BrainCircuit, Hammer, X, Layers, SplitSquareHorizontal } from 'lucide-react';
@@ -86,6 +86,9 @@ export default function BuyerEventDetailsPage() {
   const [splitSelections, setSplitSelections] = useState<Record<string, string>>({});
   
   const [isSurrogateOpen, setIsSurrogateOpen] = useState(false);
+  const [isAiBoardOpen, setIsAiBoardOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResults, setAiResults] = useState<any>(null);
   const [surrogateVendor, setSurrogateVendor] = useState('');
   const [surrogateData, setSurrogateData] = useState<Record<string, string>>({});
   const [isSubmittingSurrogate, setIsSubmittingSurrogate] = useState(false);
@@ -714,7 +717,10 @@ export default function BuyerEventDetailsPage() {
                   >
                     <Layers size={16} /> Split Award
                   </button>
-                  <button onClick={() => setIsSurrogateOpen(true)} style={{ backgroundColor: '#f59e0b', color: '#fff', padding: '6px 16px', border: 'none', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(245, 158, 11, 0.2)' }}>
+                  <button onClick={handleAiEvaluation} style={{ backgroundColor: '#0f172a', color: '#38bdf8', padding: '6px 16px', border: '1px solid #38bdf8', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 0 10px rgba(56,189,248,0.2)' }}>
+                      <Brain size={16} /> AI Board Evaluation
+                    </button>
+                    <button onClick={() => setIsSurrogateOpen(true)} style={{ backgroundColor: '#f59e0b', color: '#fff', padding: '6px 16px', border: 'none', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(245, 158, 11, 0.2)' }}>
                     <User size={16} /> Proxy Bid
                   </button>
                   <div style={{ backgroundColor: '#eff6ff', color: '#1d4ed8', padding: '4px 12px', borderRadius: '16px', fontSize: '0.85rem', fontWeight: 500 }}>
