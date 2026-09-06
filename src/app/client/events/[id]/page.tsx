@@ -1,7 +1,7 @@
 ﻿'use client';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Clock, CheckCircle2, AlertCircle, BarChart3, FileText, User, Users, Leaf, AlertTriangle, Target, Globe, BrainCircuit, Hammer, X, Layers, SplitSquareHorizontal } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle2, AlertCircle, BarChart3, FileText, User, Users, Leaf, AlertTriangle, Target, Globe, BrainCircuit, Hammer, X, Layers, SplitSquareHorizontal , Brain, Shield, Briefcase, Calculator, Star } from 'lucide-react';
 
 const Countdown = ({ endTime }: { endTime: string | Date }) => {
   const [now, setNow] = useState(new Date());
