@@ -51,7 +51,7 @@ export async function POST(request: Request) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'llama3-8b-8192',
+          model: 'qwen/qwen3.8-27b',
           messages: [
             { role: 'system', content: 'You are the ' + role + ' on a corporate procurement board. ' + instructions + ' Keep your analysis concise, punchy, and under 150 words. End with your final recommendation.' },
             { role: 'user', content: promptBase }
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama3-8b-8192',
+        model: 'qwen/qwen3.8-27b',
         messages: [
           { role: 'system', content: 'You are the CEO. You must read the reports from your CFO, Engineer, and Compliance Officer, and make a final, unified executive decision on which vendor wins the contract. Keep it under 100 words.' },
           { role: 'user', content: 'CFO:\n' + cfo + '\n\nENGINEER:\n' + engineer + '\n\nCOMPLIANCE:\n' + lawyer }
