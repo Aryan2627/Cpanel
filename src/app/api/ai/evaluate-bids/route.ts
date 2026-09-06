@@ -43,7 +43,7 @@ export async function POST(request: Request) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'llama3-70b-8192',
+          model: 'llama-3.1-70b-versatile',
           messages: [
             { role: 'system', content:  'You are the ' + role + ' on a corporate procurement board. ' + instructions + ' Keep your analysis concise, punchy, and under 150 words. End with your final recommendation.' },
             { role: 'user', content: promptBase }
@@ -53,6 +53,7 @@ export async function POST(request: Request) {
       });
       const data = await res.json();
       if (!res.ok) { return 'Groq Error: ' + JSON.stringify(data); }
+      if (!res.ok) { throw new Error('Groq API Error: ' + (data.error?.message || res.statusText)); }
       return data.choices?.[0]?.message?.content || 'Analysis failed.';
     };
 
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama3-70b-8192',
+        model: 'llama-3.1-70b-versatile',
         messages: [
           { role: 'system', content: 'You are the CEO. You must read the reports from your CFO, Engineer, and Compliance Officer, and make a final, unified executive decision on which vendor wins the contract. Keep it under 100 words.' },
           { role: 'user', content:  'CFO:\n' + cfo + '\n\nENGINEER:\n' + engineer + '\n\nCOMPLIANCE:\n' + lawyer }
