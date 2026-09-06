@@ -1,7 +1,7 @@
 ﻿'use client';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Clock, CheckCircle2, AlertCircle, BarChart3, FileText, User, Users, Leaf, AlertTriangle, Target, Globe, BrainCircuit, Hammer, X, Layers, SplitSquareHorizontal } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle2, AlertCircle, BarChart3, FileText, User, Users, Leaf, AlertTriangle, Target, Globe, BrainCircuit, Hammer, X, Layers, SplitSquareHorizontal , Brain, Shield, Briefcase, Calculator, Star } from 'lucide-react';
 
 const Countdown = ({ endTime }: { endTime: string | Date }) => {
   const [now, setNow] = useState(new Date());
@@ -376,6 +376,25 @@ export default function BuyerEventDetailsPage() {
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
   }, [params.id]);
+
+  const handleAiEvaluation = async () => {
+    if (bids.length === 0) { alert('No bids to evaluate!'); return; }
+    setIsAiBoardOpen(true);
+    setAiLoading(true);
+    try {
+      const res = await fetch('/api/ai/evaluate-bids', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventId: eventData.id })
+      });
+      const data = await res.json();
+      if (res.ok) { setAiResults(data.agents); }
+      else { alert(data.error); setIsAiBoardOpen(false); }
+    } catch (e) {
+      alert('AI Evaluation failed'); setIsAiBoardOpen(false);
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleAward = async (bid: any) => {
     if (event?.sourcePrs) {
