@@ -377,6 +377,25 @@ export default function BuyerEventDetailsPage() {
     return () => window.removeEventListener('storage', handleStorage);
   }, [params.id]);
 
+  const handleAiEvaluation = async () => {
+    if (bids.length === 0) { alert('No bids to evaluate!'); return; }
+    setIsAiBoardOpen(true);
+    setAiLoading(true);
+    try {
+      const res = await fetch('/api/ai/evaluate-bids', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventId: eventData.id })
+      });
+      const data = await res.json();
+      if (res.ok) { setAiResults(data.agents); }
+      else { alert(data.error); setIsAiBoardOpen(false); }
+    } catch (e) {
+      alert('AI Evaluation failed'); setIsAiBoardOpen(false);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const handleAward = async (bid: any) => {
     if (event?.sourcePrs) {
        const res = await fetch('/api/intakes');
