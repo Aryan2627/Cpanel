@@ -43,25 +43,24 @@ export async function POST(request: Request) {
 
     const promptBase =  'You are part of a corporate procurement Board of Directors. Review the following bids for an event.\n' + eventContext + '\n\nBIDS:\n' + bidData + '\n\n';
 
-    const callGroq = async (role: string, instructions: string) => {
+        const callGroq = async (role: string, instructions: string) => {
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization':  'Bearer ' + groqKey,
+          'Authorization': 'Bearer ' + groqKey,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'gemma2-9b-it',
+          model: 'llama3-8b-8192',
           messages: [
-            { role: 'system', content:  'You are the ' + role + ' on a corporate procurement board. ' + instructions + ' Keep your analysis concise, punchy, and under 150 words. End with your final recommendation.' },
+            { role: 'system', content: 'You are the ' + role + ' on a corporate procurement board. ' + instructions + ' Keep your analysis concise, punchy, and under 150 words. End with your final recommendation.' },
             { role: 'user', content: promptBase }
           ],
           temperature: 0.2
         })
       });
       const data = await res.json();
-      if (!res.ok) { return 'Groq Error: ' + JSON.stringify(data); }
-      if (!res.ok) { throw new Error('Groq API Error: ' + (data.error?.message || res.statusText)); }
+      if (!res.ok) { throw new Error('model_not_found'); }
       return data.choices?.[0]?.message?.content || 'Analysis failed.';
     };
 
@@ -73,22 +72,23 @@ export async function POST(request: Request) {
     ]);
 
     // Finally, run a consensus agent
-    const consensusRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        const consensusRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization':  'Bearer ' + groqKey,
+        'Authorization': 'Bearer ' + groqKey,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'gemma2-9b-it',
+        model: 'llama3-8b-8192',
         messages: [
           { role: 'system', content: 'You are the CEO. You must read the reports from your CFO, Engineer, and Compliance Officer, and make a final, unified executive decision on which vendor wins the contract. Keep it under 100 words.' },
-          { role: 'user', content:  'CFO:\n' + cfo + '\n\nENGINEER:\n' + engineer + '\n\nCOMPLIANCE:\n' + lawyer }
+          { role: 'user', content: 'CFO:\n' + cfo + '\n\nENGINEER:\n' + engineer + '\n\nCOMPLIANCE:\n' + lawyer }
         ],
         temperature: 0.2
       })
     });
     const consensusData = await consensusRes.json();
+    if (!consensusRes.ok) { throw new Error('model_not_found'); }
     const consensus = consensusData.choices?.[0]?.message?.content || 'Failed to reach consensus.';
 
     return NextResponse.json({
