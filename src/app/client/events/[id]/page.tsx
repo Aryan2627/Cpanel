@@ -1326,6 +1326,79 @@ export default function BuyerEventDetailsPage() {
       )}
 
     
+          {/* AI Board of Directors Modal */}
+      {isAiBoardOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(12px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#0f172a', width: '1000px', maxWidth: '95%', maxHeight: '90vh', overflowY: 'auto', borderRadius: '16px', padding: '32px', border: '1px solid #334155', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', color: '#f8fafc' }}>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', borderBottom: '1px solid #1e293b', paddingBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '12px', borderRadius: '12px', color: '#38bdf8' }}>
+                  <Brain size={28} />
+                </div>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, color: '#f8fafc' }}>AI Board of Directors</h2>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '0.9rem', color: '#94a3b8' }}>Multi-Agent Bid Analysis Engine</p>
+                </div>
+              </div>
+              <button onClick={() => setIsAiBoardOpen(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}><X size={24} /></button>
+            </div>
+
+            {aiLoading ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 0', gap: '20px' }}>
+                <div className="spinner" style={{ width: '40px', height: '40px', border: '4px solid #1e293b', borderTopColor: '#38bdf8', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                <style>{@keyframes spin { to { transform: rotate(360deg); } }}</style>
+                <div style={{ color: '#38bdf8', fontSize: '1.1rem', fontWeight: 600 }}>The Board is convening...</div>
+                <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Agents are currently reading all submitted bids and arguing over the best choice.</p>
+              </div>
+            ) : aiResults ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                
+                {/* Consensus Block */}
+                <div style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)', border: '1px solid rgba(56, 189, 248, 0.2)', borderRadius: '12px', padding: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', color: '#38bdf8' }}>
+                    <Star size={20} fill="#38bdf8" />
+                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>CEO Consensus Decision</h3>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '1.05rem', lineHeight: '1.6', color: '#e2e8f0', fontStyle: 'italic' }}>"{aiResults.consensus}"</p>
+                </div>
+
+                {/* 3 Agents Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+                  
+                  {/* CFO */}
+                  <div style={{ background: '#1e293b', borderRadius: '12px', padding: '20px', border: '1px solid #334155' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', color: '#10b981' }}>
+                      <Calculator size={18} />
+                      <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Chief Financial Officer</h4>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: '1.5', color: '#cbd5e1' }}>{aiResults.cfo}</p>
+                  </div>
+
+                  {/* Engineer */}
+                  <div style={{ background: '#1e293b', borderRadius: '12px', padding: '20px', border: '1px solid #334155' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', color: '#f59e0b' }}>
+                      <Briefcase size={18} />
+                      <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Lead Engineer</h4>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: '1.5', color: '#cbd5e1' }}>{aiResults.engineer}</p>
+                  </div>
+
+                  {/* Compliance */}
+                  <div style={{ background: '#1e293b', borderRadius: '12px', padding: '20px', border: '1px solid #334155' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', color: '#ef4444' }}>
+                      <Shield size={18} />
+                      <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Compliance Officer</h4>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: '1.5', color: '#cbd5e1' }}>{aiResults.compliance}</p>
+                  </div>
+
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      )}
     </>
   );
 }
