@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useIntake } from '../../../context/IntakeContext';
@@ -121,11 +121,7 @@ export default function PRPage() {
             <h1 style={{ color: '#fff', fontSize: '1.8rem', fontWeight: 800, margin: '0 0 6px', letterSpacing: '-0.5px' }}>Purchase Requisitions</h1>
             <p style={{ color: 'rgba(255,255,255,0.5)', margin: 0, fontSize: '0.9rem' }}>Review and convert ERP requisitions into procurement projects.</p>
           </div>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <button onClick={openWizard} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 20px', background: selectedRows.size > 0 ? '#2563eb' : 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', boxShadow: selectedRows.size > 0 ? '0 4px 14px rgba(37,99,235,0.4)' : 'none', transition: 'all 0.2s' }}>
-              <Plus size={17} /> Create Project {selectedRows.size > 0 && `(${selectedRows.size})`}
-            </button>
-          </div>
+          
         </div>
       </div>
 

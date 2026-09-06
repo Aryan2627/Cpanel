@@ -27,8 +27,10 @@ export default function IntakeTablePage() {
   const itemsPerPage = 10;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setExportEnabled(localStorage.getItem('exportIntake') === 'true');
-    const h = () => setExportEnabled(localStorage.getItem('exportIntake') === 'true');
+    const h = () => // eslint-disable-next-line react-hooks/set-state-in-effect
+    setExportEnabled(localStorage.getItem('exportIntake') === 'true');
     window.addEventListener('settings-updated', h);
     return () => window.removeEventListener('settings-updated', h);
   }, []);
@@ -73,7 +75,7 @@ export default function IntakeTablePage() {
         const rows = XLSX.utils.sheet_to_json(ws) as any[];
         rows.forEach(row => {
           addIntake({
-            refId: `IR-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            refId: `PR-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
             title: row['Request Title'] || 'Untitled',
             reqName: 'System Import', buyer: '', type: 'Standard',
             status: 'Draft', quantity: 1,
@@ -136,7 +138,7 @@ export default function IntakeTablePage() {
   return (
     <div style={{ backgroundColor: '#f0f4f8', minHeight: '100%', fontFamily: 'system-ui, sans-serif' }}>
 
-      {/* ── Premium Header ── */}
+      {/* -- Premium Header -- */}
       <div style={{ background: 'linear-gradient(135deg, #071330 0%, #0d1f4f 55%, #1a2f6b 100%)', padding: '28px 32px 40px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, right: 0, width: '380px', height: '100%', background: 'radial-gradient(circle at 70% 50%, rgba(59,130,246,0.12), transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -168,7 +170,7 @@ export default function IntakeTablePage() {
 
       <div style={{ padding: '0 32px 40px', marginTop: '-24px', position: 'relative', zIndex: 10 }}>
 
-        {/* ── KPI Cards ── */}
+        {/* -- KPI Cards -- */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '16px', marginBottom: '20px' }}>
           {kpis.map((k, i) => {
             const Icon = k.icon;
@@ -188,7 +190,7 @@ export default function IntakeTablePage() {
           })}
         </div>
 
-        {/* ── Search + Filter Toolbar ── */}
+        {/* -- Search + Filter Toolbar -- */}
         <div style={{ backgroundColor: '#fff', borderRadius: '14px', border: '1px solid #e2e8f0', padding: '14px 18px', marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '220px', padding: '0 14px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
             <Search size={16} color="#94a3b8" />
@@ -210,7 +212,7 @@ export default function IntakeTablePage() {
           </div>
         </div>
 
-        {/* ── Premium Table ── */}
+        {/* -- Premium Table -- */}
         <div style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -259,7 +261,7 @@ export default function IntakeTablePage() {
                         <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #0d1f4f, #2563eb)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.65rem', flexShrink: 0 }}>
                           {(item.reqName || 'U').charAt(0).toUpperCase()}
                         </div>
-                        <span style={{ fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>{item.reqName || '—'}</span>
+                        <span style={{ fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>{item.reqName || '�'}</span>
                       </div>
                     </td>
                     <td style={{ padding: '13px 16px' }}>
@@ -303,12 +305,12 @@ export default function IntakeTablePage() {
             </tbody>
           </table>
 
-          {/* ── Pagination Footer ── */}
+          {/* -- Pagination Footer -- */}
           {filtered.length > 0 && (
             <div style={{ padding: '14px 20px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fafbfc' }}>
               <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                Showing <strong style={{ color: '#0f172a' }}>{Math.min((currentPage - 1) * itemsPerPage + 1, filtered.length)}–{Math.min(currentPage * itemsPerPage, filtered.length)}</strong> of <strong style={{ color: '#0f172a' }}>{filtered.length}</strong> results
-                {selectedIds.size > 0 && <span style={{ marginLeft: '12px', color: '#2563eb', fontWeight: 600 }}>· {selectedIds.size} selected</span>}
+                Showing <strong style={{ color: '#0f172a' }}>{Math.min((currentPage - 1) * itemsPerPage + 1, filtered.length)}�{Math.min(currentPage * itemsPerPage, filtered.length)}</strong> of <strong style={{ color: '#0f172a' }}>{filtered.length}</strong> results
+                {selectedIds.size > 0 && <span style={{ marginLeft: '12px', color: '#2563eb', fontWeight: 600 }}>� {selectedIds.size} selected</span>}
               </div>
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
@@ -334,7 +336,7 @@ export default function IntakeTablePage() {
         </div>
       </div>
 
-      {/* ── Import Modal ── */}
+      {/* -- Import Modal -- */}
       {isImportModalOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setIsImportModalOpen(false)}>
           <div style={{ background: '#fff', borderRadius: '20px', width: '480px', maxWidth: '92vw', boxShadow: '0 30px 60px rgba(0,0,0,0.2)', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
@@ -361,3 +363,5 @@ export default function IntakeTablePage() {
     </div>
   );
 }
+
+

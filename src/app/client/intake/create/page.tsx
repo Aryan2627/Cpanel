@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useIntake } from '../../../../context/IntakeContext';
@@ -44,7 +44,7 @@ export default function PurchaseIntake() {
     
     const now = new Date();
     const formattedDate = `${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}, ${now.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}`;
-    const newId = `IR-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newId = `PR-${Math.floor(1000 + Math.random() * 9000)}`;
 
     try {
       await addIntake({
@@ -215,3 +215,4 @@ export default function PurchaseIntake() {
     </div>
   );
 }
+
