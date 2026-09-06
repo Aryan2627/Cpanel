@@ -101,7 +101,7 @@ export async function POST(request: Request) {
     }, { status: 200 });
 
   } catch (error: any) {
-          if (false) {
+          if (error.message.includes('decommissioned') || error.message.includes('does not exist') || error.message.includes('model_not_found')) {
         // Fallback to mock data so the UI still works beautifully if their Groq tier is locked out!
         return NextResponse.json({
           agents: {
