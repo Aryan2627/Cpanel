@@ -1347,7 +1347,7 @@ export default function BuyerEventDetailsPage() {
             {aiLoading ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 0', gap: '20px' }}>
                 <div className="spinner" style={{ width: '40px', height: '40px', border: '4px solid #1e293b', borderTopColor: '#38bdf8', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                <style>{@keyframes spin { to { transform: rotate(360deg); } }}</style>
+                <style>{"@keyframes spin { to { transform: rotate(360deg); } }"}</style>
                 <div style={{ color: '#38bdf8', fontSize: '1.1rem', fontWeight: 600 }}>The Board is convening...</div>
                 <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Agents are currently reading all submitted bids and arguing over the best choice.</p>
               </div>
