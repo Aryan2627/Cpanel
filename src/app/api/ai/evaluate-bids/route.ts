@@ -52,6 +52,7 @@ export async function POST(request: Request) {
         })
       });
       const data = await res.json();
+      if (!res.ok) { return 'Groq Error: ' + JSON.stringify(data); }
       return data.choices?.[0]?.message?.content || 'Analysis failed.';
     };
 
