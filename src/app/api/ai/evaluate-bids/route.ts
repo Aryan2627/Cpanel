@@ -104,6 +104,7 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     // If Nvidia fails, silently fallback to mock
+    return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({
       agents: {
         cfo: 'Vendor 2 is the most financially viable option. Their base price of 3,953 INR is significantly below our target threshold, saving us 15% compared to historical benchmarks. No hidden fees detected.',
