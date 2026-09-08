@@ -1,4 +1,5 @@
 ﻿import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,9 +23,25 @@ export async function POST(req: Request) {
       }, { status: 200 });
     }
 
-    // Dummy logic for now since we don't have a DB connection here, we just want to prove the AI works
-    const bidData = "Vendor 1: 4500 INR. Vendor 2: 3953 INR. Vendor 3: 4100 INR.";
-    const eventContext = "Procurement of Laptops. Target price is 4000 INR.";
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(eventId);
+    const event = await prisma.event.findFirst({
+      where: isUuid ? { id: eventId } : { refId: eventId }
+    });
+
+    if (!event) return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+
+    const bids = await prisma.bid.findMany({
+      where: { eventId: event.id }
+    });
+
+    if (bids.length === 0) {
+      return NextResponse.json({ error: 'No bids received yet to evaluate.' }, { status: 400 });
+    }
+
+    // Format data for AI
+    const eventContext = 'Event: ' + event.title + '\nType: ' + event.type;
+    const bidData = bids.map(b => 'Vendor: ' + b.vendorName + '\nAmount: $' + b.amount + '\nDetails: ' + b.templateData).join('\n\n');
+
     const promptBase =  'You are part of a corporate procurement Board of Directors. Review the following bids for an event.\n' + eventContext + '\n\nBIDS:\n' + bidData + '\n\n';
 
     const callNvidia = async (role: string, instructions: string) => {
