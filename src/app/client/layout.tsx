@@ -173,7 +173,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 16px', height: '100%', color: '#cbd5e1', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500, background: hoveredMenu === menu.name ? 'rgba(255,255,255,0.1)' : 'transparent', transition: 'all 0.15s' }}>
                       {menu.name}
-                      <ChevronDown size={14} style={{ opacity: 0.7, transform: hoveredMenu === menu.name ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                      
                     </div>
                   )}
 
