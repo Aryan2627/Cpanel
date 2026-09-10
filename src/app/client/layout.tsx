@@ -148,6 +148,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 <div 
                   key={menu.name} 
                   onClick={() => setHoveredMenu(hoveredMenu === menu.name ? null : menu.name)}
+                  onMouseLeave={() => setHoveredMenu(null)}
                   style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}
                 >
                   {menu.path ? (
