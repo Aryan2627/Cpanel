@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
@@ -236,12 +236,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: 
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(-10px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-      }} />
+      `}} />
     </IntakeProvider>
   );
 }
