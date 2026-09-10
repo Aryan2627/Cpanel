@@ -310,12 +310,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <JarvisAssistant />
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: 
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes flyoutIn {
           from { opacity: 0; transform: translateX(-8px); }
           to   { opacity: 1; transform: translateX(0); }
         }
-      }} />
+      `}} />
     </IntakeProvider>
   );
 }
