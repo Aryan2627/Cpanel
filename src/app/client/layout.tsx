@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
@@ -127,7 +127,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                           onMouseEnter={e => e.currentTarget.style.background = '#f1f5f9'}
                           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                         >
-                          <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: \\15\, color: app.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: app.color + '15', color: app.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
                             <Icon size={20} />
                           </div>
                           <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1e293b', marginBottom: '2px' }}>{app.name}</span>
