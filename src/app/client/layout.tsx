@@ -104,14 +104,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       <div className="app-container" style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', background: '#f1f5f9', overflow: 'hidden' }}>
 
         {/* TOP NAVIGATION HEADER */}
-        <header style={{ background: '#1c252a', borderBottom: '1px solid #11181c', color: '#fff', zIndex: 50, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+        <header style={{ background: 'linear-gradient(135deg, #071330 0%, #0d1f4f 100%)', borderBottom: '1px solid rgba(255,255,255,0.1)', color: '#fff', zIndex: 50, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
           
           {/* Top Row: Logo, Search, Profile */}
           <div style={{ height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => router.push('/client')}>
-              <div style={{ width: '28px', height: '28px', background: '#0fa87a', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontWeight: 900, color: '#fff', fontSize: '1rem' }}>P</span>
-              </div>
+              <img src="/logo.png" alt="ProcGen" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
               <span style={{ fontSize: '1.2rem', fontWeight: 700, letterSpacing: '-0.02em' }}>ProcGen</span>
             </div>
 
@@ -133,7 +131,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#f8fafc' }}>{currentUser?.name || 'Loading...'}</div>
                   <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>{currentUser?.companyName || ''}</div>
                 </div>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#0fa87a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }} onClick={() => router.push('/client/profile')}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #3b82f6, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }} onClick={() => router.push('/client/profile')}>
                   {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
                 </div>
                 <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }} title="Sign Out">
@@ -144,13 +142,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
 
           {/* Bottom Row: Mega Menu Navigation */}
-          <div style={{ height: '44px', background: '#161d21', display: 'flex', alignItems: 'center', padding: '0 16px' }}>
+          <div style={{ height: '44px', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', padding: '0 16px' }}>
             <nav style={{ display: 'flex', gap: '8px', height: '100%' }}>
               {TOP_MENUS.map(menu => (
                 <div 
                   key={menu.name} 
-                  onMouseEnter={() => setHoveredMenu(menu.name)}
-                  onMouseLeave={() => setHoveredMenu(null)}
+                  onClick={() => setHoveredMenu(hoveredMenu === menu.name ? null : menu.name)}
                   style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}
                 >
                   {menu.path ? (
@@ -170,7 +167,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                       <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         {menu.sub.map(subItem => (
                           <li key={subItem.name}>
-                            <Link href={subItem.path} style={{ display: 'block', padding: '10px 14px', borderRadius: '6px', fontSize: '0.875rem', color: pathname === subItem.path ? '#0284c7' : '#334155', background: pathname === subItem.path ? '#f0f9ff' : 'transparent', fontWeight: pathname === subItem.path ? 600 : 500, textDecoration: 'none' }} onMouseEnter={e => { if (pathname !== subItem.path) e.currentTarget.style.background = '#f8fafc'; }} onMouseLeave={e => { if (pathname !== subItem.path) e.currentTarget.style.background = 'transparent'; }}>
+                            <Link onClick={() => setHoveredMenu(null)} href={subItem.path} style={{ display: 'block', padding: '10px 14px', borderRadius: '6px', fontSize: '0.875rem', color: pathname === subItem.path ? '#0284c7' : '#334155', background: pathname === subItem.path ? '#f0f9ff' : 'transparent', fontWeight: pathname === subItem.path ? 600 : 500, textDecoration: 'none' }} onMouseEnter={e => { if (pathname !== subItem.path) e.currentTarget.style.background = '#f8fafc'; }} onMouseLeave={e => { if (pathname !== subItem.path) e.currentTarget.style.background = 'transparent'; }}>
                               {subItem.name}
                             </Link>
                           </li>
