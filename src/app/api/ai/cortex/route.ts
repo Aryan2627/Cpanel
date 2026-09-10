@@ -1,15 +1,16 @@
 ﻿import { NextResponse } from 'next/server';
+import intents from '../../../../data/intents.json';
 
 export async function POST(req: Request) {
   try {
     const { prompt } = await req.json();
     
     // Simulate API delay for realism
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(r => setTimeout(r, 600));
     
     const text = prompt.toLowerCase();
 
-    // 1. INVENTORY WORKFLOW
+    // 1. INVENTORY WORKFLOW (Original Agentic Demo)
     if (text.includes('inventory') || text.includes('laptop') || text.includes('replenish') || text.includes('order')) {
       return NextResponse.json({
         agentic_loop: [
@@ -24,21 +25,7 @@ export async function POST(req: Request) {
       });
     }
 
-    // 2. GREETINGS
-    if (text.match(/^(hi|hello|hey|greetings|morning|afternoon)/)) {
-      return NextResponse.json({
-        final_response: "Hello there! I am ProcGen Cortex, your AI Procurement Assistant. How can I help you automate your workflows today? You can ask me to check inventory levels, analyze a vendor, or draft a PO."
-      });
-    }
-
-    // 3. CAPABILITIES / HELP
-    if (text.includes('what can you do') || text.includes('help') || text.includes('capabilities')) {
-      return NextResponse.json({
-        final_response: "I am designed to automate procurement tasks. Currently, I can:\n\n1. Monitor and auto-replenish low inventory.\n2. Evaluate vendor bids and compliance.\n3. Draft Purchase Requests autonomously.\n\nTry saying: *'Check laptop inventory'* to see me in action."
-      });
-    }
-
-    // 4. VENDOR ANALYSIS MOCK
+    // 2. VENDOR ANALYSIS MOCK
     if (text.includes('vendor') || text.includes('analyze')) {
       return NextResponse.json({
         agentic_loop: [
@@ -49,16 +36,18 @@ export async function POST(req: Request) {
       });
     }
 
-    // 5. GRATITUDE
-    if (text.includes('thank') || text.includes('awesome') || text.includes('good')) {
-      return NextResponse.json({
-        final_response: "You're very welcome! Let me know if you need any more data crunched or workflows automated."
-      });
+    // 3. MATCH AGAINST USER PROVIDED DATASET
+    for (const intent of intents) {
+      if (text.includes(intent.q) || (intent.q === 'resume' && text.includes('resume')) || (intent.q === 'interview' && text.includes('interview'))) {
+         return NextResponse.json({
+            final_response: intent.a
+         });
+      }
     }
 
-    // DEFAULT FALLBACK (Conversational fallback)
+    // DEFAULT FALLBACK 
     return NextResponse.json({
-      final_response: "I understand you are asking about: '" + prompt + "'. \n\nMy backend LLM connection is currently running in 'Safe-Mode' for this presentation, so I am limited to specific workflows right now. For a full demonstration of my autonomous capabilities, please ask me to **'check laptop inventory'**."
+      final_response: "I am not quite sure how to respond to that based on my training data. Try asking me about my capabilities, like 'Check laptop inventory', or asking a question like 'Why do websites use databases?'"
     });
 
   } catch (error) {
