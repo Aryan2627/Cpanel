@@ -7,12 +7,13 @@ import TourButton from './TourButton';
 import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
 import JarvisAssistant from './JarvisAssistant';
-import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Settings, Bell, Search, ChevronDown, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Settings, Bell, Search, LogOut } from 'lucide-react';
 
 const TOP_MENUS = [
   { name: 'Dashboard', path: '/client', icon: LayoutDashboard },
   {
     name: 'Procurement',
+    path: '/client/intake', // default click
     icon: ShoppingCart,
     sub: [
       { name: 'Purchase Requests', path: '/client/intake' },
@@ -24,6 +25,7 @@ const TOP_MENUS = [
   },
   {
     name: 'Vendors',
+    path: '/client/vendors',
     icon: Users,
     sub: [
       { name: 'Supplier List', path: '/client/vendors' },
@@ -32,6 +34,7 @@ const TOP_MENUS = [
   },
   {
     name: 'Master Data',
+    path: '/client/manage/users',
     icon: Database,
     sub: [
       { name: 'Users', path: '/client/manage/users' },
@@ -42,6 +45,7 @@ const TOP_MENUS = [
   },
   {
     name: 'Licensing',
+    path: '/client/license/summary',
     icon: Shield,
     sub: [
       { name: 'License Summary', path: '/client/license/summary' },
@@ -61,8 +65,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const pathname = usePathname();
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string; companyName?: string; licenseStatus?: string; licensePlan?: string; organizationId?: string } | null>(null);
-
-  const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => { if (d?.name) setCurrentUser(d); }).catch(() => null);
@@ -87,8 +89,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  const isActive = (path: string) => path === '/client' ? pathname === '/client' : pathname.startsWith(path);
-
   const handleLogout = async () => {
     try { 
       await fetch('/api/auth/logout', { method: 'POST' }); 
@@ -98,6 +98,14 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       window.location.href = '/login'; 
     }
   };
+
+  // Determine the active category based on pathname
+  const activeCategory = TOP_MENUS.find(menu => {
+    if (menu.path === '/client' && pathname === '/client') return true;
+    if (menu.sub && menu.sub.some(s => pathname.startsWith(s.path))) return true;
+    if (menu.path !== '/client' && pathname.startsWith(menu.path)) return true;
+    return false;
+  });
 
   return (
     <IntakeProvider>
@@ -123,7 +131,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
               <button style={{ background: 'none', border: 'none', color: '#e2e8f0', cursor: 'pointer', position: 'relative' }}>
                 <Bell size={18} />
-                <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%', border: '2px solid #1c252a' }}></span>
+                <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%', border: '2px solid #0d1f4f' }}></span>
               </button>
               
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '20px', borderLeft: '1px solid rgba(255,255,255,0.15)' }}>
@@ -141,46 +149,57 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             </div>
           </div>
 
-          {/* Bottom Row: Mega Menu Navigation */}
+          {/* Bottom Row: Main Categories */}
           <div style={{ height: '44px', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', padding: '0 16px' }}>
             <nav style={{ display: 'flex', gap: '8px', height: '100%' }}>
-              {TOP_MENUS.map(menu => (
-                <div 
-                  key={menu.name} 
-                  onClick={() => setHoveredMenu(hoveredMenu === menu.name ? null : menu.name)}
-                  onMouseLeave={() => setHoveredMenu(null)}
-                  style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}
-                >
-                  {menu.path ? (
-                    <Link href={menu.path} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 16px', height: '100%', color: isActive(menu.path) ? '#38bdf8' : '#cbd5e1', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 500, background: hoveredMenu === menu.name ? 'rgba(255,255,255,0.05)' : 'transparent', transition: 'all 0.15s' }}>
-                      {menu.name}
-                    </Link>
-                  ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 16px', height: '100%', color: '#cbd5e1', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500, background: hoveredMenu === menu.name ? 'rgba(255,255,255,0.05)' : 'transparent', transition: 'all 0.15s' }}>
-                      {menu.name}
-                      <ChevronDown size={14} style={{ opacity: 0.7, transform: hoveredMenu === menu.name ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-                    </div>
-                  )}
-
-                  {/* Dropdown Panel */}
-                  {menu.sub && hoveredMenu === menu.name && (
-                    <div style={{ position: 'absolute', top: '44px', left: 0, minWidth: '220px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0 0 8px 8px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', padding: '8px', zIndex: 100 }}>
-                      <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        {menu.sub.map(subItem => (
-                          <li key={subItem.name}>
-                            <Link onClick={() => setHoveredMenu(null)} href={subItem.path} style={{ display: 'block', padding: '10px 14px', borderRadius: '6px', fontSize: '0.875rem', color: pathname === subItem.path ? '#0284c7' : '#334155', background: pathname === subItem.path ? '#f0f9ff' : 'transparent', fontWeight: pathname === subItem.path ? 600 : 500, textDecoration: 'none' }} onMouseEnter={e => { if (pathname !== subItem.path) e.currentTarget.style.background = '#f8fafc'; }} onMouseLeave={e => { if (pathname !== subItem.path) e.currentTarget.style.background = 'transparent'; }}>
-                              {subItem.name}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              ))}
+              {TOP_MENUS.map(menu => {
+                const isCatActive = activeCategory?.name === menu.name;
+                return (
+                  <Link 
+                    key={menu.name} 
+                    href={menu.path} 
+                    style={{ 
+                      display: 'flex', alignItems: 'center', gap: '6px', padding: '0 16px', height: '100%', 
+                      color: isCatActive ? '#38bdf8' : '#cbd5e1', 
+                      textDecoration: 'none', fontSize: '0.875rem', fontWeight: isCatActive ? 600 : 500, 
+                      background: isCatActive ? 'rgba(255,255,255,0.05)' : 'transparent',
+                      borderBottom: isCatActive ? '3px solid #38bdf8' : '3px solid transparent',
+                      transition: 'all 0.15s' 
+                    }}
+                  >
+                    {menu.name}
+                  </Link>
+                );
+              })}
             </nav>
           </div>
         </header>
+
+        {/* SECONDARY HORIZONTAL NAVIGATION BAR (replaces dropdown) */}
+        {activeCategory && activeCategory.sub && (
+          <div style={{ height: '48px', background: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', padding: '0 24px', flexShrink: 0, overflowX: 'auto', zIndex: 40, boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+            <nav style={{ display: 'flex', gap: '24px', height: '100%' }}>
+              {activeCategory.sub.map(subItem => {
+                const isSubActive = pathname === subItem.path || pathname.startsWith(subItem.path + '/');
+                return (
+                  <Link 
+                    key={subItem.name} 
+                    href={subItem.path} 
+                    style={{ 
+                      display: 'flex', alignItems: 'center', height: '100%',
+                      color: isSubActive ? '#0284c7' : '#64748b', 
+                      textDecoration: 'none', fontSize: '0.85rem', fontWeight: isSubActive ? 700 : 500,
+                      borderBottom: isSubActive ? '2px solid #0284c7' : '2px solid transparent',
+                      whiteSpace: 'nowrap', transition: 'all 0.15s'
+                    }}
+                  >
+                    {subItem.name}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        )}
 
         {/* MAIN CONTENT AREA */}
         <main style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
