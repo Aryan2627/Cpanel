@@ -36,7 +36,21 @@ export async function POST(req: Request) {
       });
     }
 
-    // 3. MATCH AGAINST USER PROVIDED DATASET
+    // 3. GREETINGS (Fallback for simple hi/hello)
+    if (/^(hi|hello|hey|greetings|morning|afternoon)\b/.test(text)) {
+      return NextResponse.json({
+        final_response: "Hello there! I am ProcGen Cortex, your AI Procurement Assistant. I am ready to process normal conversations, answer questions, or execute complex workflows like 'Check laptop inventory'."
+      });
+    }
+
+    // 4. CAPABILITIES
+    if (text.includes('what can you do') || text.includes('help') || text.includes('capabilities')) {
+      return NextResponse.json({
+        final_response: "I am designed to automate procurement tasks. Currently, I can:\n\n1. Monitor and auto-replenish low inventory.\n2. Evaluate vendor bids and compliance.\n3. Draft Purchase Requests autonomously.\n\nTry saying: *'Check laptop inventory'* to see me in action."
+      });
+    }
+
+    // 5. MATCH AGAINST USER PROVIDED DATASET
     for (const intent of intents) {
       if (text.includes(intent.q) || (intent.q === 'resume' && text.includes('resume')) || (intent.q === 'interview' && text.includes('interview'))) {
          return NextResponse.json({
