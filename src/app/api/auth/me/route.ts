@@ -31,6 +31,7 @@ export async function GET() {
     
     if (user) {
       return NextResponse.json({ 
+        id: user.id,
         name: user.name || user.email, 
         email: user.email, 
         role: user.role,
@@ -38,11 +39,20 @@ export async function GET() {
         companyName: user.organization?.name || 'My Organization',
         licenseStatus: user.organization?.licenseStatus || 'Active',
         licensePlan: user.organization?.licensePlan || 'Enterprise',
-        licenseExpiry: user.organization?.licenseExpiry || null
+        licenseExpiry: user.organization?.licenseExpiry || null,
+        permissions: user.permissions || {},
+        isImpersonating: !!payload.impersonatorId,
+        impersonatorId: payload.impersonatorId || null
       });
     }
 
-    return NextResponse.json({ name: payload.email, email: payload.email, role: payload.role });
+    return NextResponse.json({ 
+      name: payload.email, 
+      email: payload.email, 
+      role: payload.role,
+      isImpersonating: !!payload.impersonatorId,
+      impersonatorId: payload.impersonatorId || null
+    });
   } catch (err) {
     return NextResponse.json({ error: 'Failed to authenticate' }, { status: 500 });
   }

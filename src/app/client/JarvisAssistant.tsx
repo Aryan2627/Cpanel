@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect, useRef } from 'react';
 import { BrainCircuit, X, Zap, Loader2, Database, Send, Terminal, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -15,6 +15,7 @@ interface ToolCall {
 export default function JarvisAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState('');
+  const [userName, setUserName] = useState<string | null>(null);
   const [messages, setMessages] = useState<{role: 'user' | 'agent', content: string}[]>([
     { role: 'agent', content: 'Hello. I am ProcGen Cortex, your autonomous AI agent. Try asking me to "check laptop inventory and reorder".' }
   ]);
@@ -22,6 +23,22 @@ export default function JarvisAssistant() {
   const [toolCalls, setToolCalls] = useState<ToolCall[]>([]);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Fetch user info on mount to customize responses
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.name) {
+          setUserName(data.name);
+          // Update the initial greeting if desired, or just pass it in requests
+          setMessages([
+            { role: 'agent', content: `Hello ${data.name.split(' ')[0]}. I am ProcGen Cortex, your autonomous AI agent. Try asking me to "check laptop inventory and reorder".` }
+          ]);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -41,7 +58,7 @@ export default function JarvisAssistant() {
       const res = await fetch('/api/ai/cortex', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: userPrompt })
+        body: JSON.stringify({ prompt: userPrompt, userName })
       });
       
       const data = await res.json();
