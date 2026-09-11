@@ -1,6 +1,6 @@
-﻿import { NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
-import { verifySession } from '../../../../lib/session';
+import { NextResponse } from 'next/server';
+import { prisma } from '../../../lib/prisma';
+import { verifySession } from '../../../lib/session';
 
 export const runtime = 'nodejs';
 
