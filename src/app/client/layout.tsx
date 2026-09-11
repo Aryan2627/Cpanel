@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -130,11 +130,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <div style={{ height: '64px', backgroundColor: '#071330', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'relative', zIndex: 100 }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
-            <Link href="/client" style={{ color: '#fff', fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.5px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'linear-gradient(135deg, #3b82f6, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ color: '#fff', fontSize: '14px' }}>P</span>
-              </div>
-              ProcGen
+            <Link href="/client" style={{ color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <img src="/logo.png" alt="ProcGen Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
             </Link>
 
             <nav style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
