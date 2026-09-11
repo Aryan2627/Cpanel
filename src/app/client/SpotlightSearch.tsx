@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Command, ArrowRight } from 'lucide-react';
@@ -7,18 +7,46 @@ export default function SpotlightSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [dynamicResults, setDynamicResults] = useState<{id: string, title: string, icon: string, path: string}[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  const commands = [
-    { id: 'dashboard', title: 'Go to Dashboard', icon: '', path: '/client' },
-    { id: 'create-event', title: 'Create Single-Stage Event', icon: '', path: '/client/events/create/single-stage' },
-    { id: 'intakes', title: 'View Purchase Intakes', icon: '', path: '/client/intake' },
-    { id: 'templates', title: 'Manage Templates', icon: '', path: '/client/manage/templates' },
-    { id: 'products', title: 'Product Catalog', icon: '', path: '/client/manage/products' },
+  const staticCommands = [
+    { id: 'dashboard', title: 'Go to Dashboard', icon: '📊', path: '/client' },
+    { id: 'create-event', title: 'Create Single-Stage Event', icon: '⚡', path: '/client/events/create/single-stage' },
+    { id: 'intakes', title: 'View Purchase Intakes', icon: '📥', path: '/client/intake' },
+    { id: 'templates', title: 'Manage Templates', icon: '📄', path: '/client/manage/templates' },
+    { id: 'products', title: 'Product Catalog', icon: '📦', path: '/client/manage/products' },
   ];
 
-  const filteredCommands = commands.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
+  // Debounce API calls for dynamic search
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setDynamicResults([]);
+      return;
+    }
+    
+    const timeoutId = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const res = await fetch(`/api/search?q=` + encodeURIComponent(query));
+        if (res.ok) {
+          const data = await res.json();
+          setDynamicResults(data);
+        }
+      } catch (err) {
+        console.error('Search error', err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [query]);
+
+  const filteredStatic = staticCommands.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
+  const allCommands = [...filteredStatic, ...dynamicResults];
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -40,12 +68,13 @@ export default function SpotlightSearch() {
       setTimeout(() => inputRef.current?.focus(), 50);
       setQuery('');
       setSelectedIndex(0);
+      setDynamicResults([]);
     }
   }, [isOpen]);
 
   useEffect(() => {
     setSelectedIndex(0);
-  }, [query]);
+  }, [query, dynamicResults]);
 
   const executeCommand = (path: string) => {
     setIsOpen(false);
@@ -55,14 +84,14 @@ export default function SpotlightSearch() {
   const handleInputKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev < filteredCommands.length - 1 ? prev + 1 : prev));
+      setSelectedIndex((prev) => (prev < allCommands.length - 1 ? prev + 1 : prev));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (filteredCommands[selectedIndex]) {
-        executeCommand(filteredCommands[selectedIndex].path);
+      if (allCommands[selectedIndex]) {
+        executeCommand(allCommands[selectedIndex].path);
       }
     }
   };
@@ -80,20 +109,21 @@ export default function SpotlightSearch() {
           <input 
             ref={inputRef}
             type="text" 
-            placeholder="Type a command or search..." 
+            placeholder="Search POs, PRs, Vendors, or Commands..." 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleInputKeyDown}
             style={{ flex: 1, border: 'none', outline: 'none', fontSize: '1.2rem', color: '#0f172a' }}
           />
+          {isSearching && <span style={{fontSize: '0.8rem', color: '#94a3b8', marginRight: '8px'}}>Searching...</span>}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#94a3b8', fontSize: '0.75rem', fontWeight: 600 }}>
             <span style={{ padding: '2px 6px', backgroundColor: '#f1f5f9', borderRadius: '4px' }}>esc</span> to close
           </div>
         </div>
 
         <div style={{ padding: '8px', overflowY: 'auto', flex: 1 }}>
-          {filteredCommands.length > 0 ? (
-            filteredCommands.map((cmd, idx) => {
+          {allCommands.length > 0 ? (
+            allCommands.map((cmd, idx) => {
               const isSelected = idx === selectedIndex;
               return (
                 <div 
@@ -102,13 +132,13 @@ export default function SpotlightSearch() {
                   onMouseEnter={() => setSelectedIndex(idx)}
                   style={{ 
                     display: 'flex', alignItems: 'center', padding: '12px 16px', borderRadius: '8px', cursor: 'pointer', transition: 'background-color 0.1s',
-                    backgroundColor: isSelected ? '#3b82f6' : 'transparent',
-                    color: isSelected ? '#ffffff' : '#334155'
+                    backgroundColor: isSelected ? '#f1f5f9' : 'transparent',
+                    color: isSelected ? '#0f172a' : '#334155'
                   }}
                 >
                   <span style={{ fontSize: '1.25rem', marginRight: '16px' }}>{cmd.icon}</span>
                   <span style={{ flex: 1, fontWeight: 500 }}>{cmd.title}</span>
-                  {isSelected && <ArrowRight size={16} color="#ffffff" />}
+                  {isSelected && <ArrowRight size={16} color="#64748b" />}
                 </div>
               )
             })
