@@ -58,7 +58,7 @@ export default function JarvisAssistant() {
       const res = await fetch('/api/ai/cortex', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: userPrompt, userName })
+        body: JSON.stringify({ prompt: userPrompt, userName, history: messages.slice(-5) })
       });
       
       const data = await res.json();
