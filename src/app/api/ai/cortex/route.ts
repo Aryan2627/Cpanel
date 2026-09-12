@@ -44,6 +44,25 @@ export async function POST(req: Request) {
     const payload = await verifyToken(tokenStr);
     const orgId = payload?.organizationId as string | undefined;
 
+    // --- AGENTIC ACTION: LIVE DATABASE PRs ---
+    if (/(?:show|tell|get|find|list|my|recent|fetch|want|need|all).*(?:pr|prs|purchase request|intake)/i.test(text) && !text.includes('what is')) {
+      const prs = await prisma.intake.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      });
+      
+      if (prs.length === 0) {
+        return NextResponse.json({ final_response: "You don't have any recent Purchase Requests in the database." });
+      }
+
+      return NextResponse.json({
+        final_response: "Here are your latest Purchase Requests from the database:",
+        ui_component: 'pr_list',
+        ui_data: prs
+      });
+    }
+
     // --- AGENTIC ACTION: LIVE DATABASE POs ---
     if (/(?:show|tell|get|find|list|my|recent|fetch|want|need|all).*(?:po|pos|purchase order)/i.test(text) && !text.includes('what is')) {
       const pos = await prisma.purchaseOrder.findMany({

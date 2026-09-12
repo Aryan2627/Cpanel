@@ -165,6 +165,28 @@ export default function JarvisAssistant() {
                   </div>
                 )}
 
+                {msg.uiComponent === 'pr_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((pr: any) => (
+                      <div key={pr.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>{pr.refId}</div>
+                        <div style={{ color: '#64748b', marginBottom: '8px' }}>{pr.title || 'Purchase Request'}</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ padding: '2px 8px', background: '#fef3c7', color: '#d97706', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 600 }}>
+                            {pr.status}
+                          </span>
+                          <span style={{ fontWeight: 700, color: '#64748b' }}>
+                            Qty: {pr.quantity}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    <button style={{ width: '100%', padding: '8px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', marginTop: '4px' }}>
+                      View All Requests
+                    </button>
+                  </div>
+                )}
+
                 {msg.uiComponent === 'vendor_list' && msg.uiData && (
                   <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {msg.uiData.map((vendor: any) => (
