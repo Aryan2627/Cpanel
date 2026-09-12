@@ -118,6 +118,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ final_response: "Here are your active team members:", ui_component: 'user_list', ui_data: users });
     }
 
+    // --- AGENTIC ACTION: LIVE DATABASE CONTRACTS / LICENSES ---
+    const contractTargets = ['contract', 'contracts', 'agreement', 'agreements', 'license', 'licenses', 'software', 'subscription', 'licens', 'cntract'];
+    if ((/(?:contract|agreement|license|subscription)/i.test(text) || hasFuzzyMatch(text, contractTargets, 2)) && !/(what|how|why|when|where)/i.test(text)) {
+      const contracts = await prisma.contract.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      });
+      if (contracts.length === 0) return NextResponse.json({ final_response: "You have no active contracts or licenses in the database." });
+      return NextResponse.json({ final_response: "Here are your latest Contracts and Licenses:", ui_component: 'contract_list', ui_data: contracts });
+    }
+
     // --- AGENTIC ACTION: LIVE DATABASE APPROVALS ---
     const approvalTargets = ['approval', 'approvals', 'pending approval', 'aprovl', 'aprovls', 'aproval'];
     if ((/(?:approval|approvals|pending approval)/i.test(text) || hasFuzzyMatch(text, approvalTargets, 2)) && !/(what|how|why|when|where|who)/i.test(text)) {

@@ -226,6 +226,25 @@ export default function JarvisAssistant() {
                   </div>
                 )}
 
+                {msg.uiComponent === 'contract_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((c: any) => (
+                      <div key={c.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>{c.title || 'Software License Agreement'}</div>
+                        <div style={{ color: '#64748b', marginBottom: '8px' }}>Vendor: {c.vendorName || 'N/A'}</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ padding: '2px 8px', background: '#dcfce7', color: '#166534', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 600 }}>
+                            {c.status}
+                          </span>
+                          <span style={{ fontWeight: 700, color: '#64748b' }}>
+                            ${(c.total || 0).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {msg.uiComponent === 'approval_list' && msg.uiData && (
                   <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {msg.uiData.map((app: any) => (
