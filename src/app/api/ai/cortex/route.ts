@@ -118,6 +118,54 @@ export async function POST(req: Request) {
       return NextResponse.json({ final_response: "Here are your active team members:", ui_component: 'user_list', ui_data: users });
     }
 
+    // --- AGENTIC ACTION: LIVE DATABASE LOCATIONS ---
+    const locationTargets = ['location', 'locations', 'site', 'sites', 'office', 'offices', 'locaton'];
+    if ((/(?:location|site|office)/i.test(text) || hasFuzzyMatch(text, locationTargets, 2)) && !/(what|how|why|when|where)/i.test(text)) {
+      const locations = await prisma.location.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      });
+      if (locations.length === 0) return NextResponse.json({ final_response: "No locations found." });
+      return NextResponse.json({ final_response: "Here are your active locations/sites:", ui_component: 'location_list', ui_data: locations });
+    }
+
+    // --- AGENTIC ACTION: LIVE DATABASE CATEGORIES ---
+    const categoryTargets = ['category', 'categories', 'catagory', 'taxonomy'];
+    if ((/(?:category|categories|taxonomy)/i.test(text) || hasFuzzyMatch(text, categoryTargets, 2)) && !/(what|how|why|when|where)/i.test(text)) {
+      const categories = await prisma.category.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 4,
+        orderBy: { name: 'asc' }
+      });
+      if (categories.length === 0) return NextResponse.json({ final_response: "No categories found." });
+      return NextResponse.json({ final_response: "Here are your procurement categories:", ui_component: 'category_list', ui_data: categories });
+    }
+
+    // --- AGENTIC ACTION: LIVE DATABASE TEMPLATES ---
+    const templateTargets = ['template', 'templates', 'form', 'forms', 'templet'];
+    if ((/(?:template|form)/i.test(text) || hasFuzzyMatch(text, templateTargets, 2)) && !/(what|how|why|when|where)/i.test(text)) {
+      const templates = await prisma.template.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      });
+      if (templates.length === 0) return NextResponse.json({ final_response: "No templates found." });
+      return NextResponse.json({ final_response: "Here are your saved templates:", ui_component: 'template_list', ui_data: templates });
+    }
+
+    // --- AGENTIC ACTION: LIVE DATABASE WORKFLOWS ---
+    const workflowTargets = ['workflow', 'workflows', 'process', 'processes', 'wkflow'];
+    if ((/(?:workflow|process)/i.test(text) || hasFuzzyMatch(text, workflowTargets, 2)) && !/(what|how|why|when|where)/i.test(text)) {
+      const workflows = await prisma.workflow.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      });
+      if (workflows.length === 0) return NextResponse.json({ final_response: "No workflows found." });
+      return NextResponse.json({ final_response: "Here are your active approval workflows:", ui_component: 'workflow_list', ui_data: workflows });
+    }
+
     // --- AGENTIC ACTION: LIVE DATABASE CONTRACTS / LICENSES ---
     const contractTargets = ['contract', 'contracts', 'agreement', 'agreements', 'license', 'licenses', 'software', 'subscription', 'licens', 'cntract'];
     if ((/(?:contract|agreement|license|subscription)/i.test(text) || hasFuzzyMatch(text, contractTargets, 2)) && !/(what|how|why|when|where)/i.test(text)) {

@@ -226,6 +226,55 @@ export default function JarvisAssistant() {
                   </div>
                 )}
 
+                {msg.uiComponent === 'location_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((loc: any) => (
+                      <div key={loc.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{loc.name || 'Location'}</div>
+                        <div style={{ color: '#64748b' }}>{loc.city || 'N/A'} • {loc.type || 'Office'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'category_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((cat: any) => (
+                      <div key={cat.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{cat.name}</div>
+                        <div style={{ color: '#64748b', fontSize: '0.7rem' }}>Code: {cat.code || 'N/A'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'template_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((tpl: any) => (
+                      <div key={tpl.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{tpl.name}</div>
+                        <div style={{ color: '#64748b', fontSize: '0.7rem' }}>Type: {tpl.type || 'Form'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'workflow_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((wf: any) => (
+                      <div key={wf.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{wf.name}</div>
+                        <div style={{ color: '#64748b', fontSize: '0.7rem' }}>Category: {wf.category || 'General'}</div>
+                        <div style={{ marginTop: '4px' }}>
+                          <span style={{ padding: '2px 8px', background: wf.isActive ? '#dcfce7' : '#fee2e2', color: wf.isActive ? '#166534' : '#991b1b', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 600 }}>
+                            {wf.isActive ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {msg.uiComponent === 'contract_list' && msg.uiData && (
                   <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {msg.uiData.map((c: any) => (
