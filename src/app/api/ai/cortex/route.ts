@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     const orgId = payload?.organizationId as string | undefined;
 
     // --- AGENTIC ACTION: LIVE DATABASE POs ---
-    if (/(?:show|tell|get|find|list|my|recent|fetch).*(?:po|pos|purchase order)/i.test(text) && !text.includes('what is')) {
+    if (/(?:show|tell|get|find|list|my|recent|fetch|want|need|all).*(?:po|pos|purchase order)/i.test(text) && !text.includes('what is')) {
       const pos = await prisma.purchaseOrder.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: SEARCH VENDORS ---
-    if (/(?:show|tell|get|find|list|search|my|recent|fetch).*(?:vendor|supplier)/i.test(text) && !text.includes('what is')) {
+    if (/(?:show|tell|get|find|list|search|my|recent|fetch|want|need|name|who).*(?:vendor|supplier)/i.test(text) && !text.includes('what is')) {
       const vendors = await prisma.vendor.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 2,
