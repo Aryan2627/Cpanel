@@ -63,15 +63,9 @@ export default function JarvisAssistant() {
       
       const data = await res.json();
       
-      if (data.agentic_loop && data.agentic_loop.length > 0) {
-        // Simulate execution delay for each step
-        for (let i = 0; i < data.agentic_loop.length; i++) {
-          await new Promise(r => setTimeout(r, 1200));
-          setToolCalls(prev => [...prev, data.agentic_loop[i]]);
-        }
-      }
+      // Simulate brief thinking delay for UX
+      await new Promise(r => setTimeout(r, 600));
       
-      await new Promise(r => setTimeout(r, 1000));
       setMessages(prev => [...prev, { 
         role: 'agent', 
         content: data.final_response,
@@ -193,36 +187,18 @@ export default function JarvisAssistant() {
             </div>
           ))}
 
-          {/* Active Tool Calls Visualization */}
-          {toolCalls.length > 0 && (
-            <div style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', alignSelf: 'flex-start', width: '100%' }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Terminal size={12} /> Agentic Execution Trace
+          {/* Loading Indicator */}
+          {isProcessing && (
+            <div style={{ alignSelf: 'flex-start', maxWidth: '85%' }}>
+              <div style={{ 
+                background: '#ffffff', color: '#64748b', padding: '12px 16px', 
+                borderRadius: '16px 16px 16px 4px', border: '1px solid #e2e8f0',
+                fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px'
+              }}>
+                <Loader2 size={16} className="animate-spin" /> Cortex is thinking...
               </div>
-              
-              {toolCalls.map((tc, idx) => (
-                <div key={idx} style={{ fontSize: '0.8rem', fontFamily: 'monospace', background: '#ffffff', padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-                  {tc.action === 'THINKING' ? (
-                    <div style={{ color: '#64748b' }}>{tc.message}</div>
-                  ) : (
-                    <div>
-                      <div style={{ color: '#0284c7', fontWeight: 'bold' }}>&gt; {tc.tool}({JSON.stringify(tc.args)})</div>
-                      <div style={{ color: '#10b981', marginTop: '4px', display: 'flex', alignItems: 'flex-start', gap: '4px' }}>
-                        <CheckCircle2 size={12} style={{ marginTop: '2px', flexShrink: 0 }} /> {tc.result}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-              
-              {isProcessing && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: '#64748b', padding: '4px' }}>
-                  <Loader2 size={14} className="animate-spin" /> Cortex is working...
-                </div>
-              )}
             </div>
           )}
-
           <div ref={messagesEndRef} />
         </div>
 
