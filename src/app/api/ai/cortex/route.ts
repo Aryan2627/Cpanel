@@ -56,17 +56,14 @@ export async function POST(req: Request) {
         return NextResponse.json({ final_response: "You don't have any recent Purchase Orders in the database." });
       }
 
-      let markdownTable = `Here are your latest Purchase Orders from the database:\n\n| PO Number | Title | Status | Total |\n|---|---|---|---|\n`;
-      pos.forEach(po => {
-        markdownTable += `| **${po.poNumber}** | ${po.title || 'N/A'} | \`${po.status}\` | $${po.total.toLocaleString()} |\n`;
-      });
-      
       return NextResponse.json({
         agentic_loop: [
           { step: 1, action: "THINKING", message: "User is asking for their Purchase Orders. I need to securely query the database." },
           { step: 2, action: "EXECUTE_TOOL", tool: "query_database", args: { table: "PurchaseOrder", orgId }, result: `Found ${pos.length} records.` }
         ],
-        final_response: markdownTable
+        final_response: "Here are your latest Purchase Orders from the database:",
+        ui_component: 'po_list',
+        ui_data: pos
       });
     }
 
@@ -78,16 +75,15 @@ export async function POST(req: Request) {
         orderBy: { name: 'asc' }
       });
       if (vendors.length === 0) return NextResponse.json({ final_response: "I couldn't find any vendors in your database." });
-
-      let vendorText = `Here are some active vendors in your database:\n`;
-      vendors.forEach(v => vendorText += `- **${v.name}** (Code: ${v.vendorCode || 'N/A'}) - Status: ${v.status}\n`);
       
       return NextResponse.json({
         agentic_loop: [
           { step: 1, action: "THINKING", message: "Fetching live vendor list from the database..." },
           { step: 2, action: "EXECUTE_TOOL", tool: "query_database", args: { table: "Vendor", orgId }, result: `Found ${vendors.length} vendors.` }
         ],
-        final_response: vendorText
+        final_response: "Here are the active vendors I found in your database:",
+        ui_component: 'vendor_list',
+        ui_data: vendors
       });
     }
 

@@ -16,7 +16,7 @@ export default function JarvisAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState('');
   const [userName, setUserName] = useState<string | null>(null);
-  const [messages, setMessages] = useState<{role: 'user' | 'agent', content: string}[]>([
+  const [messages, setMessages] = useState<{role: 'user' | 'agent', content: string, uiComponent?: string, uiData?: any}[]>([
     { role: 'agent', content: 'Hello. I am ProcGen Cortex, your autonomous AI agent. Try asking me to "check laptop inventory and reorder".' }
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -72,7 +72,12 @@ export default function JarvisAssistant() {
       }
       
       await new Promise(r => setTimeout(r, 1000));
-      setMessages(prev => [...prev, { role: 'agent', content: data.final_response }]);
+      setMessages(prev => [...prev, { 
+        role: 'agent', 
+        content: data.final_response,
+        uiComponent: data.ui_component,
+        uiData: data.ui_data 
+      }]);
 
     } catch (err) {
       setMessages(prev => [...prev, { role: 'agent', content: 'Connection to Cortex Core failed.' }]);
@@ -143,6 +148,47 @@ export default function JarvisAssistant() {
                 fontSize: '0.9rem', lineHeight: '1.5'
               }}>
                 {msg.content}
+                
+                {msg.uiComponent === 'po_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((po: any) => (
+                      <div key={po.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>{po.poNumber}</div>
+                        <div style={{ color: '#64748b', marginBottom: '8px' }}>{po.title || 'Standard Purchase Order'}</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ padding: '2px 8px', background: '#e0e7ff', color: '#3730a3', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 600 }}>
+                            {po.status}
+                          </span>
+                          <span style={{ fontWeight: 700, color: '#16a34a' }}>
+                            ${po.total.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    <button style={{ width: '100%', padding: '8px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', marginTop: '4px' }}>
+                      View All Orders
+                    </button>
+                  </div>
+                )}
+
+                {msg.uiComponent === 'vendor_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((vendor: any) => (
+                      <div key={vendor.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '32px', height: '32px', background: '#3b82f6', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.8rem' }}>
+                          {vendor.name.charAt(0)}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.8rem' }}>{vendor.name}</div>
+                          <div style={{ color: '#64748b', fontSize: '0.7rem' }}>Code: {vendor.vendorCode || 'N/A'}</div>
+                        </div>
+                        <span style={{ padding: '2px 8px', background: vendor.status === 'Approved' ? '#dcfce7' : '#fef3c7', color: vendor.status === 'Approved' ? '#16a34a' : '#d97706', borderRadius: '12px', fontSize: '0.65rem', fontWeight: 600 }}>
+                          {vendor.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}
