@@ -83,7 +83,8 @@ export async function POST(req: Request) {
     const orgId = payload?.organizationId as string | undefined;
 
     // --- AGENTIC ACTION: LIVE DATABASE EVENTS ---
-    if ((/(?:event\b|events\b|auction|auctions|sourcing)/i.test(text) || hasFuzzyMatch(text, ['event', 'events', 'auction', 'auctions', 'sourcing'])) && !/(what|how|why|when|where|who)/i.test(text)) {
+    const eventTargets = ['event', 'events', 'auction', 'auctions', 'sourcing', 'evnt', 'evnts', 'aution', 'sorcing'];
+    if ((/(?:event\b|events\b|auction|auctions|sourcing)/i.test(text) || hasFuzzyMatch(text, eventTargets, 2)) && !/(what|how|why|when|where|who)/i.test(text)) {
       const events = await prisma.event.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -94,7 +95,8 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: LIVE DATABASE PRODUCTS ---
-    if ((/(?:product|products|item\b|items|catalog)/i.test(text) || hasFuzzyMatch(text, ['product', 'products', 'item', 'items', 'catalog'])) && !/(what|how|why|when|where|who)/i.test(text)) {
+    const productTargets = ['product', 'products', 'item', 'items', 'catalog', 'pruduct', 'prodct', 'catlog', 'producs'];
+    if ((/(?:product|products|item\b|items|catalog)/i.test(text) || hasFuzzyMatch(text, productTargets, 2)) && !/(what|how|why|when|where|who)/i.test(text)) {
       const products = await prisma.product.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -105,7 +107,8 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: LIVE DATABASE USERS ---
-    if ((/(?:user|users|team|members|staff)/i.test(text) || hasFuzzyMatch(text, ['user', 'users', 'team', 'members', 'staff'])) && !/(what|how|why|when|where)/i.test(text)) {
+    const userTargets = ['user', 'users', 'team', 'members', 'staff', 'usrs', 'member', 'staf', 'employes'];
+    if ((/(?:user|users|team|members|staff)/i.test(text) || hasFuzzyMatch(text, userTargets, 2)) && !/(what|how|why|when|where)/i.test(text)) {
       const users = await prisma.user.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -116,7 +119,8 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: LIVE DATABASE APPROVALS ---
-    if ((/(?:approval|approvals|pending approval)/i.test(text) || hasFuzzyMatch(text, ['approval', 'approvals', 'pending approval'])) && !/(what|how|why|when|where|who)/i.test(text)) {
+    const approvalTargets = ['approval', 'approvals', 'pending approval', 'aprovl', 'aprovls', 'aproval'];
+    if ((/(?:approval|approvals|pending approval)/i.test(text) || hasFuzzyMatch(text, approvalTargets, 2)) && !/(what|how|why|when|where|who)/i.test(text)) {
       const approvals = await prisma.approvalRequest.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -127,7 +131,8 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: LIVE DATABASE PRs ---
-    if ((/(?:pr\b|prs\b|purchase request|purchase requests|intake\b|intakes\b)/i.test(text) || hasFuzzyMatch(text, ['purchase request', 'purchase requests', 'intake', 'intakes'])) && !/(what|how|why|when|where|who)/i.test(text)) {
+    const prTargets = ['purchase request', 'purchase requests', 'intake', 'intakes', 'purcas request', 'purchs request', 'perchase request'];
+    if ((/(?:pr\b|prs\b|purchase request|purchase requests|intake\b|intakes\b)/i.test(text) || hasFuzzyMatch(text, prTargets, 3)) && !/(what|how|why|when|where|who)/i.test(text)) {
       const prs = await prisma.intake.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -146,7 +151,8 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: LIVE DATABASE POs ---
-    if ((/(?:po\b|pos\b|purchase order|purchase orders)/i.test(text) || hasFuzzyMatch(text, ['purchase order', 'purchase orders'])) && !/(what|how|why|when|where|who)/i.test(text)) {
+    const poTargets = ['purchase order', 'purchase orders', 'purcase order', 'purchas order', 'purchse order', 'perchase order', 'purcas order'];
+    if ((/(?:po\b|pos\b|purchase order|purchase orders)/i.test(text) || hasFuzzyMatch(text, poTargets, 3)) && !/(what|how|why|when|where|who)/i.test(text)) {
       const pos = await prisma.purchaseOrder.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -169,7 +175,8 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: SEARCH VENDORS ---
-    if ((/(?:vendor|vendors|supplier|suppliers)/i.test(text) || hasFuzzyMatch(text, ['vendor', 'vendors', 'supplier', 'suppliers'])) && !/(what|how|why|when|where)/i.test(text)) {
+    const vendorTargets = ['vendor', 'vendors', 'supplier', 'suppliers', 'vender', 'venders', 'suplier', 'supliers', 'vendrs', 'vendar', 'suplir'];
+    if ((/(?:vendor|vendors|supplier|suppliers)/i.test(text) || hasFuzzyMatch(text, vendorTargets, 2)) && !/(what|how|why|when|where)/i.test(text)) {
       const vendors = await prisma.vendor.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 2,
