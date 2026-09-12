@@ -29,6 +29,44 @@ function calculateSimilarity(inputTokens: string[], intentTokens: string[]): num
   return matches / Math.max(inputTokens.length, intentTokens.length * 0.7); // Penalize slightly if intent is much longer
 }
 
+// Levenshtein Distance for typo tolerance
+function levenshtein(a: string, b: string): number {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) { matrix[i] = [i]; }
+  for (let j = 0; j <= a.length; j++) { matrix[0][j] = j; }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) == a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+// Check if any word in text matches a target with max 1 or 2 typos
+function hasFuzzyMatch(text: string, targets: string[], maxDist = 2): boolean {
+  const tokens = text.toLowerCase().split(/[^a-z0-9]+/);
+  // Also check full phrases if targets have spaces
+  for (const target of targets) {
+    if (target.includes(' ')) {
+      if (text.toLowerCase().includes(target)) return true;
+      // Very basic phrase fuzzy check: remove spaces and compare
+      if (levenshtein(text.toLowerCase().replace(/\s+/g, ''), target.replace(/\s+/g, '')) <= maxDist) return true;
+    } else {
+      for (const token of tokens) {
+        if (token.length < 3) continue;
+        if (levenshtein(token, target) <= (target.length <= 4 ? 1 : maxDist)) return true;
+      }
+    }
+  }
+  return false;
+}
+
 export async function POST(req: Request) {
   try {
     const { prompt, userName, history } = await req.json();
@@ -45,7 +83,7 @@ export async function POST(req: Request) {
     const orgId = payload?.organizationId as string | undefined;
 
     // --- AGENTIC ACTION: LIVE DATABASE EVENTS ---
-    if (/(?:event\b|events\b|auction|auctions|sourcing)/i.test(text) && !/(what|how|why|when|where|who)/i.test(text)) {
+    if ((/(?:event\b|events\b|auction|auctions|sourcing)/i.test(text) || hasFuzzyMatch(text, ['event', 'events', 'auction', 'auctions', 'sourcing'])) && !/(what|how|why|when|where|who)/i.test(text)) {
       const events = await prisma.event.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -56,7 +94,7 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: LIVE DATABASE PRODUCTS ---
-    if (/(?:product|products|item\b|items|catalog)/i.test(text) && !/(what|how|why|when|where|who)/i.test(text)) {
+    if ((/(?:product|products|item\b|items|catalog)/i.test(text) || hasFuzzyMatch(text, ['product', 'products', 'item', 'items', 'catalog'])) && !/(what|how|why|when|where|who)/i.test(text)) {
       const products = await prisma.product.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -67,7 +105,7 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: LIVE DATABASE USERS ---
-    if (/(?:user|users|team|members|staff)/i.test(text) && !/(what|how|why|when|where)/i.test(text)) {
+    if ((/(?:user|users|team|members|staff)/i.test(text) || hasFuzzyMatch(text, ['user', 'users', 'team', 'members', 'staff'])) && !/(what|how|why|when|where)/i.test(text)) {
       const users = await prisma.user.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -78,7 +116,7 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: LIVE DATABASE APPROVALS ---
-    if (/(?:approval|approvals|pending approval)/i.test(text) && !/(what|how|why|when|where|who)/i.test(text)) {
+    if ((/(?:approval|approvals|pending approval)/i.test(text) || hasFuzzyMatch(text, ['approval', 'approvals', 'pending approval'])) && !/(what|how|why|when|where|who)/i.test(text)) {
       const approvals = await prisma.approvalRequest.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -89,7 +127,7 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: LIVE DATABASE PRs ---
-    if (/(?:pr\b|prs\b|purchase request|purchase requests|intake\b|intakes\b)/i.test(text) && !/(what|how|why|when|where|who)/i.test(text)) {
+    if ((/(?:pr\b|prs\b|purchase request|purchase requests|intake\b|intakes\b)/i.test(text) || hasFuzzyMatch(text, ['purchase request', 'purchase requests', 'intake', 'intakes'])) && !/(what|how|why|when|where|who)/i.test(text)) {
       const prs = await prisma.intake.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -108,7 +146,7 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: LIVE DATABASE POs ---
-    if (/(?:po\b|pos\b|purchase order|purchase orders)/i.test(text) && !/(what|how|why|when|where|who)/i.test(text)) {
+    if ((/(?:po\b|pos\b|purchase order|purchase orders)/i.test(text) || hasFuzzyMatch(text, ['purchase order', 'purchase orders'])) && !/(what|how|why|when|where|who)/i.test(text)) {
       const pos = await prisma.purchaseOrder.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 3,
@@ -131,7 +169,7 @@ export async function POST(req: Request) {
     }
 
     // --- AGENTIC ACTION: SEARCH VENDORS ---
-    if (/(?:vendor|vendors|supplier|suppliers)/i.test(text) && !/(what|how|why|when|where)/i.test(text)) {
+    if ((/(?:vendor|vendors|supplier|suppliers)/i.test(text) || hasFuzzyMatch(text, ['vendor', 'vendors', 'supplier', 'suppliers'])) && !/(what|how|why|when|where)/i.test(text)) {
       const vendors = await prisma.vendor.findMany({
         where: orgId ? { organizationId: orgId } : undefined,
         take: 2,
