@@ -44,6 +44,50 @@ export async function POST(req: Request) {
     const payload = await verifyToken(tokenStr);
     const orgId = payload?.organizationId as string | undefined;
 
+    // --- AGENTIC ACTION: LIVE DATABASE EVENTS ---
+    if (/(?:event\b|events\b|auction|auctions|sourcing)/i.test(text) && !/(what|how|why|when|where|who)/i.test(text)) {
+      const events = await prisma.event.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      });
+      if (events.length === 0) return NextResponse.json({ final_response: "You don't have any recent Sourcing Events." });
+      return NextResponse.json({ final_response: "Here are your latest Sourcing Events:", ui_component: 'event_list', ui_data: events });
+    }
+
+    // --- AGENTIC ACTION: LIVE DATABASE PRODUCTS ---
+    if (/(?:product|products|item\b|items|catalog)/i.test(text) && !/(what|how|why|when|where|who)/i.test(text)) {
+      const products = await prisma.product.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      });
+      if (products.length === 0) return NextResponse.json({ final_response: "You don't have any products in your catalog." });
+      return NextResponse.json({ final_response: "Here are items from your Product Catalog:", ui_component: 'product_list', ui_data: products });
+    }
+
+    // --- AGENTIC ACTION: LIVE DATABASE USERS ---
+    if (/(?:user|users|team|members|staff)/i.test(text) && !/(what|how|why|when|where)/i.test(text)) {
+      const users = await prisma.user.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      });
+      if (users.length === 0) return NextResponse.json({ final_response: "No team members found." });
+      return NextResponse.json({ final_response: "Here are your active team members:", ui_component: 'user_list', ui_data: users });
+    }
+
+    // --- AGENTIC ACTION: LIVE DATABASE APPROVALS ---
+    if (/(?:approval|approvals|pending approval)/i.test(text) && !/(what|how|why|when|where|who)/i.test(text)) {
+      const approvals = await prisma.approvalRequest.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      });
+      if (approvals.length === 0) return NextResponse.json({ final_response: "You have no pending approval requests." });
+      return NextResponse.json({ final_response: "Here are your latest approval requests:", ui_component: 'approval_list', ui_data: approvals });
+    }
+
     // --- AGENTIC ACTION: LIVE DATABASE PRs ---
     if (/(?:pr\b|prs\b|purchase request|purchase requests|intake\b|intakes\b)/i.test(text) && !/(what|how|why|when|where|who)/i.test(text)) {
       const prs = await prisma.intake.findMany({

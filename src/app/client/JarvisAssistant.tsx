@@ -187,6 +187,57 @@ export default function JarvisAssistant() {
                   </div>
                 )}
 
+                {msg.uiComponent === 'event_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((ev: any) => (
+                      <div key={ev.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>{ev.refId}</div>
+                        <div style={{ color: '#64748b', marginBottom: '8px' }}>{ev.title || 'Sourcing Event'}</div>
+                        <span style={{ padding: '2px 8px', background: '#e0e7ff', color: '#3730a3', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 600 }}>{ev.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'product_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((prod: any) => (
+                      <div key={prod.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{prod.name}</div>
+                        <div style={{ color: '#64748b' }}>Category: {prod.category || 'General'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'user_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((u: any) => (
+                      <div key={u.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '28px', height: '28px', background: '#cbd5e1', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                          {u.name?.charAt(0) || 'U'}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 700, color: '#0f172a' }}>{u.name}</div>
+                          <div style={{ color: '#64748b', fontSize: '0.7rem' }}>{u.role || 'User'}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'approval_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((app: any) => (
+                      <div key={app.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#fffbeb', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#92400e', marginBottom: '4px' }}>Approval Required</div>
+                        <div style={{ color: '#b45309', marginBottom: '8px' }}>Workflow ID: {app.workflowId}</div>
+                        <button style={{ padding: '4px 12px', background: '#d97706', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer' }}>Review Now</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {msg.uiComponent === 'vendor_list' && msg.uiData && (
                   <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {msg.uiData.map((vendor: any) => (
