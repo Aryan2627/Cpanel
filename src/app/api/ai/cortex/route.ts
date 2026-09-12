@@ -82,6 +82,14 @@ export async function POST(req: Request) {
     const payload = await verifyToken(tokenStr);
     const orgId = payload?.organizationId as string | undefined;
 
+    // --- AGENTIC ACTION: CORTEX IDENTITY ---
+    const identityTargets = ['who are you', 'what are you', 'are you ai', 'are you an ai', 'are you agent', 'ai agent', 'cortex', 'is cortex a ai agent', 'is cortex an ai agent'];
+    if (/(?:who are you|what are you|ai agent|cortex|about yourself)/i.test(text) || hasFuzzyMatch(text, identityTargets, 1)) {
+      return NextResponse.json({
+        final_response: "Yes! I am **Cortex**, an autonomous AI agent built directly into the ProcGen platform. Unlike standard chatbots, I have direct, secure access to your organization's database and can dynamically render native UI cards for things like POs, Vendors, and Sourcing Events right here in the chat. How can I help you?"
+      });
+    }
+
     // --- AGENTIC ACTION: LIVE DATABASE EVENTS ---
     const eventTargets = ['event', 'events', 'auction', 'auctions', 'sourcing', 'evnt', 'evnts', 'aution', 'sorcing'];
     if ((/(?:event\b|events\b|auction|auctions|sourcing)/i.test(text) || hasFuzzyMatch(text, eventTargets, 2)) && !/(what|how|why|when|where|who)/i.test(text)) {
