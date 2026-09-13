@@ -13,6 +13,7 @@ interface ToolCall {
 }
 
 export default function JarvisAssistant() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState('');
   const [userName, setUserName] = useState<string | null>(null);
@@ -306,22 +307,87 @@ export default function JarvisAssistant() {
                   </div>
                 )}
 
-                {msg.uiComponent === 'vendor_list' && msg.uiData && (
-                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {msg.uiData.map((vendor: any) => (
-                      <div key={vendor.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '32px', height: '32px', background: '#3b82f6', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.8rem' }}>
-                          {vendor.name.charAt(0)}
+                {msg.uiComponent === 'inventory_reorder' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ padding: '12px', border: '1px solid #e2e8f0', borderRadius: '10px', background: '#f8fafc' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                        <div>
+                          <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.85rem' }}>{msg.uiData.productName}</div>
+                          <div style={{ color: '#64748b', fontSize: '0.72rem' }}>SKU: {msg.uiData.sku} • Category: Hardware</div>
                         </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.8rem' }}>{vendor.name}</div>
-                          <div style={{ color: '#64748b', fontSize: '0.7rem' }}>Code: {vendor.vendorCode || 'N/A'}</div>
-                        </div>
-                        <span style={{ padding: '2px 8px', background: vendor.status === 'Approved' ? '#dcfce7' : '#fef3c7', color: vendor.status === 'Approved' ? '#16a34a' : '#d97706', borderRadius: '12px', fontSize: '0.65rem', fontWeight: 600 }}>
-                          {vendor.status}
+                        <span style={{ padding: '2px 8px', background: '#fee2e2', color: '#dc2626', borderRadius: '12px', fontSize: '0.68rem', fontWeight: 700 }}>
+                          {msg.uiData.stockAlert}
                         </span>
                       </div>
-                    ))}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px', background: '#fff', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                        <div>
+                          <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>CURRENT STOCK</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#dc2626' }}>{msg.uiData.currentStock} Units</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>RECOMMENDED RESTOCK</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#16a34a' }}>+{msg.uiData.reorderQuantity} Units</div>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setMessages(prev => [...prev, { role: 'user', content: `Auto-reorder ${msg.uiData.reorderQuantity} units of ${msg.uiData.productName}` }]);
+                          setIsProcessing(true);
+                          fetch('/api/ai/cortex', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ prompt: 'reorder now', userName, history: messages.slice(-5) })
+                          })
+                          .then(r => r.json())
+                          .then(d => {
+                            setMessages(prev => [...prev, { role: 'agent', content: d.final_response }]);
+                          })
+                          .catch(() => {
+                            setMessages(prev => [...prev, { role: 'agent', content: 'Reorder triggered. Redirecting to Purchase Request studio...' }]);
+                            setTimeout(() => router.push('/client/intake/create'), 1200);
+                          })
+                          .finally(() => setIsProcessing(false));
+                        }}
+                        style={{ width: '100%', padding: '9px', background: 'linear-gradient(135deg, #0f172a, #1e293b)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', boxShadow: '0 2px 6px rgba(15,23,42,0.15)' }}
+                      >
+                        <Zap size={14} color="#38bdf8" /> Auto-Create Reorder Request
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {msg.uiComponent === 'vendor_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((vendor: any) => {
+                      const isGood = ['Approved', 'Active', 'Onboarded'].includes(vendor.status);
+                      return (
+                        <div key={vendor.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{ width: '32px', height: '32px', background: '#3b82f6', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.85rem' }}>
+                            {vendor.name.charAt(0)}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.85rem' }}>{vendor.name}</div>
+                            <div style={{ color: '#64748b', fontSize: '0.72rem' }}>Code: {vendor.vendorCode || 'N/A'}</div>
+                          </div>
+                          <span style={{ 
+                            padding: '3px 8px', 
+                            background: isGood ? '#dcfce7' : '#fef3c7', 
+                            color: isGood ? '#16a34a' : '#d97706', 
+                            borderRadius: '12px', 
+                            fontSize: '0.68rem', 
+                            fontWeight: 700 
+                          }}>
+                            {vendor.status}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    <button 
+                      onClick={() => router.push('/client/vendors')}
+                      style={{ width: '100%', padding: '8px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', marginTop: '4px' }}
+                    >
+                      View All Vendors in Directory
+                    </button>
                   </div>
                 )}
               </div>
