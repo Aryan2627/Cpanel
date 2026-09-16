@@ -20,8 +20,6 @@ function AuctionCreateContent() {
   
   const [title, setTitle] = useState(initialTitle);
   const { intakes } = useIntake();
-  const [isWorkspaceMode, setIsWorkspaceMode] = useState(false);
-  
   const [showTinderMatchmaking, setShowTinderMatchmaking] = useState(false);
   const [isTinderModalOpen, setIsTinderModalOpen] = useState(false);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
@@ -294,53 +292,6 @@ function AuctionCreateContent() {
   return (
     <div style={{ display: 'flex', height: '100%', minHeight: '100vh', background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', margin: '-32px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       
-      {/* Workspace Sidebar */}
-      {isWorkspaceMode && (
-        <div style={{ width: '380px', background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(20px)', borderRight: '1px solid rgba(255,255,255,0.6)', padding: '24px', overflowY: 'auto', boxShadow: '4px 0 24px rgba(0,0,0,0.02)', zIndex: 40 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <LayoutTemplate size={20} color="#0f172a" />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', margin: 0 }}>Intake Workspace</h2>
-          </div>
-          <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '24px', lineHeight: '1.5' }}>Drag an intake and drop it into the Event Line Items table to auto-populate data.</p>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {intakes.length === 0 && (
-              <div style={{ padding: '24px', textAlign: 'center', background: 'rgba(255,255,255,0.5)', borderRadius: '12px', border: '1px dashed rgba(203,213,225,0.8)' }}>
-                <div style={{ color: '#94a3b8', fontSize: '0.9rem' }}>No intakes available.</div>
-              </div>
-            )}
-            {intakes.map((intake: any) => (
-              <div 
-                key={intake.refId} 
-                draggable 
-                onDragStart={(e) => {
-                  e.dataTransfer.setData('text/plain', intake.refId);
-                  e.currentTarget.style.opacity = '0.5';
-                  e.currentTarget.style.transform = 'scale(0.98)';
-                }}
-                onDragEnd={(e) => {
-                  e.currentTarget.style.opacity = '1';
-                  e.currentTarget.style.transform = 'none';
-                }}
-                style={{ background: '#ffffff', border: '1px solid rgba(226, 232, 240, 0.8)', borderRadius: '12px', padding: '16px', cursor: 'grab', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', transition: 'all 0.2s ease', position: 'relative' }}
-                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)'; e.currentTarget.style.transform = 'none'; }}
-              >
-                <div style={{ position: 'absolute', right: '16px', top: '16px', color: '#cbd5e1' }}><GripVertical size={16} /></div>
-                <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#3b82f6', marginBottom: '4px', letterSpacing: '0.5px' }}>{intake.refId}</div>
-                <div style={{ fontSize: '1.05rem', fontWeight: '600', color: '#1e293b', marginBottom: '12px', paddingRight: '20px' }}>{intake.title}</div>
-                <div style={{ fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ background: '#f1f5f9', color: '#475569', padding: '4px 8px', borderRadius: '6px', fontWeight: '500' }}>{intake.type}</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: intake.status === 'Approved' ? '#10b981' : '#f59e0b', fontWeight: '600' }}>
-                    {intake.status === 'Approved' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />} {intake.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Main Container */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
         
@@ -357,12 +308,7 @@ function AuctionCreateContent() {
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', padding: '6px', borderRadius: '30px', gap: '4px', border: '1px solid rgba(255,255,255,0.2)' }}>
-            <button 
-              onClick={() => setIsWorkspaceMode(!isWorkspaceMode)}
-              style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: '600', borderRadius: '24px', cursor: 'pointer', border: 'none', background: isWorkspaceMode ? 'rgba(255,255,255,0.2)' : 'transparent', color: '#fff', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <LayoutTemplate size={16} /> {isWorkspaceMode ? 'Hide Workspace' : 'Workspace'}
-            </button>
+            
             
           </div>
         </div>
