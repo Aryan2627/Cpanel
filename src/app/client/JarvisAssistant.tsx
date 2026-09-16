@@ -535,7 +535,63 @@ export default function JarvisAssistant() {
 
         {/* Input Area */}
         <div style={{ padding: '16px', background: '#ffffff', borderTop: '1px solid #e2e8f0' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px' }}>
+          
+            {/* Slash Command Menu */}
+            {showSlashMenu && (
+              <div style={{ position: 'absolute', bottom: '80px', left: '16px', right: '16px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)', overflowY: 'auto', maxHeight: '400px', zIndex: 60 }}>
+                <div style={{ padding: '8px 12px', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>COMMANDS</div>
+                <button type="button" onClick={() => { setInputText('/create-event'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#e0e7ff', color: '#4f46e5', padding: '6px', borderRadius: '6px' }}><Zap size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/create-event</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Autonomously draft a new Sourcing Event</div></div>
+                </button>
+                <button type="button" onClick={() => { setInputText('/new-vendor'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#dcfce7', color: '#16a34a', padding: '6px', borderRadius: '6px' }}><Zap size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/new-vendor</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Onboard a new supplier</div></div>
+                </button>
+                <button type="button" onClick={() => { setInputText('/draft-po'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#fef08a', color: '#ca8a04', padding: '6px', borderRadius: '6px' }}><Zap size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/draft-po</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Instantly generate a PO</div></div>
+                </button>
+                <button type="button" onClick={() => { setInputText('/add-product'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#e0f2fe', color: '#0284c7', padding: '6px', borderRadius: '6px' }}><Zap size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/add-product</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Add a new item to catalog</div></div>
+                </button>
+                <div style={{ padding: '8px 12px', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', borderTop: '1px solid #e2e8f0' }}>ADVANCED & AI COMMANDS</div>
+                <button type="button" onClick={() => { executeCommand('/approve-all'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#dcfce7', color: '#16a34a', padding: '6px', borderRadius: '6px' }}><CheckCircle2 size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/approve-all</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Instantly approve all pending requests</div></div>
+                </button>
+                <button type="button" onClick={() => { executeCommand('/spend-report'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#fef08a', color: '#ca8a04', padding: '6px', borderRadius: '6px' }}><Database size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/spend-report</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Generate a quick analytics card</div></div>
+                </button>
+                <button type="button" onClick={() => { executeCommand('/analyze-bids'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#e0e7ff', color: '#4f46e5', padding: '6px', borderRadius: '6px' }}><BrainCircuit size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/analyze-bids</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>AI recommendation for active auctions</div></div>
+                </button>
+                <button type="button" onClick={() => { executeCommand('/find-savings'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#fce7f3', color: '#db2777', padding: '6px', borderRadius: '6px' }}><Zap size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/find-savings</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>AI scans history for savings</div></div>
+                </button>
+                <button type="button" onClick={() => { executeCommand('/generate-mock-data'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#f3f4f6', color: '#4b5563', padding: '6px', borderRadius: '6px' }}><Terminal size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/generate-mock-data</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Inject test data into the DB</div></div>
+                </button>
+                <button type="button" onClick={() => { executeCommand('/remind-approvers'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#fee2e2', color: '#dc2626', padding: '6px', borderRadius: '6px' }}><Zap size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/remind-approvers</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Send nudge emails</div></div>
+                </button>
+                <button type="button" onClick={() => { executeCommand('/export-csv'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#e0f2fe', color: '#0284c7', padding: '6px', borderRadius: '6px' }}><Database size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/export-csv</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Download recent data as CSV</div></div>
+                </button>
+                <button type="button" onClick={() => { executeCommand('/clear'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#f1f5f9', color: '#64748b', padding: '6px', borderRadius: '6px' }}><X size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/clear</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Clear the chat history</div></div>
+                </button>
+              </div>
+            )}
+<form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px' }}>
             <input 
               type="text" 
               value={inputText}
