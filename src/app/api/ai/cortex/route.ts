@@ -360,7 +360,8 @@ export async function POST(req: Request) {
             title: data.title || 'Untitled Event',
             type: data.type || 'RFQ',
             itemsCount: parseInt(data.quantity) || 1,
-            baseCurrency: data.currency || 'USD',
+            baseCurrency: 'USD',
+            endTime: new Date(Date.now() + (parseInt(data.duration) || 7) * 24 * 60 * 60 * 1000),
             status: 'Draft',
           }
         });

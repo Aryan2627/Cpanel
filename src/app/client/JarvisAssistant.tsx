@@ -17,7 +17,7 @@ export default function JarvisAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState('');
   const [showSlashMenu, setShowSlashMenu] = useState(false);
-  const [eventForm, setEventForm] = useState({ title: '', type: 'RFQ', quantity: '1', currency: 'USD' });
+  const [eventForm, setEventForm] = useState({ title: '', type: 'RFQ', quantity: '1', duration: '7', participants: 'all' });
     const [vendorForm, setVendorForm] = useState({ name: '', email: '', type: 'Supplier', city: '' });
     const [poForm, setPoForm] = useState({ title: '', amount: '' });
     const [productForm, setProductForm] = useState({ name: '', sku: '', price: '', category: '' });
@@ -49,6 +49,29 @@ export default function JarvisAssistant() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, toolCalls]);
+
+  
+  const executeCommand = async (command: string) => {
+    if (isProcessing) return;
+    if (command.trim().toLowerCase() === '/clear') {
+      setMessages([]);
+      setInputText('');
+      setShowSlashMenu(false);
+      return;
+    }
+    setMessages(prev => [...prev, { role: 'user', content: command }]);
+    setIsProcessing(true);
+    try {
+      const res = await fetch('/api/ai/cortex', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: command, userName, history: messages.slice(-5) })
+      });
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: 'agent', content: data.final_response, uiComponent: data.ui_component, uiData: data.ui_data }]);
+    } catch(err) {}
+    setIsProcessing(false);
+  };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -276,40 +299,45 @@ export default function JarvisAssistant() {
                 )}
 
                 {msg.uiComponent === 'event_creation_form' && (
-                  <div style={{ marginTop: '12px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                    <div style={{ marginBottom: '12px' }}>
-                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Event Title / Product Name</label>
-                      <input type="text" placeholder="e.g. 50 Dell XPS Laptops" value={eventForm.title} onChange={e => setEventForm({...eventForm, title: e.target.value})} style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                    <div style={{ marginTop: '12px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                      <div style={{ marginBottom: '12px' }}>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Product & Title</label>
+                        <input type="text" placeholder="e.g. 50 Dell XPS Laptops" value={eventForm.title} onChange={e => setEventForm({...eventForm, title: e.target.value})} style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Event Type</label>
+                          <select value={eventForm.type} onChange={e => setEventForm({...eventForm, type: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}>
+                            <option>RFQ</option><option>Auction</option>
+                          </select>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Duration (Days)</label>
+                          <input type="number" value={eventForm.duration} onChange={e => setEventForm({...eventForm, duration: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Quantity</label>
+                          <input type="number" value={eventForm.quantity} onChange={e => setEventForm({...eventForm, quantity: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Vendors</label>
+                          <select value={eventForm.participants} onChange={e => setEventForm({...eventForm, participants: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}>
+                            <option value="all">Invite All Active</option>
+                            <option value="top_rated">Top Rated Only</option>
+                            <option value="manual">Manual Selection</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <button type="button" onClick={() => executeCommand('/execute-create-event ' + JSON.stringify(eventForm))} style={{ width: '100%', padding: '10px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                        <Zap size={16} /> Launch Event Autonomously
+                      </button>
                     </div>
-                    <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Type</label>
-                        <select value={eventForm.type} onChange={e => setEventForm({...eventForm, type: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}>
-                          <option>RFQ</option>
-                          <option>Auction</option>
-                        </select>
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Quantity</label>
-                        <input type="number" value={eventForm.quantity} onChange={e => setEventForm({...eventForm, quantity: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Currency</label>
-                        <select value={eventForm.currency} onChange={e => setEventForm({...eventForm, currency: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}>
-                          <option>USD</option>
-                          <option>INR</option>
-                          <option>EUR</option>
-                        </select>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => executeCommand('/execute-create-event ' + JSON.stringify(eventForm))}
-                      style={{ width: '100%', padding: '10px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
-                    >
-                      <Zap size={16} /> Create Event Autonomously
-                    </button>
-                  </div>
-                )}
+                  )}
 
                 {msg.uiComponent === 'event_list' && msg.uiData && (
 
