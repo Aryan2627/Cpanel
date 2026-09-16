@@ -12,6 +12,74 @@ interface ToolCall {
   result?: string;
 }
 
+
+const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
+  const [docType, setDocType] = useState('NDA');
+  const [formData, setFormData] = useState<any>({});
+
+  return (
+    <div style={{ marginTop: '12px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Select Document Type</label>
+        <select value={docType} onChange={e => { setDocType(e.target.value); setFormData({}); }} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.9rem', fontWeight: 600 }}>
+          <option value="NDA">Non-Disclosure Agreement (NDA)</option>
+          <option value="SOW">Statement of Work (SOW)</option>
+          <option value="RFP">Request for Proposal (RFP)</option>
+        </select>
+      </div>
+      
+      {docType === 'NDA' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Vendor Legal Name</label>
+            <input type="text" placeholder="e.g. Acme Corp LLC" onChange={e => setFormData({...formData, vendorName: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Governing State / Jurisdiction</label>
+            <input type="text" placeholder="e.g. Delaware" onChange={e => setFormData({...formData, jurisdiction: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+          </div>
+        </div>
+      )}
+
+      {docType === 'SOW' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Project Name</label>
+            <input type="text" placeholder="e.g. Q4 Cloud Migration" onChange={e => setFormData({...formData, projectName: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Vendor</label>
+              <input type="text" placeholder="e.g. TechFlow" onChange={e => setFormData({...formData, vendorName: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Total Cost ($)</label>
+              <input type="number" placeholder="e.g. 50000" onChange={e => setFormData({...formData, cost: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {docType === 'RFP' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Project / RFP Title</label>
+            <input type="text" placeholder="e.g. Global ERP Replacement" onChange={e => setFormData({...formData, projectName: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>High-Level Requirements</label>
+            <textarea rows={2} placeholder="Briefly describe what vendors need to supply..." onChange={e => setFormData({...formData, requirements: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem', resize: 'none' }} />
+          </div>
+        </div>
+      )}
+
+      <button type="button" onClick={() => onSubmit({ type: docType, ...formData })} style={{ width: '100%', padding: '10px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+        <Zap size={16} /> Generate Official Document
+      </button>
+    </div>
+  );
+};
+
 export default function JarvisAssistant() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -82,6 +150,7 @@ export default function JarvisAssistant() {
     if (command.startsWith('/execute-create-vendor')) displayMessage = "Onboard this new vendor.";
     if (command.startsWith('/execute-draft-po')) displayMessage = "Draft this purchase order.";
     if (command.startsWith('/execute-add-product')) displayMessage = "Add this product to the catalog.";
+    if (command.startsWith('/execute-draft-document')) displayMessage = "Generate this document for me.";
     
     setMessages(prev => [...prev, { role: 'user', content: displayMessage }]);
 
@@ -304,6 +373,22 @@ export default function JarvisAssistant() {
                 )}
 
                 
+                
+                {msg.uiComponent === 'document_generator_form' && (
+                  <DocumentGeneratorForm onSubmit={(data) => executeCommand('/execute-draft-document ' + JSON.stringify(data))} />
+                )}
+
+                {msg.uiComponent === 'pdf_viewer' && msg.uiData && (
+                  <div style={{ marginTop: '16px', width: '100%' }}>
+                    <div style={{ padding: '30px', background: '#fff', border: '1px solid #cbd5e1', borderRadius: '4px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', fontFamily: '"Times New Roman", Times, serif', color: '#000', fontSize: '0.95rem', lineHeight: '1.6', position: 'relative' }}>
+                      <div dangerouslySetInnerHTML={{ __html: msg.uiData.html }} />
+                    </div>
+                    <button type="button" onClick={() => alert('PDF Downloaded successfully!')} style={{ marginTop: '12px', width: '100%', padding: '10px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                      Download as PDF
+                    </button>
+                  </div>
+                )}
+
                 {msg.uiComponent === 'spend_report' && msg.uiData && (
                   <div style={{ marginTop: '12px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: '#fff', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
                     <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '8px', fontWeight: 600, letterSpacing: '1px' }}>ENTERPRISE SPEND DASHBOARD</div>
@@ -612,6 +697,11 @@ export default function JarvisAssistant() {
                   <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/add-product</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Add a new item to catalog</div></div>
                 </button>
                 <div style={{ padding: '8px 12px', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', borderTop: '1px solid #e2e8f0' }}>ADVANCED & AI COMMANDS</div>
+                <button type="button" onClick={() => { setInputText('/draft-contract'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ background: '#f3e8ff', color: '#9333ea', padding: '6px', borderRadius: '6px' }}><Terminal size={16} /></div>
+                  <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/draft-contract</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Dynamic Legal Document Generator</div></div>
+                </button>
+
                 <button type="button" onClick={() => { executeCommand('/approve-all'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ background: '#dcfce7', color: '#16a34a', padding: '6px', borderRadius: '6px' }}><CheckCircle2 size={16} /></div>
                   <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/approve-all</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Instantly approve all pending requests</div></div>
