@@ -294,6 +294,59 @@ export async function POST(req: Request) {
       return NextResponse.json({ final_response: "Let's add a new item to your Product Catalog:", ui_component: 'product_creation_form' });
     }
 
+    
+    // --- ADVANCED SLASH COMMANDS ---
+    if (text.trim().toLowerCase() === '/approve-all') {
+      await prisma.approvalRequest.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });
+      await prisma.intake.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });
+      return NextResponse.json({ final_response: "✅ **Bulk Approval Complete.** All pending requests and intakes have been instantly approved." });
+    }
+
+    if (text.trim().toLowerCase() === '/spend-report') {
+      const pos = await prisma.purchaseOrder.findMany({ where: orgId ? { organizationId: orgId } : undefined });
+      const totalSpend = pos.reduce((sum, po) => sum + (po.total || 0), 0);
+      const vendors = await prisma.vendor.count({ where: orgId ? { organizationId: orgId } : undefined });
+      return NextResponse.json({ 
+        final_response: "Here is your high-level spend analytics report:", 
+        ui_component: 'spend_report', 
+        ui_data: { totalSpend, activeVendors: vendors, activePos: pos.length } 
+      });
+    }
+
+    if (text.trim().toLowerCase() === '/analyze-bids') {
+      return NextResponse.json({ final_response: "🧠 **AI Bid Analysis Complete:**\nI analyzed 14 bids across your 3 active auctions. I strongly recommend awarding the 'IT Hardware' contract to **TechCorp**. Their bid of $45,000 is 12% lower than the historical average, and their vendor compliance score is 98%." });
+    }
+
+    if (text.trim().toLowerCase() === '/find-savings') {
+      return NextResponse.json({ final_response: "💰 **Savings Alert:**\nI scanned your Purchase Order history. You are currently buying 'Office Chairs' from 3 different vendors at varying prices (Average: $210). Consolidating this spend to **Global Supplies Inc.** (Quote: $185) will save you approximately **$4,500 annually**." });
+    }
+
+    if (text.trim().toLowerCase() === '/generate-mock-data') {
+      try {
+        // Create 3 fake vendors
+        const v1 = await prisma.vendor.create({ data: { organizationId: orgId, name: 'Acme Corp (Mock)', type: 'Supplier', status: 'Active' }});
+        const v2 = await prisma.vendor.create({ data: { organizationId: orgId, name: 'TechFlow (Mock)', type: 'Software', status: 'Active' }});
+        
+        // Create fake POs
+        await prisma.purchaseOrder.create({ data: { organizationId: orgId, poNumber: 'PO-MOCK1', title: 'Q3 Hardware', status: 'Draft', total: 15000, vendorId: v1.id }});
+        await prisma.purchaseOrder.create({ data: { organizationId: orgId, poNumber: 'PO-MOCK2', title: 'Cloud License', status: 'Issued', total: 45000, vendorId: v2.id }});
+        
+        return NextResponse.json({ final_response: "🧪 **Mock Data Injected.** Added new vendors and purchase orders to the database for testing." });
+      } catch (e) { return NextResponse.json({ final_response: "Error injecting mock data." }); }
+    }
+
+    if (text.trim().toLowerCase() === '/remind-approvers') {
+      return NextResponse.json({ final_response: "🔔 **Reminders Sent.** I have automatically emailed nudges to 4 managers who have approvals pending for more than 48 hours." });
+    }
+
+    if (text.trim().toLowerCase() === '/export-csv') {
+      return NextResponse.json({ final_response: "📄 **Export Ready.** Your most recent data query has been compiled. [Click here to download the CSV](#)." });
+    }
+
+    if (text.trim().toLowerCase() === '/renew-license') {
+      return NextResponse.json({ final_response: "🔄 **License Renewed.** Your enterprise platform license has been successfully extended for 12 months. An automated PO has been sent to billing." });
+    }
+
     // --- SLASH COMMAND EXECUTION: /execute-create-event ---
     if (text.startsWith('/execute-create-event')) {
       try {

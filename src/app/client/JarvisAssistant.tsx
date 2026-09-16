@@ -255,6 +255,26 @@ export default function JarvisAssistant() {
                   </div>
                 )}
 
+                
+                {msg.uiComponent === 'spend_report' && msg.uiData && (
+                  <div style={{ marginTop: '12px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: '#fff', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
+                    <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '8px', fontWeight: 600, letterSpacing: '1px' }}>ENTERPRISE SPEND DASHBOARD</div>
+                    <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#fff', marginBottom: '16px' }}>
+                      ${(msg.uiData.totalSpend || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
+                    </div>
+                    <div style={{ display: 'flex', gap: '16px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px' }}>
+                      <div>
+                        <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>ACTIVE POS</div>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>{msg.uiData.activePos}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>ONBOARDED VENDORS</div>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>{msg.uiData.activeVendors}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {msg.uiComponent === 'event_creation_form' && (
                   <div style={{ marginTop: '12px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
                     <div style={{ marginBottom: '12px' }}>
