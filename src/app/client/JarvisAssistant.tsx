@@ -380,16 +380,26 @@ export default function JarvisAssistant() {
 
                 {msg.uiComponent === 'pdf_viewer' && msg.uiData && (
                   <div style={{ marginTop: '16px', width: '100%' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Zap size={14} color="#f59e0b" /> LIVE EDIT ENABLED: Click anywhere on the text below to edit
+                    </div>
                     <div style={{ padding: '30px', background: '#fff', border: '1px solid #cbd5e1', borderRadius: '4px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', fontFamily: '"Times New Roman", Times, serif', color: '#000', fontSize: '0.95rem', lineHeight: '1.6', position: 'relative' }}>
-                      <div dangerouslySetInnerHTML={{ __html: msg.uiData.html }} />
+                      <div 
+                        id={`doc-edit-${i}`}
+                        contentEditable={true}
+                        suppressContentEditableWarning={true}
+                        style={{ outline: 'none', minHeight: '200px' }}
+                        dangerouslySetInnerHTML={{ __html: msg.uiData.html }} 
+                      />
                     </div>
                     <button type="button" onClick={() => {
+                      const liveHtml = document.getElementById(`doc-edit-${i}`)?.innerHTML || msg.uiData.html;
                       const printWindow = window.open('', '', 'height=800,width=800');
                       if (printWindow) {
                         printWindow.document.write('<html><head><title>Legal Document</title>');
                         printWindow.document.write('<style>body { font-family: "Times New Roman", Times, serif; padding: 40px; color: #000; line-height: 1.6; }</style>');
                         printWindow.document.write('</head><body>');
-                        printWindow.document.write(msg.uiData.html);
+                        printWindow.document.write(liveHtml);
                         printWindow.document.write('</body></html>');
                         printWindow.document.close();
                         printWindow.focus();
