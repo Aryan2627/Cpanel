@@ -490,23 +490,23 @@ export async function POST(req: Request) {
 
     // --- SLASH COMMAND EXECUTION: /execute-add-product ---
     if (text.startsWith('/execute-add-product')) {
-      try {
-        const data = JSON.parse(text.replace('/execute-add-product', '').trim());
-        const newProduct = await prisma.product.create({
-          data: {
-            organizationId: orgId,
-            name: data.name || 'New Product',
-            sku: data.sku || 'SKU-' + Math.floor(1000 + Math.random() * 9000),
-            price: parseFloat(data.price) || 0,
-            category: data.category || 'General',
-            status: 'Active'
-          }
-        });
-        return NextResponse.json({ final_response: `Product **${newProduct.name}** added to catalog.`, ui_component: 'product_list', ui_data: [newProduct] });
-      } catch(e) { return NextResponse.json({ final_response: "Error adding product." }); }
-    }
+        try {
+          const data = JSON.parse(text.replace('/execute-add-product', '').trim());
+          const newProduct = await prisma.product.create({
+            data: {
+              organizationId: orgId,
+              name: data.name || 'New Product',
+              articleCode: data.sku || 'SKU-' + Math.floor(1000 + Math.random() * 9000),
+              category: data.category || 'General',
+              description: data.price ? ('Base Price: $' + data.price) : 'Standard Item',
+              status: 'Active'
+            }
+          });
+          return NextResponse.json({ final_response: `Product **${newProduct.name}** added to catalog.`, ui_component: 'product_list', ui_data: [newProduct] });
+        } catch(e) { return NextResponse.json({ final_response: "Error adding product." }); }
+      }
 
-    // --- CONTEXTUAL MEMORY / AFFIRMATION ACTIONS ---
+      // --- CONTEXTUAL MEMORY / AFFIRMATION ACTIONS ---
     if (history && history.length > 0 && /^(yes|yeah|sure|do it|approve it|confirm|proceed|reorder now)\b/i.test(lowerText)) {
       const lastAgentMessage = [...history].reverse().find((m: any) => m.role === 'agent');
       if (lastAgentMessage) {
