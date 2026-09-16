@@ -383,8 +383,23 @@ export default function JarvisAssistant() {
                     <div style={{ padding: '30px', background: '#fff', border: '1px solid #cbd5e1', borderRadius: '4px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', fontFamily: '"Times New Roman", Times, serif', color: '#000', fontSize: '0.95rem', lineHeight: '1.6', position: 'relative' }}>
                       <div dangerouslySetInnerHTML={{ __html: msg.uiData.html }} />
                     </div>
-                    <button type="button" onClick={() => alert('PDF Downloaded successfully!')} style={{ marginTop: '12px', width: '100%', padding: '10px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-                      Download as PDF
+                    <button type="button" onClick={() => {
+                      const printWindow = window.open('', '', 'height=800,width=800');
+                      if (printWindow) {
+                        printWindow.document.write('<html><head><title>Legal Document</title>');
+                        printWindow.document.write('<style>body { font-family: "Times New Roman", Times, serif; padding: 40px; color: #000; line-height: 1.6; }</style>');
+                        printWindow.document.write('</head><body>');
+                        printWindow.document.write(msg.uiData.html);
+                        printWindow.document.write('</body></html>');
+                        printWindow.document.close();
+                        printWindow.focus();
+                        setTimeout(() => {
+                          printWindow.print();
+                          printWindow.close();
+                        }, 250);
+                      }
+                    }} style={{ marginTop: '12px', width: '100%', padding: '10px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                      <Zap size={16} /> Download as PDF
                     </button>
                   </div>
                 )}
