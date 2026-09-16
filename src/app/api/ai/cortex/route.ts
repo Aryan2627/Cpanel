@@ -304,7 +304,7 @@ export async function POST(req: Request) {
         
         let greeting = `Hello ${userName ? userName.split(' ')[0] : 'there'}! I am ProcGen Cortex.`;
         
-        let alerts = [];
+        const alerts = [];
         if (pendingApprovals > 0) alerts.push(`**${pendingApprovals} pending approvals**`);
         if (draftPos > 0) alerts.push(`**${draftPos} drafted Purchase Orders**`);
 
@@ -496,7 +496,8 @@ export async function POST(req: Request) {
             data: {
               organizationId: orgId,
               name: data.name || 'New Product',
-              articleCode: data.sku || 'SKU-' + Math.floor(1000 + Math.random() * 9000),
+              code: 'P-' + Math.floor(100000 + Math.random() * 900000).toString(),
+              articleCode: (data.sku && data.sku.startsWith('P')) ? data.sku : ('P-' + (data.sku || Math.floor(10000 + Math.random() * 90000))),
               category: data.category || 'General',
               description: data.price ? ('Base Price: $' + data.price) : 'Standard Item',
               status: 'Active'
