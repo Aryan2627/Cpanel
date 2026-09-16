@@ -497,7 +497,7 @@ export async function POST(req: Request) {
               organizationId: orgId,
               name: data.name || 'New Product',
               code: 'P-' + Math.floor(100000 + Math.random() * 900000).toString(),
-              articleCode: (data.sku && data.sku.startsWith('P')) ? data.sku : ('P-' + (data.sku || Math.floor(10000 + Math.random() * 90000))),
+              articleCode: (data.sku && String(data.sku).startsWith('P')) ? String(data.sku) : ('P-' + (data.sku || Math.floor(10000 + Math.random() * 90000))),
               category: data.category || 'General',
               description: data.price ? ('Base Price: $' + data.price) : 'Standard Item',
               status: 'Active'
