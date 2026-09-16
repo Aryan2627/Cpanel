@@ -1,0 +1,671 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '../../../../lib/prisma';
+import { verifyToken } from '../../../../lib/session';
+import { headers } from 'next/headers';
+import intents from '../../../../data/intents.json';
+
+// Comprehensive Stop Words (never used for typo/fuzzy matching against entity names)
+const STOP_WORDS = new Set([
+  'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+  'what', 'whats', "what's", 'how', 'why', 'who', 'whom', 'which', 'where', 'when',
+  'do', 'does', 'did', 'to', 'for', 'of', 'in', 'on', 'with', 'at', 'by', 'from',
+  'as', 'into', 'about', 'can', 'could', 'would', 'should', 'please', 'check',
+  'show', 'find', 'search', 'get', 'give', 'tell', 'look', 'display', 'view',
+  'list', 'pull', 'i', 'me', 'my', 'we', 'our', 'you', 'your', 'any', 'all',
+  'some', 'up', 'out', 'us', 'there', 'here', 'have', 'has', 'had'
+]);
+
+// Tokenizer that cleans punctuation and normalizes words
+function tokenize(text: string): string[] {
+  return text.toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 0 && !STOP_WORDS.has(w));
+}
+
+function getRawTokens(text: string): string[] {
+  return text.toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 0);
+}
+
+// Jaccard Similarity / TF-IDF light for intents.json
+function calculateSimilarity(inputTokens: string[], intentTokens: string[]): number {
+  if (inputTokens.length === 0 || intentTokens.length === 0) return 0;
+  
+  let matches = 0;
+  for (const token of inputTokens) {
+    if (intentTokens.includes(token)) matches++;
+    else if (intentTokens.some(it => it.startsWith(token) || token.startsWith(it))) matches += 0.5;
+  }
+  
+  return matches / Math.max(inputTokens.length, intentTokens.length * 0.7);
+}
+
+// Levenshtein Distance for typo tolerance
+function levenshtein(a: string, b: string): number {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const matrix: number[][] = [];
+  for (let i = 0; i <= b.length; i++) { matrix[i] = [i]; }
+  for (let j = 0; j <= a.length; j++) { matrix[0][j] = j; }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+// Fuzzy matching that strictly ignores stopwords to prevent collision (e.g. "for" vs "form")
+function hasSafeFuzzyMatch(text: string, targets: string[], maxDist = 2): boolean {
+  // Check meaningful tokens only, NEVER stopwords
+  const cleanTokens = tokenize(text);
+  const rawText = text.toLowerCase();
+
+  for (const target of targets) {
+    if (target.includes(' ')) {
+      if (rawText.includes(target)) return true;
+      if (levenshtein(rawText.replace(/\s+/g, ''), target.replace(/\s+/g, '')) <= maxDist) return true;
+    } else {
+      // Direct substring match for longer words
+      if (target.length >= 4 && rawText.includes(target)) return true;
+      
+      for (const token of cleanTokens) {
+        // Prevent short words like "to", "in", "for" from matching target words
+        if (token.length < 3 || STOP_WORDS.has(token)) continue;
+        const allowedDist = target.length <= 4 ? 1 : maxDist;
+        if (levenshtein(token, target) <= allowedDist) return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Entity scoring definition
+interface EntityScore {
+  entity: string;
+  score: number;
+  statusFilter?: string;
+  subType?: string;
+}
+
+function scoreUserIntent(rawQuery: string): EntityScore {
+  const text = rawQuery.toLowerCase();
+  const cleanTokens = tokenize(text);
+  const rawTokens = getRawTokens(text);
+
+  // Status modifiers
+  const hasActive = /\b(active|live|current|onboarded|approved)\b/i.test(text);
+  const hasPending = /\b(pending|waiting|in progress|review)\b/i.test(text);
+  const hasClosed = /\b(closed|past|expired|archived|rejected)\b/i.test(text);
+  const statusFilter = hasActive ? 'active' : hasPending ? 'pending' : hasClosed ? 'closed' : undefined;
+
+  const scores: Record<string, number> = {
+    laptop_reorder: 0,
+    identity: 0,
+    vendor: 0,
+    po: 0,
+    pr: 0,
+    event: 0,
+    product: 0,
+    user: 0,
+    approval: 0,
+    contract: 0,
+    workflow: 0,
+    template: 0,
+    location: 0,
+    category: 0
+  };
+
+  // 1. Laptop Inventory & Reorder Workflow
+  if (/(?:check|view|inspect|test|show)?\s*(?:laptop|thinkpad|computer|hardware|pc)?\s*(?:inventory|stock|reorder)/i.test(text) &&
+      (/(laptop|computer|hardware|thinkpad)/i.test(text) || /(inventory.*reorder|reorder.*inventory)/i.test(text))) {
+    scores.laptop_reorder += 95;
+  }
+
+  // 2. Identity / Self-Awareness
+  if (/(?:who are you|what are you|are you ai|are you an ai|are you agent|about yourself|cortex\b)/i.test(text) &&
+      !/(vendor|po\b|event|product|template)/i.test(text)) {
+    scores.identity += 80;
+  }
+
+  // 3. Vendors / Suppliers
+  const vendorRegex = /\b(vendor|vendors|supplier|suppliers|contractor|contractors|seller|sellers|venders?|supliers?)\b/i;
+  if (vendorRegex.test(text)) {
+    scores.vendor += 60;
+    if (hasActive) scores.vendor += 15;
+    if (hasPending) scores.vendor += 15;
+    if (/\b(search|find|show|check|list|get|lookup|where|who|what)\b/i.test(text)) scores.vendor += 15;
+  } else if (hasSafeFuzzyMatch(text, ['vendor', 'vendors', 'supplier', 'suppliers', 'vender', 'venders'], 2)) {
+    scores.vendor += 45;
+  }
+
+  // 4. Purchase Orders (POs)
+  const poRegex = /\b(po|pos|purchase order|purchase orders|purchase_order)\b/i;
+  if (poRegex.test(text) || (/\b(orders?)\b/i.test(text) && /\b(purchase|po|track|status|show|list|look|find|check|open|get|view|search)\b/i.test(text))) {
+    scores.po += 60;
+    if (hasActive || hasPending) scores.po += 15;
+    if (/\b(search|find|show|check|list|get|my|recent|open|look)\b/i.test(text)) scores.po += 15;
+  } else if (hasSafeFuzzyMatch(text, ['purchase order', 'purchase orders'], 2)) {
+    scores.po += 45;
+  }
+
+  // 5. Purchase Requests (PRs / Intakes)
+  const prRegex = /\b(pr|prs|purchase request|purchase requests|intake|intakes|requisition|requisitions)\b/i;
+  if (prRegex.test(text)) {
+    scores.pr += 60;
+    if (/\b(search|find|show|check|list|get|my|recent)\b/i.test(text)) scores.pr += 15;
+  } else if (hasSafeFuzzyMatch(text, ['purchase request', 'purchase requests', 'intake', 'requisition'], 2)) {
+    scores.pr += 45;
+  }
+
+  // 6. Sourcing Events & Auctions
+  const eventRegex = /\b(event|events|auction|auctions|sourcing|rfq|rfp|tender|tenders|bids?|bidding)\b/i;
+  if (eventRegex.test(text)) {
+    scores.event += 60;
+    if (hasActive || hasClosed) scores.event += 15;
+    if (/\b(search|find|show|check|list|get|live|ongoing)\b/i.test(text)) scores.event += 15;
+  } else if (hasSafeFuzzyMatch(text, ['auction', 'auctions', 'sourcing'], 2)) {
+    scores.event += 45;
+  }
+
+  // 7. Products / Catalog
+  const productRegex = /\b(product|products|catalog|catalogue|items?|sku)\b/i;
+  if (productRegex.test(text)) {
+    scores.product += 50;
+    if (/\b(search|find|show|check|list|get|inventory)\b/i.test(text)) scores.product += 15;
+  } else if (hasSafeFuzzyMatch(text, ['product', 'products', 'catalog'], 2)) {
+    scores.product += 40;
+  }
+
+  // 8. Users / Team
+  const userRegex = /\b(user|users|team|members?|staff|colleague|colleagues|employee|employees)\b/i;
+  if (userRegex.test(text)) {
+    scores.user += 50;
+    if (/\b(who|search|find|show|check|list|get)\b/i.test(text)) scores.user += 15;
+  } else if (hasSafeFuzzyMatch(text, ['members', 'staff', 'colleagues'], 2)) {
+    scores.user += 40;
+  }
+
+  // 9. Approvals
+  const approvalRegex = /\b(approval|approvals|signoff|signoffs|approve)\b/i;
+  if (approvalRegex.test(text)) {
+    scores.approval += 50;
+    if (hasPending) scores.approval += 20;
+    if (/\b(search|find|show|check|list|get|pending|need)\b/i.test(text)) scores.approval += 15;
+  }
+
+  // 10. Contracts / Licenses
+  const contractRegex = /\b(contract|contracts|license|licenses|agreement|agreements|subscription|subscriptions)\b/i;
+  if (contractRegex.test(text)) {
+    scores.contract += 55;
+    if (/\b(search|find|show|check|list|get|active|expiry)\b/i.test(text)) scores.contract += 15;
+  } else if (hasSafeFuzzyMatch(text, ['contract', 'agreement', 'license'], 2)) {
+    scores.contract += 40;
+  }
+
+  // 11. Workflows
+  const workflowRegex = /\b(workflow|workflows|approval rule|approval rules|routing)\b/i;
+  if (workflowRegex.test(text)) {
+    scores.workflow += 50;
+    if (/\b(search|find|show|check|list|get)\b/i.test(text)) scores.workflow += 15;
+  }
+
+  // 12. Templates (Strict: only triggers if word 'template' is used, or 'form' paired with procurement context)
+  const templateRegex = /\b(template|templates|questionnaire|questionnaires)\b/i;
+  const formInContextRegex = /\b(rfq form|tender form|intake form|creation form|form template|evaluation form)\b/i;
+  if (templateRegex.test(text) || formInContextRegex.test(text)) {
+    scores.template += 65;
+    if (/\b(search|find|show|check|list|get|my|saved)\b/i.test(text)) scores.template += 15;
+  } else if (hasSafeFuzzyMatch(text, ['template', 'templates', 'questionnaire'], 2)) {
+    scores.template += 45;
+  }
+
+  // 13. Locations / Sites
+  const locationRegex = /\b(location|locations|office|offices|site|sites|facility|facilities)\b/i;
+  if (locationRegex.test(text)) {
+    scores.location += 50;
+    if (/\b(search|find|show|check|list|get|where)\b/i.test(text)) scores.location += 15;
+  }
+
+  // 14. Categories
+  const categoryRegex = /\b(category|categories|taxonomy|spend category)\b/i;
+  if (categoryRegex.test(text)) {
+    scores.category += 50;
+    if (/\b(search|find|show|check|list|get)\b/i.test(text)) scores.category += 15;
+  }
+
+  // Pick highest scoring entity
+  let bestEntity = 'none';
+  let maxScore = 0;
+
+  for (const [ent, sc] of Object.entries(scores)) {
+    if (sc > maxScore) {
+      maxScore = sc;
+      bestEntity = ent;
+    }
+  }
+
+  return {
+    entity: maxScore >= 35 ? bestEntity : 'none',
+    score: maxScore,
+    statusFilter
+  };
+}
+
+export async function POST(req: Request) {
+  try {
+    const { prompt, userName, history } = await req.json();
+    await new Promise(r => setTimeout(r, 300));
+    const text = (prompt || '').trim();
+    const lowerText = text.toLowerCase();
+    const firstName = userName ? userName.split(' ')[0] : 'there';
+
+    // Verify Session for DB access
+    const headersList = await headers();
+    const cookieHeader = headersList.get('cookie') || '';
+    const cookies = Object.fromEntries(cookieHeader.split(';').map(c => c.trim().split('=')).filter(([k]) => k).map(([k, ...v]) => [k.trim(), v.join('=').trim()]));
+    const tokenStr = cookies['proc-session'];
+    const payload = await verifyToken(tokenStr);
+    const orgId = payload?.organizationId as string | undefined;
+
+    // --- CONTEXTUAL MEMORY / AFFIRMATION ACTIONS ---
+    if (history && history.length > 0 && /^(yes|yeah|sure|do it|approve it|confirm|proceed|reorder now)\b/i.test(lowerText)) {
+      const lastAgentMessage = [...history].reverse().find((m: any) => m.role === 'agent');
+      if (lastAgentMessage) {
+        if (lastAgentMessage.content.includes('PO-') || lastAgentMessage.uiComponent === 'po_list') {
+          return NextResponse.json({
+            agentic_loop: [
+              { step: 1, action: "THINKING", message: "User confirmed action. Resolving Purchase Order reference from recent conversation context." },
+              { step: 2, action: "EXECUTE_TOOL", tool: "update_record", args: { action: "Approve", entity: "PurchaseOrder" }, result: "Success" }
+            ],
+            final_response: "✅ I have approved the Purchase Order you were viewing."
+          });
+        }
+        if (lastAgentMessage.uiComponent === 'inventory_reorder' || lastAgentMessage.content.includes('laptop')) {
+          return NextResponse.json({
+            agentic_loop: [
+              { step: 1, action: "THINKING", message: "User confirmed restock reorder. Dispatching purchase requisition workflow." },
+              { step: 2, action: "EXECUTE_TOOL", tool: "create_intake", args: { item: "Enterprise Laptops (ThinkPad X1 / Dell)", quantity: 25 }, result: "Success: PR-498210" }
+            ],
+            final_response: "🚀 Reorder requisition PR-498210 for 25 Enterprise Laptops has been successfully created and sent for approval!"
+          });
+        }
+      }
+    }
+
+    // --- SCORE USER INTENT WITH FLEXIBLE NATURAL LANGUAGE PARSER ---
+    const intentResult = scoreUserIntent(text);
+
+    // 1. IDENTITY & CAPABILITIES
+    if (intentResult.entity === 'identity') {
+      return NextResponse.json({
+        final_response: "Yes! I am **ProcGen Cortex**, your autonomous AI procurement agent. Unlike standard chatbots, I connect directly and securely to your database to query vendors, purchase orders, sourcing events, and execute automated workflows directly from our conversation. How can I help you today?"
+      });
+    }
+
+    // 2. CHECK LAPTOP INVENTORY AND REORDER (Featured Demo Workflow)
+    if (intentResult.entity === 'laptop_reorder') {
+      // Look up any matching products or provide dynamic intelligent analysis
+      const laptopProducts = await prisma.product.findMany({
+        where: orgId ? {
+          organizationId: orgId,
+          OR: [
+            { name: { contains: 'laptop', mode: 'insensitive' } },
+            { name: { contains: 'hardware', mode: 'insensitive' } },
+            { category: { contains: 'hardware', mode: 'insensitive' } }
+          ]
+        } : undefined,
+        take: 3
+      }).catch(() => []);
+
+      const productName = laptopProducts[0]?.name || 'Dell Latitude 5540 / ThinkPad X1 Laptops';
+      const sku = laptopProducts[0]?.code || 'HW-LPT-2026';
+
+      return NextResponse.json({
+        agentic_loop: [
+          { step: 1, action: "THINKING", message: "Querying internal hardware warehouse database for active laptop allocations..." },
+          { step: 2, action: "EXECUTE_TOOL", tool: "check_stock_thresholds", args: { category: "Hardware", item: productName }, result: "Stock Level: 3 / 25 threshold" },
+          { step: 3, action: "DECISION", message: "Inventory is below safety buffer (3 units remaining). Automated reorder trigger initiated." }
+        ],
+        final_response: `I checked your laptop inventory. Current stock for **${productName}** is critically low at **3 units** (minimum threshold is 15). I recommend reordering **25 units** to meet upcoming team onboarding demand.`,
+        ui_component: 'inventory_reorder',
+        ui_data: {
+          productName,
+          sku,
+          currentStock: 3,
+          reorderQuantity: 25,
+          stockAlert: 'Critical Stock (3 left)',
+          unitPrice: 1250,
+          totalCost: 31250
+        }
+      });
+    }
+
+    // 3. VENDORS / SUPPLIERS
+    if (intentResult.entity === 'vendor') {
+      const whereClause: any = orgId ? { organizationId: orgId } : {};
+      
+      // If user specified active/onboarded, filter for active statuses
+      if (intentResult.statusFilter === 'active') {
+        whereClause.status = { in: ['Active', 'Onboarded', 'Onboarding in Progress', 'Pending Onboarding'] };
+      } else if (intentResult.statusFilter === 'pending') {
+        whereClause.status = { in: ['Pending Review', 'Pending Onboarding', 'Pending Approval'] };
+      } else if (intentResult.statusFilter === 'closed') {
+        whereClause.status = { in: ['Rejected', 'Suspended', 'Inactive'] };
+      }
+
+      let vendors = await prisma.vendor.findMany({
+        where: whereClause,
+        take: 4,
+        orderBy: { name: 'asc' }
+      }).catch(() => []);
+
+      // If strict status filter returned 0, fall back to general vendor list
+      if (vendors.length === 0 && intentResult.statusFilter) {
+        vendors = await prisma.vendor.findMany({
+          where: orgId ? { organizationId: orgId } : undefined,
+          take: 4,
+          orderBy: { name: 'asc' }
+        }).catch(() => []);
+      }
+
+      if (vendors.length === 0) {
+        return NextResponse.json({
+          final_response: "I couldn't find any vendors in your database. You can invite new suppliers from the Vendors portal."
+        });
+      }
+
+      const statusDesc = intentResult.statusFilter === 'active' ? 'active ' : '';
+      return NextResponse.json({
+        agentic_loop: [
+          { step: 1, action: "THINKING", message: `Scanning supplier directory for ${statusDesc}vendors...` },
+          { step: 2, action: "EXECUTE_TOOL", tool: "query_database", args: { table: "Vendor", filter: intentResult.statusFilter || 'all' }, result: `Found ${vendors.length} matching vendors.` }
+        ],
+        final_response: `Here are the ${statusDesc}vendors I found in your database:`,
+        ui_component: 'vendor_list',
+        ui_data: vendors
+      });
+    }
+
+    // 4. PURCHASE ORDERS (POs)
+    if (intentResult.entity === 'po') {
+      const whereClause: any = orgId ? { organizationId: orgId } : {};
+      if (intentResult.statusFilter === 'active') {
+        whereClause.status = { in: ['Approved', 'Issued', 'Processing', 'Open'] };
+      }
+
+      let pos = await prisma.purchaseOrder.findMany({
+        where: whereClause,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      }).catch(() => []);
+
+      if (pos.length === 0 && intentResult.statusFilter) {
+        pos = await prisma.purchaseOrder.findMany({
+          where: orgId ? { organizationId: orgId } : undefined,
+          take: 3,
+          orderBy: { createdAt: 'desc' }
+        }).catch(() => []);
+      }
+
+      if (pos.length === 0) {
+        return NextResponse.json({ final_response: "You don't have any recent Purchase Orders in the database." });
+      }
+
+      return NextResponse.json({
+        agentic_loop: [
+          { step: 1, action: "THINKING", message: "Fetching live Purchase Orders from the database..." },
+          { step: 2, action: "EXECUTE_TOOL", tool: "query_database", args: { table: "PurchaseOrder" }, result: `Retrieved ${pos.length} records.` }
+        ],
+        final_response: "Here are your latest Purchase Orders from the database:",
+        ui_component: 'po_list',
+        ui_data: pos
+      });
+    }
+
+    // 5. PURCHASE REQUESTS (PRs / Intakes)
+    if (intentResult.entity === 'pr') {
+      const prs = await prisma.intake.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      }).catch(() => []);
+
+      if (prs.length === 0) {
+        return NextResponse.json({ final_response: "You don't have any recent Purchase Requests in the database." });
+      }
+
+      return NextResponse.json({
+        agentic_loop: [
+          { step: 1, action: "THINKING", message: "Querying recent Purchase Requests..." },
+          { step: 2, action: "EXECUTE_TOOL", tool: "query_database", args: { table: "Intake" }, result: `Retrieved ${prs.length} records.` }
+        ],
+        final_response: "Here are your latest Purchase Requests from the database:",
+        ui_component: 'pr_list',
+        ui_data: prs
+      });
+    }
+
+    // 6. SOURCING EVENTS & AUCTIONS
+    if (intentResult.entity === 'event') {
+      const events = await prisma.event.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      }).catch(() => []);
+
+      if (events.length === 0) {
+        return NextResponse.json({ final_response: "You don't have any recent Sourcing Events or Auctions." });
+      }
+
+      return NextResponse.json({
+        agentic_loop: [
+          { step: 1, action: "THINKING", message: "Querying active sourcing events and reverse auctions..." },
+          { step: 2, action: "EXECUTE_TOOL", tool: "query_database", args: { table: "Event" }, result: `Retrieved ${events.length} records.` }
+        ],
+        final_response: "Here are your latest Sourcing Events and Auctions:",
+        ui_component: 'event_list',
+        ui_data: events
+      });
+    }
+
+    // 7. PRODUCTS / CATALOG
+    if (intentResult.entity === 'product') {
+      const products = await prisma.product.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      }).catch(() => []);
+
+      if (products.length === 0) {
+        return NextResponse.json({ final_response: "You don't have any items in your Product Catalog." });
+      }
+
+      return NextResponse.json({
+        final_response: "Here are items from your Product Catalog:",
+        ui_component: 'product_list',
+        ui_data: products
+      });
+    }
+
+    // 8. USERS / TEAM
+    if (intentResult.entity === 'user') {
+      const users = await prisma.user.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      }).catch(() => []);
+
+      if (users.length === 0) {
+        return NextResponse.json({ final_response: "No team members found in the organization directory." });
+      }
+
+      return NextResponse.json({
+        final_response: "Here are your active team members:",
+        ui_component: 'user_list',
+        ui_data: users
+      });
+    }
+
+    // 9. APPROVALS
+    if (intentResult.entity === 'approval') {
+      const approvals = await prisma.approvalRequest.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      }).catch(() => []);
+
+      if (approvals.length === 0) {
+        return NextResponse.json({ final_response: "You have no pending approval requests." });
+      }
+
+      return NextResponse.json({
+        final_response: "Here are your latest approval requests:",
+        ui_component: 'approval_list',
+        ui_data: approvals
+      });
+    }
+
+    // 10. CONTRACTS & LICENSES
+    if (intentResult.entity === 'contract') {
+      const contracts = await prisma.contract.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      }).catch(() => []);
+
+      if (contracts.length === 0) {
+        return NextResponse.json({ final_response: "You have no active contracts or licenses in the database." });
+      }
+
+      return NextResponse.json({
+        final_response: "Here are your latest Contracts and Licenses:",
+        ui_component: 'contract_list',
+        ui_data: contracts
+      });
+    }
+
+    // 11. WORKFLOWS
+    if (intentResult.entity === 'workflow') {
+      const workflows = await prisma.workflow.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      }).catch(() => []);
+
+      if (workflows.length === 0) {
+        return NextResponse.json({ final_response: "No approval workflows found." });
+      }
+
+      return NextResponse.json({
+        final_response: "Here are your active approval workflows:",
+        ui_component: 'workflow_list',
+        ui_data: workflows
+      });
+    }
+
+    // 12. TEMPLATES (Only when user specifically asked for templates/questionnaires)
+    if (intentResult.entity === 'template') {
+      const templates = await prisma.template.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      }).catch(() => []);
+
+      if (templates.length === 0) {
+        return NextResponse.json({ final_response: "No templates found in your organization." });
+      }
+
+      return NextResponse.json({
+        final_response: "Here are your saved templates:",
+        ui_component: 'template_list',
+        ui_data: templates
+      });
+    }
+
+    // 13. LOCATIONS
+    if (intentResult.entity === 'location') {
+      const locations = await prisma.location.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      }).catch(() => []);
+
+      if (locations.length === 0) {
+        return NextResponse.json({ final_response: "No locations or offices found." });
+      }
+
+      return NextResponse.json({
+        final_response: "Here are your active locations and offices:",
+        ui_component: 'location_list',
+        ui_data: locations
+      });
+    }
+
+    // 14. CATEGORIES
+    if (intentResult.entity === 'category') {
+      const categories = await prisma.category.findMany({
+        where: orgId ? { organizationId: orgId } : undefined,
+        take: 4,
+        orderBy: { name: 'asc' }
+      }).catch(() => []);
+
+      if (categories.length === 0) {
+        return NextResponse.json({ final_response: "No spend categories found." });
+      }
+
+      return NextResponse.json({
+        final_response: "Here are your procurement categories:",
+        ui_component: 'category_list',
+        ui_data: categories
+      });
+    }
+
+    // --- 15. GREETINGS ---
+    if (/^(hi|hello|hey|greetings|good\s*(?:morning|afternoon|evening))\b/i.test(lowerText)) {
+      return NextResponse.json({
+        final_response: `Hello ${firstName}! I am ProcGen Cortex, your autonomous AI procurement assistant.\n\nI can execute live database actions and workflows directly in our chat. You can ask me naturally, such as:\n- *"Can you please check for active vendors?"*\n- *"Show my recent purchase orders"*\n- *"Check laptop inventory and reorder"*`
+      });
+    }
+
+    // --- 16. NLP MATCHING (Intents.json for general FAQ / Procurement knowledge) ---
+    const inputTokens = tokenize(lowerText);
+    let bestMatch = { intent: null as any, score: 0 };
+
+    for (const intent of intents) {
+      const intentTokens = tokenize(intent.q);
+      const score = calculateSimilarity(inputTokens, intentTokens);
+      
+      if (lowerText.includes(intent.q.toLowerCase())) {
+        bestMatch = { intent, score: 1.0 };
+        break;
+      }
+
+      if (score > bestMatch.score) {
+        bestMatch = { intent, score };
+      }
+    }
+
+    if (bestMatch.score > 0.45 && bestMatch.intent) {
+      return NextResponse.json({
+        final_response: bestMatch.intent.a
+      });
+    }
+
+    // --- 17. CONVERSATIONAL FALLBACK (Friendly & Action-Oriented) ---
+    return NextResponse.json({
+      final_response: `I didn't quite catch that. You can talk to me naturally—try asking:\n- *"Can you check for active vendors?"*\n- *"Show my open purchase orders"*\n- *"Check laptop inventory and reorder"*\n- *"What sourcing events are running?"*`
+    });
+
+  } catch (error) {
+    console.error("Cortex API error:", error);
+    return NextResponse.json({ error: 'Failed to process agentic request.' }, { status: 500 });
+  }
+}

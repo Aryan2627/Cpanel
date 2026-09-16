@@ -43,6 +43,8 @@ model User {
   email          String?       @unique
   phone          String?
   role           String?
+  permissions      Json?
+  impersonatedBy   String?
   password       String?
   erpId          String?
   status         String        @default("Active")
@@ -316,3 +318,4 @@ model AuditLog {
   @@index([organizationId, createdAt(sort: Desc)])
   @@index([actorEmail])
 }
+

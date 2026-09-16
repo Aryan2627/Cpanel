@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect, useMemo } from 'react';
 import { Search, Plus, X, Users, UserCheck, UserX, Shield, Edit, Trash2, ArrowUpDown } from 'lucide-react';
 
@@ -154,6 +154,17 @@ export default function UsersPage() {
                     <td style={{ padding:'13px 16px',color:'#94a3b8',fontSize:'0.78rem',fontFamily:'monospace' }}>{u.erpId||'—'}</td>
                     <td style={{ padding:'13px 16px' }}>
                       <div style={{ display:'flex',gap:'6px' }}>
+                        <button onClick={async ()=>{
+                            if (!confirm(`Impersonate ${u.name}?`)) return;
+                            const res = await fetch('/api/auth/impersonate', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ targetUserId: u.id }) });
+                            if (res.ok) window.location.href = '/client';
+                            else alert('Failed to impersonate. Are you an Admin?');
+                          }}
+                          style={{ display:'flex',alignItems:'center',gap:'4px',padding:'5px 10px',background:'#fefce8',border:'1px solid #fef08a',borderRadius:'7px',cursor:'pointer',fontSize:'0.72rem',fontWeight:600,color:'#854d0e',transition:'all 0.15s' }}
+                          title="Impersonate User"
+                        >
+                          👁️ Login As
+                        </button>
                         <button onClick={()=>{setIsEditMode(true);setEditingUserId(u.id);setFormData({name:u.name||'',email:u.email||'',phone:u.phone||'',role:u.role||'Buyer',erpId:u.erpId||'',status:u.status||'Active',department:u.department||''});setIsCreateModalOpen(true);}}
                           style={{ display:'flex',alignItems:'center',gap:'4px',padding:'5px 10px',background:'#f8fafc',border:'1px solid #e2e8f0',borderRadius:'7px',cursor:'pointer',fontSize:'0.72rem',fontWeight:600,color:'#475569',transition:'all 0.15s' }}
                           onMouseOver={e=>{(e.currentTarget as HTMLElement).style.background='#eff6ff';(e.currentTarget as HTMLElement).style.color='#2563eb';}}
@@ -214,6 +225,16 @@ export default function UsersPage() {
                   {(opts as string[]).map((o:string)=><option key={o}>{o}</option>)}
                 </select></div>
               ))}
+              <div style={{ marginTop: '4px' }}>
+                <label style={{ display:'block',fontSize:'0.75rem',fontWeight:700,color:'#0f172a',marginBottom:'8px',textTransform:'uppercase',letterSpacing:'0.04em',borderBottom:'1px solid #e2e8f0',paddingBottom:'6px' }}>Security Matrix (Access Control)</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  {['Purchase Orders', 'Purchase Requests', 'Sourcing Events', 'Vendors Data'].map((module) => (
+                     <label key={module} style={{ display:'flex',alignItems:'center',gap:'8px',fontSize:'0.8rem',color:'#475569',cursor:'pointer' }}>
+                        <input type="checkbox" defaultChecked={true} style={{ accentColor: '#2563eb', width: '16px', height: '16px' }} /> {module}
+                     </label>
+                  ))}
+                </div>
+              </div>
               <div style={{ display:'flex',gap:'10px',marginTop:'4px' }}>
                 <button onClick={()=>setIsCreateModalOpen(false)} style={{ flex:1,padding:'11px',border:'1px solid #e2e8f0',borderRadius:'10px',background:'#fff',color:'#475569',fontWeight:600,fontSize:'0.875rem',cursor:'pointer' }}>Cancel</button>
                 <button onClick={handleSave} style={{ flex:2,padding:'11px',background:'#1e3a8a',color:'#fff',border:'none',borderRadius:'10px',fontWeight:700,fontSize:'0.875rem',cursor:'pointer' }}>

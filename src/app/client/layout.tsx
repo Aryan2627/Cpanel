@@ -1,31 +1,38 @@
-﻿'use client';
+'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { IntakeProvider } from '../../context/IntakeContext';
 import TourButton from './TourButton';
 import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
 import JarvisAssistant from './JarvisAssistant';
-import { LayoutDashboard, ClipboardList, FileText, Gavel, Bot, Users, ShoppingBag, Database, Shield, Settings, ChevronRight, Bell, LogOut, Menu, X, Building2, Briefcase } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut } from 'lucide-react';
 
-const NAV_ITEMS = [
+const TOP_MENUS = [
   { name: 'Dashboard', path: '/client', icon: LayoutDashboard },
-  { name: 'Approvals', path: '/client/approvals', icon: ClipboardList },
-  { name: 'Purchase Requests', path: '/client/intake', icon: FileText },
-  { name: 'Requisitions', path: '/client/pr', icon: Briefcase },
-  { name: 'Tenders & Auctions', path: '/client/events', icon: Gavel },
-  { name: 'AI Negotiators', path: '/client/ai-agents', icon: Bot },
   {
-    name: 'Vendors', path: '#vendors', icon: Users,
+    name: 'Procurement',
+    icon: ShoppingCart,
+    sub: [
+      { name: 'Purchase Requests', path: '/client/intake' },
+      { name: 'Requisitions', path: '/client/pr' },
+      { name: 'Tenders & Auctions', path: '/client/events' },
+      { name: 'Purchase Orders', path: '/client/po' },
+      { name: 'Approvals', path: '/client/approvals' },
+    ]
+  },
+  {
+    name: 'Vendors',
+    icon: Users,
     sub: [
       { name: 'Supplier List', path: '/client/vendors' },
       { name: 'Chat / Messages', path: '/client/vendors/messages' },
     ]
   },
-  { name: 'Purchase Orders', path: '/client/po', icon: ShoppingBag },
   {
-    name: 'Master Data', path: '#master', icon: Database,
+    name: 'Master Data',
+    icon: Database,
     sub: [
       { name: 'Users', path: '/client/manage/users' },
       { name: 'Products', path: '/client/manage/products' },
@@ -34,34 +41,29 @@ const NAV_ITEMS = [
     ]
   },
   {
-    name: 'License Mgmt', path: '#license', icon: Shield,
+    name: 'Licensing',
+    icon: Shield,
     sub: [
       { name: 'License Summary', path: '/client/license/summary' },
       { name: 'Product Summary', path: '/client/license/products' },
       { name: 'All Licenses', path: '/client/license/all' },
       { name: 'Allocations', path: '/client/license/allocations' },
       { name: 'Recommendations', path: '/client/license/recommendations' },
-      { name: '� EXPIRY �', isHeader: true },
       { name: 'Maintenance Expiry', path: '/client/license/expiry/maintenance' },
       { name: 'Contract Expiry', path: '/client/license/expiry/contracts' },
       { name: 'Payments Due', path: '/client/license/expiry/payments' },
     ]
   },
-  {
-    name: 'Settings', path: '#settings', icon: Settings,
-    sub: [{ name: 'General', path: '/client/settings' }]
-  },
+  { name: 'AI Agents', path: '/client/ai-agents', icon: Bot },
 ];
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [currentUser, setCurrentUser] = useState<{ name: string; email: string; companyName?: string; licenseStatus?: string; licensePlan?: string; organizationId?: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ name: string; email: string; companyName?: string; licenseStatus?: string; licensePlan?: string; organizationId?: string; isImpersonating?: boolean } | null>(null);
 
-  // Flyout state: which item is hovered and at what Y position (fixed)
-  const [flyout, setFlyout] = useState<{ name: string; top: number } | null>(null);
-  const flyoutTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Track which dropdown is open
+  const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => { if (d?.name) setCurrentUser(d); }).catch(() => null);
@@ -71,6 +73,19 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     const res = await fetch('/api/license/renew', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ organizationId: currentUser?.organizationId }) });
     if (res.ok) { alert('Renewal PO Generated! Your license is now in a 14-day grace period.'); window.location.reload(); }
     else alert('Failed to generate PO');
+  };
+
+  const endImpersonation = async () => {
+    try {
+      const res = await fetch('/api/auth/unimpersonate', { method: 'POST' });
+      if (res.ok) {
+        window.location.href = '/client/manage/users';
+      } else {
+        alert('Failed to end impersonation');
+      }
+    } catch (e) {
+      alert('Error ending impersonation');
+    }
   };
 
   if (currentUser && currentUser.licenseStatus === 'Expired') {
@@ -86,231 +101,165 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  const isActive = (path: string) => path === '/client' ? pathname === '/client' : pathname.startsWith(path);
-
-  const pageName = (() => {
-    const flat = NAV_ITEMS.flatMap(n => n.sub ? n.sub : [n]);
-    const match = [...flat].sort((a, b) => (b.path?.length || 0) - (a.path?.length || 0)).find(n => n.path && n.path !== '#' && !n.path.startsWith('#') && pathname.startsWith(n.path));
-    return match?.name || 'Procurement Portal';
-  })();
-
-  const openFlyout = (name: string, el: HTMLElement) => {
-    if (flyoutTimer.current) clearTimeout(flyoutTimer.current);
-    const rect = el.getBoundingClientRect();
-    setFlyout({ name, top: rect.top });
+  const handleLogout = async () => {
+    try { 
+      await fetch('/api/auth/logout', { method: 'POST' }); 
+      const { signOut } = await import('next-auth/react'); 
+      await signOut({ redirect: true, callbackUrl: '/login' }); 
+    } catch(e) { 
+      window.location.href = '/login'; 
+    }
   };
-
-  const closeFlyout = () => {
-    flyoutTimer.current = setTimeout(() => setFlyout(null), 120);
-  };
-
-  const keepFlyout = () => {
-    if (flyoutTimer.current) clearTimeout(flyoutTimer.current);
-  };
-
-  const currentFlyoutItem = NAV_ITEMS.find(n => n.name === flyout?.name && n.sub);
 
   return (
     <IntakeProvider>
-      <div className="app-container">
-
-        {/* SIDEBAR */}
-        <nav style={{
-          width: isSidebarOpen ? '260px' : '0',
-          minWidth: isSidebarOpen ? '260px' : '0',
-          height: '100vh',
-          background: 'linear-gradient(175deg, #071330 0%, #0d1f4f 50%, #1a2f6b 100%)',
-          display: 'flex',
-          flexDirection: 'column',
-          flexShrink: 0,
-          boxShadow: '4px 0 20px rgba(0,0,0,0.15)',
-          zIndex: 30,
-          transition: 'all 0.3s ease',
-          opacity: isSidebarOpen ? 1 : 0,
-          overflow: 'hidden',
-          position: 'relative',
-        }}>
-
-          {/* Logo */}
-          <div style={{ padding: '22px 20px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-            <img src="/logo.png" alt="ProcGen" style={{ width: '36px', height: '36px', objectFit: 'contain', flexShrink: 0 }} />
-            <div>
-              <div style={{ color: '#fff', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.5px', lineHeight: 1 }}>ProcGen</div>
-              <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.62rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Procurement Suite</div>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
+        
+        {currentUser?.isImpersonating && (
+          <div style={{ background: '#f97316', color: '#fff', padding: '8px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', fontWeight: 700, zIndex: 999999, position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '1.2rem' }}>👁️</span> 
+              <span>IMPERSONATION ACTIVE: You are viewing the platform with {currentUser.name}'s permissions. Actions taken will be logged under their identity.</span>
             </div>
-          </div>
-
-          {/* Nav � overflow visible so flyouts can escape, scroll handled by inner wrapper */}
-          <div style={{ flex: 1, overflowY: 'auto', overflowX: 'visible', padding: '14px 10px' }}>
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              {NAV_ITEMS.map((item) => {
-                const Icon = item.icon;
-                const active = !item.sub && item.path !== '#' && !item.path.startsWith('#') && isActive(item.path);
-                const subActive = item.sub && item.sub.some((s: any) => s.path && pathname.startsWith(s.path));
-
-                const baseStyle: React.CSSProperties = {
-                  display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px',
-                  borderRadius: '8px', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer',
-                  color: (active || subActive) ? '#ffffff' : 'rgba(255,255,255,0.65)',
-                  background: (active || subActive) ? 'rgba(255,255,255,0.18)' : 'transparent',
-                  textDecoration: 'none', transition: 'all 0.15s',
-                  boxShadow: (active || subActive) ? 'inset 3px 0 0 rgba(255,255,255,0.6)' : 'none',
-                  justifyContent: item.sub ? 'space-between' : 'flex-start',
-                  width: '100%', border: 'none',
-                };
-
-                return (
-                  <li key={item.name} style={{ position: 'relative' }}>
-                    {item.sub ? (
-                      <div
-                        style={baseStyle}
-                        onMouseEnter={(e) => openFlyout(item.name, e.currentTarget as HTMLElement)}
-                        onMouseLeave={closeFlyout}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <Icon size={17} />{item.name}
-                        </div>
-                        <ChevronRight size={14} style={{ opacity: 0.5 }} />
-                      </div>
-                    ) : (
-                      <Link
-                        href={item.path}
-                        style={baseStyle}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                        onMouseLeave={(e) => { if (!active) { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.65)'; } }}
-                      >
-                        <Icon size={17} />{item.name}
-                      </Link>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          {/* User Footer */}
-          <div style={{ padding: '12px', borderTop: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '10px', background: 'rgba(255,255,255,0.08)', marginBottom: '8px' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #3b82f6, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: '0.875rem', flexShrink: 0 }}>
-                {currentUser?.name ? currentUser.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'PG'}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{currentUser?.name || 'Loading...'}</div>
-                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.45)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{currentUser?.companyName || currentUser?.email || ''}</div>
-              </div>
-            </div>
-            <button
-              onClick={async () => { try { await fetch('/api/auth/logout', { method: 'POST' }); const { signOut } = await import('next-auth/react'); await signOut({ redirect: true, callbackUrl: '/login' }); } catch(e) { window.location.href = '/login'; } }}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '9px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', background: 'transparent', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 500, transition: 'all 0.15s' }}
-              onMouseOver={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.2)'; e.currentTarget.style.color = '#fca5a5'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)'; }}
-              onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; }}
-            >
-              <LogOut size={15} /> Sign Out
+            <button onClick={endImpersonation} style={{ background: '#fff', color: '#f97316', border: 'none', borderRadius: '4px', padding: '4px 12px', fontWeight: 800, cursor: 'pointer' }}>
+              End Impersonation
             </button>
           </div>
-        </nav>
-
-        {/* FLYOUT SUBMENU � rendered as fixed so it escapes overflow clipping */}
-        {flyout && currentFlyoutItem && (
-          <ul
-            onMouseEnter={keepFlyout}
-            onMouseLeave={closeFlyout}
-            style={{
-              position: 'fixed',
-              left: isSidebarOpen ? '268px' : '8px',
-              top: Math.min(flyout.top, window.innerHeight - 400),
-              minWidth: '240px',
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '14px',
-              boxShadow: '0 20px 48px rgba(0,0,0,0.15)',
-              padding: '8px',
-              zIndex: 9999,
-              listStyle: 'none',
-              maxHeight: '80vh',
-              overflowY: 'auto',
-              animation: 'flyoutIn 0.15s ease',
-            }}
-          >
-            <li style={{ padding: '8px 14px 6px', fontSize: '0.68rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              {currentFlyoutItem.name}
-            </li>
-            {currentFlyoutItem.sub!.map((sub: any) =>
-              sub.isHeader ? (
-                <li key={sub.name} style={{ padding: '8px 14px 4px', fontSize: '0.65rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginTop: '6px', borderTop: '1px solid #f1f5f9' }}>
-                  {sub.name}
-                </li>
-              ) : (
-                <li key={sub.name}>
-                  <Link
-                    href={sub.path}
-                    onClick={() => setFlyout(null)}
-                    style={{
-                      display: 'block', padding: '9px 14px', borderRadius: '8px', fontSize: '0.875rem',
-                      color: pathname === sub.path ? '#2563eb' : '#334155',
-                      background: pathname === sub.path ? '#eff6ff' : 'transparent',
-                      fontWeight: pathname === sub.path ? 700 : 500,
-                      textDecoration: 'none', transition: 'all 0.12s',
-                    }}
-                    onMouseEnter={e => { if (pathname !== sub.path) { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; (e.currentTarget as HTMLElement).style.color = '#1e3a8a'; } }}
-                    onMouseLeave={e => { if (pathname !== sub.path) { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#334155'; } }}
-                  >
-                    {sub.name}
-                  </Link>
-                </li>
-              )
-            )}
-          </ul>
         )}
 
-        {/* MAIN */}
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', overflow: 'hidden' }}>
-          {/* Topbar */}
-          <header style={{ height: '60px', background: '#fff', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', flexShrink: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.04)', zIndex: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '6px', color: '#64748b', display: 'flex' }} title="Toggle Sidebar">
-                {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-              </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Building2 size={16} color="#94a3b8" />
-                <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0f172a' }}>{pageName}</span>
+        <div style={{ height: '64px', backgroundColor: '#071330', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'relative', zIndex: 100 }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
+            <Link href="/client" style={{ color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <img src="/logo.png" alt="ProcGen Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
+            </Link>
+
+            <nav style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {TOP_MENUS.map((menu) => (
+                <div 
+                  key={menu.name}
+                  onMouseEnter={() => setHoveredMenu(menu.name)}
+                  onMouseLeave={() => setHoveredMenu(null)}
+                  style={{ position: 'relative' }}
+                >
+                  <Link 
+                    href={menu.path || '#'}
+                    style={{ 
+                      padding: '8px 16px', 
+                      borderRadius: '8px',
+                      color: (pathname === menu.path || (menu.sub && menu.sub.some(s => pathname.startsWith(s.path)))) ? '#fff' : 'rgba(255,255,255,0.7)',
+                      textDecoration: 'none',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s',
+                      backgroundColor: hoveredMenu === menu.name ? 'rgba(255,255,255,0.1)' : 'transparent'
+                    }}
+                  >
+                    <menu.icon size={16} />
+                    {menu.name}
+                  </Link>
+
+                  {menu.sub && hoveredMenu === menu.name && (
+                    <div style={{ 
+                      position: 'absolute', top: '100%', left: 0, marginTop: '4px',
+                      backgroundColor: '#fff', borderRadius: '12px', padding: '8px',
+                      minWidth: '220px',
+                      boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+                      border: '1px solid #e2e8f0',
+                      display: 'flex', flexDirection: 'column', gap: '4px'
+                    }}>
+                      {menu.sub.map((sub) => (
+                        <Link
+                          key={sub.name}
+                          href={sub.path}
+                          style={{
+                            padding: '10px 16px', borderRadius: '8px',
+                            color: pathname.startsWith(sub.path) ? '#2563eb' : '#475569',
+                            backgroundColor: pathname.startsWith(sub.path) ? '#eff6ff' : 'transparent',
+                            textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            transition: 'all 0.1s'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!pathname.startsWith(sub.path)) {
+                              (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
+                              (e.currentTarget as HTMLElement).style.color = '#0f172a';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!pathname.startsWith(sub.path)) {
+                              (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                              (e.currentTarget as HTMLElement).style.color = '#475569';
+                            }
+                          }}
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </nav>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+            {/* Global Spotlight Search Trigger */}
+            <div 
+              style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '8px', cursor: 'text', border: '1px solid rgba(255,255,255,0.1)' }}
+              onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+            >
+              <Search size={14} color="rgba(255,255,255,0.5)" />
+              <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', fontWeight: 500, width: '150px' }}>Search...</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', fontWeight: 700 }}>
+                <span>⌘K</span>
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', borderRadius: '8px', color: '#64748b', display: 'flex', position: 'relative' }}>
-                <Bell size={20} />
-                <span style={{ position: 'absolute', top: '4px', right: '4px', width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%', border: '2px solid #fff' }}></span>
-              </button>
-              <button onClick={() => router.push('/client/profile')} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 12px 6px 6px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '50px', cursor: 'pointer', transition: 'all 0.15s' }}
-                onMouseOver={e => e.currentTarget.style.background = '#f1f5f9'} onMouseOut={e => e.currentTarget.style.background = '#f8fafc'}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #0d1f4f, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: '0.75rem' }}>
-                  {currentUser?.companyName ? currentUser.companyName.substring(0, 2).toUpperCase() : 'PG'}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ position: 'relative', cursor: 'pointer' }}>
+                <Bell size={20} color="rgba(255,255,255,0.7)" />
+                <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', border: '2px solid #071330' }} />
+              </div>
+              
+              <Link href="/client/settings" style={{ textDecoration: 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '16px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e293b, #334155)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>
+                    {(currentUser?.name || 'A')[0]}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 600 }}>{currentUser?.name || 'Admin'}</span>
+                    <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem' }}>{currentUser?.companyName || 'My Organization'}</span>
+                  </div>
                 </div>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: '0.62rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Workspace</div>
-                  <div style={{ fontSize: '0.82rem', color: '#0f172a', fontWeight: 700 }}>{currentUser?.companyName || 'Loading...'}</div>
-                </div>
+              </Link>
+              <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Logout">
+                <LogOut size={18} />
               </button>
             </div>
-          </header>
-          <div style={{ flex: 1, overflowY: 'auto' }}>{children}</div>
-        </main>
+          </div>
+        </div>
 
-        <TourButton />
-        <SpotlightSearch />
-        <CartOverlay />
-        <JarvisAssistant />
+        {/* The Absolute Backdrop Blur for Cinematic Nav effect */}
+        {hoveredMenu && (
+          <div style={{
+            position: 'absolute', top: '64px', left: 0, width: '100vw', height: 'calc(100vh - 64px)',
+            backgroundColor: 'rgba(15, 23, 42, 0.2)', backdropFilter: 'blur(6px)', zIndex: 90
+          }} />
+        )}
+
+        <div style={{ flex: 1, overflow: 'auto', position: 'relative', zIndex: 10 }}>
+          {children}
+        </div>
       </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes flyoutIn {
-          from { opacity: 0; transform: translateX(-8px); }
-          to   { opacity: 1; transform: translateX(0); }
-        }
-      `}} />
+      
+      <CartOverlay />
+      <TourButton />
+      <SpotlightSearch />
+      <JarvisAssistant />
     </IntakeProvider>
   );
 }
-
-
-

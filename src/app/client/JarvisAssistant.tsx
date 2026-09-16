@@ -1,357 +1,435 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { BrainCircuit, X, Zap, Loader2, Database, Send, Terminal, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Mic, Terminal, X, BrainCircuit, Activity, Zap } from 'lucide-react';
+
+interface ToolCall {
+  step: number;
+  action: string;
+  message?: string;
+  tool?: string;
+  args?: any;
+  result?: string;
+}
 
 export default function JarvisAssistant() {
   const router = useRouter();
-  const [isEnabled, setIsEnabled] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const [inputText, setInputText] = useState('');
+  const [userName, setUserName] = useState<string | null>(null);
+  const [messages, setMessages] = useState<{role: 'user' | 'agent', content: string, uiComponent?: string, uiData?: any}[]>([
+    { role: 'agent', content: 'Hello. I am ProcGen Cortex, your autonomous AI agent. Try asking me to "check laptop inventory and reorder".' }
+  ]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [toolCalls, setToolCalls] = useState<ToolCall[]>([]);
   
-  const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const [jarvisResponse, setJarvisResponse] = useState('');
-  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
-  const [position, setPosition] = useState({ x: typeof window !== "undefined" ? window.innerWidth - 90 : 1000, y: 20 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [pulseScale, setPulseScale] = useState(1);
-  const positionRef = useRef(position);
-  useEffect(() => { positionRef.current = position; }, [position]);
-  const [isLockdown, setIsLockdown] = useState(false);
-  const [shouldCrash, setShouldCrash] = useState(false);
-  const [textInput, setTextInput] = useState('');
-  
-  const [targetResponse, setTargetResponse] = useState('');
-  const [displayedResponse, setDisplayedResponse] = useState('');
-  
-  const recognitionRef = useRef<any>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const speak = (text: string) => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.0;
-      utterance.pitch = 1.0;
-      const voices = window.speechSynthesis.getVoices();
-      const preferredVoice = voices.find(v => v.name.includes('Google UK English') || v.name.includes('Samantha') || v.name.includes('Daniel'));
-      if (preferredVoice) utterance.voice = preferredVoice;
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-
+  // Fetch user info on mount to customize responses
   useEffect(() => {
-    const checkSettings = () => {
-      try {
-        const saved = localStorage.getItem('godTierFeatures');
-        if (saved) {
-          const features = JSON.parse(saved);
-          if (features.jarvisAssistant === false) {
-             setIsEnabled(false);
-          } else {
-             setIsEnabled(true);
-          }
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.name) {
+          setUserName(data.name);
+          // Update the initial greeting if desired, or just pass it in requests
+          setMessages([
+            { role: 'agent', content: `Hello ${data.name.split(' ')[0]}. I am ProcGen Cortex, your autonomous AI agent. Try asking me to "check laptop inventory and reorder".` }
+          ]);
         }
-      } catch (e) {}
-    };
-    checkSettings();
-    
-    // Poll for settings changes as a fallback, or use event listeners
-    const interval = setInterval(checkSettings, 2000);
-    return () => clearInterval(interval);
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
-    if (displayedResponse !== targetResponse) {
-      const timeout = setTimeout(() => {
-        setDisplayedResponse(targetResponse.slice(0, displayedResponse.length + 1));
-      }, 15); // Typing speed
-      return () => clearTimeout(timeout);
-    }
-  }, [displayedResponse, targetResponse]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, toolCalls]);
 
-  // Global Keyboard Shortcut: Ctrl + J
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Check for Ctrl + J or Cmd + J
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'j') {
-        e.preventDefault();
-        setIsTerminalOpen(prev => !prev);
-      }
-    };
-    
-    if (isEnabled) {
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isEnabled]);
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!inputText.trim() || isProcessing) return;
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = true;
+    const userPrompt = inputText.trim();
+    setInputText('');
+    setMessages(prev => [...prev, { role: 'user', content: userPrompt }]);
+    setIsProcessing(true);
+    setToolCalls([]);
 
-      recognitionRef.current.onresult = (event: any) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const trans = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += trans;
-          } else {
-            interimTranscript += trans;
-          }
-        }
-        
-        const currentText = finalTranscript || interimTranscript;
-        setTranscript(currentText);
-        
-        // Pulse effect based on audio (simulated via text length changes)
-        setPulseScale(1 + Math.random() * 0.5);
-        setTimeout(() => setPulseScale(1), 100);
-      };
-
-      recognitionRef.current.onend = () => {
-        setIsListening(false);
-      };
-
-      recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error', event.error);
-        setIsListening(false);
-      };
-    }
-  }, []);
-
-  // Process command when listening stops and we have a transcript
-  useEffect(() => {
-    if (!isListening && transcript) {
-      processCommand(transcript);
-    }
-  }, [isListening]);
-
-  const toggleListening = () => {
-    if (!recognitionRef.current) {
-      alert("Speech recognition is not supported in this browser.");
-      return;
-    }
-    
-    if (isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    } else {
-      setTranscript('');
-      setJarvisResponse('Listening...');
-      setIsTerminalOpen(true);
-      recognitionRef.current.start();
-      setIsListening(true);
-    }
-  };
-
-  const handleTextSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && textInput.trim()) {
-      const command = textInput;
-      setTranscript(command);
-      setTextInput('');
-      processCommand(command);
-    }
-  };
-
-  const handleChipClick = (command: string) => {
-    setTranscript(command);
-    processCommand(command);
-  };
-
-  const processCommand = async (text: string) => {
-    setTargetResponse('');
-    setDisplayedResponse('');
-    
     try {
-      const res = await fetch('/api/jarvis/chat', {
+      const res = await fetch('/api/ai/cortex', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text })
+        body: JSON.stringify({ prompt: userPrompt, userName, history: messages.slice(-5) })
       });
+      
       const data = await res.json();
       
-      const reply = data.reply || 'I encountered an error processing your request.';
-      setTargetResponse(reply);
-      speak(reply);
+      // Simulate brief thinking delay for UX
+      await new Promise(r => setTimeout(r, 600));
+      
+      setMessages(prev => [...prev, { 
+        role: 'agent', 
+        content: data.final_response,
+        uiComponent: data.ui_component,
+        uiData: data.ui_data 
+      }]);
 
-      if (data.action) {
-        if (data.action.type === 'NAVIGATE' && data.action.payload) {
-          setTimeout(() => { router.push(data.action.payload); closeTerminal(); }, 2000);
-        } else if (data.action.type === 'UI_EFFECT') {
-          if (data.action.payload === 'LOCKDOWN') {
-            setIsLockdown(true);
-            document.body.style.backgroundColor = '#7f1d1d';
-            setTimeout(() => closeTerminal(), 3000);
-          } else if (data.action.payload === 'DARK_MODE') {
-            document.body.style.backgroundColor = '#0f172a';
-            document.body.style.color = '#f8fafc';
-            const els = document.querySelectorAll('.app-container, .sidebar, .main-content');
-            els.forEach((el: any) => el.style.backgroundColor = '#0f172a');
-          } else if (data.action.payload === 'CRASH') {
-            setTimeout(() => setShouldCrash(true), 1500);
-          }
-        }
-      }
     } catch (err) {
-      console.error(err);
-      const errReply = 'I lost connection to the mainframe.';
-      setTargetResponse(errReply);
-      speak(errReply);
+      setMessages(prev => [...prev, { role: 'agent', content: 'Connection to Cortex Core failed.' }]);
+    } finally {
+      setIsProcessing(false);
     }
   };
-
-  const closeTerminal = () => {
-    setIsTerminalOpen(false);
-    setTranscript('');
-    setTargetResponse('');
-    setDisplayedResponse('');
-    setTextInput('');
-  };
-
-  if (shouldCrash) {
-    throw new Error("CRITICAL_FAULT: Manual Override Exception Triggered by Jarvis Protocol.");
-  }
-
-  
 
   return (
     <>
-      {isLockdown && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(220, 38, 38, 0.2)', pointerEvents: 'none', zIndex: 9999999, animation: 'lockdownFlash 1s infinite alternate' }}>
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#ef4444', fontSize: '5rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '10px', textShadow: '0 0 20px #ef4444' }}>
-            SYSTEM LOCKDOWN
-          </div>
-        </div>
-      )}
-
-      {/* Holographic Orb */}
+      {/* Floating Trigger */}
       <div 
-        
-        onMouseDown={(e) => {
-          setIsDragging(true);
-          setDragOffset({ x: e.clientX - position.x, y: e.clientY - position.y });
-          e.stopPropagation();
-        }}
-        onClick={(e) => {
-          if (!isDragging) toggleListening();
-        }}
-  
-        title="Toggle Jarvis (Ctrl + J)"
+        onClick={() => setIsOpen(!isOpen)}
         style={{
-          position: 'fixed', top: `${position.y}px`, left: `${position.x}px`,
-          width: '60px', height: '60px',
+          position: 'fixed', bottom: '30px', right: '30px',
+          width: '64px', height: '64px',
+          backgroundColor: '#0f172a',
+          borderRadius: '50%',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer', zIndex: 999999,
-          transform: `scale(${isListening ? pulseScale : 1})`,
-          transition: 'transform 0.1s'
+          boxShadow: '0 10px 25px rgba(0,0,0,0.3), inset 0 0 0 2px #38bdf8',
+          transition: 'transform 0.2s, box-shadow 0.2s',
+          transform: isOpen ? 'scale(0.9)' : 'scale(1)'
         }}
       >
-        {/* Core Ring 1 */}
-        <div style={{
-          position: 'absolute', width: '100%', height: '100%',
-          border: `2px solid ${isListening ? '#f43f5e' : '#38bdf8'}`,
-          borderRadius: '50%', borderTopColor: 'transparent', borderBottomColor: 'transparent',
-          animation: 'spin 4s linear infinite',
-          boxShadow: `0 0 15px ${isListening ? '#f43f5e' : '#38bdf8'}`
-        }} />
-        {/* Core Ring 2 */}
-        <div style={{
-          position: 'absolute', width: '70%', height: '70%',
-          border: `3px solid ${isListening ? '#8b5cf6' : '#818cf8'}`,
-          borderRadius: '50%', borderLeftColor: 'transparent', borderRightColor: 'transparent',
-          animation: 'spin-reverse 3s linear infinite',
-          boxShadow: `inset 0 0 10px ${isListening ? '#8b5cf6' : '#818cf8'}`
-        }} />
-        {/* Center Glow */}
-        <div style={{
-          position: 'absolute', width: '40%', height: '40%',
-          backgroundColor: isListening ? '#f43f5e' : '#38bdf8',
-          borderRadius: '50%',
-          boxShadow: `0 0 20px 5px ${isListening ? '#f43f5e' : '#38bdf8'}`,
-          animation: 'pulse-glow 2s ease-in-out infinite'
-        }} />
-        <Zap color="#fff" size={20} style={{ position: 'relative', zIndex: 2 }} fill="#fff" />
+        <BrainCircuit color="#38bdf8" size={32} />
       </div>
 
-      {/* Slide-out Terminal Overlay */}
+      {/* Cortex Panel */}
       <div style={{
         position: 'fixed',
-        top: `${typeof window !== "undefined" ? Math.min(position.y + 70, window.innerHeight - 300) : position.y + 70}px`,
-        left: isTerminalOpen ? `${typeof window !== "undefined" ? Math.min(position.x - 360 > 0 ? position.x - 360 : position.x + 70, window.innerWidth - 380) : position.x - 360}px` : '-1000px',
-        width: '350px',
-        backgroundColor: 'rgba(10, 15, 30, 0.85)',
-        backdropFilter: 'blur(20px) saturate(150%)',
+        bottom: isOpen ? '110px' : '-800px',
+        right: '30px',
+        width: '400px',
+        height: '600px',
+        backgroundColor: '#f8fafc',
         borderRadius: '16px',
-        border: '1px solid rgba(56, 189, 248, 0.4)',
-        boxShadow: '0 0 40px rgba(56, 189, 248, 0.15), 0 20px 25px -5px rgba(0, 0, 0, 0.8)',
-        padding: '20px',
-        color: '#fff',
+        border: '1px solid #e2e8f0',
+        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+        display: 'flex',
+        flexDirection: 'column',
         zIndex: 999998,
-        transition: 'right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        fontFamily: 'monospace'
+        transition: 'bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        overflow: 'hidden'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontWeight: 'bold' }}>
-            <BrainCircuit size={18} /> JARVIS TERMINAL
+        {/* Header */}
+        <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#fff' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <BrainCircuit size={20} color="#38bdf8" />
+            <span style={{ fontWeight: 700, letterSpacing: '0.5px' }}>ProcGen Cortex</span>
           </div>
-          <button onClick={closeTerminal} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
-            <X size={18} />
+          <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+            <X size={20} />
           </button>
         </div>
 
-        <div>
-          <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px', letterSpacing: '1px' }}>System Response</div>
-          <div style={{ minHeight: '60px', color: '#34d399', fontSize: '0.9rem', lineHeight: '1.5', marginBottom: '16px', textShadow: '0 0 10px rgba(52, 211, 153, 0.6)' }}>
-            {displayedResponse && '> ' + displayedResponse}
-            {displayedResponse !== targetResponse && displayedResponse.length > 0 && (
-              <span style={{ display: 'inline-block', width: '8px', height: '14px', backgroundColor: '#34d399', marginLeft: '4px', animation: 'blink 1s step-end infinite', boxShadow: '0 0 8px #34d399' }}></span>
-            )}
-          </div>
+        {/* Chat / Tool Output Area */}
+        <div style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {messages.map((msg, i) => (
+            <div key={i} style={{ alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
+              <div style={{ 
+                background: msg.role === 'user' ? '#0f172a' : '#ffffff', 
+                color: msg.role === 'user' ? '#fff' : '#1e293b',
+                padding: '12px 16px', 
+                borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                border: msg.role === 'user' ? 'none' : '1px solid #e2e8f0',
+                boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
+                fontSize: '0.9rem', lineHeight: '1.5'
+              }}>
+                {msg.content}
+                
+                {msg.uiComponent === 'po_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((po: any) => (
+                      <div key={po.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>{po.poNumber}</div>
+                        <div style={{ color: '#64748b', marginBottom: '8px' }}>{po.title || 'Standard Purchase Order'}</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ padding: '2px 8px', background: '#e0e7ff', color: '#3730a3', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 600 }}>
+                            {po.status}
+                          </span>
+                          <span style={{ fontWeight: 700, color: '#16a34a' }}>
+                            ${po.total.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    <button style={{ width: '100%', padding: '8px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', marginTop: '4px' }}>
+                      View All Orders
+                    </button>
+                  </div>
+                )}
+
+                {msg.uiComponent === 'pr_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((pr: any) => (
+                      <div key={pr.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>{pr.refId}</div>
+                        <div style={{ color: '#64748b', marginBottom: '8px' }}>{pr.title || 'Purchase Request'}</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ padding: '2px 8px', background: '#fef3c7', color: '#d97706', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 600 }}>
+                            {pr.status}
+                          </span>
+                          <span style={{ fontWeight: 700, color: '#64748b' }}>
+                            Qty: {pr.quantity}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    <button style={{ width: '100%', padding: '8px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', marginTop: '4px' }}>
+                      View All Requests
+                    </button>
+                  </div>
+                )}
+
+                {msg.uiComponent === 'event_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((ev: any) => (
+                      <div key={ev.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>{ev.refId}</div>
+                        <div style={{ color: '#64748b', marginBottom: '8px' }}>{ev.title || 'Sourcing Event'}</div>
+                        <span style={{ padding: '2px 8px', background: '#e0e7ff', color: '#3730a3', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 600 }}>{ev.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'product_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((prod: any) => (
+                      <div key={prod.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{prod.name}</div>
+                        <div style={{ color: '#64748b' }}>Category: {prod.category || 'General'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'user_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((u: any) => (
+                      <div key={u.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '28px', height: '28px', background: '#cbd5e1', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                          {u.name?.charAt(0) || 'U'}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 700, color: '#0f172a' }}>{u.name}</div>
+                          <div style={{ color: '#64748b', fontSize: '0.7rem' }}>{u.role || 'User'}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'location_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((loc: any) => (
+                      <div key={loc.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{loc.name || 'Location'}</div>
+                        <div style={{ color: '#64748b' }}>{loc.city || 'N/A'} • {loc.type || 'Office'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'category_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((cat: any) => (
+                      <div key={cat.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{cat.name}</div>
+                        <div style={{ color: '#64748b', fontSize: '0.7rem' }}>Code: {cat.code || 'N/A'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'template_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((tpl: any) => (
+                      <div key={tpl.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{tpl.name}</div>
+                        <div style={{ color: '#64748b', fontSize: '0.7rem' }}>Type: {tpl.type || 'Form'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'workflow_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((wf: any) => (
+                      <div key={wf.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{wf.name}</div>
+                        <div style={{ color: '#64748b', fontSize: '0.7rem' }}>Category: {wf.category || 'General'}</div>
+                        <div style={{ marginTop: '4px' }}>
+                          <span style={{ padding: '2px 8px', background: wf.isActive ? '#dcfce7' : '#fee2e2', color: wf.isActive ? '#166534' : '#991b1b', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 600 }}>
+                            {wf.isActive ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'contract_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((c: any) => (
+                      <div key={c.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>{c.title || 'Software License Agreement'}</div>
+                        <div style={{ color: '#64748b', marginBottom: '8px' }}>Vendor: {c.vendorName || 'N/A'}</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ padding: '2px 8px', background: '#dcfce7', color: '#166534', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 600 }}>
+                            {c.status}
+                          </span>
+                          <span style={{ fontWeight: 700, color: '#64748b' }}>
+                            ${(c.total || 0).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'approval_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((app: any) => (
+                      <div key={app.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#fffbeb', fontSize: '0.8rem' }}>
+                        <div style={{ fontWeight: 700, color: '#92400e', marginBottom: '4px' }}>Approval Required</div>
+                        <div style={{ color: '#b45309', marginBottom: '8px' }}>Workflow ID: {app.workflowId}</div>
+                        <button style={{ padding: '4px 12px', background: '#d97706', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer' }}>Review Now</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {msg.uiComponent === 'inventory_reorder' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ padding: '12px', border: '1px solid #e2e8f0', borderRadius: '10px', background: '#f8fafc' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                        <div>
+                          <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.85rem' }}>{msg.uiData.productName}</div>
+                          <div style={{ color: '#64748b', fontSize: '0.72rem' }}>SKU: {msg.uiData.sku} • Category: Hardware</div>
+                        </div>
+                        <span style={{ padding: '2px 8px', background: '#fee2e2', color: '#dc2626', borderRadius: '12px', fontSize: '0.68rem', fontWeight: 700 }}>
+                          {msg.uiData.stockAlert}
+                        </span>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px', background: '#fff', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                        <div>
+                          <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>CURRENT STOCK</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#dc2626' }}>{msg.uiData.currentStock} Units</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>RECOMMENDED RESTOCK</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#16a34a' }}>+{msg.uiData.reorderQuantity} Units</div>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setMessages(prev => [...prev, { role: 'user', content: `Auto-reorder ${msg.uiData.reorderQuantity} units of ${msg.uiData.productName}` }]);
+                          setIsProcessing(true);
+                          fetch('/api/ai/cortex', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ prompt: 'reorder now', userName, history: messages.slice(-5) })
+                          })
+                          .then(r => r.json())
+                          .then(d => {
+                            setMessages(prev => [...prev, { role: 'agent', content: d.final_response }]);
+                          })
+                          .catch(() => {
+                            setMessages(prev => [...prev, { role: 'agent', content: 'Reorder triggered. Redirecting to Purchase Request studio...' }]);
+                            setTimeout(() => router.push('/client/intake/create'), 1200);
+                          })
+                          .finally(() => setIsProcessing(false));
+                        }}
+                        style={{ width: '100%', padding: '9px', background: 'linear-gradient(135deg, #0f172a, #1e293b)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', boxShadow: '0 2px 6px rgba(15,23,42,0.15)' }}
+                      >
+                        <Zap size={14} color="#38bdf8" /> Auto-Create Reorder Request
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {msg.uiComponent === 'vendor_list' && msg.uiData && (
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {msg.uiData.map((vendor: any) => {
+                      const isGood = ['Approved', 'Active', 'Onboarded'].includes(vendor.status);
+                      return (
+                        <div key={vendor.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{ width: '32px', height: '32px', background: '#3b82f6', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.85rem' }}>
+                            {vendor.name.charAt(0)}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.85rem' }}>{vendor.name}</div>
+                            <div style={{ color: '#64748b', fontSize: '0.72rem' }}>Code: {vendor.vendorCode || 'N/A'}</div>
+                          </div>
+                          <span style={{ 
+                            padding: '3px 8px', 
+                            background: isGood ? '#dcfce7' : '#fef3c7', 
+                            color: isGood ? '#16a34a' : '#d97706', 
+                            borderRadius: '12px', 
+                            fontSize: '0.68rem', 
+                            fontWeight: 700 
+                          }}>
+                            {vendor.status}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    <button 
+                      onClick={() => router.push('/client/vendors')}
+                      style={{ width: '100%', padding: '8px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', marginTop: '4px' }}
+                    >
+                      View All Vendors in Directory
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {/* Loading Indicator */}
+          {isProcessing && (
+            <div style={{ alignSelf: 'flex-start', maxWidth: '85%' }}>
+              <div style={{ 
+                background: '#ffffff', color: '#64748b', padding: '12px 16px', 
+                borderRadius: '16px 16px 16px 4px', border: '1px solid #e2e8f0',
+                fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px'
+              }}>
+                <Loader2 size={16} className="animate-spin" /> Cortex is thinking...
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
 
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px', letterSpacing: '1px' }}>Manual Override</div>
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '8px', borderBottom: '2px solid rgba(56, 189, 248, 0.6)', transition: 'border-color 0.2s' }}>
-            <span style={{ color: '#38bdf8', paddingLeft: '12px', fontWeight: 'bold' }}>{'>'}</span>
+        {/* Input Area */}
+        <div style={{ padding: '16px', background: '#ffffff', borderTop: '1px solid #e2e8f0' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px' }}>
             <input 
               type="text" 
-              placeholder="Type a command..." 
-              value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
-              onKeyDown={handleTextSubmit}
-              style={{ width: '100%', padding: '12px 10px', backgroundColor: 'transparent', border: 'none', color: '#fff', fontSize: '0.9rem', outline: 'none', fontFamily: 'monospace' }}
+              value={inputText}
+              onChange={e => setInputText(e.target.value)}
+              placeholder="Ask Cortex to execute a workflow..."
+              disabled={isProcessing}
+              style={{ flex: 1, padding: '12px 16px', borderRadius: '24px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem', background: isProcessing ? '#f8fafc' : '#fff' }}
             />
-          </div>
+            <button 
+              type="submit" 
+              disabled={isProcessing || !inputText.trim()}
+              style={{ width: '42px', height: '42px', borderRadius: '50%', background: inputText.trim() && !isProcessing ? '#0f172a' : '#cbd5e1', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: inputText.trim() && !isProcessing ? 'pointer' : 'default', transition: 'background 0.2s' }}
+            >
+              <Send size={18} />
+            </button>
+          </form>
         </div>
 
-        <style>
-          {`
-            @keyframes blink {
-              0%, 100% { opacity: 1; }
-              50% { opacity: 0; }
-            }
-            @keyframes spin {
-              100% { transform: rotate(360deg); }
-            }
-            @keyframes spin-reverse {
-              100% { transform: rotate(-360deg); }
-            }
-            @keyframes pulse-glow {
-              0%, 100% { transform: scale(1); opacity: 0.8; }
-              50% { transform: scale(1.2); opacity: 1; }
-            }
-            @keyframes lockdownFlash {
-              0% { background-color: rgba(220, 38, 38, 0.1); }
-              100% { background-color: rgba(220, 38, 38, 0.4); }
-            }
-          `}
-        </style>
       </div>
     </>
   );
