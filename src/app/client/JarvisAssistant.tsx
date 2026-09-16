@@ -211,8 +211,9 @@ export default function JarvisAssistant() {
         style={{
           position: 'fixed', bottom: '30px', right: '30px',
           width: '64px', height: '64px',
-          backgroundColor: '#0f172a',
+          background: 'linear-gradient(135deg, #0f172a 0%, #3b82f6 100%)',
           borderRadius: '50%',
+          boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 8px 10px -6px rgba(59, 130, 246, 0.5)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer', zIndex: 999999,
           boxShadow: '0 10px 25px rgba(0,0,0,0.3), inset 0 0 0 2px #38bdf8',
@@ -254,16 +255,19 @@ export default function JarvisAssistant() {
         {/* Chat / Tool Output Area */}
         <div style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {messages.map((msg, i) => (
-            <div key={i} style={{ alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
-              <div style={{ 
-                background: msg.role === 'user' ? '#0f172a' : '#ffffff', 
-                color: msg.role === 'user' ? '#fff' : '#1e293b',
-                padding: '12px 16px', 
-                borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                border: msg.role === 'user' ? 'none' : '1px solid #e2e8f0',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
-                fontSize: '0.9rem', lineHeight: '1.5'
-              }}>
+            <div key={i} style={{ alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '85%', display: 'flex', gap: '8px', flexDirection: msg.role === 'user' ? 'row-reverse' : 'row' }}>
+                <div style={{ flexShrink: 0, width: '28px', height: '28px', borderRadius: '50%', background: msg.role === 'user' ? 'linear-gradient(135deg, #2563eb, #4f46e5)' : 'linear-gradient(135deg, #0f172a, #334155)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.7rem', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                  {msg.role === 'user' ? 'ME' : 'AI'}
+                </div>
+                <div style={{ 
+                  background: msg.role === 'user' ? 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)' : '#ffffff', 
+                  color: msg.role === 'user' ? '#fff' : '#1e293b',
+                  padding: '12px 16px', 
+                  borderRadius: msg.role === 'user' ? '16px 4px 16px 16px' : '4px 16px 16px 16px',
+                  border: msg.role === 'user' ? 'none' : '1px solid rgba(226, 232, 240, 0.8)',
+                  boxShadow: msg.role === 'user' ? '0 4px 15px -3px rgba(37, 99, 235, 0.3)' : '0 4px 15px -3px rgba(0,0,0,0.05)',
+                  fontSize: '0.9rem', lineHeight: '1.5'
+                }}>
                 {msg.content}
                 
                 {msg.uiComponent === 'po_list' && msg.uiData && (
