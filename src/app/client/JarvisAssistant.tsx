@@ -16,6 +16,8 @@ export default function JarvisAssistant() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState('');
+  const [showSlashMenu, setShowSlashMenu] = useState(false);
+  const [eventForm, setEventForm] = useState({ title: '', type: 'RFQ', quantity: '1', currency: 'USD' });
   const [userName, setUserName] = useState<string | null>(null);
   const [messages, setMessages] = useState<{role: 'user' | 'agent', content: string, uiComponent?: string, uiData?: any}[]>([
     { role: 'agent', content: 'Hello. I am ProcGen Cortex, your autonomous AI agent. Try asking me to "check laptop inventory and reorder".' }
@@ -188,7 +190,45 @@ export default function JarvisAssistant() {
                   </div>
                 )}
 
+                
+                {msg.uiComponent === 'event_creation_form' && (
+                  <div style={{ marginTop: '12px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                    <div style={{ marginBottom: '12px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Event Title / Product Name</label>
+                      <input type="text" placeholder="e.g. 50 Dell XPS Laptops" value={eventForm.title} onChange={e => setEventForm({...eventForm, title: e.target.value})} style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Type</label>
+                        <select value={eventForm.type} onChange={e => setEventForm({...eventForm, type: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}>
+                          <option>RFQ</option>
+                          <option>Auction</option>
+                        </select>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Quantity</label>
+                        <input type="number" value={eventForm.quantity} onChange={e => setEventForm({...eventForm, quantity: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Currency</label>
+                        <select value={eventForm.currency} onChange={e => setEventForm({...eventForm, currency: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}>
+                          <option>USD</option>
+                          <option>INR</option>
+                          <option>EUR</option>
+                        </select>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => executeCommand('/execute-create-event ' + JSON.stringify(eventForm))}
+                      style={{ width: '100%', padding: '10px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+                    >
+                      <Zap size={16} /> Create Event Autonomously
+                    </button>
+                  </div>
+                )}
+
                 {msg.uiComponent === 'event_list' && msg.uiData && (
+
                   <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {msg.uiData.map((ev: any) => (
                       <div key={ev.id} style={{ padding: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.8rem' }}>
@@ -415,7 +455,12 @@ export default function JarvisAssistant() {
             <input 
               type="text" 
               value={inputText}
-              onChange={e => setInputText(e.target.value)}
+              onChange={e => {
+                  const val = e.target.value;
+                  setInputText(val);
+                  if (val === '/') setShowSlashMenu(true);
+                  else setShowSlashMenu(false);
+                }}
               placeholder="Ask Cortex to execute a workflow..."
               disabled={isProcessing}
               style={{ flex: 1, padding: '12px 16px', borderRadius: '24px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.9rem', background: isProcessing ? '#f8fafc' : '#fff' }}

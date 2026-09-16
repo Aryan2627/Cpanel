@@ -275,6 +275,42 @@ export async function POST(req: Request) {
     const payload = await verifyToken(tokenStr);
     const orgId = payload?.organizationId as string | undefined;
 
+    // --- SLASH COMMAND: /create-event ---
+    if (text.trim().toLowerCase() === '/create-event') {
+      return NextResponse.json({
+        final_response: "Let's build that event. Fill in the important details below:",
+        ui_component: 'event_creation_form'
+      });
+    }
+
+    // --- SLASH COMMAND EXECUTION: /execute-create-event ---
+    if (text.startsWith('/execute-create-event')) {
+      try {
+        const jsonStr = text.replace('/execute-create-event', '').trim();
+        const data = JSON.parse(jsonStr);
+        
+        const newEvent = await prisma.event.create({
+          data: {
+            organizationId: orgId,
+            refId: `EVT-${Math.floor(1000 + Math.random() * 9000)}`,
+            title: data.title || 'Untitled Event',
+            type: data.type || 'RFQ',
+            itemsCount: parseInt(data.quantity) || 1,
+            baseCurrency: data.currency || 'USD',
+            status: 'Draft',
+          }
+        });
+
+        return NextResponse.json({
+          final_response: `Success! Your event **${newEvent.refId}** has been created autonomously.`,
+          ui_component: 'event_list',
+          ui_data: [newEvent]
+        });
+      } catch (err) {
+        return NextResponse.json({ final_response: "I encountered an error creating the event. Please check the data." });
+      }
+    }
+
     // --- CONTEXTUAL MEMORY / AFFIRMATION ACTIONS ---
     if (history && history.length > 0 && /^(yes|yeah|sure|do it|approve it|confirm|proceed|reorder now)\b/i.test(lowerText)) {
       const lastAgentMessage = [...history].reverse().find((m: any) => m.role === 'agent');
