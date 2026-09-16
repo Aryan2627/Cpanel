@@ -27,6 +27,7 @@ export default function JarvisAssistant() {
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [toolCalls, setToolCalls] = useState<ToolCall[]>([]);
+  const [registeredVendors, setRegisteredVendors] = useState<any[]>([]);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +43,13 @@ export default function JarvisAssistant() {
             { role: 'agent', content: `Hello ${data.name.split(' ')[0]}. I am ProcGen Cortex, your autonomous AI agent. Try asking me to "check laptop inventory and reorder".` }
           ]);
         }
+      })
+      .catch(() => {});
+      
+    fetch('/api/vendors')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setRegisteredVendors(data);
       })
       .catch(() => {});
   }, []);
@@ -336,7 +344,9 @@ export default function JarvisAssistant() {
                           <select value={eventForm.participants} onChange={e => setEventForm({...eventForm, participants: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}>
                             <option value="all">Invite All Active</option>
                             <option value="top_rated">Top Rated Only</option>
-                            <option value="manual">Manual Selection</option>
+                            {registeredVendors.map((v: any) => (
+                              <option key={v.id} value={v.id}>{v.name}</option>
+                            ))}
                           </select>
                         </div>
                       </div>
