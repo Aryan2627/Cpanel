@@ -18,6 +18,9 @@ export default function JarvisAssistant() {
   const [inputText, setInputText] = useState('');
   const [showSlashMenu, setShowSlashMenu] = useState(false);
   const [eventForm, setEventForm] = useState({ title: '', type: 'RFQ', quantity: '1', currency: 'USD' });
+    const [vendorForm, setVendorForm] = useState({ name: '', email: '', type: 'Supplier', city: '' });
+    const [poForm, setPoForm] = useState({ title: '', amount: '' });
+    const [productForm, setProductForm] = useState({ name: '', sku: '', price: '', category: '' });
   const [userName, setUserName] = useState<string | null>(null);
   const [messages, setMessages] = useState<{role: 'user' | 'agent', content: string, uiComponent?: string, uiData?: any}[]>([
     { role: 'agent', content: 'Hello. I am ProcGen Cortex, your autonomous AI agent. Try asking me to "check laptop inventory and reorder".' }
@@ -191,6 +194,67 @@ export default function JarvisAssistant() {
                 )}
 
                 
+                
+                {msg.uiComponent === 'vendor_creation_form' && (
+                  <div style={{ marginTop: '12px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                    <div style={{ marginBottom: '12px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Vendor Name</label>
+                      <input type="text" value={vendorForm.name} onChange={e => setVendorForm({...vendorForm, name: e.target.value})} style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Email</label>
+                        <input type="email" value={vendorForm.email} onChange={e => setVendorForm({...vendorForm, email: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>City</label>
+                        <input type="text" value={vendorForm.city} onChange={e => setVendorForm({...vendorForm, city: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                      </div>
+                    </div>
+                    <button onClick={() => executeCommand('/execute-create-vendor ' + JSON.stringify(vendorForm))} style={{ width: '100%', padding: '10px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                      <Zap size={16} /> Onboard Vendor
+                    </button>
+                  </div>
+                )}
+
+                {msg.uiComponent === 'po_creation_form' && (
+                  <div style={{ marginTop: '12px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                    <div style={{ marginBottom: '12px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>PO Title / Description</label>
+                      <input type="text" value={poForm.title} onChange={e => setPoForm({...poForm, title: e.target.value})} style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                    </div>
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Total Amount</label>
+                      <input type="number" value={poForm.amount} onChange={e => setPoForm({...poForm, amount: e.target.value})} style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                    </div>
+                    <button onClick={() => executeCommand('/execute-draft-po ' + JSON.stringify(poForm))} style={{ width: '100%', padding: '10px', background: '#ca8a04', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                      <Zap size={16} /> Draft PO
+                    </button>
+                  </div>
+                )}
+
+                {msg.uiComponent === 'product_creation_form' && (
+                  <div style={{ marginTop: '12px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                    <div style={{ marginBottom: '12px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Product Name</label>
+                      <input type="text" value={productForm.name} onChange={e => setProductForm({...productForm, name: e.target.value})} style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>SKU</label>
+                        <input type="text" value={productForm.sku} onChange={e => setProductForm({...productForm, sku: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Price</label>
+                        <input type="number" value={productForm.price} onChange={e => setProductForm({...productForm, price: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                      </div>
+                    </div>
+                    <button onClick={() => executeCommand('/execute-add-product ' + JSON.stringify(productForm))} style={{ width: '100%', padding: '10px', background: '#0284c7', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                      <Zap size={16} /> Add to Catalog
+                    </button>
+                  </div>
+                )}
+
                 {msg.uiComponent === 'event_creation_form' && (
                   <div style={{ marginTop: '12px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
                     <div style={{ marginBottom: '12px' }}>

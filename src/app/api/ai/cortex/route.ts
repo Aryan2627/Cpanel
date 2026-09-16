@@ -283,6 +283,17 @@ export async function POST(req: Request) {
       });
     }
 
+    
+    if (text.trim().toLowerCase() === '/new-vendor') {
+      return NextResponse.json({ final_response: "Let's onboard a new vendor. Please provide the details:", ui_component: 'vendor_creation_form' });
+    }
+    if (text.trim().toLowerCase() === '/draft-po') {
+      return NextResponse.json({ final_response: "Let's draft a new Purchase Order:", ui_component: 'po_creation_form' });
+    }
+    if (text.trim().toLowerCase() === '/add-product') {
+      return NextResponse.json({ final_response: "Let's add a new item to your Product Catalog:", ui_component: 'product_creation_form' });
+    }
+
     // --- SLASH COMMAND EXECUTION: /execute-create-event ---
     if (text.startsWith('/execute-create-event')) {
       try {
@@ -309,6 +320,62 @@ export async function POST(req: Request) {
       } catch (err) {
         return NextResponse.json({ final_response: "I encountered an error creating the event. Please check the data." });
       }
+    }
+
+    
+    // --- SLASH COMMAND EXECUTION: /execute-create-vendor ---
+    if (text.startsWith('/execute-create-vendor')) {
+      try {
+        const data = JSON.parse(text.replace('/execute-create-vendor', '').trim());
+        const newVendor = await prisma.vendor.create({
+          data: {
+            organizationId: orgId,
+            name: data.name || 'Unknown Vendor',
+            email: data.email || 'contact@vendor.com',
+            type: data.type || 'Supplier',
+            city: data.city || 'Global',
+            status: 'Active',
+            vendorCode: 'V-' + Math.floor(1000 + Math.random() * 9000)
+          }
+        });
+        return NextResponse.json({ final_response: `Vendor **${newVendor.name}** successfully onboarded!`, ui_component: 'vendor_list', ui_data: [newVendor] });
+      } catch(e) { return NextResponse.json({ final_response: "Error creating vendor." }); }
+    }
+
+    // --- SLASH COMMAND EXECUTION: /execute-draft-po ---
+    if (text.startsWith('/execute-draft-po')) {
+      try {
+        const data = JSON.parse(text.replace('/execute-draft-po', '').trim());
+        const newPo = await prisma.purchaseOrder.create({
+          data: {
+            organizationId: orgId,
+            poNumber: 'PO-' + Math.floor(10000 + Math.random() * 90000),
+            title: data.title || 'Standard PO',
+            status: 'Draft',
+            total: parseFloat(data.amount) || 0,
+            source: 'Cortex AI'
+          }
+        });
+        return NextResponse.json({ final_response: `Purchase Order **${newPo.poNumber}** drafted successfully.`, ui_component: 'po_list', ui_data: [newPo] });
+      } catch(e) { return NextResponse.json({ final_response: "Error drafting PO." }); }
+    }
+
+    // --- SLASH COMMAND EXECUTION: /execute-add-product ---
+    if (text.startsWith('/execute-add-product')) {
+      try {
+        const data = JSON.parse(text.replace('/execute-add-product', '').trim());
+        const newProduct = await prisma.product.create({
+          data: {
+            organizationId: orgId,
+            name: data.name || 'New Product',
+            sku: data.sku || 'SKU-' + Math.floor(1000 + Math.random() * 9000),
+            price: parseFloat(data.price) || 0,
+            category: data.category || 'General',
+            status: 'Active'
+          }
+        });
+        return NextResponse.json({ final_response: `Product **${newProduct.name}** added to catalog.`, ui_component: 'product_list', ui_data: [newProduct] });
+      } catch(e) { return NextResponse.json({ final_response: "Error adding product." }); }
     }
 
     // --- CONTEXTUAL MEMORY / AFFIRMATION ACTIONS ---
