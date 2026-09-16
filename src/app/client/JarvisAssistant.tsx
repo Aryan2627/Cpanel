@@ -59,7 +59,15 @@ export default function JarvisAssistant() {
       setShowSlashMenu(false);
       return;
     }
-    setMessages(prev => [...prev, { role: 'user', content: command }]);
+    
+    let displayMessage = command;
+    if (command.startsWith('/execute-create-event')) displayMessage = "Create this event for me.";
+    if (command.startsWith('/execute-create-vendor')) displayMessage = "Onboard this new vendor.";
+    if (command.startsWith('/execute-draft-po')) displayMessage = "Draft this purchase order.";
+    if (command.startsWith('/execute-add-product')) displayMessage = "Add this product to the catalog.";
+    
+    setMessages(prev => [...prev, { role: 'user', content: displayMessage }]);
+
     setIsProcessing(true);
     try {
       const res = await fetch('/api/ai/cortex', {
