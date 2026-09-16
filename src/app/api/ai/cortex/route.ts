@@ -295,6 +295,31 @@ export async function POST(req: Request) {
     }
 
     
+    
+    // --- SYSTEM COMMAND: PROACTIVE CHECK (RUN ON MOUNT) ---
+    if (text.trim().toLowerCase() === '/proactive-check') {
+      try {
+        const pendingApprovals = await prisma.approvalRequest.count({ where: orgId ? { organizationId: orgId, status: 'Pending' } : { status: 'Pending' } });
+        const draftPos = await prisma.purchaseOrder.count({ where: orgId ? { organizationId: orgId, status: 'Draft' } : { status: 'Draft' } });
+        
+        let greeting = `Hello ${userName ? userName.split(' ')[0] : 'there'}! I am ProcGen Cortex.`;
+        
+        let alerts = [];
+        if (pendingApprovals > 0) alerts.push(`**${pendingApprovals} pending approvals**`);
+        if (draftPos > 0) alerts.push(`**${draftPos} drafted Purchase Orders**`);
+
+        if (alerts.length > 0) {
+          greeting += ` Just a heads up, you currently have ${alerts.join(' and ')} that need your attention. Would you like me to pull them up or shall we start something new?`;
+        } else {
+          greeting += ` All your queues are clear today. What would you like to build or analyze?`;
+        }
+
+        return NextResponse.json({ final_response: greeting });
+      } catch (e) {
+        return NextResponse.json({ final_response: `Hello ${userName ? userName.split(' ')[0] : ''}! I am ProcGen Cortex, your AI agent. How can I assist you today?` });
+      }
+    }
+
     // --- ADVANCED SLASH COMMANDS ---
     if (text.trim().toLowerCase() === '/approve-all') {
       await prisma.approvalRequest.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });

@@ -36,13 +36,22 @@ export default function JarvisAssistant() {
     fetch('/api/auth/me')
       .then(res => res.json())
       .then(data => {
-        if (data && data.name) {
-          setUserName(data.name);
-          // Update the initial greeting if desired, or just pass it in requests
-          setMessages([
-            { role: 'agent', content: `Hello ${data.name.split(' ')[0]}. I am ProcGen Cortex, your autonomous AI agent. Try asking me to "check laptop inventory and reorder".` }
-          ]);
-        }
+        const uName = (data && data.name) ? data.name : '';
+        if (uName) setUserName(uName);
+        
+        // Fire Proactive Check in the background
+        fetch('/api/ai/cortex', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: '/proactive-check', userName: uName, history: [] })
+        })
+        .then(res => res.json())
+        .then(aiData => {
+           setMessages([
+             { role: 'agent', content: aiData.final_response }
+           ]);
+        })
+        .catch(() => {});
       })
       .catch(() => {});
       
