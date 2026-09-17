@@ -162,7 +162,7 @@ export default function CortexPage() {
   ];
 
   return (
-    <div style={{ display:'flex', height:'calc(100vh - 64px)', background:'#070d1c', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+    <div style={{ display:'flex', height:'calc(100vh - 64px)', background:'#070d1c', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative', contain:'strict' }}>
       
       {/* Animated Background */}
       <style>{`
@@ -224,11 +224,11 @@ export default function CortexPage() {
       </div>
 
       {/* ── MAIN CHAT ── */}
-      <div style={{ flex:1, display:'flex', flexDirection:'column', position:'relative', overflow:'hidden' }}>
+      <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', minWidth:0 }}>
         
         {/* Messages */}
-        <div style={{ flex:1, overflowY:'auto', padding:'32px 0 0' }}>
-          <div style={{ maxWidth:'780px', margin:'0 auto', display:'flex', flexDirection:'column', gap:'28px', padding:'0 28px 200px' }}>
+        <div style={{ flex:1, overflowY:'auto', overflowX:'hidden', padding:'32px 0 0', minHeight:0 }}>
+          <div style={{ maxWidth:'780px', margin:'0 auto', display:'flex', flexDirection:'column', gap:'28px', padding:'0 28px 24px' }}>
             {messages.map((msg, idx)=>(
               <div key={idx} className="cortex-msg" style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
                 
@@ -408,7 +408,7 @@ export default function CortexPage() {
         </div>
 
         {/* ── INPUT AREA ── */}
-        <div style={{ position:'absolute', bottom:0, width:'100%', padding:'0 28px 28px', background:'linear-gradient(180deg,transparent 0%,#070d1c 35%)' }}>
+        <div style={{ padding:'16px 28px 24px', background:'linear-gradient(180deg,transparent 0%,#070d1c 40%)', flexShrink:0 }}>
           <div style={{ maxWidth:'780px', margin:'0 auto', position:'relative' }}>
 
             {/* Slash Menu */}
