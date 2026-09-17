@@ -670,12 +670,10 @@ export default function CortexPage() {
               <X size={20}/> Close
             </button>
             <div style={{ overflow:'hidden', borderRadius:'10px', aspectRatio:'16/9', background:'#000', position: 'relative' }}>
-               <iframe 
-                  src="https://drive.google.com/file/d/1PCzvVNfOPVQzJLEk8kJFg2Y_pfnau2K2/preview" 
-                  style={{ width:'100%', height:'100%', border:'none' }}
-                  allow="autoplay"
-                  allowFullScreen
-               ></iframe>
+               <video controls autoPlay style={{ width:'100%', height:'100%' }}>
+                  <source src="/tutorial.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+               </video>
             </div>
             <div style={{ padding:'12px 16px', color:'#a5b4fc', fontSize:'0.75rem', textAlign:'center', background:'rgba(99,102,241,0.05)' }}>
               <strong>Video Tutorial Loaded!</strong> Your AI tutorial is now fully integrated.
