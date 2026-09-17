@@ -38,41 +38,7 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => 
         <Zap size={15}/> Generate Document
       </button>
       
-      {/* Video Tutorial Modal */}
-      {tutorialVideo && (
-        <div style={{ position:'fixed', top:0, left:0, width:'100vw', height:'100vh', background:'rgba(0,0,0,0.85)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(10px)' }}>
-          <div style={{ position:'relative', width:'800px', maxWidth:'95vw', background:'#070d1c', padding:'8px', borderRadius:'16px', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
-            <button onClick={()=>setTutorialVideo(null)} style={{ position:'absolute', top:'-40px', right:0, background:'transparent', border:'none', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.9rem', fontWeight:600 }}>
-              <X size={20}/> Close
-            </button>
-            <div style={{ overflow:'hidden', borderRadius:'10px', aspectRatio:'16/9', background:'#000', position: 'relative' }}>
-               <iframe 
-                  src="https://drive.google.com/file/d/1PCzvVNfOPVQzJLEk8kJFg2Y_pfnau2K2/preview" 
-                  style={{ width:'100%', height:'100%', border:'none' }}
-                  allow="autoplay"
-                  allowFullScreen
-               ></iframe>
-            </div>
-            <div style={{ padding:'12px 16px', color:'#a5b4fc', fontSize:'0.75rem', textAlign:'center', background:'rgba(99,102,241,0.05)' }}>
-              <strong>Video Tutorial Loaded!</strong> Your AI tutorial is now fully integrated.
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Image Viewer Modal */}
-      {viewImage && (
-        <div style={{ position:'fixed', top:0, left:0, width:'100vw', height:'100vh', background:'rgba(0,0,0,0.85)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(10px)' }}>
-          <div style={{ position:'relative', maxWidth:'90vw', maxHeight:'90vh', background:'#070d1c', padding:'8px', borderRadius:'16px', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
-            <button onClick={()=>setViewImage(null)} style={{ position:'absolute', top:'-40px', right:0, background:'transparent', border:'none', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.9rem', fontWeight:600 }}>
-              <X size={20}/> Close
-            </button>
-            <div style={{ overflow:'hidden', borderRadius:'10px' }}>
-              <img src={viewImage} style={{ maxWidth:'100%', maxHeight:'85vh', display:'block', clipPath:'inset(0px 0px 8% 0px)' }} alt="Full View" />
-            </div>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 };
@@ -688,6 +654,42 @@ export default function CortexPage() {
           </div>
         </div>
       </div>
+
+{/* Video Tutorial Modal */}
+      {tutorialVideo && (
+        <div style={{ position:'fixed', top:0, left:0, width:'100vw', height:'100vh', background:'rgba(0,0,0,0.85)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(10px)' }}>
+          <div style={{ position:'relative', width:'800px', maxWidth:'95vw', background:'#070d1c', padding:'8px', borderRadius:'16px', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <button onClick={()=>setTutorialVideo(null)} style={{ position:'absolute', top:'-40px', right:0, background:'transparent', border:'none', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.9rem', fontWeight:600 }}>
+              <X size={20}/> Close
+            </button>
+            <div style={{ overflow:'hidden', borderRadius:'10px', aspectRatio:'16/9', background:'#000', position: 'relative' }}>
+               <iframe 
+                  src="https://drive.google.com/file/d/1PCzvVNfOPVQzJLEk8kJFg2Y_pfnau2K2/preview" 
+                  style={{ width:'100%', height:'100%', border:'none' }}
+                  allow="autoplay"
+                  allowFullScreen
+               ></iframe>
+            </div>
+            <div style={{ padding:'12px 16px', color:'#a5b4fc', fontSize:'0.75rem', textAlign:'center', background:'rgba(99,102,241,0.05)' }}>
+              <strong>Video Tutorial Loaded!</strong> Your AI tutorial is now fully integrated.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Viewer Modal */}
+      {viewImage && (
+        <div style={{ position:'fixed', top:0, left:0, width:'100vw', height:'100vh', background:'rgba(0,0,0,0.85)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(10px)' }}>
+          <div style={{ position:'relative', maxWidth:'90vw', maxHeight:'90vh', background:'#070d1c', padding:'8px', borderRadius:'16px', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <button onClick={()=>setViewImage(null)} style={{ position:'absolute', top:'-40px', right:0, background:'transparent', border:'none', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.9rem', fontWeight:600 }}>
+              <X size={20}/> Close
+            </button>
+            <div style={{ overflow:'hidden', borderRadius:'10px' }}>
+              <img src={viewImage} style={{ maxWidth:'100%', maxHeight:'85vh', display:'block', clipPath:'inset(0px 0px 8% 0px)' }} alt="Full View" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
