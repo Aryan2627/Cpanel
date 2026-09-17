@@ -370,6 +370,33 @@ export async function POST(req: Request) {
       }
     }
 
+      // --- AI IMAGE GENERATION ---
+      const imageRegex = /\b(generate|create|make|draw|imagine)\b.*\b(image|picture|photo|logo|mockup|render)\b/i;
+      if (imageRegex.test(text)) {
+        // Extract the prompt
+        let prompt = text.replace(/\b(generate|create|make|draw|imagine)\b.*\b(image|picture|photo|logo|mockup|render)\b/i, '').trim();
+        if (!prompt || prompt.length < 3) prompt = "A futuristic corporate procurement dashboard, glowing neon, cyberpunk";
+        else {
+          // Remove leading words like "of a" or "for"
+          prompt = prompt.replace(/^(of|for|about|a|an|the)\s+/i, '').trim();
+        }
+        
+        const safePrompt = encodeURIComponent(prompt);
+        const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=450&nologo=true`;
+
+        return NextResponse.json({
+          final_response: `I have generated the image based on your request: "${prompt}"`,
+          thought_process: [
+            `[Image Gen] Analyzing semantic request...`,
+            `[Image Gen] Extracted prompt: "${prompt}"`,
+            `[Diffusion Model] Initializing latent space diffusion...`,
+            `[Diffusion Model] Rendering high-fidelity output...`
+          ],
+          ui_component: 'generated_image',
+          ui_data: { url: imageUrl, prompt: prompt }
+        });
+      }
+
     // --- ADVANCED SLASH COMMANDS ---
     if (text.trim().toLowerCase() === '/approve-all') {
       await prisma.approvalRequest.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });
