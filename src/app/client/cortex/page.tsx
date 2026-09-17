@@ -117,6 +117,8 @@ export default function CortexPage() {
   const [showSlashMenu, setShowSlashMenu] = useState(false);
   const [registeredVendors, setRegisteredVendors] = useState<any[]>([]);
   const [eventForm, setEventForm] = useState({ title: '', budget: '', vendorId: '', duration: '' });
+  const [vendorForm, setVendorForm] = useState({ name: '', email: '', category: '' });
+  const [poForm, setPoForm] = useState({ poNumber: '', amount: '', desc: '' });
   const [productForm, setProductForm] = useState({ name: '', sku: '', price: '' });
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -274,6 +276,49 @@ export default function CortexPage() {
                         style={{ padding: '30px', maxHeight: '500px', overflowY: 'auto', background: '#fff', fontSize: '0.9rem', lineHeight: '1.8', outline: 'none' }}
                         dangerouslySetInnerHTML={{ __html: msg.uiData.htmlContent }}
                       />
+                    </div>
+                  )}
+
+                  
+                  {msg.uiComponent === 'event_form' && (
+                    <div style={{ marginTop: '16px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', width: '100%' }}>
+                      <div style={{ marginBottom: '16px', fontWeight: 600 }}>Create Sourcing Event</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div><input type="text" placeholder="Event Title" value={eventForm.title} onChange={e => setEventForm({...eventForm, title: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                          <div style={{ flex: 1 }}><input type="number" placeholder="Budget ($)" value={eventForm.budget} onChange={e => setEventForm({...eventForm, budget: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
+                          <div style={{ flex: 1 }}><input type="text" placeholder="Duration (Days)" value={eventForm.duration} onChange={e => setEventForm({...eventForm, duration: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
+                        </div>
+                        <button onClick={() => executeCommand('/execute-create-event ' + JSON.stringify(eventForm))} style={{ width: '100%', padding: '10px', background: '#ea580c', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Publish Event</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {msg.uiComponent === 'vendor_form' && (
+                    <div style={{ marginTop: '16px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', width: '100%' }}>
+                      <div style={{ marginBottom: '16px', fontWeight: 600 }}>Onboard New Supplier</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div><input type="text" placeholder="Company Name" value={vendorForm?.name || ''} onChange={e => setVendorForm({...vendorForm, name: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                          <div style={{ flex: 1 }}><input type="email" placeholder="Contact Email" value={vendorForm?.email || ''} onChange={e => setVendorForm({...vendorForm, email: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
+                          <div style={{ flex: 1 }}><input type="text" placeholder="Category (e.g. IT, Legal)" value={vendorForm?.category || ''} onChange={e => setVendorForm({...vendorForm, category: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
+                        </div>
+                        <button onClick={() => executeCommand('/execute-create-vendor ' + JSON.stringify(vendorForm))} style={{ width: '100%', padding: '10px', background: '#0284c7', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Register Vendor</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {msg.uiComponent === 'po_form' && (
+                    <div style={{ marginTop: '16px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', width: '100%' }}>
+                      <div style={{ marginBottom: '16px', fontWeight: 600 }}>Draft Purchase Order</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div><input type="text" placeholder="Description / Purpose" value={poForm?.desc || ''} onChange={e => setPoForm({...poForm, desc: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                          <div style={{ flex: 1 }}><input type="text" placeholder="PO Number (Optional)" value={poForm?.poNumber || ''} onChange={e => setPoForm({...poForm, poNumber: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
+                          <div style={{ flex: 1 }}><input type="number" placeholder="Total Amount ($)" value={poForm?.amount || ''} onChange={e => setPoForm({...poForm, amount: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
+                        </div>
+                        <button onClick={() => executeCommand('/execute-draft-po ' + JSON.stringify(poForm))} style={{ width: '100%', padding: '10px', background: '#059669', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Generate PO</button>
+                      </div>
                     </div>
                   )}
 
