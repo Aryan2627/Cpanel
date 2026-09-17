@@ -110,7 +110,7 @@ export default function CortexPage() {
   const [eventForm, setEventForm] = useState({ title:'', budget:'', vendorId:'', duration:'' });
   const [vendorForm, setVendorForm] = useState({ name:'', email:'', category:'' });
   const [poForm, setPoForm] = useState({ poNumber:'', amount:'', desc:'' });
-  const [productForm, setProductForm] = useState({ name:'', sku:'', price:'' });
+  const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'' });
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -399,9 +399,29 @@ export default function CortexPage() {
                       <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Add to Catalog</div>
                       <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
                         <input type="text" placeholder="Product Name" value={productForm.name} onChange={e=>setProductForm({...productForm, name:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                        
+                        <div style={{ display:'flex', gap:'10px' }}>
+                          <button onClick={() => {
+                            if(!productForm.name) return alert('Enter a product name first!');
+                            const safePrompt = encodeURIComponent('high quality professional product photography of ' + productForm.name + ', studio lighting, clean minimal background');
+                            setProductForm({...productForm, imageUrl: `https://image.pollinations.ai/prompt/${safePrompt}?width=400&height=440&nologo=1`});
+                          }} style={{ flex:1, padding:'8px', background:'rgba(99,102,241,0.15)', color:'#818cf8', border:'1px solid rgba(99,102,241,0.3)', borderRadius:'8px', fontSize:'0.75rem', cursor:'pointer' }}>
+                            ✨ Generate AI Image
+                          </button>
+                          <button onClick={() => alert('Gallery upload simulation active! In production, this opens a file picker.')} style={{ flex:1, padding:'8px', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'8px', fontSize:'0.75rem', cursor:'pointer' }}>
+                            📁 Upload from Gallery
+                          </button>
+                        </div>
+
+                        {productForm.imageUrl && (
+                          <div style={{ position:'relative', width:'100%', height:'200px', overflow:'hidden', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)' }}>
+                             <img src={productForm.imageUrl} style={{ width:'100%', height:'240px', objectFit:'cover', objectPosition:'top' }} alt="Product Preview" />
+                          </div>
+                        )}
+
                         <div style={{ display:'flex', gap:'10px' }}>
                           <input type="text" placeholder="SKU" value={productForm.sku} onChange={e=>setProductForm({...productForm, sku:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                          <input type="number" placeholder="Price" value={productForm.price} onChange={e=>setProductForm({...productForm, price:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <input type="number" placeholder="Price ($)" value={productForm.price} onChange={e=>setProductForm({...productForm, price:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
                         </div>
                         <button onClick={()=>execute('/execute-add-product '+JSON.stringify(productForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#6366f1,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Add to Catalog</button>
                       </div>
@@ -412,9 +432,18 @@ export default function CortexPage() {
                   {msg.uiComponent==='product_list' && msg.uiData && (
                     <div style={{ marginTop:'14px', display:'flex', flexDirection:'column', gap:'8px' }}>
                       {msg.uiData.map((p:any)=>(
-                        <div key={p.id} style={{ padding:'13px 16px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'10px' }}>
-                          <div style={{ fontWeight:700, color:'#e2e8f0', fontSize:'0.88rem' }}>{p.name}</div>
-                          <div style={{ color:'#475569', fontSize:'0.78rem', marginTop:'3px' }}>Code: {p.articleCode||p.code} · Category: {p.category||'General'}</div>
+                        <div key={p.id} style={{ padding:'13px 16px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'10px', display:'flex', gap:'12px', alignItems:'center' }}>
+                          {p.imageUrl ? (
+                             <div style={{ width:'44px', height:'44px', borderRadius:'8px', overflow:'hidden', flexShrink:0 }}>
+                               <img src={p.imageUrl} style={{ width:'100%', height:'52px', objectFit:'cover', objectPosition:'top' }} alt={p.name} />
+                             </div>
+                          ) : (
+                             <div style={{ width:'44px', height:'44px', borderRadius:'8px', background:'rgba(255,255,255,0.05)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.65rem', color:'#475569', flexShrink:0 }}>No Img</div>
+                          )}
+                          <div>
+                            <div style={{ fontWeight:700, color:'#e2e8f0', fontSize:'0.88rem' }}>{p.name}</div>
+                            <div style={{ color:'#475569', fontSize:'0.75rem', marginTop:'3px' }}>SKU: {p.articleCode||p.code||p.sku||'N/A'} &middot; Price: ${p.price||0}</div>
+                          </div>
                         </div>
                       ))}
                     </div>
