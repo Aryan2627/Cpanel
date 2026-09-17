@@ -491,7 +491,14 @@ export async function POST(req: Request) {
     // --- SLASH COMMAND EXECUTION: /execute-add-product ---
     if (text.startsWith('/analyze-risk') || text.includes('swarm')) {
       return NextResponse.json({
-        final_response: "Deploying specialized sub-agents to analyze this request...",
+        thought_process: [
+            "[Agent: Controller] Analyzing user request: Risk profile generation.",
+            "[Agent: Finance] Querying historical pricing benchmarks...",
+            "[Agent: Legal] Checking recent SEC filings for vendor...",
+            "[Agent: Compliance] Searching global supply chain blacklists...",
+            "[Agent: Controller] Aggregating swarm findings..."
+          ],
+          final_response: "Deploying specialized sub-agents to analyze this request...",
         ui_component: 'agent_swarm',
         ui_data: {
           target: "Global Vendor Risk & Contract Analysis",

@@ -173,7 +173,7 @@ export default function CortexPage() {
         body: JSON.stringify({ prompt: command, userName, history: messages.slice(-5) })
       });
       const data = await res.json();
-      setMessages(prev => [...prev, { role: 'agent', content: data.final_response, uiComponent: data.ui_component, uiData: data.ui_data }]);
+      setMessages(prev => [...prev, { role: 'agent', content: data.final_response, uiComponent: data.ui_component, uiData: data.ui_data, thoughtProcess: data.thought_process }]);
     } catch(err) {}
     setIsProcessing(false);
   };
@@ -197,7 +197,7 @@ export default function CortexPage() {
         body: JSON.stringify({ prompt: userPrompt, userName, history: messages.slice(-5) })
       });
       const data = await res.json();
-      setMessages(prev => [...prev, { role: 'agent', content: data.final_response, uiComponent: data.ui_component, uiData: data.ui_data }]);
+      setMessages(prev => [...prev, { role: 'agent', content: data.final_response, uiComponent: data.ui_component, uiData: data.ui_data, thoughtProcess: data.thought_process }]);
     } catch (err) {
       setMessages(prev => [...prev, { role: 'agent', content: 'Connection to Cortex Core failed.' }]);
     } finally {
@@ -256,6 +256,49 @@ export default function CortexPage() {
                     {formatText(msg.content)}
                   </div>
                   
+                  
+                  {/* CHAIN OF THOUGHT UI */}
+                  {msg.thoughtProcess && (
+                    <div style={{ marginBottom: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
+                      <details>
+                        <summary style={{ padding: '10px 16px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700, color: '#64748b', display: 'flex', alignItems: 'center', gap: '8px', outline: 'none' }}>
+                          <BrainCircuit size={16} /> Agentic Chain of Thought (CoT)
+                        </summary>
+                        <div style={{ padding: '12px 16px', borderTop: '1px solid #e2e8f0', background: '#0f172a', color: '#38bdf8', fontFamily: 'monospace', fontSize: '0.75rem', lineHeight: '1.6' }}>
+                          {msg.thoughtProcess.map((step, idx) => (
+                            <div key={idx} style={{ display: 'flex', gap: '8px', opacity: 0.9 }}>
+                              <span style={{ color: '#64748b' }}>[{String(idx+1).padStart(2, '0')}]</span> {step}
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    </div>
+                  )}
+
+                  {/* LEGAL ANALYSIS UI */}
+                  {msg.uiComponent === 'legal_analysis' && msg.uiData && (
+                    <div style={{ marginTop: '16px', width: '100%', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                      <div style={{ background: 'linear-gradient(135deg, #7f1d1d, #991b1b)', padding: '16px', color: '#fff', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ background: 'rgba(255,255,255,0.2)', padding: '8px', borderRadius: '8px' }}><AlertTriangle size={20} /></div>
+                        <div>
+                          <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.9 }}>Legal AI Sub-Agent</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 600 }}>Contract Clause Risk Analysis</div>
+                        </div>
+                      </div>
+                      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {msg.uiData.risks.map((risk: any, i: number) => (
+                          <div key={i} style={{ padding: '16px', background: risk.type === 'Critical' ? '#fef2f2' : '#fffbeb', border: '1px solid', borderColor: risk.type === 'Critical' ? '#fecaca' : '#fde68a', borderRadius: '8px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                              <div style={{ fontWeight: 700, color: risk.type === 'Critical' ? '#991b1b' : '#92400e' }}>{risk.clause}</div>
+                              <div style={{ fontSize: '0.7rem', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', background: risk.type === 'Critical' ? '#ef4444' : '#f59e0b', color: '#fff' }}>{risk.type}</div>
+                            </div>
+                            <div style={{ fontSize: '0.85rem', color: risk.type === 'Critical' ? '#7f1d1d' : '#78350f', lineHeight: '1.5' }}>{risk.detail}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {msg.uiComponent === 'agent_swarm' && msg.uiData && (
                     <div style={{ marginTop: '16px', width: '100%' }}>
                       <AgentSwarm data={msg.uiData} />
@@ -402,6 +445,7 @@ export default function CortexPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '350px', overflowY: 'auto' }}>
                   {[
 
+                    { cmd: '/analyze-contract', desc: 'Deep Legal Review via CUAD Data', icon: <FileText size={16}/>, color: '#b91c1c', bg: '#fef2f2' },
                     { cmd: '/analyze-risk', desc: 'Multi-Agent Risk Swarm', icon: <AlertTriangle size={16}/>, color: '#e11d48', bg: '#fee2e2' },
                     { cmd: '/draft-contract', desc: 'Dynamic Legal Document Generator', icon: <Terminal size={16}/>, color: '#9333ea', bg: '#f3e8ff' },
                     { cmd: '/create-event', desc: 'Create a new sourcing event/auction', icon: <Zap size={16}/>, color: '#ea580c', bg: '#ffedd5' },
@@ -417,7 +461,7 @@ export default function CortexPage() {
                     { cmd: '/clear', desc: 'Clear the chat history', icon: <X size={16}/>, color: '#64748b', bg: '#f1f5f9' }
                   ].map((item, i) => (
                     <button key={i} onClick={() => { 
-                      const autoExec = ['/analyze-risk', '/analyze-bids', '/approve-all', '/export-csv', '/generate-mock-data', '/remind-approvers', '/clear', '/find-savings'];
+                      const autoExec = ['/analyze-contract', '/analyze-risk', '/analyze-bids', '/approve-all', '/export-csv', '/generate-mock-data', '/remind-approvers', '/clear', '/find-savings'];
                       if(autoExec.includes(item.cmd)) {
                         executeCommand(item.cmd); 
                       } else {
