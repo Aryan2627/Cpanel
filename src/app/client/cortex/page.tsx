@@ -404,7 +404,8 @@ export default function CortexPage() {
                           <button onClick={() => {
                             if(!productForm.name) return alert('Enter a product name first!');
                             const safePrompt = encodeURIComponent('high quality professional product photography of ' + productForm.name + ', studio lighting, clean minimal background');
-                            setProductForm({...productForm, imageUrl: `https://image.pollinations.ai/prompt/${safePrompt}?width=400&height=440&nologo=1`});
+                            const seed = Math.floor(Math.random() * 100000);
+                            setProductForm({...productForm, imageUrl: `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=500&nologo=1&seed=${seed}`});
                           }} style={{ flex:1, padding:'8px', background:'rgba(99,102,241,0.15)', color:'#818cf8', border:'1px solid rgba(99,102,241,0.3)', borderRadius:'8px', fontSize:'0.75rem', cursor:'pointer' }}>
                             ✨ Generate AI Image
                           </button>
