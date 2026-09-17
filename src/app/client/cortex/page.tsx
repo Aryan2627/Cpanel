@@ -114,6 +114,11 @@ export default function CortexPage() {
     { role: 'agent', content: 'Hello. I am ProcGen Cortex, your advanced multi-agent system. How can I assist you today?' }
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [historyLog, setHistoryLog] = useState([
+    'Advanced Multi-Agent Swarm',
+    'Drafting Legal Document SOW',
+    'Adding "MacBook Pro" to Catalog'
+  ]);
   const [showSlashMenu, setShowSlashMenu] = useState(false);
   const [registeredVendors, setRegisteredVendors] = useState<any[]>([]);
   const [eventForm, setEventForm] = useState({ title: '', budget: '', vendorId: '', duration: '' });
@@ -156,6 +161,9 @@ export default function CortexPage() {
     if (command.startsWith('/analyze-risk')) displayMessage = "Deploy an AI swarm to analyze this contract's risk profile.";
     
     setMessages(prev => [...prev, { role: 'user', content: displayMessage }]);
+    if (messages.length === 1) {
+      setHistoryLog(prev => [displayMessage.length > 35 ? displayMessage.substring(0, 35) + '...' : displayMessage, ...prev]);
+    }
 
     setIsProcessing(true);
     try {
@@ -177,6 +185,9 @@ export default function CortexPage() {
     const userPrompt = inputText.trim();
     setInputText('');
     setMessages(prev => [...prev, { role: 'user', content: userPrompt }]);
+    if (messages.length === 1) {
+      setHistoryLog(prev => [userPrompt.length > 35 ? userPrompt.substring(0, 35) + '...' : userPrompt, ...prev]);
+    }
     setIsProcessing(true);
 
     try {
@@ -207,22 +218,18 @@ export default function CortexPage() {
       {/* LEFT SIDEBAR - ChatGPT Style History */}
       <div style={{ width: '280px', background: '#f9f9f9', borderRight: '1px solid #e5e5e5', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: '16px' }}>
-          <button onClick={() => { setMessages([]); setInputText(''); }} style={{ width: '100%', background: '#fff', border: '1px solid #e5e5e5', padding: '10px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', color: '#171717', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+          <button onClick={() => { setMessages([{ role: 'agent', content: 'Hello. I am ProcGen Cortex, your advanced multi-agent system. How can I assist you today?' }]); setInputText(''); }} style={{ width: '100%', background: '#fff', border: '1px solid #e5e5e5', padding: '10px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', color: '#171717', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
             <Plus size={16} /> New Chat
           </button>
         </div>
         
         <div style={{ padding: '0 16px', fontSize: '0.75rem', fontWeight: 600, color: '#888', marginTop: '12px', marginBottom: '8px' }}>Today</div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px' }}>
-          <div style={{ padding: '10px 12px', background: '#e5e5e5', borderRadius: '8px', fontSize: '0.85rem', color: '#171717', cursor: 'pointer', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            Advanced Multi-Agent Swarm
-          </div>
-          <div style={{ padding: '10px 12px', borderRadius: '8px', fontSize: '0.85rem', color: '#555', cursor: 'pointer', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            Drafting Legal Document SOW
-          </div>
-          <div style={{ padding: '10px 12px', borderRadius: '8px', fontSize: '0.85rem', color: '#555', cursor: 'pointer', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            Adding "MacBook Pro" to Catalog
-          </div>
+          {historyLog.map((title, idx) => (
+            <div key={idx} style={{ padding: '10px 12px', background: (idx === 0 && messages.length > 1) ? '#e5e5e5' : 'transparent', borderRadius: '8px', fontSize: '0.85rem', color: (idx === 0 && messages.length > 1) ? '#171717' : '#555', cursor: 'pointer', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {title}
+            </div>
+          ))}
         </div>
         <div style={{ padding: '16px', borderTop: '1px solid #e5e5e5', fontSize: '0.85rem', color: '#555', display: 'flex', gap: '12px', alignItems: 'center', cursor: 'pointer' }}>
           <Settings size={16} /> Settings
