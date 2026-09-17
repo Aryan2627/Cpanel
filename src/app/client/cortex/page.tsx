@@ -83,24 +83,6 @@ const S2PProgressAndEvent = ({ data, execute }: { data: any, execute: (c:string)
       </div>
 
       
-                    {/* S2P Intake Form */}
-                    {msg.uiComponent==='s2p_intake_form' && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Initiate Source-to-Pay (Intake)</div>
-                        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-                          <input type="text" placeholder="Project / Intake Title" value={s2pForm.title} onChange={e=>setS2pForm({...s2pForm, title:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                          <input type="text" placeholder="Estimated Budget ($)" value={s2pForm.budget} onChange={e=>setS2pForm({...s2pForm, budget:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                          <input type="text" placeholder="Requesting Department" value={s2pForm.department} onChange={e=>setS2pForm({...s2pForm, department:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                          <button onClick={()=>execute('/execute-s2p-intake '+JSON.stringify(s2pForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#10b981,#059669)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Submit Intake</button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* S2P Progress & Event Form */}
-                    {msg.uiComponent==='s2p_progress_and_event' && msg.uiData && (
-                      <S2PProgressAndEvent data={msg.uiData} execute={execute} />
-                    )}
-
                     {/* Event Form */}
       {step >= 3 && (
         <div style={{ animation:'fadeSlideIn 0.5s ease-out forwards', paddingTop:'18px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
@@ -573,6 +555,25 @@ export default function CortexPage() {
                       <div contentEditable suppressContentEditableWarning style={{ padding:'24px', maxHeight:'400px', overflowY:'auto', background:'rgba(15,23,42,0.95)', fontSize:'0.9rem', lineHeight:'1.9', color:'#e2e8f0', outline:'none', minHeight:'200px' }} dangerouslySetInnerHTML={{ __html:msg.uiData.htmlContent }}/>
                     </div>
                   )}
+
+
+                    {/* S2P Intake Form */}
+                    {msg.uiComponent==='s2p_intake_form' && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Initiate Source-to-Pay (Intake)</div>
+                        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+                          <input type="text" placeholder="Project / Intake Title" value={s2pForm.title} onChange={e=>setS2pForm({...s2pForm, title:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <input type="text" placeholder="Estimated Budget ($)" value={s2pForm.budget} onChange={e=>setS2pForm({...s2pForm, budget:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <input type="text" placeholder="Requesting Department" value={s2pForm.department} onChange={e=>setS2pForm({...s2pForm, department:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <button onClick={()=>execute('/execute-s2p-intake '+JSON.stringify(s2pForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#10b981,#059669)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Submit Intake</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* S2P Progress & Event Form */}
+                    {msg.uiComponent==='s2p_progress_and_event' && msg.uiData && (
+                      <S2PProgressAndEvent data={msg.uiData} execute={execute} />
+                    )}
 
                   {/* Event Form */}
                   {msg.uiComponent==='event_creation_form' && (
