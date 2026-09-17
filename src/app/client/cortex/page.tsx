@@ -227,7 +227,7 @@ export default function CortexPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [eventForm, setEventForm] = useState({ title:'', budget:'', vendorId:'', duration:'', durationUnit:'days' });
-  const [s2pForm, setS2pForm] = useState({ title: '', budget: '', department: '' });
+  const [s2pForm, setS2pForm] = useState({ title: '', category: 'IT', department: 'Engineering', budget: '', description: '', quantity: 1, requiredDate: '', address: '' });
   const [vendorForm, setVendorForm] = useState({ name:'', email:'', category:'' });
   const [poForm, setPoForm] = useState({ poNumber:'', amount:'', desc:'' });
   const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'', isGenerating:false });
@@ -562,10 +562,38 @@ export default function CortexPage() {
                       <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
                         <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Initiate Source-to-Pay (Intake)</div>
                         <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-                          <input type="text" placeholder="Project / Intake Title" value={s2pForm.title} onChange={e=>setS2pForm({...s2pForm, title:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                          <input type="text" placeholder="Estimated Budget ($)" value={s2pForm.budget} onChange={e=>setS2pForm({...s2pForm, budget:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                          <input type="text" placeholder="Requesting Department" value={s2pForm.department} onChange={e=>setS2pForm({...s2pForm, department:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                          <button onClick={()=>execute('/execute-s2p-intake '+JSON.stringify(s2pForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#10b981,#059669)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Submit Intake</button>
+                          <input type="text" placeholder="Request Title *" value={s2pForm.title} onChange={e=>setS2pForm({...s2pForm, title:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          
+                          <div style={{ display:'flex', gap:'10px' }}>
+                            <select value={s2pForm.category} onChange={e=>setS2pForm({...s2pForm, category:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', cursor:'pointer' }}>
+                              <option value="" disabled style={{background:'#0f172a'}}>Select Category</option>
+                              <option value="IT" style={{background:'#0f172a'}}>IT</option>
+                              <option value="HR" style={{background:'#0f172a'}}>HR</option>
+                              <option value="Marketing" style={{background:'#0f172a'}}>Marketing</option>
+                              <option value="Operations" style={{background:'#0f172a'}}>Operations</option>
+                            </select>
+                            <select value={s2pForm.department} onChange={e=>setS2pForm({...s2pForm, department:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', cursor:'pointer' }}>
+                              <option value="" disabled style={{background:'#0f172a'}}>Select Dept.</option>
+                              <option value="Engineering" style={{background:'#0f172a'}}>Engineering</option>
+                              <option value="Sales" style={{background:'#0f172a'}}>Sales</option>
+                              <option value="Finance" style={{background:'#0f172a'}}>Finance</option>
+                              <option value="Legal" style={{background:'#0f172a'}}>Legal</option>
+                            </select>
+                          </div>
+
+                          <div style={{ display:'flex', gap:'10px' }}>
+                            <input type="number" placeholder="Budget ($) *" value={s2pForm.budget} onChange={e=>setS2pForm({...s2pForm, budget:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                            <input type="number" placeholder="Quantity *" value={s2pForm.quantity || ''} onChange={e=>setS2pForm({...s2pForm, quantity:parseInt(e.target.value) || 1})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          </div>
+
+                          <textarea rows={2} placeholder="Item Description *" value={s2pForm.description} onChange={e=>setS2pForm({...s2pForm, description:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', resize:'none' }}/>
+                          
+                          <div style={{ display:'flex', gap:'10px' }}>
+                            <input type="date" placeholder="Required Date" value={s2pForm.requiredDate} onChange={e=>setS2pForm({...s2pForm, requiredDate:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', colorScheme: 'dark' }}/>
+                            <input type="text" placeholder="Delivery Address *" value={s2pForm.address} onChange={e=>setS2pForm({...s2pForm, address:e.target.value})} style={{ flex:2, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          </div>
+
+                          <button onClick={()=>execute('/execute-s2p-intake '+JSON.stringify(s2pForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#10b981,#059669)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem', marginTop:'6px' }}>Submit Intake</button>
                         </div>
                       </div>
                     )}
