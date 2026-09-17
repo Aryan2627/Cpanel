@@ -479,7 +479,7 @@ export default function CortexPage() {
                       </div>
                       <div style={{ position:'relative', width:'100%', minHeight:'300px', background:'rgba(0,0,0,0.5)', display:'flex', justifyContent:'center', alignItems:'center' }}>
                         {/* The image takes time to load from pollinations, so we show it directly. It streams down. */}
-                        <img src={msg.uiData.url} alt={msg.uiData.prompt} style={{ width:'100%', height:'auto', display:'block' }} />
+                        <img src={msg.uiData.url} alt={msg.uiData.prompt} style={{ width:'100%', height:'auto', display:'block', clipPath:'inset(0px 0px 40px 0px)', marginBottom:'-40px' }} />
                       </div>
                       <div style={{ padding:'12px 18px', background:'rgba(0,0,0,0.3)', fontSize:'0.75rem', color:'#94a3b8', fontStyle:'italic' }}>
                         Prompt: "{msg.uiData.prompt}"

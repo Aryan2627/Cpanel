@@ -382,7 +382,7 @@ export async function POST(req: Request) {
         }
         
         const safePrompt = encodeURIComponent(prompt);
-        const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=450&nologo=true`;
+        const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=490&nologo=1`;
 
         return NextResponse.json({
           final_response: `I have generated the image based on your request: "${prompt}"`,
