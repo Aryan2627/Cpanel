@@ -197,6 +197,33 @@ export default function CortexPage() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        if (!sessionStorage.getItem('cortex_greeted')) {
+          const msg = new SpeechSynthesisUtterance("Welcome to Cortex A I");
+          msg.rate = 0.95;
+          msg.pitch = 1.05;
+          // Try to select an English female voice if available
+          const setVoice = () => {
+             const voices = window.speechSynthesis.getVoices();
+             const selectedVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Samantha') || (v.lang.includes('en') && v.name.includes('Female')));
+             if (selectedVoice) msg.voice = selectedVoice;
+             window.speechSynthesis.speak(msg);
+             sessionStorage.setItem('cortex_greeted', 'true');
+          };
+          if (window.speechSynthesis.getVoices().length > 0) {
+             setVoice();
+          } else {
+             window.speechSynthesis.onvoiceschanged = setVoice;
+          }
+        }
+      } catch (e) {
+        console.error("Audio autoplay blocked by browser policy.");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     setIsClient(true);
     try {
       const stored = localStorage.getItem('cortex_chats_v2');
