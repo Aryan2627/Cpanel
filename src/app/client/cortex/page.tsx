@@ -423,25 +423,26 @@ export default function CortexPage() {
                           }} style={{ flex:1, padding:'8px', background:'rgba(99,102,241,0.15)', color:'#818cf8', border:'1px solid rgba(99,102,241,0.3)', borderRadius:'8px', fontSize:'0.75rem', cursor:'pointer' }}>
                             ✨ Generate AI Image
                           </button>
-                          <button onClick={() => alert('Gallery upload simulation active! In production, this opens a file picker.')} style={{ flex:1, padding:'8px', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'8px', fontSize:'0.75rem', cursor:'pointer' }}>
+                          <button onClick={(e) => { e.preventDefault(); alert('Gallery upload simulation active! In production, this opens a file picker.')} style={{ flex:1, padding:'8px', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'8px', fontSize:'0.75rem', cursor:'pointer' }}>
                             📁 Upload from Gallery
                           </button>
                         </div>
 
                         {productForm.imageUrl && (
-                          <div style={{ position:'relative', width:'100%', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', overflow:'hidden', background:'rgba(0,0,0,0.2)' }}>
-                             <img src={productForm.imageUrl} style={{ width:'100%', height:'auto', display:'block', clipPath:'inset(0px 0px 40px 0px)', marginBottom:'-40px' }} alt="Product Preview" />
-                             <button onClick={() => setViewImage(productForm.imageUrl)} style={{ position:'absolute', top:'10px', right:'10px', background:'rgba(15,23,42,0.8)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:'8px', padding:'6px 10px', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.75rem', backdropFilter:'blur(4px)' }}>
-                               <Eye size={14}/> View Full
-                             </button>
-                          </div>
-                        )}
-
-                        <div style={{ display:'flex', gap:'10px' }}>
+                            <div style={{ position:'relative', width:'100%', aspectRatio:'8/5', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', overflow:'hidden', background:'rgba(0,0,0,0.4)', display:'flex', alignItems:'flex-start', justifyContent:'center', marginTop: '10px', marginBottom: '10px' }}>
+                               <img src={productForm.imageUrl} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', clipPath:'inset(0px 0px 8% 0px)' }} alt="Product Preview" />
+                               
+                               <button onClick={(e) => { e.preventDefault(); setViewImage(productForm.imageUrl); }} style={{ position:'absolute', top:'10px', right:'10px', background:'rgba(15,23,42,0.8)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:'8px', padding:'6px 10px', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.75rem', backdropFilter:'blur(4px)' }}>
+                                 <Eye size={14}/> View Full
+                               </button>
+                            </div>
+                          )}
+                          
+                          <div style={{ display:'flex', gap:'10px' }}>
                           <input type="text" placeholder="SKU" value={productForm.sku} onChange={e=>setProductForm({...productForm, sku:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
                           <input type="number" placeholder="Price ($)" value={productForm.price} onChange={e=>setProductForm({...productForm, price:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
                         </div>
-                        <button onClick={()=>execute('/execute-add-product '+JSON.stringify(productForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#6366f1,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Add to Catalog</button>
+                        <button onClick={(e)=>{ e.preventDefault(); execute('/execute-add-product '+JSON.stringify(productForm)); }} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#6366f1,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Add to Catalog</button>
                       </div>
                     </div>
                   )}
