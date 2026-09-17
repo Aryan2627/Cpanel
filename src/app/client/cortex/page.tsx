@@ -37,6 +37,27 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => 
       <button onClick={()=>onSubmit({ type:docType, ...fd })} style={{ width:'100%', marginTop:'16px', padding:'11px', background:'linear-gradient(135deg,#7c3aed,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px', fontSize:'0.85rem' }}>
         <Zap size={15}/> Generate Document
       </button>
+      
+      {/* Video Tutorial Modal */}
+      {tutorialVideo && (
+        <div style={{ position:'fixed', top:0, left:0, width:'100vw', height:'100vh', background:'rgba(0,0,0,0.85)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(10px)' }}>
+          <div style={{ position:'relative', width:'800px', maxWidth:'95vw', background:'#070d1c', padding:'8px', borderRadius:'16px', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <button onClick={()=>setTutorialVideo(null)} style={{ position:'absolute', top:'-40px', right:0, background:'transparent', border:'none', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.9rem', fontWeight:600 }}>
+              <X size={20}/> Close
+            </button>
+            <div style={{ overflow:'hidden', borderRadius:'10px', aspectRatio:'16/9', background:'#000', position: 'relative' }}>
+               <video controls autoPlay style={{ width:'100%', height:'100%' }}>
+                  <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+               </video>
+            </div>
+            <div style={{ padding:'12px 16px', color:'#94a3b8', fontSize:'0.75rem', textAlign:'center' }}>
+              <strong>AI Video Ready:</strong> Once you generate your AI video tutorial for Cortex, simply swap the MP4 source link in <code>page.tsx</code>.
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Image Viewer Modal */}
       {viewImage && (
         <div style={{ position:'fixed', top:0, left:0, width:'100vw', height:'100vh', background:'rgba(0,0,0,0.85)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(10px)' }}>
@@ -125,6 +146,7 @@ export default function CortexPage() {
   const [poForm, setPoForm] = useState({ poNumber:'', amount:'', desc:'' });
   const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'', isGenerating:false });
   const [viewImage, setViewImage] = useState<string | null>(null);
+  const [tutorialVideo, setTutorialVideo] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const [isClient, setIsClient] = useState(false);
 
@@ -220,7 +242,7 @@ export default function CortexPage() {
   const slashCmds = [
     { cmd:'/analyze-risk',    label:'Multi-Agent Risk Swarm',          icon:<AlertTriangle size={14}/>,  color:'#f87171', bg:'rgba(239,68,68,0.12)',    auto:true },
     { cmd:'/analyze-contract',label:'Deep Legal Clause Review (CUAD)',  icon:<Shield size={14}/>,         color:'#c084fc', bg:'rgba(168,85,247,0.12)',   auto:true },
-    { cmd:'/draft-contract',  label:'Generate Legal Document',          icon:<FileText size={14}/>,       color:'#818cf8', bg:'rgba(99,102,241,0.12)',   auto:false },
+    { cmd:'/draft-contract',  label:'Generate Legal Document',          icon:<FileText size={14}/>,       color:'#818cf8', bg:'rgba(99,102,241,0.12)',   auto:false, hasTutorial: true },
     { cmd:'/create-event',    label:'Create Sourcing Event / Auction',  icon:<Zap size={14}/>,            color:'#fb923c', bg:'rgba(249,115,22,0.12)',   auto:false },
     { cmd:'/create-vendor',   label:'Onboard New Supplier',             icon:<CheckCircle2 size={14}/>,   color:'#34d399', bg:'rgba(16,185,129,0.12)',   auto:false },
     { cmd:'/draft-po',        label:'Draft Purchase Order',             icon:<Database size={14}/>,       color:'#38bdf8', bg:'rgba(14,165,233,0.12)',   auto:false },
