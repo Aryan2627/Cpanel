@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { prisma } from '../../../../lib/prisma';
 import { verifyToken } from '../../../../lib/session';
@@ -40,6 +40,7 @@ export async function GET() {
         licenseStatus: user.organization?.licenseStatus || 'Active',
         licensePlan: user.organization?.licensePlan || 'Enterprise',
         licenseExpiry: user.organization?.licenseExpiry || null,
+        features: user.organization?.features || null,
         permissions: user.permissions || {},
         isImpersonating: !!payload.impersonatorId,
         impersonatorId: payload.impersonatorId || null

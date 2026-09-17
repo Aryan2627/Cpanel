@@ -79,7 +79,7 @@ export default function VendorLiveBidding() {
                  expr = expr.replace(new RegExp(`\\b${vName}\\b`, 'g'), v.toString());
                }
              });
-             // eslint-disable-next-line no-new-func
+              
              const result = new Function('return ' + expr)();
              initData[f.key] = (Number(result) || 0).toString();
            } catch(e) {}
@@ -197,7 +197,7 @@ export default function VendorLiveBidding() {
                  expr = expr.replace(new RegExp(`\\b${vName}\\b`, 'g'), v.toString());
                }
              });
-             // eslint-disable-next-line no-new-func
+              
              const result = new Function('return ' + expr)();
              next[f.key] = (Number(result) || 0).toString();
            } catch(e) {}

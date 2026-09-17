@@ -29,7 +29,7 @@ export default function IntakeTablePage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setExportEnabled(localStorage.getItem('exportIntake') === 'true');
-    const h = () => // eslint-disable-next-line react-hooks/set-state-in-effect
+    const h = () =>  
     setExportEnabled(localStorage.getItem('exportIntake') === 'true');
     window.addEventListener('settings-updated', h);
     return () => window.removeEventListener('settings-updated', h);
@@ -91,7 +91,7 @@ export default function IntakeTablePage() {
   };
 
   const sorted = useMemo(() => {
-    let data = [...intakes];
+    const data = [...intakes];
     if (sortConfig) {
       data.sort((a, b) => {
         const av = (a as any)[sortConfig.key] || '';

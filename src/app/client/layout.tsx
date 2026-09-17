@@ -54,13 +54,12 @@ const TOP_MENUS = [
       { name: 'Payments Due', path: '/client/license/expiry/payments' },
     ]
   },
-  { name: 'AI Agents', path: '/client/ai-agents', icon: Bot },
 ];
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<{ name: string; email: string; companyName?: string; licenseStatus?: string; licensePlan?: string; organizationId?: string; isImpersonating?: boolean } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ name: string; email: string; companyName?: string; licenseStatus?: string; licensePlan?: string; organizationId?: string; features?: string | null; isImpersonating?: boolean } | null>(null);
 
   // Track which dropdown is open
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
@@ -207,19 +206,27 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-            {/* Global Spotlight Search Trigger */}
-            <div 
-              style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '8px', cursor: 'text', border: '1px solid rgba(255,255,255,0.1)' }}
-              onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
-            >
-              <Search size={14} color="rgba(255,255,255,0.5)" />
-              <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', fontWeight: 500, width: '150px' }}>Search...</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', fontWeight: 700 }}>
-                <span>⌘K</span>
-              </div>
-            </div>
+            
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              
+              {(currentUser?.features ? (() => { try { return JSON.parse(currentUser.features).cortex_ai; } catch { return false; } })() : false) && (
+<Link 
+                href="/client/cortex"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                  textDecoration: 'none',
+                  border: 'none', borderRadius: '24px',
+                  padding: '6px 14px', color: '#fff', fontSize: '0.8rem', fontWeight: 600,
+                  cursor: 'pointer', boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)',
+                  transition: 'transform 0.2s',
+                }}
+              >
+                <Bot size={14} /> Cortex AI
+              </Link>
+              )}
+
               <div style={{ position: 'relative', cursor: 'pointer' }}>
                 <Bell size={20} color="rgba(255,255,255,0.7)" />
                 <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', border: '2px solid #071330' }} />
@@ -251,7 +258,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           }} />
         )}
 
-        <div style={{ flex: 1, overflow: 'auto', position: 'relative', zIndex: 10 }}>
+        <div style={{ flex: 1, overflow: 'hidden', position: 'relative', zIndex: 10 }}>
           {children}
         </div>
       </div>
@@ -259,7 +266,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       <CartOverlay />
       <TourButton />
       <SpotlightSearch />
-      <JarvisAssistant />
+      
     </IntakeProvider>
   );
 }

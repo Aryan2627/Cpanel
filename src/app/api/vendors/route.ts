@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const eventId = searchParams.get('eventId');
 
-    let whereClause: any = { organizationId: orgId }; // ALWAYS enforce tenant isolation
+    const whereClause: any = { organizationId: orgId }; // ALWAYS enforce tenant isolation
 
     if (eventId) {
       const event = await prisma.event.findUnique({

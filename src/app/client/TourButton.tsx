@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { driver } from 'driver.js';
@@ -46,7 +46,7 @@ export default function TourButton() {
       case pathname.includes('/client/events/create'):
         steps = [
           { popover: { title: 'Event Builder', description: 'Welcome to the Event Builder! This is where you configure your RFQ or Auction before sending it to vendors.' } },
-          { element: 'button', popover: { title: 'Workspace Toggle', description: 'Pro Tip: Click this to open a split-screen view of your pending Intakes, allowing you to drag-and-drop items directly into this event!' } },
+
           { element: 'select', popover: { title: 'Smart Templates', description: 'Selecting a template will automatically load the specific technical questions and fields that vendors must answer.' } },
           { element: 'table', popover: { title: 'Line Items Grid', description: 'Add your requested items here. You can manually add rows, or click inside the grid and press Ctrl+V to paste directly from Excel!' } },
           { popover: { title: 'Publishing', description: 'Once you invite vendors and configure your dates, hit publish to instantly notify all invited suppliers.' } }

@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  
   typescript: { ignoreBuildErrors: true },
   poweredByHeader: false, experimental: { after: true },
   async headers() {

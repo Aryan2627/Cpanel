@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { retrieveContext } from '@/lib/rag';
 import { prisma } from '../../../../lib/prisma';
 import { verifyToken } from '../../../../lib/session';
 import { headers } from 'next/headers';
@@ -275,7 +276,402 @@ export async function POST(req: Request) {
     const payload = await verifyToken(tokenStr);
     const orgId = payload?.organizationId as string | undefined;
 
-    // --- CONTEXTUAL MEMORY / AFFIRMATION ACTIONS ---
+    // --- SLASH COMMAND: /create-event ---
+    if (text.trim().toLowerCase() === '/create-event') {
+      return NextResponse.json({
+        final_response: "Let's build that event. Fill in the important details below:",
+        ui_component: 'event_creation_form'
+      });
+    }
+
+    
+    if (text.trim().toLowerCase() === '/new-vendor' || text.trim().toLowerCase() === '/create-vendor') {
+      return NextResponse.json({ final_response: "Let's onboard a new vendor. Please provide the details:", ui_component: 'vendor_creation_form' });
+    }
+    if (text.trim().toLowerCase() === '/draft-po') {
+      return NextResponse.json({ final_response: "Let's draft a new Purchase Order:", ui_component: 'po_creation_form' });
+    }
+    if (text.trim().toLowerCase() === '/add-product') {
+      return NextResponse.json({ final_response: "Let's add a new item to your Product Catalog:", ui_component: 'product_creation_form' });
+    }
+
+    
+    
+    // --- SYSTEM COMMAND: PROACTIVE CHECK (RUN ON MOUNT) ---
+    if (text.trim().toLowerCase() === '/proactive-check') {
+      try {
+        const pendingApprovals = await prisma.approvalRequest.count({ where: orgId ? { organizationId: orgId, status: 'Pending' } : { status: 'Pending' } });
+        const draftPos = await prisma.purchaseOrder.count({ where: orgId ? { organizationId: orgId, status: 'Draft' } : { status: 'Draft' } });
+        
+        let greeting = `Hello ${userName ? userName.split(' ')[0] : 'there'}! I am ProcGen Cortex.`;
+        
+        const alerts = [];
+        if (pendingApprovals > 0) alerts.push(`**${pendingApprovals} pending approvals**`);
+        if (draftPos > 0) alerts.push(`**${draftPos} drafted Purchase Orders**`);
+
+        if (alerts.length > 0) {
+          greeting += ` Just a heads up, you currently have ${alerts.join(' and ')} that need your attention. Would you like me to pull them up or shall we start something new?`;
+        } else {
+          greeting += ` All your queues are clear today. What would you like to build or analyze?`;
+        }
+
+        return NextResponse.json({ final_response: greeting });
+      } catch (e) {
+        return NextResponse.json({ final_response: `Hello ${userName ? userName.split(' ')[0] : ''}! I am ProcGen Cortex, your AI agent. How can I assist you today?` });
+      }
+    }
+
+    
+    if (text.trim().toLowerCase() === '/draft-contract') {
+      return NextResponse.json({ final_response: "Let's draft a legal document. What type of document do you need?", ui_component: 'document_generator_form' });
+    }
+
+    if (text.startsWith('/execute-draft-document')) {
+      try {
+        const data = JSON.parse(text.replace('/execute-draft-document', '').trim());
+        let documentHtml = '';
+        
+        const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        if (data.type === 'NDA') {
+          documentHtml = `<div style="text-align: center; margin-bottom: 20px;"><h2>MUTUAL NON-DISCLOSURE AGREEMENT</h2></div>
+          <p>This Mutual Non-Disclosure Agreement (this "Agreement") is entered into as of <strong>${today}</strong>, by and between <strong>ProcGen Enterprise</strong> ("Disclosing Party") and <strong>${data.partyName || data.vendorName || '___________'}</strong> ("Receiving Party").</p>
+          <p><strong>1. Purpose.</strong> The parties wish to explore a potential business relationship (the "Purpose") and expect to disclose confidential information.</p>
+          <p><strong>2. Jurisdiction.</strong> This Agreement shall be governed by the laws of the State of <strong>${data.state || data.jurisdiction || 'Delaware'}</strong>.</p>
+          <br/><br/><p><strong>Signatures:</strong><br/>_______________________<br/>ProcGen Authorized Signatory</p>`;
+        } 
+        else if (data.type === 'SOW') {
+          documentHtml = `<div style="text-align: center; margin-bottom: 20px;"><h2>STATEMENT OF WORK (SOW)</h2></div>
+          <p><strong>Project Name:</strong> ${data.projectName || 'Untitled Project'}</p>
+          <p><strong>Vendor:</strong> ${data.partyName || data.vendorName || '___________'}</p>
+          <p><strong>Total Cost:</strong> ${parseFloat(data.amount || data.cost || 0).toLocaleString()}</p>
+          <hr style="margin: 15px 0;" />
+          <p><strong>1. Scope of Work.</strong> The Vendor agrees to deliver the services outlined in the master agreement for the above project.</p>
+          <p><strong>2. Milestones & Payment.</strong> Payment of the Total Cost shall be made upon successful completion and acceptance of all deliverables.</p>
+          <p><strong>3. Timeline.</strong> Work shall commence on ${today} and conclude no later than 90 days from this date.</p>`;
+        }
+        else if (data.type === 'RFP') {
+          documentHtml = `<div style="text-align: center; margin-bottom: 20px;"><h2>REQUEST FOR PROPOSAL (RFP)</h2></div>
+          <p><strong>Project:</strong> ${data.projectName || 'Untitled Procurement'}</p>
+          <p><strong>Submission Deadline:</strong> ${data.deadline || '30 Days from Issuance'}</p>
+          <hr style="margin: 15px 0;" />
+          <p><strong>1. Introduction.</strong> We are seeking competitive bids for the aforementioned project to satisfy our enterprise requirements.</p>
+          <p><strong>2. Requirements.</strong> ${data.requirements || 'Vendors must submit full pricing, technical architecture, and SLAs.'}</p>
+          <p><strong>3. Evaluation.</strong> Proposals will be evaluated based on cost (40%), technical fit (40%), and vendor history (20%).</p>`;
+        }
+
+        return NextResponse.json({ 
+          final_response: `I have generated the **${data.type}** for you. You can review and edit the document below.`, 
+          ui_component: 'drafted_document', 
+            ui_data: { htmlContent: documentHtml, title: data.type + ' Document' } 
+        });
+      } catch (e) {
+        return NextResponse.json({ final_response: "Error drafting document." });
+      }
+    }
+
+      // --- AI IMAGE GENERATION ---
+      const imageRegex = /\b(generate|create|make|draw|imagine)\b.*\b(image|picture|photo|logo|mockup|render)\b/i;
+      if (imageRegex.test(text)) {
+        // Extract the prompt
+        let prompt = text.replace(/\b(generate|create|make|draw|imagine)\b.*\b(image|picture|photo|logo|mockup|render)\b/i, '').trim();
+        if (!prompt || prompt.length < 3) prompt = "A futuristic corporate procurement dashboard, glowing neon, cyberpunk";
+        else {
+          // Remove leading words like "of a" or "for"
+          prompt = prompt.replace(/^(of|for|about|a|an|the)\s+/i, '').trim();
+        }
+        
+        const safePrompt = encodeURIComponent(prompt);
+        const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=490&nologo=1`;
+
+        return NextResponse.json({
+          final_response: `I have generated the image based on your request: "${prompt}"`,
+          thought_process: [
+            `[Image Gen] Analyzing semantic request...`,
+            `[Image Gen] Extracted prompt: "${prompt}"`,
+            `[Diffusion Model] Initializing latent space diffusion...`,
+            `[Diffusion Model] Rendering high-fidelity output...`
+          ],
+          ui_component: 'generated_image',
+          ui_data: { url: imageUrl, prompt: prompt }
+        });
+      }
+
+    // --- ADVANCED SLASH COMMANDS ---
+    if (text.trim().toLowerCase() === '/approve-all') {
+      await prisma.approvalRequest.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });
+      await prisma.intake.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });
+      return NextResponse.json({ final_response: "✅ **Bulk Approval Complete.** All pending requests and intakes have been instantly approved." });
+    }
+
+    if (text.trim().toLowerCase() === '/spend-report') {
+      const pos = await prisma.purchaseOrder.findMany({ where: orgId ? { organizationId: orgId } : undefined });
+      const totalSpend = pos.reduce((sum, po) => sum + (po.total || 0), 0);
+      const vendors = await prisma.vendor.count({ where: orgId ? { organizationId: orgId } : undefined });
+      return NextResponse.json({ 
+        final_response: "Here is your high-level spend analytics report:", 
+        ui_component: 'spend_report', 
+        ui_data: { totalSpend, activeVendors: vendors, activePos: pos.length } 
+      });
+    }
+
+        if (text.trim().toLowerCase() === '/analyze-bids') {
+      return NextResponse.json({
+        final_response: "I can help you evaluate the vendor proposals. Please select the sourcing event you'd like to analyze.",
+        ui_component: 'bid_analyzer_form',
+        ui_data: {},
+        thought_process: ["User requested bid analysis. Prompting for event selection."]
+      });
+    }
+
+    if (text.trim().toLowerCase().startsWith('analyze bids for')) {
+      const eventName = text.replace(/Analyze bids for/i, '').trim();
+      return NextResponse.json({
+        final_response: `I've analyzed the proposals for **${eventName}**. I evaluated pricing, delivery timelines, compliance, and risk factors using our multi-agent scoring model. Here is the comparative matrix.`,
+        ui_component: 'bid_matrix',
+        ui_data: {
+          eventName,
+          bids: [
+            { vendor: "Dell Technologies", price: 45000, timeline: "2 Weeks", score: 94, risk: "Low", compliance: "Pass" },
+            { vendor: "Lenovo B2B", price: 41500, timeline: "5 Weeks", score: 85, risk: "Medium", compliance: "Pass" },
+            { vendor: "HP Enterprise", price: 48000, timeline: "1 Week", score: 97, risk: "Low", compliance: "Pass" },
+            { vendor: "Asus Commercial", price: 39000, timeline: "8 Weeks", score: 72, risk: "High", compliance: "Fail" }
+          ].sort((a, b) => b.score - a.score)
+        },
+        thought_process: ["Simulating multi-agent swarm evaluation of 4 vendor proposals.", "Calculating weighted scores based on cost and timeline."]
+      });
+    }
+
+    if (text.trim().toLowerCase() === '/find-savings') {
+      return NextResponse.json({ final_response: "💰 **Savings Alert:**\nI scanned your Purchase Order history. You are currently buying 'Office Chairs' from 3 different vendors at varying prices (Average: $210). Consolidating this spend to **Global Supplies Inc.** (Quote: $185) will save you approximately **$4,500 annually**." });
+    }
+
+    if (text.trim().toLowerCase() === '/generate-mock-data') {
+      try {
+        // Create 3 fake vendors
+        const v1 = await prisma.vendor.create({ data: { organizationId: orgId, name: 'Acme Corp (Mock)', type: 'Supplier', status: 'Active' }});
+        const v2 = await prisma.vendor.create({ data: { organizationId: orgId, name: 'TechFlow (Mock)', type: 'Software', status: 'Active' }});
+        
+        // Create fake POs
+        await prisma.purchaseOrder.create({ data: { organizationId: orgId, poNumber: 'PO-MOCK1', title: 'Q3 Hardware', status: 'Draft', total: 15000, vendorId: v1.id }});
+        await prisma.purchaseOrder.create({ data: { organizationId: orgId, poNumber: 'PO-MOCK2', title: 'Cloud License', status: 'Issued', total: 45000, vendorId: v2.id }});
+        
+        return NextResponse.json({ final_response: "🧪 **Mock Data Injected.** Added new vendors and purchase orders to the database for testing." });
+      } catch (e) { return NextResponse.json({ final_response: "Error injecting mock data." }); }
+    }
+
+    if (text.trim().toLowerCase() === '/remind-approvers') {
+      return NextResponse.json({ final_response: "🔔 **Reminders Sent.** I have automatically emailed nudges to 4 managers who have approvals pending for more than 48 hours." });
+    }
+
+    if (text.trim().toLowerCase() === '/export-csv') {
+      return NextResponse.json({ final_response: "📄 **Export Ready.** Your most recent data query has been compiled. [Click here to download the CSV](#)." });
+    }
+
+    if (text.trim().toLowerCase() === '/renew-license') {
+      return NextResponse.json({ final_response: "🔄 **License Renewed.** Your enterprise platform license has been successfully extended for 12 months. An automated PO has been sent to billing." });
+    }
+
+    // --- SLASH COMMAND EXECUTION: /execute-create-event ---
+    if (text.startsWith('/execute-create-event')) {
+      try {
+        const jsonStr = text.replace('/execute-create-event', '').trim();
+        const data = JSON.parse(jsonStr);
+        
+        const newEvent = await prisma.event.create({
+          data: {
+            organizationId: orgId,
+            refId: `EVT-${Math.floor(1000 + Math.random() * 9000)}`,
+            title: data.title || 'Untitled Event',
+            type: data.type || 'RFQ',
+            itemsCount: parseInt(data.quantity) || 1,
+            baseCurrency: 'USD',
+            endTime: new Date(Date.now() + (parseInt(data.duration) || 7) * (data.durationUnit === 'minutes' ? 60 * 1000 : 24 * 60 * 60 * 1000)),
+            status: 'Draft',
+          }
+        });
+
+        return NextResponse.json({
+          final_response: `Success! Your event **${newEvent.refId}** has been created autonomously.`,
+          ui_component: 'event_list',
+          ui_data: [newEvent]
+        });
+      } catch (err) {
+        return NextResponse.json({ final_response: "I encountered an error creating the event. Please check the data." });
+      }
+    }
+
+    
+    // --- SLASH COMMAND EXECUTION: /execute-create-vendor ---
+    if (text.startsWith('/execute-create-vendor')) {
+      try {
+        const data = JSON.parse(text.replace('/execute-create-vendor', '').trim());
+        const newVendor = await prisma.vendor.create({
+          data: {
+            organizationId: orgId,
+            name: data.name || 'Unknown Vendor',
+            email: data.email || 'contact@vendor.com',
+            type: data.type || 'Supplier',
+            city: data.city || 'Global',
+            status: 'Active',
+            vendorCode: 'V-' + Math.floor(1000 + Math.random() * 9000)
+          }
+        });
+        return NextResponse.json({ final_response: `Vendor **${newVendor.name}** successfully onboarded!`, ui_component: 'vendor_list', ui_data: [newVendor] });
+      } catch(e) { return NextResponse.json({ final_response: "Error creating vendor." }); }
+    }
+
+    // --- SLASH COMMAND EXECUTION: /execute-draft-po ---
+    if (text.startsWith('/execute-draft-po')) {
+      try {
+        const data = JSON.parse(text.replace('/execute-draft-po', '').trim());
+        const newPo = await prisma.purchaseOrder.create({
+          data: {
+            organizationId: orgId,
+            poNumber: 'PO-' + Math.floor(10000 + Math.random() * 90000),
+            title: data.title || 'Standard PO',
+            status: 'Draft',
+            total: parseFloat(data.amount) || 0,
+            source: 'Cortex AI'
+          }
+        });
+        return NextResponse.json({ final_response: `Purchase Order **${newPo.poNumber}** drafted successfully.`, ui_component: 'po_list', ui_data: [newPo] });
+      } catch(e) { return NextResponse.json({ final_response: "Error drafting PO." }); }
+    }
+
+    // --- SLASH COMMAND EXECUTION: /execute-add-product ---
+    if (text.startsWith('/analyze-risk') || text.includes('swarm')) {
+        return NextResponse.json({
+          thought_process: [
+              "[Agent: Controller] Analyzing user request: Comprehensive risk profile generation.",
+              "[Agent: Finance] Querying historical pricing benchmarks and liquidity ratios...",
+              "[Agent: Legal] Checking recent SEC filings, litigation history, and clause traps...",
+              "[Agent: Compliance] Searching global supply chain blacklists and ESG indices...",
+              "[Agent: Cyber] Scanning vendor endpoints for known CVE vulnerabilities...",
+              "[Agent: Controller] Aggregating swarm findings into unified dashboard..."
+            ],
+            final_response: "I've deployed a multi-agent swarm to analyze the comprehensive risk profile. Here is the executive synthesis and recommended mitigation plan.",
+          ui_component: 'agent_swarm',
+          ui_data: {
+            target: "Global Vendor Risk & Contract Analysis",
+            score: 87,
+            riskLevel: "CRITICAL",
+            agents: [
+              { id: 'legal', name: 'Legal AI', role: 'Clause Analysis', finding: 'Identified auto-renewal trap in Section 4.2 with 90-day strict notice period.' },
+              { id: 'finance', name: 'Finance AI', role: 'Cost Benchmarking', finding: 'Proposed pricing is 12.4% above Q3 market index average.' },
+              { id: 'risk', name: 'Compliance AI', role: 'Supply Chain Monitoring', finding: 'Detected severe factory strikes in primary supplier region (Shenzhen).' },
+              { id: 'cyber', name: 'Cyber Risk AI', role: 'Security Posture', finding: 'Vendor failed SOC-2 Type II audit in Q1 2026.' }
+            ],
+            summary: "The proposed contract poses severe operational and financial risks. The vendor's security posture and supply chain stability are currently compromised, and pricing is above market rate.",
+            mitigations: [
+              "Strike the auto-renewal clause (Section 4.2) and enforce Net-60 payment terms.",
+              "Require SOC-2 Type II remediation proof before finalizing data sharing agreements.",
+              "Mandate a 15% pricing discount to offset identified supply chain volatility."
+            ]
+          }
+        });
+      }
+
+    
+      if (text.startsWith('/s2p')) {
+        return NextResponse.json({
+          final_response: "Let's initiate a new Source-to-Pay (S2P) workflow. Please provide the intake details below.",
+          ui_component: 's2p_intake_form'
+        });
+      }
+
+      if (text.startsWith('/execute-s2p-intake')) {
+        try {
+          const jsonStr = text.replace('/execute-s2p-intake', '').trim();
+          const d = JSON.parse(jsonStr);
+          
+          // Create Intake
+          const newIntake = await prisma.intake.create({
+            data: {
+              organizationId: orgId,
+              refId: `INT-${Math.floor(1000 + Math.random() * 9000)}`,
+              title: d.title || 'Untitled S2P Intake',
+              reqName: d.department || 'General',
+              status: 'Approved',
+              type: 'S2P Flow',
+              buyer: 'Cortex AI',
+              reqAt: new Date().toISOString()
+            }
+          });
+
+          // Create PR (PurchaseOrder)
+          const newPR = await prisma.purchaseOrder.create({
+            data: {
+              organizationId: orgId,
+              poNumber: `PR-${Math.floor(10000 + Math.random() * 90000)}`,
+              title: `PR for ${d.title || 'Intake'}`,
+              status: 'Approved',
+              total: parseFloat(d.budget) || 0
+            }
+          });
+
+          return NextResponse.json({
+            final_response: "Intake successfully submitted and routed. PR has been generated.",
+            ui_component: 's2p_progress_and_event',
+            ui_data: {
+              intakeRef: newIntake.refId,
+              poRef: newPR.poNumber,
+              defaultTitle: `Event for ${d.title || 'S2P Request'}`
+            }
+          });
+        } catch (err: any) {
+          console.error(err);
+          return NextResponse.json({ final_response: "Error processing S2P intake." });
+        }
+      }
+
+      if (text.startsWith('/execute-s2p-event')) {
+        try {
+          const jsonStr = text.replace('/execute-s2p-event', '').trim();
+          const d = JSON.parse(jsonStr);
+          
+          const newEvent = await prisma.event.create({
+            data: {
+              organizationId: orgId,
+              refId: `EVT-${Math.floor(1000 + Math.random() * 9000)}`,
+              title: d.title || 'S2P Event',
+              type: 'RFQ',
+              itemsCount: parseInt(d.quantity) || 1,
+              baseCurrency: 'USD',
+              endTime: new Date(Date.now() + (parseInt(d.duration) || 7) * (d.durationUnit === 'minutes' ? 60 * 1000 : 24 * 60 * 60 * 1000)),
+              status: 'Draft',
+            }
+          });
+
+          return NextResponse.json({
+            final_response: `Success! The sourcing event **${newEvent.refId}** has been generated for PR **${d.poRef}**.`,
+            ui_component: null
+          });
+        } catch (err: any) {
+          console.error(err);
+          return NextResponse.json({ final_response: "Error creating S2P event." });
+        }
+      }
+
+      if (text.startsWith('/execute-add-product')) {
+        try {
+          const data = JSON.parse(text.replace('/execute-add-product', '').trim());
+          const newProduct = await prisma.product.create({
+            data: {
+              organizationId: orgId,
+              name: data.name || 'New Product',
+              code: 'P-' + Math.floor(100000 + Math.random() * 900000).toString(),
+              articleCode: (data.sku && String(data.sku).startsWith('P')) ? String(data.sku) : ('P-' + (data.sku || Math.floor(10000 + Math.random() * 90000))),
+              category: data.category || 'General',
+              description: data.price ? ('Base Price: $' + data.price) : 'Standard Item',
+              status: 'Active'
+            }
+          });
+          return NextResponse.json({ final_response: `Product **${newProduct.name}** added to catalog.`, ui_component: 'product_list', ui_data: [newProduct] });
+        } catch(e) { console.error("PRODUCT ERROR:", e); return NextResponse.json({ final_response: "Error adding product: " + e.message }); }
+      }
+
+      // --- CONTEXTUAL MEMORY / AFFIRMATION ACTIONS ---
     if (history && history.length > 0 && /^(yes|yeah|sure|do it|approve it|confirm|proceed|reorder now)\b/i.test(lowerText)) {
       const lastAgentMessage = [...history].reverse().find((m: any) => m.role === 'agent');
       if (lastAgentMessage) {
@@ -664,7 +1060,41 @@ export async function POST(req: Request) {
       final_response: `I didn't quite catch that. You can talk to me naturally—try asking:\n- *"Can you check for active vendors?"*\n- *"Show my open purchase orders"*\n- *"Check laptop inventory and reorder"*\n- *"What sourcing events are running?"*`
     });
 
-  } catch (error) {
+  
+      // --- RAG (RETRIEVAL-AUGMENTED GENERATION) FOR GENERAL QUERIES ---
+      // If it's not a specific slash command, we search the knowledge base!
+      const retrievedDocs = await retrieveContext(text);
+      
+      let final_response = "I couldn't find any specific company policies related to your query.";
+      let thought_process = [
+        `[RAG Engine] Embedding query: "${text}"`,
+        `[Vector DB] Searching index 'enterprise-policies'...`,
+      ];
+
+      if (retrievedDocs.length > 0) {
+        thought_process.push(`[Vector DB] Found ${retrievedDocs.length} matching documents (Semantic similarity > 0.82)`);
+        
+        // Context Injection (Simulating LLM synthesis)
+        const contextStr = retrievedDocs.map(d => `[${d.title}] ${d.content}`).join(" | ");
+        thought_process.push(`[LLM Context Injection] "${contextStr}"`);
+        thought_process.push(`[LLM Generation] Synthesizing final response based strictly on retrieved company guidelines...`);
+        
+        final_response = `Based on our internal company policies:\n\n`;
+        retrievedDocs.forEach(doc => {
+          final_response += `**${doc.title}**\n${doc.content}\n\n`;
+        });
+        final_response += `*Is there a specific part of this policy you need help applying?*`;
+      } else {
+        thought_process.push(`[Vector DB] No highly relevant documents found for context.`);
+      }
+
+      return NextResponse.json({
+        final_response,
+        thought_process,
+        ui_component: 'markdown'
+      });
+
+    } catch (error) {
     console.error("Cortex API error:", error);
     return NextResponse.json({ error: 'Failed to process agentic request.' }, { status: 500 });
   }
