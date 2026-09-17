@@ -1,55 +1,41 @@
-
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { BrainCircuit, X, Zap, Loader2, Database, Send, Terminal, CheckCircle2, AlertTriangle, CheckCircle, MessageSquare, Menu, FileText, Settings, Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import {
+  BrainCircuit, X, Zap, Loader2, Database, Send, Terminal,
+  CheckCircle2, AlertTriangle, CheckCircle, FileText, Settings,
+  Plus, Sparkles, Shield, ChevronRight, BarChart3, Bot
+} from 'lucide-react';
 
-const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
+/* ───────────────────────── Utility sub-components ───────────────────────── */
+
+const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => {
   const [docType, setDocType] = useState('NDA');
-  const [formData, setFormData] = useState<any>({});
-  
+  const [fd, setFd] = useState<any>({});
+  const inp = { width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.07)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' };
   return (
-    <div style={{ marginTop: '12px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-      <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Select Document Type</label>
-        <select value={docType} onChange={e => { setDocType(e.target.value); setFormData({}); }} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.9rem', fontWeight: 600 }}>
+    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)' }}>
+      <div style={{ marginBottom:'14px' }}>
+        <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Document Type</label>
+        <select value={docType} onChange={e=>{ setDocType(e.target.value); setFd({}); }} style={{ ...inp, cursor:'pointer' }}>
           <option value="NDA">Non-Disclosure Agreement (NDA)</option>
           <option value="SOW">Statement of Work (SOW)</option>
           <option value="RFP">Request for Proposal (RFP)</option>
         </select>
       </div>
-      
-      {docType === 'NDA' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Counterparty Name</label>
-            <input type="text" placeholder="e.g. Acme Corp" onChange={e => setFormData({...formData, partyName: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Governing Law State</label>
-            <input type="text" placeholder="e.g. California" onChange={e => setFormData({...formData, state: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
-          </div>
+      {docType==='NDA' && (
+        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+          <input type="text" placeholder="Counterparty Name" onChange={e=>setFd({...fd, partyName:e.target.value})} style={inp}/>
+          <input type="text" placeholder="Governing Law State" onChange={e=>setFd({...fd, state:e.target.value})} style={inp}/>
         </div>
       )}
-      
-      {docType === 'SOW' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Project Name</label>
-            <input type="text" placeholder="e.g. Phase 1 Implementation" onChange={e => setFormData({...formData, projectName: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>Total Compensation ($)</label>
-            <input type="number" placeholder="50000" onChange={e => setFormData({...formData, amount: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
-          </div>
+      {docType==='SOW' && (
+        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+          <input type="text" placeholder="Project Name" onChange={e=>setFd({...fd, projectName:e.target.value})} style={inp}/>
+          <input type="number" placeholder="Total Compensation ($)" onChange={e=>setFd({...fd, amount:e.target.value})} style={inp}/>
         </div>
       )}
-      
-      <button 
-        onClick={() => onSubmit({ type: docType, ...formData })}
-        style={{ width: '100%', marginTop: '16px', padding: '10px', background: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
-      >
-        <Zap size={16} /> Generate Document
+      <button onClick={()=>onSubmit({ type:docType, ...fd })} style={{ width:'100%', marginTop:'16px', padding:'11px', background:'linear-gradient(135deg,#7c3aed,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px', fontSize:'0.85rem' }}>
+        <Zap size={15}/> Generate Document
       </button>
     </div>
   );
@@ -57,48 +43,42 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (data: any) => void }) 
 
 const AgentSwarm = ({ data }: { data: any }) => {
   const [step, setStep] = useState(0);
-
   useEffect(() => {
-    const t1 = setTimeout(() => setStep(1), 1500); 
-    const t2 = setTimeout(() => setStep(2), 3000); 
-    const t3 = setTimeout(() => setStep(3), 4500); 
-    const t4 = setTimeout(() => setStep(4), 5200); 
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+    const ts = [setTimeout(()=>setStep(1),1400), setTimeout(()=>setStep(2),2800), setTimeout(()=>setStep(3),4200), setTimeout(()=>setStep(4),5000)];
+    return () => ts.forEach(clearTimeout);
   }, []);
-
   return (
-    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden', width: '100%', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
-      <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)', padding: '16px', color: '#fff' }}>
-        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>Multi-Agent Swarm</div>
-        <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>{data.target}</div>
+    <div style={{ background:'linear-gradient(135deg,rgba(15,23,42,0.95),rgba(30,41,59,0.9))', border:'1px solid rgba(99,102,241,0.3)', borderRadius:'16px', overflow:'hidden', width:'100%', backdropFilter:'blur(20px)' }}>
+      <div style={{ padding:'16px 20px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', alignItems:'center', gap:'12px' }}>
+        <div style={{ background:'linear-gradient(135deg,#6366f1,#8b5cf6)', padding:'8px', borderRadius:'10px', display:'flex' }}><Sparkles size={16} color="#fff"/></div>
+        <div>
+          <div style={{ fontSize:'0.65rem', fontWeight:700, color:'#6366f1', textTransform:'uppercase', letterSpacing:'2px' }}>Multi-Agent Swarm</div>
+          <div style={{ fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9', marginTop:'1px' }}>{data.target}</div>
+        </div>
       </div>
-      
-      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {data.agents.map((agent: any, index: number) => {
-          const isProcessing = step === index;
-          const isDone = step > index;
-          
+      <div style={{ padding:'16px', display:'flex', flexDirection:'column', gap:'10px' }}>
+        {data.agents.map((agent: any, i: number) => {
+          const active = step===i, done = step>i;
           return (
-            <div key={agent.id} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '12px', background: isDone ? '#f8fafc' : '#ffffff', border: '1px solid', borderColor: isDone ? '#e2e8f0' : (isProcessing ? '#3b82f6' : '#f1f5f9'), borderRadius: '8px', transition: 'all 0.3s' }}>
-              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: isDone ? '#10b981' : (isProcessing ? '#3b82f6' : '#cbd5e1'), display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
-                {isDone ? <CheckCircle size={14} /> : (isProcessing ? <Loader2 size={14} className="animate-spin" /> : <div style={{width: '6px', height: '6px', borderRadius: '50%', background: '#fff'}} />)}
+            <div key={agent.id} style={{ display:'flex', gap:'12px', alignItems:'flex-start', padding:'12px', background: done?'rgba(16,185,129,0.06)':active?'rgba(99,102,241,0.08)':'rgba(255,255,255,0.02)', border:'1px solid', borderColor: done?'rgba(16,185,129,0.2)':active?'rgba(99,102,241,0.3)':'rgba(255,255,255,0.05)', borderRadius:'10px', transition:'all 0.4s' }}>
+              <div style={{ width:'28px', height:'28px', borderRadius:'50%', background: done?'linear-gradient(135deg,#10b981,#059669)':active?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                {done ? <CheckCircle size={14} color="#fff"/> : active ? <Loader2 size={14} color="#fff" className="animate-spin"/> : <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#475569'}}/>}
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>{agent.name}</div>
-                  <div style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{agent.role}</div>
+              <div style={{ flex:1 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                  <div style={{ fontSize:'0.85rem', fontWeight:700, color:'#e2e8f0' }}>{agent.name}</div>
+                  <div style={{ fontSize:'0.65rem', fontWeight:700, color: done?'#10b981':active?'#818cf8':'#475569', background: done?'rgba(16,185,129,0.1)':active?'rgba(99,102,241,0.15)':'rgba(255,255,255,0.05)', padding:'2px 8px', borderRadius:'20px' }}>{agent.role}</div>
                 </div>
-                {isProcessing && <div style={{ fontSize: '0.8rem', color: '#3b82f6', marginTop: '4px', animation: 'pulse 2s infinite' }}>Analyzing data...</div>}
-                {isDone && <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '4px', borderLeft: '2px solid #cbd5e1', paddingLeft: '8px' }}>{agent.finding}</div>}
+                {active && <div style={{ fontSize:'0.78rem', color:'#818cf8', marginTop:'5px' }}>Scanning data streams...</div>}
+                {done && <div style={{ fontSize:'0.78rem', color:'#94a3b8', marginTop:'5px', paddingLeft:'8px', borderLeft:'2px solid rgba(16,185,129,0.4)' }}>{agent.finding}</div>}
               </div>
             </div>
           );
         })}
-
-        {step >= 4 && (
-          <div style={{ marginTop: '8px', padding: '12px', background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '8px', display: 'flex', gap: '12px', alignItems: 'center', animation: 'fadeIn 0.5s ease' }}>
-            <AlertTriangle size={20} color="#e11d48" style={{ flexShrink: 0 }} />
-            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#9f1239' }}>{data.summary}</div>
+        {step>=4 && (
+          <div style={{ padding:'14px', background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:'10px', display:'flex', gap:'12px', alignItems:'center' }}>
+            <AlertTriangle size={18} color="#f87171"/>
+            <div style={{ fontSize:'0.83rem', fontWeight:600, color:'#fca5a5' }}>{data.summary}</div>
           </div>
         )}
       </div>
@@ -106,307 +86,297 @@ const AgentSwarm = ({ data }: { data: any }) => {
   );
 };
 
+/* ─────────────────────────── Main Page ──────────────────────────── */
+
+type Message = { role:'user'|'agent'; content:string; uiComponent?:string; uiData?:any; thoughtProcess?:string[] };
+
 export default function CortexPage() {
-  const router = useRouter();
-  const [inputText, setInputText] = useState('');
+  const [input, setInput] = useState('');
   const [userName, setUserName] = useState('Admin');
-  const [messages, setMessages] = useState<{role: 'user' | 'agent', content: string, uiComponent?: string, uiData?: any}[]>([
-    { role: 'agent', content: 'Hello. I am ProcGen Cortex, your advanced multi-agent system. How can I assist you today?' }
+  const [messages, setMessages] = useState<Message[]>([
+    { role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [historyLog, setHistoryLog] = useState([
-    'Advanced Multi-Agent Swarm',
-    'Drafting Legal Document SOW',
-    'Adding "MacBook Pro" to Catalog'
-  ]);
-  const [showSlashMenu, setShowSlashMenu] = useState(false);
-  const [registeredVendors, setRegisteredVendors] = useState<any[]>([]);
-  const [eventForm, setEventForm] = useState({ title: '', budget: '', vendorId: '', duration: '' });
-  const [vendorForm, setVendorForm] = useState({ name: '', email: '', category: '' });
-  const [poForm, setPoForm] = useState({ poNumber: '', amount: '', desc: '' });
-  const [productForm, setProductForm] = useState({ name: '', sku: '', price: '' });
-  
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [showSlash, setShowSlash] = useState(false);
+  const [historyLog, setHistoryLog] = useState(['Risk Swarm — Vendor Contract Q3','Legal Review — NDA Acme Corp','Procurement Savings Analysis']);
+  const [eventForm, setEventForm] = useState({ title:'', budget:'', vendorId:'', duration:'' });
+  const [vendorForm, setVendorForm] = useState({ name:'', email:'', category:'' });
+  const [poForm, setPoForm] = useState({ poNumber:'', amount:'', desc:'' });
+  const [productForm, setProductForm] = useState({ name:'', sku:'', price:'' });
+  const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch('/api/auth/me').then(res => res.json()).then(data => {
-      const uName = (data && data.name) ? data.name : '';
-      if (uName) setUserName(uName);
-    }).catch(() => {});
-      
-    fetch('/api/vendors').then(res => res.json()).then(data => {
-      if (Array.isArray(data)) setRegisteredVendors(data);
-    }).catch(() => {});
+    fetch('/api/auth/me').then(r=>r.json()).then(d=>{ if(d?.name) setUserName(d.name); }).catch(()=>{});
   }, []);
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior:'smooth' }); }, [messages, isProcessing]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isProcessing]);
-
-  const executeCommand = async (command: string) => {
-    if (isProcessing) return;
-    if (command.trim().toLowerCase() === '/clear') {
-      setMessages([]);
-      setInputText('');
-      setShowSlashMenu(false);
-      return;
-    }
-    
-    let displayMessage = command;
-    if (command.startsWith('/execute-create-event')) displayMessage = "Create this event for me.";
-    if (command.startsWith('/execute-create-vendor')) displayMessage = "Onboard this new vendor.";
-    if (command.startsWith('/execute-draft-po')) displayMessage = "Draft this purchase order.";
-    if (command.startsWith('/execute-add-product')) displayMessage = "Add this product to the catalog.";
-    if (command.startsWith('/execute-draft-document')) displayMessage = "Generate this document for me.";
-    if (command.startsWith('/analyze-risk')) displayMessage = "Deploy an AI swarm to analyze this contract's risk profile.";
-    
-    setMessages(prev => [...prev, { role: 'user', content: displayMessage }]);
-    if (messages.length === 1) {
-      setHistoryLog(prev => [displayMessage.length > 35 ? displayMessage.substring(0, 35) + '...' : displayMessage, ...prev]);
-    }
-
+  const execute = async (cmd: string) => {
+    if(isProcessing) return;
+    let display = cmd;
+    if(cmd.startsWith('/execute-')) display = 'Executing action...';
+    if(cmd.startsWith('/analyze-risk')) display = 'Deploy AI swarm to analyze this contract\'s risk profile.';
+    if(cmd.startsWith('/analyze-contract')) display = 'Run deep legal clause analysis.';
+    setMessages(p=>[...p, { role:'user', content:display }]);
+    if(messages.length===1) setHistoryLog(p=>[display.substring(0,40), ...p]);
     setIsProcessing(true);
     try {
-      const res = await fetch('/api/ai/cortex', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: command, userName, history: messages.slice(-5) })
-      });
-      const data = await res.json();
-      setMessages(prev => [...prev, { role: 'agent', content: data.final_response, uiComponent: data.ui_component, uiData: data.ui_data, thoughtProcess: data.thought_process }]);
-    } catch(err) {}
+      const r = await fetch('/api/ai/cortex',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ prompt:cmd, userName, history:messages.slice(-5) }) });
+      const d = await r.json();
+      setMessages(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
+    } catch(e) { setMessages(p=>[...p,{ role:'agent', content:'Connection error.' }]); }
     setIsProcessing(false);
   };
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!inputText.trim() || isProcessing) return;
-
-    const userPrompt = inputText.trim();
-    setInputText('');
-    setMessages(prev => [...prev, { role: 'user', content: userPrompt }]);
-    if (messages.length === 1) {
-      setHistoryLog(prev => [userPrompt.length > 35 ? userPrompt.substring(0, 35) + '...' : userPrompt, ...prev]);
-    }
+  const send = async (e?: React.FormEvent) => {
+    if(e) e.preventDefault();
+    if(!input.trim()||isProcessing) return;
+    const q = input.trim(); setInput('');
+    setMessages(p=>[...p,{ role:'user', content:q }]);
+    if(messages.length===1) setHistoryLog(p=>[q.substring(0,40), ...p]);
     setIsProcessing(true);
-
     try {
-      const res = await fetch('/api/ai/cortex', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: userPrompt, userName, history: messages.slice(-5) })
-      });
-      const data = await res.json();
-      setMessages(prev => [...prev, { role: 'agent', content: data.final_response, uiComponent: data.ui_component, uiData: data.ui_data, thoughtProcess: data.thought_process }]);
-    } catch (err) {
-      setMessages(prev => [...prev, { role: 'agent', content: 'Connection to Cortex Core failed.' }]);
-    } finally {
-      setIsProcessing(false);
-    }
+      const r = await fetch('/api/ai/cortex',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ prompt:q, userName, history:messages.slice(-5) }) });
+      const d = await r.json();
+      setMessages(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
+    } catch(e) { setMessages(p=>[...p,{ role:'agent', content:'Connection to Cortex Core failed.' }]); }
+    setIsProcessing(false);
   };
 
-  const formatText = (text: string) => {
-    return text.split('\n').map((line, i) => {
-      let fLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      return <div key={i} dangerouslySetInnerHTML={{ __html: fLine }} style={{ marginBottom: '8px', lineHeight: '1.5' }} />;
-    });
-  };
+  const fmt = (txt: string) => txt.split('\n').map((l,i)=>(
+    <div key={i} dangerouslySetInnerHTML={{ __html: l.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} style={{ marginBottom:'6px', lineHeight:'1.7' }}/>
+  ));
+
+  const slashCmds = [
+    { cmd:'/analyze-risk',    label:'Multi-Agent Risk Swarm',          icon:<AlertTriangle size={14}/>,  color:'#f87171', bg:'rgba(239,68,68,0.12)',    auto:true },
+    { cmd:'/analyze-contract',label:'Deep Legal Clause Review (CUAD)',  icon:<Shield size={14}/>,         color:'#c084fc', bg:'rgba(168,85,247,0.12)',   auto:true },
+    { cmd:'/draft-contract',  label:'Generate Legal Document',          icon:<FileText size={14}/>,       color:'#818cf8', bg:'rgba(99,102,241,0.12)',   auto:false },
+    { cmd:'/create-event',    label:'Create Sourcing Event / Auction',  icon:<Zap size={14}/>,            color:'#fb923c', bg:'rgba(249,115,22,0.12)',   auto:false },
+    { cmd:'/create-vendor',   label:'Onboard New Supplier',             icon:<CheckCircle2 size={14}/>,   color:'#34d399', bg:'rgba(16,185,129,0.12)',   auto:false },
+    { cmd:'/draft-po',        label:'Draft Purchase Order',             icon:<Database size={14}/>,       color:'#38bdf8', bg:'rgba(14,165,233,0.12)',   auto:false },
+    { cmd:'/add-product',     label:'Add Item to Catalog',              icon:<Plus size={14}/>,           color:'#a3e635', bg:'rgba(132,204,22,0.12)',   auto:false },
+    { cmd:'/approve-all',     label:'Approve All Pending Requests',     icon:<CheckCircle size={14}/>,    color:'#4ade80', bg:'rgba(74,222,128,0.12)',   auto:true  },
+    { cmd:'/analyze-bids',    label:'AI Bid Recommendation Engine',     icon:<BarChart3 size={14}/>,      color:'#818cf8', bg:'rgba(99,102,241,0.12)',   auto:true  },
+    { cmd:'/find-savings',    label:'Scan History for Savings',         icon:<Sparkles size={14}/>,       color:'#f472b6', bg:'rgba(244,114,182,0.12)',  auto:true  },
+    { cmd:'/remind-approvers',label:'Nudge Approvers via Email',        icon:<Terminal size={14}/>,       color:'#fb923c', bg:'rgba(249,115,22,0.12)',   auto:true  },
+    { cmd:'/clear',           label:'Clear Conversation',               icon:<X size={14}/>,              color:'#94a3b8', bg:'rgba(148,163,184,0.08)',  auto:true  },
+  ];
 
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 64px)', background: '#fff', overflow: 'hidden', width: '100%' }}>
+    <div style={{ display:'flex', height:'calc(100vh - 64px)', background:'#070d1c', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
       
-      {/* LEFT SIDEBAR - ChatGPT Style History */}
-      <div style={{ width: '280px', background: '#f9f9f9', borderRight: '1px solid #e5e5e5', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-        <div style={{ padding: '16px' }}>
-          <button onClick={() => { setMessages([{ role: 'agent', content: 'Hello. I am ProcGen Cortex, your advanced multi-agent system. How can I assist you today?' }]); setInputText(''); }} style={{ width: '100%', background: '#fff', border: '1px solid #e5e5e5', padding: '10px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', color: '#171717', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-            <Plus size={16} /> New Chat
+      {/* Animated Background */}
+      <style>{`
+        @keyframes bgFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-20px) scale(1.05)} }
+        @keyframes pulse2 { 0%,100%{opacity:0.4} 50%{opacity:0.7} }
+        @keyframes cortexSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes fadeSlideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+        .cortex-msg { animation: fadeSlideIn 0.35s ease forwards; }
+        .slash-btn:hover { background: rgba(255,255,255,0.06) !important; }
+        .hist-item:hover { background: rgba(255,255,255,0.05) !important; }
+        ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08); border-radius:4px; }
+      `}</style>
+      <div style={{ position:'absolute', top:'-200px', left:'30%', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', animation:'bgFloat 8s ease-in-out infinite', pointerEvents:'none' }}/>
+      <div style={{ position:'absolute', bottom:'-100px', right:'10%', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)', animation:'bgFloat 12s ease-in-out infinite reverse', pointerEvents:'none' }}/>
+
+      {/* ── LEFT SIDEBAR ── */}
+      <div style={{ width:'270px', background:'rgba(255,255,255,0.02)', borderRight:'1px solid rgba(255,255,255,0.05)', display:'flex', flexDirection:'column', flexShrink:0, backdropFilter:'blur(20px)' }}>
+        
+        {/* Brand */}
+        <div style={{ padding:'20px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'14px' }}>
+            <div style={{ width:'32px', height:'32px', borderRadius:'10px', background:'linear-gradient(135deg,#6366f1,#8b5cf6)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 20px rgba(99,102,241,0.4)' }}>
+              <BrainCircuit size={18} color="#fff"/>
+            </div>
+            <div>
+              <div style={{ fontSize:'0.9rem', fontWeight:800, color:'#f1f5f9', letterSpacing:'-0.5px' }}>Cortex AI</div>
+              <div style={{ fontSize:'0.65rem', color:'#4ade80', fontWeight:600, display:'flex', alignItems:'center', gap:'4px' }}>
+                <span style={{ width:'5px', height:'5px', borderRadius:'50%', background:'#4ade80', display:'inline-block', animation:'pulse2 2s infinite' }}/>Online · RAG Active
+              </div>
+            </div>
+          </div>
+          <button onClick={()=>{ setMessages([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); }} style={{ width:'100%', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#a5b4fc', transition:'all 0.2s' }}>
+            <Plus size={15}/> New Chat
           </button>
         </div>
-        
-        <div style={{ padding: '0 16px', fontSize: '0.75rem', fontWeight: 600, color: '#888', marginTop: '12px', marginBottom: '8px' }}>Today</div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px' }}>
-          {historyLog.map((title, idx) => (
-            <div key={idx} style={{ padding: '10px 12px', background: (idx === 0 && messages.length > 1) ? '#e5e5e5' : 'transparent', borderRadius: '8px', fontSize: '0.85rem', color: (idx === 0 && messages.length > 1) ? '#171717' : '#555', cursor: 'pointer', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+
+        {/* History */}
+        <div style={{ flex:1, overflowY:'auto', padding:'12px 10px' }}>
+          <div style={{ fontSize:'0.63rem', fontWeight:700, color:'#334155', textTransform:'uppercase', letterSpacing:'1.5px', padding:'0 8px', marginBottom:'8px' }}>Recent</div>
+          {historyLog.map((title,i)=>(
+            <div key={i} className="hist-item" style={{ padding:'9px 12px', background: i===0?'rgba(99,102,241,0.1)':'transparent', border: i===0?'1px solid rgba(99,102,241,0.2)':'1px solid transparent', borderRadius:'8px', fontSize:'0.8rem', color: i===0?'#a5b4fc':'#475569', cursor:'pointer', marginBottom:'3px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', transition:'all 0.2s' }}>
               {title}
             </div>
           ))}
         </div>
-        <div style={{ padding: '16px', borderTop: '1px solid #e5e5e5', fontSize: '0.85rem', color: '#555', display: 'flex', gap: '12px', alignItems: 'center', cursor: 'pointer' }}>
-          <Settings size={16} /> Settings
+
+        {/* User / Settings */}
+        <div style={{ padding:'14px', borderTop:'1px solid rgba(255,255,255,0.04)', display:'flex', alignItems:'center', gap:'10px' }}>
+          <div style={{ width:'32px', height:'32px', borderRadius:'50%', background:'linear-gradient(135deg,#334155,#1e293b)', display:'flex', alignItems:'center', justifyContent:'center', color:'#94a3b8', fontWeight:700, fontSize:'0.9rem', flexShrink:0 }}>
+            {userName.charAt(0)}
+          </div>
+          <div style={{ flex:1, overflow:'hidden' }}>
+            <div style={{ fontSize:'0.82rem', fontWeight:600, color:'#e2e8f0', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{userName}</div>
+            <div style={{ fontSize:'0.7rem', color:'#475569' }}>Enterprise Plan</div>
+          </div>
+          <Settings size={15} color="#334155" style={{ cursor:'pointer', flexShrink:0 }}/>
         </div>
       </div>
 
-      {/* MAIN CHAT AREA */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', background: '#fff' }}>
+      {/* ── MAIN CHAT ── */}
+      <div style={{ flex:1, display:'flex', flexDirection:'column', position:'relative', overflow:'hidden' }}>
         
-        {/* Messages List */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '40px 0' }}>
-          <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px', padding: '0 24px' }}>
-            {messages.map((msg, idx) => (
-              <div key={idx} style={{ display: 'flex', gap: '20px' }}>
-                <div style={{ width: '36px', height: '36px', flexShrink: 0, borderRadius: '50%', background: msg.role === 'agent' ? '#10a37f' : '#171717', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-                  {msg.role === 'agent' ? <BrainCircuit size={20} /> : <div style={{ fontSize: '1rem', fontWeight: 600 }}>{userName.charAt(0)}</div>}
-                </div>
+        {/* Messages */}
+        <div style={{ flex:1, overflowY:'auto', padding:'32px 0 0' }}>
+          <div style={{ maxWidth:'780px', margin:'0 auto', display:'flex', flexDirection:'column', gap:'28px', padding:'0 28px 200px' }}>
+            {messages.map((msg, idx)=>(
+              <div key={idx} className="cortex-msg" style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
                 
-                <div style={{ flex: 1, paddingTop: '6px' }}>
-                  <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '8px', color: '#171717' }}>
-                    {msg.role === 'agent' ? 'Cortex AI' : 'You'}
+                {/* Avatar */}
+                <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background: msg.role==='agent'?'linear-gradient(135deg,#6366f1,#8b5cf6)':'rgba(255,255,255,0.07)', border: msg.role==='agent'?'none':'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', boxShadow: msg.role==='agent'?'0 0 16px rgba(99,102,241,0.3)':'none' }}>
+                  {msg.role==='agent' ? <BrainCircuit size={18}/> : <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{userName.charAt(0)}</span>}
+                </div>
+
+                <div style={{ flex:1, paddingTop:'4px', minWidth:0 }}>
+                  <div style={{ fontSize:'0.78rem', fontWeight:700, marginBottom:'8px', color: msg.role==='agent'?'#818cf8':'#94a3b8', textTransform:'uppercase', letterSpacing:'0.5px' }}>
+                    {msg.role==='agent' ? 'Cortex AI' : 'You'}
                   </div>
-                  <div style={{ color: '#333', fontSize: '1rem', lineHeight: '1.6' }}>
-                    {formatText(msg.content)}
+                  <div style={{ color: msg.role==='agent'?'#e2e8f0':'#94a3b8', fontSize:'0.95rem', lineHeight:'1.7' }}>
+                    {fmt(msg.content)}
                   </div>
-                  
-                  
-                  {/* CHAIN OF THOUGHT UI */}
+
+                  {/* Chain of Thought */}
                   {msg.thoughtProcess && (
-                    <div style={{ marginBottom: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
-                      <details>
-                        <summary style={{ padding: '10px 16px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700, color: '#64748b', display: 'flex', alignItems: 'center', gap: '8px', outline: 'none' }}>
-                          <BrainCircuit size={16} /> Agentic Chain of Thought (CoT)
-                        </summary>
-                        <div style={{ padding: '12px 16px', borderTop: '1px solid #e2e8f0', background: '#0f172a', color: '#38bdf8', fontFamily: 'monospace', fontSize: '0.75rem', lineHeight: '1.6' }}>
-                          {msg.thoughtProcess.map((step, idx) => (
-                            <div key={idx} style={{ display: 'flex', gap: '8px', opacity: 0.9 }}>
-                              <span style={{ color: '#64748b' }}>[{String(idx+1).padStart(2, '0')}]</span> {step}
-                            </div>
-                          ))}
-                        </div>
-                      </details>
-                    </div>
+                    <details style={{ marginTop:'12px' }}>
+                      <summary style={{ fontSize:'0.73rem', fontWeight:700, color:'#4f6072', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', userSelect:'none', listStyle:'none', marginBottom:'0' }}>
+                        <ChevronRight size={12}/> Agentic Chain of Thought · {msg.thoughtProcess.length} steps
+                      </summary>
+                      <div style={{ marginTop:'8px', padding:'12px 14px', background:'rgba(0,0,0,0.4)', border:'1px solid rgba(255,255,255,0.05)', borderRadius:'8px', fontFamily:'monospace', fontSize:'0.72rem', lineHeight:'1.7', color:'#38bdf8' }}>
+                        {msg.thoughtProcess.map((s,i)=>(<div key={i} style={{ opacity:0.8 }}><span style={{ color:'#334155', marginRight:'8px' }}>[{String(i+1).padStart(2,'0')}]</span>{s}</div>))}
+                      </div>
+                    </details>
                   )}
 
-                  {/* LEGAL ANALYSIS UI */}
-                  {msg.uiComponent === 'legal_analysis' && msg.uiData && (
-                    <div style={{ marginTop: '16px', width: '100%', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                      <div style={{ background: 'linear-gradient(135deg, #7f1d1d, #991b1b)', padding: '16px', color: '#fff', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{ background: 'rgba(255,255,255,0.2)', padding: '8px', borderRadius: '8px' }}><AlertTriangle size={20} /></div>
+                  {/* Legal Analysis */}
+                  {msg.uiComponent==='legal_analysis' && msg.uiData && (
+                    <div style={{ marginTop:'14px', borderRadius:'14px', overflow:'hidden', border:'1px solid rgba(239,68,68,0.2)' }}>
+                      <div style={{ background:'linear-gradient(135deg,rgba(127,29,29,0.7),rgba(153,27,27,0.6))', padding:'14px 18px', display:'flex', alignItems:'center', gap:'12px', backdropFilter:'blur(10px)' }}>
+                        <Shield size={18} color="#f87171"/>
                         <div>
-                          <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.9 }}>Legal AI Sub-Agent</div>
-                          <div style={{ fontSize: '1.1rem', fontWeight: 600 }}>Contract Clause Risk Analysis</div>
+                          <div style={{ fontSize:'0.65rem', fontWeight:700, color:'#f87171', textTransform:'uppercase', letterSpacing:'1px' }}>Legal AI · CUAD Analysis</div>
+                          <div style={{ fontSize:'0.9rem', fontWeight:700, color:'#fff', marginTop:'1px' }}>Contract Clause Risk Report</div>
                         </div>
                       </div>
-                      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {msg.uiData.risks.map((risk: any, i: number) => (
-                          <div key={i} style={{ padding: '16px', background: risk.type === 'Critical' ? '#fef2f2' : '#fffbeb', border: '1px solid', borderColor: risk.type === 'Critical' ? '#fecaca' : '#fde68a', borderRadius: '8px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                              <div style={{ fontWeight: 700, color: risk.type === 'Critical' ? '#991b1b' : '#92400e' }}>{risk.clause}</div>
-                              <div style={{ fontSize: '0.7rem', fontWeight: 700, padding: '4px 8px', borderRadius: '4px', background: risk.type === 'Critical' ? '#ef4444' : '#f59e0b', color: '#fff' }}>{risk.type}</div>
+                      <div style={{ padding:'14px', display:'flex', flexDirection:'column', gap:'10px', background:'rgba(0,0,0,0.3)' }}>
+                        {msg.uiData.risks.map((r:any, i:number)=>(
+                          <div key={i} style={{ padding:'13px 15px', background: r.type==='Critical'?'rgba(239,68,68,0.08)':'rgba(245,158,11,0.07)', border:'1px solid', borderColor: r.type==='Critical'?'rgba(239,68,68,0.2)':'rgba(245,158,11,0.2)', borderRadius:'10px' }}>
+                            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'7px' }}>
+                              <div style={{ fontWeight:700, color: r.type==='Critical'?'#fca5a5':'#fcd34d', fontSize:'0.85rem' }}>{r.clause}</div>
+                              <div style={{ fontSize:'0.65rem', fontWeight:800, padding:'3px 8px', borderRadius:'20px', background: r.type==='Critical'?'rgba(239,68,68,0.2)':'rgba(245,158,11,0.2)', color: r.type==='Critical'?'#f87171':'#fbbf24' }}>{r.type.toUpperCase()}</div>
                             </div>
-                            <div style={{ fontSize: '0.85rem', color: risk.type === 'Critical' ? '#7f1d1d' : '#78350f', lineHeight: '1.5' }}>{risk.detail}</div>
+                            <div style={{ fontSize:'0.8rem', color:'#94a3b8', lineHeight:'1.5' }}>{r.detail}</div>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {msg.uiComponent === 'agent_swarm' && msg.uiData && (
-                    <div style={{ marginTop: '16px', width: '100%' }}>
-                      <AgentSwarm data={msg.uiData} />
-                    </div>
+                  {/* Agent Swarm */}
+                  {msg.uiComponent==='agent_swarm' && msg.uiData && (
+                    <div style={{ marginTop:'14px' }}><AgentSwarm data={msg.uiData}/></div>
                   )}
 
-                  {msg.uiComponent === 'document_generator_form' && (
-                    <DocumentGeneratorForm onSubmit={(data) => executeCommand('/execute-draft-document ' + JSON.stringify(data))} />
+                  {/* Document Generator Form */}
+                  {msg.uiComponent==='document_generator_form' && (
+                    <DocumentGeneratorForm onSubmit={d=>execute('/execute-draft-document '+JSON.stringify(d))}/>
                   )}
 
-                  {msg.uiComponent === 'drafted_document' && msg.uiData && (
-                    <div style={{ marginTop: '16px', width: '100%', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-                      <div style={{ background: '#f8fafc', padding: '16px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}><FileText size={18} color="#3b82f6"/> {msg.uiData.title}</div>
-                        <button onClick={() => {
-                          const docWindow = window.open('', '_blank');
-                          docWindow?.document.write('<html><head><title>Document</title></head><body style="font-family: sans-serif; padding: 40px; max-width: 800px; margin: 0 auto;">' + msg.uiData.htmlContent + '</body></html>');
-                          docWindow?.document.close();
-                          setTimeout(() => docWindow?.print(), 500);
-                        }} style={{ padding: '6px 12px', background: '#0f172a', color: '#fff', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', border: 'none' }}>Download PDF</button>
+                  {/* Drafted Document */}
+                  {msg.uiComponent==='drafted_document' && msg.uiData && (
+                    <div style={{ marginTop:'14px', borderRadius:'14px', overflow:'hidden', border:'1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ background:'rgba(255,255,255,0.04)', padding:'14px 18px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                        <div style={{ fontWeight:700, color:'#e2e8f0', display:'flex', alignItems:'center', gap:'8px' }}><FileText size={16} color="#818cf8"/>{msg.uiData.title}</div>
+                        <button onClick={()=>{ const w=window.open('','_blank'); w?.document.write('<html><body style="font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;">'+msg.uiData.htmlContent+'</body></html>'); w?.document.close(); setTimeout(()=>w?.print(),500); }} style={{ padding:'6px 12px', background:'rgba(99,102,241,0.2)', color:'#a5b4fc', borderRadius:'6px', fontSize:'0.78rem', cursor:'pointer', border:'1px solid rgba(99,102,241,0.3)', fontWeight:600 }}>Download PDF</button>
                       </div>
-                      <div 
-                        contentEditable={true}
-                        suppressContentEditableWarning={true}
-                        style={{ padding: '30px', maxHeight: '500px', overflowY: 'auto', background: '#fff', fontSize: '0.9rem', lineHeight: '1.8', outline: 'none' }}
-                        dangerouslySetInnerHTML={{ __html: msg.uiData.htmlContent }}
-                      />
+                      <div contentEditable suppressContentEditableWarning style={{ padding:'24px', maxHeight:'400px', overflowY:'auto', background:'rgba(0,0,0,0.2)', fontSize:'0.88rem', lineHeight:'1.8', color:'#cbd5e1', outline:'none' }} dangerouslySetInnerHTML={{ __html:msg.uiData.htmlContent }}/>
                     </div>
                   )}
 
-                  
-                  {msg.uiComponent === 'event_creation_form' && (
-                    <div style={{ marginTop: '16px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', width: '100%' }}>
-                      <div style={{ marginBottom: '16px', fontWeight: 600 }}>Create Sourcing Event</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <div><input type="text" placeholder="Event Title" value={eventForm.title} onChange={e => setEventForm({...eventForm, title: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
-                        <div style={{ display: 'flex', gap: '12px' }}>
-                          <div style={{ flex: 1 }}><input type="number" placeholder="Budget ($)" value={eventForm.budget} onChange={e => setEventForm({...eventForm, budget: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
-                          <div style={{ flex: 1 }}><input type="text" placeholder="Duration (Days)" value={eventForm.duration} onChange={e => setEventForm({...eventForm, duration: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
+                  {/* Event Form */}
+                  {msg.uiComponent==='event_creation_form' && (
+                    <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Create Sourcing Event</div>
+                      <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+                        {[{ p:'Event Title', k:'title' },{ p:'Budget ($)', k:'budget' },{ p:'Duration (Days)', k:'duration' }].map(f=>(
+                          <input key={f.k} type="text" placeholder={f.p} value={(eventForm as any)[f.k]} onChange={e=>setEventForm({...eventForm, [f.k]:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                        ))}
+                        <button onClick={()=>execute('/execute-create-event '+JSON.stringify(eventForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#ea580c,#c2410c)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Publish Event</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Vendor Form */}
+                  {msg.uiComponent==='vendor_creation_form' && (
+                    <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Onboard Supplier</div>
+                      <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+                        {[{ p:'Company Name', k:'name' },{ p:'Contact Email', k:'email' },{ p:'Category (e.g. IT, Legal)', k:'category' }].map(f=>(
+                          <input key={f.k} type="text" placeholder={f.p} value={(vendorForm as any)[f.k]} onChange={e=>setVendorForm({...vendorForm, [f.k]:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                        ))}
+                        <button onClick={()=>execute('/execute-create-vendor '+JSON.stringify(vendorForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#0284c7,#0369a1)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Register Vendor</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* PO Form */}
+                  {msg.uiComponent==='po_creation_form' && (
+                    <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Draft Purchase Order</div>
+                      <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+                        {[{ p:'Description / Purpose', k:'desc' },{ p:'PO Number (Optional)', k:'poNumber' },{ p:'Total Amount ($)', k:'amount' }].map(f=>(
+                          <input key={f.k} type="text" placeholder={f.p} value={(poForm as any)[f.k]} onChange={e=>setPoForm({...poForm, [f.k]:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                        ))}
+                        <button onClick={()=>execute('/execute-draft-po '+JSON.stringify(poForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#059669,#047857)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Generate PO</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Product Form */}
+                  {msg.uiComponent==='product_creation_form' && (
+                    <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Add to Catalog</div>
+                      <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+                        <input type="text" placeholder="Product Name" value={productForm.name} onChange={e=>setProductForm({...productForm, name:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                        <div style={{ display:'flex', gap:'10px' }}>
+                          <input type="text" placeholder="SKU" value={productForm.sku} onChange={e=>setProductForm({...productForm, sku:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <input type="number" placeholder="Price" value={productForm.price} onChange={e=>setProductForm({...productForm, price:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
                         </div>
-                        <button onClick={() => executeCommand('/execute-create-event ' + JSON.stringify(eventForm))} style={{ width: '100%', padding: '10px', background: '#ea580c', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Publish Event</button>
+                        <button onClick={()=>execute('/execute-add-product '+JSON.stringify(productForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#6366f1,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Add to Catalog</button>
                       </div>
                     </div>
                   )}
 
-                  {msg.uiComponent === 'vendor_creation_form' && (
-                    <div style={{ marginTop: '16px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', width: '100%' }}>
-                      <div style={{ marginBottom: '16px', fontWeight: 600 }}>Onboard New Supplier</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <div><input type="text" placeholder="Company Name" value={vendorForm?.name || ''} onChange={e => setVendorForm({...vendorForm, name: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
-                        <div style={{ display: 'flex', gap: '12px' }}>
-                          <div style={{ flex: 1 }}><input type="email" placeholder="Contact Email" value={vendorForm?.email || ''} onChange={e => setVendorForm({...vendorForm, email: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
-                          <div style={{ flex: 1 }}><input type="text" placeholder="Category (e.g. IT, Legal)" value={vendorForm?.category || ''} onChange={e => setVendorForm({...vendorForm, category: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
-                        </div>
-                        <button onClick={() => executeCommand('/execute-create-vendor ' + JSON.stringify(vendorForm))} style={{ width: '100%', padding: '10px', background: '#0284c7', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Register Vendor</button>
-                      </div>
-                    </div>
-                  )}
-
-                  {msg.uiComponent === 'po_creation_form' && (
-                    <div style={{ marginTop: '16px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', width: '100%' }}>
-                      <div style={{ marginBottom: '16px', fontWeight: 600 }}>Draft Purchase Order</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <div><input type="text" placeholder="Description / Purpose" value={poForm?.desc || ''} onChange={e => setPoForm({...poForm, desc: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
-                        <div style={{ display: 'flex', gap: '12px' }}>
-                          <div style={{ flex: 1 }}><input type="text" placeholder="PO Number (Optional)" value={poForm?.poNumber || ''} onChange={e => setPoForm({...poForm, poNumber: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
-                          <div style={{ flex: 1 }}><input type="number" placeholder="Total Amount ($)" value={poForm?.amount || ''} onChange={e => setPoForm({...poForm, amount: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
-                        </div>
-                        <button onClick={() => executeCommand('/execute-draft-po ' + JSON.stringify(poForm))} style={{ width: '100%', padding: '10px', background: '#059669', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Generate PO</button>
-                      </div>
-                    </div>
-                  )}
-
-                  {msg.uiComponent === 'product_creation_form' && (
-                    <div style={{ marginTop: '16px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', width: '100%' }}>
-                      <div style={{ marginBottom: '16px', fontWeight: 600 }}>Create New Product</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <div><input type="text" placeholder="Product Name" value={productForm.name} onChange={e => setProductForm({...productForm, name: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
-                        <div style={{ display: 'flex', gap: '12px' }}>
-                          <div style={{ flex: 1 }}><input type="text" placeholder="SKU" value={productForm.sku} onChange={e => setProductForm({...productForm, sku: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
-                          <div style={{ flex: 1 }}><input type="number" placeholder="Price" value={productForm.price} onChange={e => setProductForm({...productForm, price: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} /></div>
-                        </div>
-                        <button onClick={() => executeCommand('/execute-add-product ' + JSON.stringify(productForm))} style={{ width: '100%', padding: '10px', background: '#10a37f', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Add to Catalog</button>
-                      </div>
-                    </div>
-                  )}
-
-                  {msg.uiComponent === 'product_list' && msg.uiData && (
-                    <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      {msg.uiData.map((prod: any) => (
-                        <div key={prod.id} style={{ padding: '16px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', fontSize: '0.9rem' }}>
-                          <div style={{ fontWeight: 700, color: '#0f172a' }}>{prod.name}</div>
-                          <div style={{ color: '#64748b', marginTop: '4px' }}>Category: {prod.category || 'General'} | Code: {prod.articleCode || prod.code}</div>
+                  {/* Product List */}
+                  {msg.uiComponent==='product_list' && msg.uiData && (
+                    <div style={{ marginTop:'14px', display:'flex', flexDirection:'column', gap:'8px' }}>
+                      {msg.uiData.map((p:any)=>(
+                        <div key={p.id} style={{ padding:'13px 16px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'10px' }}>
+                          <div style={{ fontWeight:700, color:'#e2e8f0', fontSize:'0.88rem' }}>{p.name}</div>
+                          <div style={{ color:'#475569', fontSize:'0.78rem', marginTop:'3px' }}>Code: {p.articleCode||p.code} · Category: {p.category||'General'}</div>
                         </div>
                       ))}
                     </div>
                   )}
-                  
-                  {msg.uiComponent === 'vendor_list' && msg.uiData && (
-                    <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      {msg.uiData.map((vendor: any) => (
-                        <div key={vendor.id} style={{ padding: '16px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{ width: '40px', height: '40px', background: '#3b82f6', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem' }}>
-                            {vendor.name.charAt(0)}
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '1rem' }}>{vendor.name}</div>
-                            <div style={{ color: '#64748b', fontSize: '0.8rem' }}>Code: {vendor.vendorCode || 'N/A'}</div>
+
+                  {/* Vendor List */}
+                  {msg.uiComponent==='vendor_list' && msg.uiData && (
+                    <div style={{ marginTop:'14px', display:'flex', flexDirection:'column', gap:'8px' }}>
+                      {msg.uiData.map((v:any)=>(
+                        <div key={v.id} style={{ padding:'13px 16px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'10px', display:'flex', alignItems:'center', gap:'12px' }}>
+                          <div style={{ width:'36px', height:'36px', background:'linear-gradient(135deg,#3b82f6,#1d4ed8)', borderRadius:'10px', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:800, fontSize:'1rem' }}>{v.name?.charAt(0)}</div>
+                          <div>
+                            <div style={{ fontWeight:700, color:'#e2e8f0', fontSize:'0.88rem' }}>{v.name}</div>
+                            <div style={{ color:'#475569', fontSize:'0.75rem', marginTop:'2px' }}>Code: {v.vendorCode||'N/A'}</div>
                           </div>
                         </div>
                       ))}
@@ -416,63 +386,45 @@ export default function CortexPage() {
               </div>
             ))}
 
+            {/* Thinking Indicator */}
             {isProcessing && (
-              <div style={{ display: 'flex', gap: '20px' }}>
-                <div style={{ width: '36px', height: '36px', flexShrink: 0, borderRadius: '50%', background: '#10a37f', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-                  <Loader2 size={20} className="animate-spin" />
+              <div className="cortex-msg" style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
+                <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background:'linear-gradient(135deg,#6366f1,#8b5cf6)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 16px rgba(99,102,241,0.4)' }}>
+                  <Loader2 size={18} color="#fff" className="animate-spin"/>
                 </div>
-                <div style={{ flex: 1, paddingTop: '8px' }}>
-                  <style>{`
-                    @keyframes cortexGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-                  `}</style>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', background: 'linear-gradient(270deg, #f8fafc, #f1f5f9, #f8fafc)', backgroundSize: '200% 200%', animation: 'cortexGradient 2s ease infinite', padding: '12px 18px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#475569' }}>Cortex is thinking...</span>
+                <div style={{ paddingTop:'8px' }}>
+                  <div style={{ fontSize:'0.78rem', fontWeight:700, color:'#818cf8', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'8px' }}>Cortex AI</div>
+                  <div style={{ display:'flex', alignItems:'center', gap:'10px', background:'rgba(99,102,241,0.08)', border:'1px solid rgba(99,102,241,0.15)', padding:'10px 16px', borderRadius:'12px' }}>
+                    <div style={{ display:'flex', gap:'4px' }}>
+                      {[0,1,2].map(i=><div key={i} style={{ width:'6px', height:'6px', borderRadius:'50%', background:'#6366f1', animation:`pulse2 1.4s ease-in-out ${i*0.2}s infinite` }}/>)}
+                    </div>
+                    <span style={{ fontSize:'0.83rem', color:'#818cf8', fontWeight:500 }}>Cortex is thinking...</span>
                   </div>
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef} style={{ height: '180px', flexShrink: 0 }} />
+            <div ref={endRef} style={{ height:'10px' }}/>
           </div>
         </div>
 
-        {/* BOTTOM INPUT AREA */}
-        <div style={{ padding: '24px 40px 40px', background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 30%)', position: 'absolute', bottom: 0, width: '100%' }}>
-          <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative' }}>
-            
-            {showSlashMenu && (
-              <div style={{ position: 'absolute', bottom: '100%', left: 0, width: '100%', background: '#fff', border: '1px solid #e5e5e5', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', overflow: 'hidden', marginBottom: '12px', zIndex: 10 }}>
-                <div style={{ padding: '8px 16px', background: '#f9f9f9', fontSize: '0.75rem', fontWeight: 700, color: '#888' }}>ADVANCED WORKFLOWS</div>
-                <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '350px', overflowY: 'auto' }}>
-                  {[
+        {/* ── INPUT AREA ── */}
+        <div style={{ position:'absolute', bottom:0, width:'100%', padding:'0 28px 28px', background:'linear-gradient(180deg,transparent 0%,#070d1c 35%)' }}>
+          <div style={{ maxWidth:'780px', margin:'0 auto', position:'relative' }}>
 
-                    { cmd: '/analyze-contract', desc: 'Deep Legal Review via CUAD Data', icon: <FileText size={16}/>, color: '#b91c1c', bg: '#fef2f2' },
-                    { cmd: '/analyze-risk', desc: 'Multi-Agent Risk Swarm', icon: <AlertTriangle size={16}/>, color: '#e11d48', bg: '#fee2e2' },
-                    { cmd: '/draft-contract', desc: 'Dynamic Legal Document Generator', icon: <Terminal size={16}/>, color: '#9333ea', bg: '#f3e8ff' },
-                    { cmd: '/create-event', desc: 'Create a new sourcing event/auction', icon: <Zap size={16}/>, color: '#ea580c', bg: '#ffedd5' },
-                    { cmd: '/create-vendor', desc: 'Onboard a new supplier', icon: <CheckCircle size={16}/>, color: '#0284c7', bg: '#e0f2fe' },
-                    { cmd: '/draft-po', desc: 'Draft a new Purchase Order', icon: <FileText size={16}/>, color: '#059669', bg: '#d1fae5' },
-                    { cmd: '/add-product', desc: 'Add a new item to catalog', icon: <Database size={16}/>, color: '#4f46e5', bg: '#e0e7ff' },
-                    { cmd: '/approve-all', desc: 'Instantly approve all pending requests', icon: <CheckCircle2 size={16}/>, color: '#16a34a', bg: '#dcfce7' },
-                    { cmd: '/analyze-bids', desc: 'AI recommendation for active auctions', icon: <BrainCircuit size={16}/>, color: '#4f46e5', bg: '#e0e7ff' },
-                    { cmd: '/find-savings', desc: 'AI scans history for savings', icon: <Zap size={16}/>, color: '#db2777', bg: '#fce7f3' },
-                    { cmd: '/export-csv', desc: 'Download recent data as CSV', icon: <Database size={16}/>, color: '#0284c7', bg: '#e0f2fe' },
-                    { cmd: '/generate-mock-data', desc: 'Inject test data into the DB', icon: <Terminal size={16}/>, color: '#4b5563', bg: '#f3f4f6' },
-                    { cmd: '/remind-approvers', desc: 'Send nudge emails', icon: <AlertTriangle size={16}/>, color: '#dc2626', bg: '#fee2e2' },
-                    { cmd: '/clear', desc: 'Clear the chat history', icon: <X size={16}/>, color: '#64748b', bg: '#f1f5f9' }
-                  ].map((item, i) => (
-                    <button key={i} onClick={() => { 
-                      const autoExec = ['/analyze-contract', '/analyze-risk', '/analyze-bids', '/approve-all', '/export-csv', '/generate-mock-data', '/remind-approvers', '/clear', '/find-savings'];
-                      if(autoExec.includes(item.cmd)) {
-                        executeCommand(item.cmd); 
-                      } else {
-                        setInputText(item.cmd); 
-                      }
-                      setShowSlashMenu(false); 
-                    }} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 16px', background: 'transparent', border: 'none', borderBottom: '1px solid #f1f1f1', cursor: 'pointer', textAlign: 'left' }}>
-                      <div style={{ background: item.bg, color: item.color, padding: '8px', borderRadius: '8px' }}>{item.icon}</div>
+            {/* Slash Menu */}
+            {showSlash && (
+              <div style={{ position:'absolute', bottom:'100%', left:0, width:'100%', background:'rgba(7,13,28,0.97)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'16px', boxShadow:'0 -20px 60px rgba(0,0,0,0.5)', overflow:'hidden', marginBottom:'10px', backdropFilter:'blur(20px)' }}>
+                <div style={{ padding:'10px 16px', borderBottom:'1px solid rgba(255,255,255,0.05)', display:'flex', alignItems:'center', gap:'8px' }}>
+                  <Sparkles size={13} color="#6366f1"/>
+                  <span style={{ fontSize:'0.68rem', fontWeight:800, color:'#475569', textTransform:'uppercase', letterSpacing:'1.5px' }}>Advanced Workflows</span>
+                </div>
+                <div style={{ maxHeight:'320px', overflowY:'auto' }}>
+                  {slashCmds.map((item,i)=>(
+                    <button key={i} className="slash-btn" onClick={()=>{ item.auto ? execute(item.cmd) : setInput(item.cmd); setShowSlash(false); }} style={{ display:'flex', alignItems:'center', gap:'14px', padding:'11px 16px', width:'100%', background:'transparent', border:'none', borderBottom:'1px solid rgba(255,255,255,0.03)', cursor:'pointer', textAlign:'left', transition:'all 0.15s' }}>
+                      <div style={{ background:item.bg, color:item.color, padding:'7px', borderRadius:'8px', display:'flex', flexShrink:0 }}>{item.icon}</div>
                       <div>
-                        <div style={{ fontWeight: 600, color: '#171717', fontSize: '0.9rem' }}>{item.cmd}</div>
-                        <div style={{ color: '#555', fontSize: '0.8rem' }}>{item.desc}</div>
+                        <div style={{ fontWeight:600, color:'#e2e8f0', fontSize:'0.85rem' }}>{item.cmd}</div>
+                        <div style={{ color:'#475569', fontSize:'0.75rem', marginTop:'1px' }}>{item.label}</div>
                       </div>
                     </button>
                   ))}
@@ -480,29 +432,25 @@ export default function CortexPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} style={{ position: 'relative' }}>
-              <input 
-                type="text" 
-                value={inputText}
-                onChange={e => {
-                  const val = e.target.value;
-                  setInputText(val);
-                  setShowSlashMenu(val === '/');
-                }}
-                placeholder="Message Cortex..."
-                style={{ width: '100%', padding: '16px 56px 16px 24px', borderRadius: '24px', border: '1px solid #e5e5e5', fontSize: '1rem', outline: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}
+            {/* Input Box */}
+            <form onSubmit={send} style={{ position:'relative', display:'flex', alignItems:'center' }}>
+              <div style={{ position:'absolute', left:'18px', zIndex:2, display:'flex', alignItems:'center' }}>
+                <Bot size={16} color={input?'#6366f1':'#334155'} style={{ transition:'color 0.2s' }}/>
+              </div>
+              <input
+                type="text" value={input}
+                onChange={e=>{ setInput(e.target.value); setShowSlash(e.target.value=='/'); }}
+                onKeyDown={e=>{ if(e.key==='Escape') setShowSlash(false); }}
+                placeholder="Ask Cortex anything, or type / for AI workflows..."
                 disabled={isProcessing}
+                style={{ width:'100%', padding:'16px 56px 16px 46px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#e2e8f0', fontSize:'0.95rem', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
               />
-              <button 
-                type="submit" 
-                disabled={isProcessing || !inputText.trim()}
-                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '36px', height: '36px', borderRadius: '50%', background: inputText.trim() && !isProcessing ? '#171717' : '#e5e5e5', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: inputText.trim() && !isProcessing ? 'pointer' : 'default', transition: 'all 0.2s' }}
-              >
-                <Send size={16} />
+              <button type="submit" disabled={!input.trim()||isProcessing} style={{ position:'absolute', right:'10px', width:'38px', height:'38px', borderRadius:'12px', background: input.trim()&&!isProcessing?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.05)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor: input.trim()&&!isProcessing?'pointer':'default', transition:'all 0.2s', boxShadow: input.trim()&&!isProcessing?'0 0 16px rgba(99,102,241,0.4)':'none' }}>
+                <Send size={15} color={input.trim()&&!isProcessing?'#fff':'#334155'}/>
               </button>
             </form>
-            <div style={{ textAlign: 'center', color: '#888', fontSize: '0.75rem', marginTop: '12px' }}>
-              Cortex AI can make mistakes. Consider verifying critical compliance and pricing data.
+            <div style={{ textAlign:'center', color:'#1e293b', fontSize:'0.7rem', marginTop:'10px' }}>
+              Cortex · Enterprise RAG · Multi-Agent Swarm · Legal AI · Chain of Thought
             </div>
           </div>
         </div>
