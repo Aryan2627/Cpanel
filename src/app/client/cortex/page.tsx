@@ -347,16 +347,26 @@ export default function CortexPage() {
             {showSlashMenu && (
               <div style={{ position: 'absolute', bottom: '100%', left: 0, width: '100%', background: '#fff', border: '1px solid #e5e5e5', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', overflow: 'hidden', marginBottom: '12px', zIndex: 10 }}>
                 <div style={{ padding: '8px 16px', background: '#f9f9f9', fontSize: '0.75rem', fontWeight: 700, color: '#888' }}>ADVANCED WORKFLOWS</div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '350px', overflowY: 'auto' }}>
                   {[
+
                     { cmd: '/analyze-risk', desc: 'Multi-Agent Risk Swarm', icon: <AlertTriangle size={16}/>, color: '#e11d48', bg: '#fee2e2' },
                     { cmd: '/draft-contract', desc: 'Dynamic Legal Document Generator', icon: <Terminal size={16}/>, color: '#9333ea', bg: '#f3e8ff' },
+                    { cmd: '/create-event', desc: 'Create a new sourcing event/auction', icon: <Zap size={16}/>, color: '#ea580c', bg: '#ffedd5' },
+                    { cmd: '/create-vendor', desc: 'Onboard a new supplier', icon: <CheckCircle size={16}/>, color: '#0284c7', bg: '#e0f2fe' },
+                    { cmd: '/draft-po', desc: 'Draft a new Purchase Order', icon: <FileText size={16}/>, color: '#059669', bg: '#d1fae5' },
+                    { cmd: '/add-product', desc: 'Add a new item to catalog', icon: <Database size={16}/>, color: '#4f46e5', bg: '#e0e7ff' },
                     { cmd: '/approve-all', desc: 'Instantly approve all pending requests', icon: <CheckCircle2 size={16}/>, color: '#16a34a', bg: '#dcfce7' },
                     { cmd: '/analyze-bids', desc: 'AI recommendation for active auctions', icon: <BrainCircuit size={16}/>, color: '#4f46e5', bg: '#e0e7ff' },
-                    { cmd: '/find-savings', desc: 'AI scans history for savings', icon: <Zap size={16}/>, color: '#db2777', bg: '#fce7f3' }
+                    { cmd: '/find-savings', desc: 'AI scans history for savings', icon: <Zap size={16}/>, color: '#db2777', bg: '#fce7f3' },
+                    { cmd: '/export-csv', desc: 'Download recent data as CSV', icon: <Database size={16}/>, color: '#0284c7', bg: '#e0f2fe' },
+                    { cmd: '/generate-mock-data', desc: 'Inject test data into the DB', icon: <Terminal size={16}/>, color: '#4b5563', bg: '#f3f4f6' },
+                    { cmd: '/remind-approvers', desc: 'Send nudge emails', icon: <AlertTriangle size={16}/>, color: '#dc2626', bg: '#fee2e2' },
+                    { cmd: '/clear', desc: 'Clear the chat history', icon: <X size={16}/>, color: '#64748b', bg: '#f1f5f9' }
                   ].map((item, i) => (
                     <button key={i} onClick={() => { 
-                      if(item.cmd === '/draft-contract' || item.cmd === '/analyze-risk' || item.cmd === '/analyze-bids') {
+                      const autoExec = ['/analyze-risk', '/analyze-bids', '/approve-all', '/export-csv', '/generate-mock-data', '/remind-approvers', '/clear', '/find-savings'];
+                      if(autoExec.includes(item.cmd)) {
                         executeCommand(item.cmd); 
                       } else {
                         setInputText(item.cmd); 
