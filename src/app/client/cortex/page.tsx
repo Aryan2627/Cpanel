@@ -162,7 +162,7 @@ export default function CortexPage() {
   ];
 
   return (
-    <div style={{ display:'flex', height:'calc(100vh - 64px)', background:'#070d1c', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative', contain:'strict' }}>
+    <div style={{ display:'flex', height:'100%', width:'100%', background:'#070d1c', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
       
       {/* Animated Background */}
       <style>{`
@@ -176,8 +176,8 @@ export default function CortexPage() {
         .hist-item:hover { background: rgba(255,255,255,0.05) !important; }
         ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08); border-radius:4px; }
       `}</style>
-      <div style={{ position:'absolute', top:'-200px', left:'30%', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', animation:'bgFloat 8s ease-in-out infinite', pointerEvents:'none' }}/>
-      <div style={{ position:'absolute', bottom:'-100px', right:'10%', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)', animation:'bgFloat 12s ease-in-out infinite reverse', pointerEvents:'none' }}/>
+      <div style={{ position:'fixed', top:'-200px', left:'30%', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', animation:'bgFloat 8s ease-in-out infinite', pointerEvents:'none', zIndex:0 }}/>
+      <div style={{ position:'fixed', bottom:'-100px', right:'10%', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)', animation:'bgFloat 12s ease-in-out infinite reverse', pointerEvents:'none', zIndex:0 }}/>
 
       {/* ── LEFT SIDEBAR ── */}
       <div style={{ width:'270px', background:'rgba(255,255,255,0.02)', borderRight:'1px solid rgba(255,255,255,0.05)', display:'flex', flexDirection:'column', flexShrink:0, backdropFilter:'blur(20px)' }}>
