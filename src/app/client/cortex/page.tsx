@@ -199,39 +199,25 @@ export default function CortexPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const playGreeting = () => {
-        if (!sessionStorage.getItem('cortex_greeted')) {
+        if (!sessionStorage.getItem('cortex_greeted_v2')) {
           try {
-            window.speechSynthesis.cancel(); // Clear any hung speeches
-            const msg = new SpeechSynthesisUtterance("Welcome to Cortex A I.");
-            msg.rate = 1.0;
-            msg.pitch = 1.1;
-            
-            const voices = window.speechSynthesis.getVoices();
-            const selectedVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Samantha') || (v.lang.includes('en') && v.name.includes('Female')));
-            if (selectedVoice) msg.voice = selectedVoice;
-            
-            window.speechSynthesis.speak(msg);
-            sessionStorage.setItem('cortex_greeted', 'true');
-            
-            // Remove listeners once played
-            document.removeEventListener('click', playGreeting);
-            document.removeEventListener('keydown', playGreeting);
+            const audio = new Audio('/greeting.mp3');
+            audio.volume = 1.0;
+            audio.play().then(() => {
+              sessionStorage.setItem('cortex_greeted_v2', 'true');
+              document.removeEventListener('click', playGreeting);
+              document.removeEventListener('keydown', playGreeting);
+            }).catch(e => {
+              // Autoplay still blocked, keep listeners active
+            });
           } catch(e) {}
         }
       };
 
-      // Try playing immediately (works if they navigated via sidebar link)
-      // We wrap it in a short timeout to ensure voices are loaded
-      setTimeout(() => {
-        if (window.speechSynthesis.getVoices().length > 0) {
-           playGreeting();
-        } else {
-           window.speechSynthesis.onvoiceschanged = playGreeting;
-        }
-      }, 500);
+      // Try playing immediately
+      setTimeout(playGreeting, 500);
 
-      // Fallback: If autoplay was blocked because they opened a new tab or hard-refreshed,
-      // it will play the very first time they click or type anywhere on the page.
+      // Fallback: If autoplay blocked, play on first interaction
       document.addEventListener('click', playGreeting);
       document.addEventListener('keydown', playGreeting);
       
