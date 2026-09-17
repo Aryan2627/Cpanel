@@ -434,6 +434,39 @@ export default function CortexPage() {
                       ))}
                     </div>
                   )}
+
+                  {/* PO List */}
+                  {msg.uiComponent==='po_list' && msg.uiData && (
+                    <div style={{ marginTop:'14px', display:'flex', flexDirection:'column', gap:'8px' }}>
+                      {msg.uiData.map((po:any)=>(
+                        <div key={po.id} style={{ padding:'13px 16px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'10px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                          <div>
+                            <div style={{ fontWeight:700, color:'#e2e8f0', fontSize:'0.88rem' }}>{po.poNumber || 'PO'}</div>
+                            <div style={{ color:'#475569', fontSize:'0.75rem', marginTop:'2px' }}>{po.title || 'Purchase Order'} &middot; {new Date(po.createdAt || Date.now()).toLocaleDateString()}</div>
+                          </div>
+                          <div style={{ textAlign:'right' }}>
+                            <div style={{ fontWeight:800, color:'#10b981', fontSize:'0.88rem' }}>${Number(po.total || 0).toLocaleString()}</div>
+                            <div style={{ fontSize:'0.65rem', fontWeight:700, color:'#e2e8f0', background:'rgba(255,255,255,0.1)', padding:'2px 6px', borderRadius:'10px', display:'inline-block', marginTop:'4px' }}>{po.status || 'Draft'}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Event List */}
+                  {msg.uiComponent==='event_list' && msg.uiData && (
+                    <div style={{ marginTop:'14px', display:'flex', flexDirection:'column', gap:'8px' }}>
+                      {msg.uiData.map((ev:any)=>(
+                        <div key={ev.id} style={{ padding:'13px 16px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'10px' }}>
+                          <div style={{ fontWeight:700, color:'#e2e8f0', fontSize:'0.88rem' }}>{ev.title || 'Sourcing Event'}</div>
+                          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'8px' }}>
+                            <div style={{ color:'#475569', fontSize:'0.75rem' }}>Budget: <span style={{color:'#94a3b8'}}>${Number(ev.budget || 0).toLocaleString()}</span></div>
+                            <div style={{ fontSize:'0.65rem', fontWeight:700, background:'rgba(249,115,22,0.2)', color:'#fb923c', padding:'2px 6px', borderRadius:'10px' }}>{ev.status || 'Active'}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
