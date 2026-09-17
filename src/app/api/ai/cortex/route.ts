@@ -284,7 +284,7 @@ export async function POST(req: Request) {
     }
 
     
-    if (text.trim().toLowerCase() === '/new-vendor') {
+    if (text.trim().toLowerCase() === '/new-vendor' || text.trim().toLowerCase() === '/create-vendor') {
       return NextResponse.json({ final_response: "Let's onboard a new vendor. Please provide the details:", ui_component: 'vendor_creation_form' });
     }
     if (text.trim().toLowerCase() === '/draft-po') {

@@ -280,7 +280,7 @@ export default function CortexPage() {
                   )}
 
                   
-                  {msg.uiComponent === 'event_form' && (
+                  {msg.uiComponent === 'event_creation_form' && (
                     <div style={{ marginTop: '16px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', width: '100%' }}>
                       <div style={{ marginBottom: '16px', fontWeight: 600 }}>Create Sourcing Event</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -294,7 +294,7 @@ export default function CortexPage() {
                     </div>
                   )}
 
-                  {msg.uiComponent === 'vendor_form' && (
+                  {msg.uiComponent === 'vendor_creation_form' && (
                     <div style={{ marginTop: '16px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', width: '100%' }}>
                       <div style={{ marginBottom: '16px', fontWeight: 600 }}>Onboard New Supplier</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -308,7 +308,7 @@ export default function CortexPage() {
                     </div>
                   )}
 
-                  {msg.uiComponent === 'po_form' && (
+                  {msg.uiComponent === 'po_creation_form' && (
                     <div style={{ marginTop: '16px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', width: '100%' }}>
                       <div style={{ marginBottom: '16px', fontWeight: 600 }}>Draft Purchase Order</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -322,7 +322,7 @@ export default function CortexPage() {
                     </div>
                   )}
 
-                  {msg.uiComponent === 'product_form' && (
+                  {msg.uiComponent === 'product_creation_form' && (
                     <div style={{ marginTop: '16px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', width: '100%' }}>
                       <div style={{ marginBottom: '16px', fontWeight: 600 }}>Create New Product</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
