@@ -54,7 +54,6 @@ const TOP_MENUS = [
       { name: 'Payments Due', path: '/client/license/expiry/payments' },
     ]
   },
-  { name: 'AI Agents', path: '/client/ai-agents', icon: Bot },
 ];
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
