@@ -92,6 +92,84 @@ const AgentSwarm = ({ data }: { data: any }) => {
 
 type Message = { role:'user'|'agent'; content:string; uiComponent?:string; uiData?:any; thoughtProcess?:string[] };
 
+
+const BidAnalyzerForm = ({ onSubmit }: { onSubmit: (e: string) => void }) => {
+  const [evt, setEvt] = useState('EVT-992: Q4 Enterprise Laptops');
+  return (
+    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(15,23,42,0.9)', border:'1px solid rgba(244,63,94,0.3)', boxShadow:'0 4px 24px rgba(0,0,0,0.4)' }}>
+      <div style={{ marginBottom:'14px' }}>
+        <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Select Sourcing Event</label>
+        <select value={evt} onChange={e=>setEvt(e.target.value)} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.07)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', cursor:'pointer' }}>
+          <option value="EVT-992: Q4 Enterprise Laptops">EVT-992: Q4 Enterprise Laptops</option>
+          <option value="EVT-993: Cloud Hosting Renewal">EVT-993: Cloud Hosting Renewal</option>
+          <option value="EVT-994: Office Furniture">EVT-994: Office Furniture</option>
+        </select>
+      </div>
+      <button onClick={()=>onSubmit(`Analyze bids for ${evt}`)} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#f43f5e,#e11d48)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px', fontSize:'0.85rem' }}>
+        <BarChart3 size={15}/> Evaluate Proposals
+      </button>
+    </div>
+  );
+};
+
+const BidMatrix = ({ data }: { data: any }) => {
+  const downloadCSV = () => {
+    const headers = ["Vendor", "Price ($)", "Timeline", "Risk", "Compliance", "Overall Score"];
+    const rows = data.bids.map((b:any) => [b.vendor, b.price, b.timeline, b.risk, b.compliance, b.score]);
+    const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${data.eventName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_bid_analysis.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  return (
+    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(15,23,42,0.9)', border:'1px solid rgba(244,63,94,0.3)', boxShadow:'0 4px 24px rgba(0,0,0,0.4)' }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'16px' }}>
+        <div style={{ fontSize:'0.9rem', fontWeight:700, color:'#e2e8f0' }}>Bid Analysis: {data.eventName}</div>
+        <button onClick={downloadCSV} style={{ padding:'6px 12px', background:'rgba(244,63,94,0.15)', border:'1px solid rgba(244,63,94,0.4)', color:'#fba9bc', borderRadius:'6px', fontSize:'0.75rem', fontWeight:600, cursor:'pointer', display:'flex', alignItems:'center', gap:'6px' }}>
+          <Database size={13}/> Download CSV
+        </button>
+      </div>
+      <div style={{ overflowX:'auto' }}>
+        <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'0.8rem', color:'#cbd5e1' }}>
+          <thead>
+            <tr style={{ borderBottom:'1px solid rgba(255,255,255,0.1)', color:'#94a3b8', textAlign:'left' }}>
+              <th style={{ padding:'8px 4px' }}>Vendor</th>
+              <th style={{ padding:'8px 4px' }}>Price</th>
+              <th style={{ padding:'8px 4px' }}>Timeline</th>
+              <th style={{ padding:'8px 4px' }}>Risk</th>
+              <th style={{ padding:'8px 4px' }}>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.bids.map((b:any, i:number) => (
+              <tr key={i} style={{ borderBottom:'1px solid rgba(255,255,255,0.05)', background: i===0 ? 'rgba(34,197,94,0.05)' : 'transparent' }}>
+                <td style={{ padding:'10px 4px', fontWeight: i===0?700:400, color: i===0?'#4ade80':'#cbd5e1' }}>{b.vendor} {i===0 && '🏆'}</td>
+                <td style={{ padding:'10px 4px' }}>${b.price.toLocaleString()}</td>
+                <td style={{ padding:'10px 4px' }}>{b.timeline}</td>
+                <td style={{ padding:'10px 4px', color: b.risk==='Low'?'#4ade80':b.risk==='Medium'?'#fbbf24':'#f87171' }}>{b.risk}</td>
+                <td style={{ padding:'10px 4px' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:'6px' }}>
+                    <div style={{ width:'40px', height:'6px', background:'rgba(255,255,255,0.1)', borderRadius:'3px', overflow:'hidden' }}>
+                      <div style={{ width:`${b.score}%`, height:'100%', background: b.score>90?'#4ade80':b.score>80?'#fbbf24':'#f87171' }} />
+                    </div>
+                    {b.score}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
 export default function CortexPage() {
   const [input, setInput] = useState('');
   const [userName, setUserName] = useState('Admin');
@@ -208,7 +286,8 @@ export default function CortexPage() {
   ));
 
   const slashCmds = [
-    { cmd:'/analyze-risk',    label:'Multi-Agent Risk Swarm',          icon:<AlertTriangle size={14}/>,  color:'#f87171', bg:'rgba(239,68,68,0.12)',    auto:true },
+    { cmd:'/analyze-bids',    label:'Compare Vendor Bids & Export',    icon:<BarChart3 size={14}/>,      color:'#f43f5e', bg:'rgba(244,63,94,0.12)',    auto:true, hasTutorial: false },
+      { cmd:'/analyze-risk',    label:'Multi-Agent Risk Swarm',          icon:<AlertTriangle size={14}/>,  color:'#f87171', bg:'rgba(239,68,68,0.12)',    auto:true },
     { cmd:'/analyze-contract',label:'Deep Legal Clause Review (CUAD)',  icon:<Shield size={14}/>,         color:'#c084fc', bg:'rgba(168,85,247,0.12)',   auto:true },
     { cmd:'/draft-contract',  label:'Generate Legal Document',          icon:<FileText size={14}/>,       color:'#818cf8', bg:'rgba(99,102,241,0.12)',   auto:false, hasTutorial: true },
     { cmd:'/create-event',    label:'Create Sourcing Event / Auction',  icon:<Zap size={14}/>,            color:'#fb923c', bg:'rgba(249,115,22,0.12)',   auto:false },
