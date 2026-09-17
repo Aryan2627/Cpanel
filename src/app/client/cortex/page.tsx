@@ -98,7 +98,15 @@ export default function CortexPage() {
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSlash, setShowSlash] = useState(false);
-  const [historyLog, setHistoryLog] = useState(['Risk Swarm — Vendor Contract Q3','Legal Review — NDA Acme Corp','Procurement Savings Analysis']);
+  const [chats, setChats] = useState<{id: string, title: string, messages: Message[]}[]>([
+    { id: 'c1', title: 'Risk Swarm — Vendor Contract Q3', messages: [{ role: 'agent', content: 'Multi-Agent Swarm analysis completed for Vendor Contract Q3.' }] },
+    { id: 'c2', title: 'Legal Review — NDA Acme Corp', messages: [{ role: 'agent', content: 'Legal clause review completed for Acme Corp NDA.' }] },
+    { id: 'c3', title: 'Procurement Savings Analysis', messages: [{ role: 'agent', content: 'Savings analysis: Found 12% cost reduction opportunities.' }] },
+  ]);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
   const [eventForm, setEventForm] = useState({ title:'', budget:'', vendorId:'', duration:'' });
   const [vendorForm, setVendorForm] = useState({ name:'', email:'', category:'' });
   const [poForm, setPoForm] = useState({ poNumber:'', amount:'', desc:'' });
@@ -117,7 +125,12 @@ export default function CortexPage() {
     if(cmd.startsWith('/analyze-risk')) display = 'Deploy AI swarm to analyze this contract\'s risk profile.';
     if(cmd.startsWith('/analyze-contract')) display = 'Run deep legal clause analysis.';
     setMessages(p=>[...p, { role:'user', content:display }]);
-    if(messages.length===1) setHistoryLog(p=>[display.substring(0,40), ...p]);
+    const newId = 'c_' + Date.now();
+    if(messages.length===1) {
+      const title = display.substring(0, 40);
+      setChats(p=>[{ id: newId, title, messages: [] }, ...p]);
+      setActiveChatId(newId);
+    }
     setIsProcessing(true);
     try {
       const r = await fetch('/api/ai/cortex',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ prompt:cmd, userName, history:messages.slice(-5) }) });
@@ -132,7 +145,12 @@ export default function CortexPage() {
     if(!input.trim()||isProcessing) return;
     const q = input.trim(); setInput('');
     setMessages(p=>[...p,{ role:'user', content:q }]);
-    if(messages.length===1) setHistoryLog(p=>[q.substring(0,40), ...p]);
+    const newId2 = 'c_' + Date.now();
+    if(messages.length===1) {
+      const title2 = q.substring(0, 40);
+      setChats(p=>[{ id: newId2, title: title2, messages: [] }, ...p]);
+      setActiveChatId(newId2);
+    }
     setIsProcessing(true);
     try {
       const r = await fetch('/api/ai/cortex',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ prompt:q, userName, history:messages.slice(-5) }) });
@@ -173,7 +191,7 @@ export default function CortexPage() {
         @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
         .cortex-msg { animation: fadeSlideIn 0.35s ease forwards; }
         .slash-btn:hover { background: rgba(255,255,255,0.06) !important; }
-        .hist-item:hover { background: rgba(255,255,255,0.05) !important; }
+        .hist-item:hover { background: rgba(255,255,255,0.05) !important; } .hist-item:hover .dots-btn { opacity: 1 !important; }
         ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08); border-radius:4px; }
       `}</style>
       <div style={{ position:'fixed', top:'-200px', left:'30%', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', animation:'bgFloat 8s ease-in-out infinite', pointerEvents:'none', zIndex:0 }}/>
@@ -195,7 +213,7 @@ export default function CortexPage() {
               </div>
             </div>
           </div>
-          <button onClick={()=>{ setMessages([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); }} style={{ width:'100%', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#a5b4fc', transition:'all 0.2s' }}>
+          <button onClick={()=>{ setMessages([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); setActiveChatId(null); setMenuOpenId(null); }} style={{ width:'100%', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#a5b4fc', transition:'all 0.2s' }}>
             <Plus size={15}/> New Chat
           </button>
         </div>
@@ -203,11 +221,45 @@ export default function CortexPage() {
         {/* History */}
         <div style={{ flex:1, overflowY:'auto', padding:'12px 10px' }}>
           <div style={{ fontSize:'0.63rem', fontWeight:700, color:'#334155', textTransform:'uppercase', letterSpacing:'1.5px', padding:'0 8px', marginBottom:'8px' }}>Recent</div>
-          {historyLog.map((title,i)=>(
-            <div key={i} className="hist-item" style={{ padding:'9px 12px', background: i===0?'rgba(99,102,241,0.1)':'transparent', border: i===0?'1px solid rgba(99,102,241,0.2)':'1px solid transparent', borderRadius:'8px', fontSize:'0.8rem', color: i===0?'#a5b4fc':'#475569', cursor:'pointer', marginBottom:'3px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', transition:'all 0.2s' }}>
-              {title}
-            </div>
-          ))}
+          {chats.map((chat)=>{
+            const isActive = activeChatId===chat.id;
+            const menuOpen = menuOpenId===chat.id;
+            const isEditing = editingId===chat.id;
+            return (
+              <div key={chat.id} className="hist-item" style={{ padding:'9px 12px', paddingRight:'8px', background: isActive?'rgba(99,102,241,0.12)':'transparent', border: isActive?'1px solid rgba(99,102,241,0.25)':'1px solid transparent', borderRadius:'8px', fontSize:'0.8rem', cursor:'pointer', marginBottom:'3px', transition:'all 0.2s', position:'relative', display:'flex', alignItems:'center', gap:'6px' }}
+                onClick={()=>{ if(!isEditing){ setActiveChatId(chat.id); setMessages(chat.messages.length>0?chat.messages:[{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setMenuOpenId(null); } }}
+              >
+                {isEditing ? (
+                  <input
+                    autoFocus
+                    value={editTitle}
+                    onChange={e=>setEditTitle(e.target.value)}
+                    onBlur={()=>{ setChats(p=>p.map(c=>c.id===chat.id?{...c,title:editTitle}:c)); setEditingId(null); }}
+                    onKeyDown={e=>{ if(e.key==='Enter'){ setChats(p=>p.map(c=>c.id===chat.id?{...c,title:editTitle}:c)); setEditingId(null); } if(e.key==='Escape') setEditingId(null); }}
+                    onClick={e=>e.stopPropagation()}
+                    style={{ flex:1, background:'rgba(255,255,255,0.08)', border:'1px solid rgba(99,102,241,0.4)', borderRadius:'4px', padding:'2px 6px', color:'#e2e8f0', fontSize:'0.8rem', outline:'none' }}
+                  />
+                ) : (
+                  <span style={{ flex:1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', color: isActive?'#a5b4fc':'#475569' }}>{chat.title}</span>
+                )}
+                <button
+                  onClick={e=>{ e.stopPropagation(); setMenuOpenId(menuOpen?null:chat.id); }}
+                  style={{ background:'none', border:'none', color:'#475569', cursor:'pointer', padding:'2px 4px', borderRadius:'4px', flexShrink:0, opacity: isActive||menuOpen?1:0, transition:'opacity 0.2s', fontSize:'1rem', lineHeight:'1', display:'flex', alignItems:'center' }}
+                  className="dots-btn"
+                >⋯</button>
+                {menuOpen && (
+                  <div onClick={e=>e.stopPropagation()} style={{ position:'absolute', right:'4px', top:'100%', zIndex:100, background:'#0f172a', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'10px', boxShadow:'0 8px 24px rgba(0,0,0,0.5)', overflow:'hidden', minWidth:'140px', marginTop:'4px' }}>
+                    <button onClick={()=>{ setEditTitle(chat.title); setEditingId(chat.id); setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#e2e8f0', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
+                      ✏️ Rename
+                    </button>
+                    <button onClick={()=>{ setChats(p=>p.filter(c=>c.id!==chat.id)); if(activeChatId===chat.id){ setActiveChatId(null); setMessages([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); } setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#f87171', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
+                      🗑️ Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* User / Settings */}
