@@ -46,13 +46,15 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => 
               <X size={20}/> Close
             </button>
             <div style={{ overflow:'hidden', borderRadius:'10px', aspectRatio:'16/9', background:'#000', position: 'relative' }}>
-               <video controls autoPlay style={{ width:'100%', height:'100%' }}>
-                  <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-               </video>
+               <iframe 
+                  src="https://drive.google.com/file/d/1PCzvVNfOPVQzJLEk8kJFg2Y_pfnau2K2/preview" 
+                  style={{ width:'100%', height:'100%', border:'none' }}
+                  allow="autoplay"
+                  allowFullScreen
+               ></iframe>
             </div>
-            <div style={{ padding:'12px 16px', color:'#94a3b8', fontSize:'0.75rem', textAlign:'center' }}>
-              <strong>AI Video Ready:</strong> Once you generate your AI video tutorial for Cortex, simply swap the MP4 source link in <code>page.tsx</code>.
+            <div style={{ padding:'12px 16px', color:'#a5b4fc', fontSize:'0.75rem', textAlign:'center', background:'rgba(99,102,241,0.05)' }}>
+              <strong>Video Tutorial Loaded!</strong> Your AI tutorial is now fully integrated.
             </div>
           </div>
         </div>
