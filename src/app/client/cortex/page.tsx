@@ -45,7 +45,7 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => 
               <X size={20}/> Close
             </button>
             <div style={{ overflow:'hidden', borderRadius:'10px' }}>
-              <img src={viewImage} style={{ maxWidth:'100%', maxHeight:'85vh', display:'block', clipPath:'inset(0px 0px 40px 0px)', marginBottom:'-40px' }} alt="Full View" />
+              <img src={viewImage} style={{ maxWidth:'100%', maxHeight:'85vh', display:'block', clipPath:'inset(0px 0px 8% 0px)' }} alt="Full View" />
             </div>
           </div>
         </div>
