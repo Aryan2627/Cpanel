@@ -13,13 +13,13 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => 
   const [fd, setFd] = useState<any>({});
   const inp = { width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.07)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' };
   return (
-    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)' }}>
+    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(15,23,42,0.9)', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 4px 24px rgba(0,0,0,0.4)' }}>
       <div style={{ marginBottom:'14px' }}>
-        <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Document Type</label>
-        <select value={docType} onChange={e=>{ setDocType(e.target.value); setFd({}); }} style={{ ...inp, cursor:'pointer', backgroundColor:'#0f172a', color:'#e2e8f0' }}>
-          <option value="NDA" style={{ backgroundColor:'#0f172a', color:'#e2e8f0' }}>Non-Disclosure Agreement (NDA)</option>
-          <option value="SOW" style={{ backgroundColor:'#0f172a', color:'#e2e8f0' }}>Statement of Work (SOW)</option>
-          <option value="RFP" style={{ backgroundColor:'#0f172a', color:'#e2e8f0' }}>Request for Proposal (RFP)</option>
+        <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Document Type</label>
+        <select value={docType} onChange={e=>{ setDocType(e.target.value); setFd({}); }} style={{ ...inp, cursor:'pointer', backgroundColor:'#1e293b', color:'#f1f5f9', border:'1px solid rgba(99,102,241,0.3)' }}>
+          <option value="NDA" style={{ backgroundColor:'#1e293b', color:'#f1f5f9' }}>Non-Disclosure Agreement (NDA)</option>
+          <option value="SOW" style={{ backgroundColor:'#1e293b', color:'#f1f5f9' }}>Statement of Work (SOW)</option>
+          <option value="RFP" style={{ backgroundColor:'#1e293b', color:'#f1f5f9' }}>Request for Proposal (RFP)</option>
         </select>
       </div>
       {docType==='NDA' && (
@@ -346,11 +346,11 @@ export default function CortexPage() {
                   {/* Drafted Document */}
                   {msg.uiComponent==='drafted_document' && msg.uiData && (
                     <div style={{ marginTop:'14px', borderRadius:'14px', overflow:'hidden', border:'1px solid rgba(255,255,255,0.08)' }}>
-                      <div style={{ background:'rgba(255,255,255,0.04)', padding:'14px 18px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                      <div style={{ background:'rgba(15,23,42,0.9)', padding:'14px 18px', borderBottom:'1px solid rgba(99,102,241,0.2)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                         <div style={{ fontWeight:700, color:'#e2e8f0', display:'flex', alignItems:'center', gap:'8px' }}><FileText size={16} color="#818cf8"/>{msg.uiData.title}</div>
                         <button onClick={()=>{ const w=window.open('','_blank'); w?.document.write('<html><body style="font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;">'+msg.uiData.htmlContent+'</body></html>'); w?.document.close(); setTimeout(()=>w?.print(),500); }} style={{ padding:'6px 12px', background:'rgba(99,102,241,0.2)', color:'#a5b4fc', borderRadius:'6px', fontSize:'0.78rem', cursor:'pointer', border:'1px solid rgba(99,102,241,0.3)', fontWeight:600 }}>Download PDF</button>
                       </div>
-                      <div contentEditable suppressContentEditableWarning style={{ padding:'24px', maxHeight:'400px', overflowY:'auto', background:'rgba(0,0,0,0.2)', fontSize:'0.88rem', lineHeight:'1.8', color:'#cbd5e1', outline:'none' }} dangerouslySetInnerHTML={{ __html:msg.uiData.htmlContent }}/>
+                      <div contentEditable suppressContentEditableWarning style={{ padding:'24px', maxHeight:'400px', overflowY:'auto', background:'rgba(15,23,42,0.95)', fontSize:'0.9rem', lineHeight:'1.9', color:'#e2e8f0', outline:'none', minHeight:'200px' }} dangerouslySetInnerHTML={{ __html:msg.uiData.htmlContent }}/>
                     </div>
                   )}
 
