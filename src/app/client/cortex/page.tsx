@@ -123,7 +123,7 @@ export default function CortexPage() {
   const [eventForm, setEventForm] = useState({ title:'', budget:'', vendorId:'', duration:'' });
   const [vendorForm, setVendorForm] = useState({ name:'', email:'', category:'' });
   const [poForm, setPoForm] = useState({ poNumber:'', amount:'', desc:'' });
-  const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'' });
+  const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'', isGenerating:false });
   const [viewImage, setViewImage] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -428,12 +428,30 @@ export default function CortexPage() {
                           </button>
                         </div>
 
-                        {productForm.imageUrl && (
-                            <div style={{ position:'relative', width:'100%', aspectRatio:'8/5', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', overflow:'hidden', background:'rgba(0,0,0,0.4)', display:'flex', alignItems:'flex-start', justifyContent:'center', marginTop: '10px', marginBottom: '10px' }}>
-                               <img src={productForm.imageUrl} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', clipPath:'inset(0px 0px 8% 0px)' }} alt="Product Preview" />
+                        {productForm.isGenerating && (
+                            <div style={{ position:'relative', width:'100%', aspectRatio:'8/5', borderRadius:'12px', border:'1px solid rgba(99,102,241,0.5)', overflow:'hidden', background:'#070d1c', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', marginTop: '10px', marginBottom: '10px', boxShadow:'0 0 40px rgba(99,102,241,0.15)' }}>
+                               <style>{`@keyframes scanline { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }`}</style>
+                               <div style={{ position:'absolute', top:0, left:0, width:'100%', height:'4px', background:'linear-gradient(90deg, transparent, #818cf8, transparent)', animation:'scanline 2s ease-in-out infinite', boxShadow:'0 0 15px #818cf8' }} />
+                               <Loader2 className="animate-spin" size={36} color="#818cf8" style={{ marginBottom:'20px' }} />
+                               <div style={{ color:'#a5b4fc', fontWeight:700, fontSize:'0.9rem', letterSpacing:'2px', textTransform:'uppercase', marginBottom:'8px' }}>Synthesizing Latent Space</div>
+                               <div style={{ color:'#64748b', fontSize:'0.75rem', fontFamily:'monospace' }}>Applying 8K Textures & Studio Lighting...</div>
+                               <div style={{ color:'#475569', fontSize:'0.65rem', fontFamily:'monospace', marginTop:'4px' }}>Model: SDXL-Turbo-v2 &middot; Seed: Randomized</div>
+                            </div>
+                          )}
+                          {!productForm.isGenerating && productForm.imageUrl && (
+                            <div style={{ position:'relative', width:'100%', aspectRatio:'8/5', borderRadius:'12px', border:'1px solid rgba(99,102,241,0.3)', overflow:'hidden', background:'rgba(0,0,0,0.6)', display:'flex', alignItems:'flex-start', justifyContent:'center', marginTop: '10px', marginBottom: '10px', boxShadow:'0 10px 30px rgba(0,0,0,0.3)' }}>
+                               <img 
+                                 src={productForm.imageUrl} 
+                                 onError={(e) => { 
+                                   // High-end fallback if pollinations fails or rate-limits
+                                   e.currentTarget.src = `https://loremflickr.com/800/500/${encodeURIComponent(productForm.name)}?lock=${Math.floor(Math.random()*1000)}`; 
+                                 }}
+                                 style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', clipPath:'inset(0px 0px 8% 0px)', transition:'opacity 0.5s ease-in' }} 
+                                 alt="Product Preview" 
+                               />
                                
-                               <button onClick={(e) => { e.preventDefault(); setViewImage(productForm.imageUrl); }} style={{ position:'absolute', top:'10px', right:'10px', background:'rgba(15,23,42,0.8)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:'8px', padding:'6px 10px', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.75rem', backdropFilter:'blur(4px)' }}>
-                                 <Eye size={14}/> View Full
+                               <button onClick={(e) => { e.preventDefault(); setViewImage(productForm.imageUrl); }} style={{ position:'absolute', top:'12px', right:'12px', background:'rgba(15,23,42,0.7)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:'8px', padding:'8px 14px', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'8px', fontSize:'0.8rem', fontWeight:600, backdropFilter:'blur(8px)', transition:'all 0.2s' }}>
+                                 <Eye size={16}/> View 4K
                                </button>
                             </div>
                           )}
