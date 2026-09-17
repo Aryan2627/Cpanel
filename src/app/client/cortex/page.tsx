@@ -164,7 +164,7 @@ export default function CortexPage() {
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
-  const [eventForm, setEventForm] = useState({ title:'', budget:'', vendorId:'', duration:'' });
+  const [eventForm, setEventForm] = useState({ title:'', budget:'', vendorId:'', duration:'', durationUnit:'days' });
   const [vendorForm, setVendorForm] = useState({ name:'', email:'', category:'' });
   const [poForm, setPoForm] = useState({ poNumber:'', amount:'', desc:'' });
   const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'', isGenerating:false });
@@ -494,16 +494,22 @@ export default function CortexPage() {
 
                   {/* Event Form */}
                   {msg.uiComponent==='event_creation_form' && (
-                    <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
-                      <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Create Sourcing Event</div>
-                      <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-                        {[{ p:'Event Title', k:'title' },{ p:'Budget ($)', k:'budget' },{ p:'Duration (Days)', k:'duration' }].map(f=>(
-                          <input key={f.k} type="text" placeholder={f.p} value={(eventForm as any)[f.k]} onChange={e=>setEventForm({...eventForm, [f.k]:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                        ))}
-                        <button onClick={()=>execute('/execute-create-event '+JSON.stringify(eventForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#ea580c,#c2410c)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Publish Event</button>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Create Sourcing Event</div>
+                        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+                          <input type="text" placeholder="Event Title" value={eventForm.title} onChange={e=>setEventForm({...eventForm, title:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <input type="text" placeholder="Budget ($)" value={eventForm.budget} onChange={e=>setEventForm({...eventForm, budget:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <div style={{ display:'flex', gap:'10px' }}>
+                            <input type="text" placeholder="Duration" value={eventForm.duration} onChange={e=>setEventForm({...eventForm, duration:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                            <select value={eventForm.durationUnit} onChange={e=>setEventForm({...eventForm, durationUnit:e.target.value})} style={{ width:'120px', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', cursor:'pointer' }}>
+                              <option value="minutes" style={{ background:'#0f172a' }}>Minutes</option>
+                              <option value="days" style={{ background:'#0f172a' }}>Days</option>
+                            </select>
+                          </div>
+                          <button onClick={()=>execute('/execute-create-event '+JSON.stringify(eventForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#ea580c,#c2410c)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Publish Event</button>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {/* Vendor Form */}
                   {msg.uiComponent==='vendor_creation_form' && (

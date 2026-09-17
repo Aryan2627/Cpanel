@@ -486,7 +486,7 @@ export async function POST(req: Request) {
             type: data.type || 'RFQ',
             itemsCount: parseInt(data.quantity) || 1,
             baseCurrency: 'USD',
-            endTime: new Date(Date.now() + (parseInt(data.duration) || 7) * 24 * 60 * 60 * 1000),
+            endTime: new Date(Date.now() + (parseInt(data.duration) || 7) * (data.durationUnit === 'minutes' ? 60 * 1000 : 24 * 60 * 60 * 1000)),
             status: 'Draft',
           }
         });
