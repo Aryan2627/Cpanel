@@ -420,7 +420,7 @@ export async function POST(req: Request) {
         final_response: "I can help you evaluate the vendor proposals. Please select the sourcing event you'd like to analyze.",
         ui_component: 'bid_analyzer_form',
         ui_data: {},
-        thought_process: "User requested bid analysis. Prompting for event selection."
+        thought_process: ["User requested bid analysis. Prompting for event selection."]
       });
     }
 
