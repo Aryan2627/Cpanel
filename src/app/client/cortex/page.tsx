@@ -1,3 +1,48 @@
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import {
+  BrainCircuit, X, Zap, Loader2, Database, Send, Terminal,
+  CheckCircle2, AlertTriangle, CheckCircle, FileText, Settings, Eye,
+  Plus, Sparkles, Shield, ChevronRight, BarChart3, Bot
+, Sun, Moon } from 'lucide-react';
+
+/* ───────────────────────── Utility sub-components ───────────────────────── */
+
+const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => {
+  const [docType, setDocType] = useState('NDA');
+  const [fd, setFd] = useState<any>({});
+  const inp = { width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.07)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' };
+  return (
+    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(15,23,42,0.9)', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 4px 24px rgba(0,0,0,0.4)' }}>
+      <div style={{ marginBottom:'14px' }}>
+        <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Document Type</label>
+        <select value={docType} onChange={e=>{ setDocType(e.target.value); setFd({}); }} style={{ ...inp, cursor:'pointer', backgroundColor:'#1e293b', color:'#f1f5f9', border:'1px solid rgba(99,102,241,0.3)' }}>
+          <option value="NDA" style={{ backgroundColor:'#1e293b', color:'#f1f5f9' }}>Non-Disclosure Agreement (NDA)</option>
+          <option value="SOW" style={{ backgroundColor:'#1e293b', color:'#f1f5f9' }}>Statement of Work (SOW)</option>
+          <option value="RFP" style={{ backgroundColor:'#1e293b', color:'#f1f5f9' }}>Request for Proposal (RFP)</option>
+        </select>
+      </div>
+      {docType==='NDA' && (
+        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+          <input type="text" placeholder="Counterparty Name" onChange={e=>setFd({...fd, partyName:e.target.value})} style={inp}/>
+          <input type="text" placeholder="Governing Law State" onChange={e=>setFd({...fd, state:e.target.value})} style={inp}/>
+        </div>
+      )}
+      {docType==='SOW' && (
+        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+          <input type="text" placeholder="Project Name" onChange={e=>setFd({...fd, projectName:e.target.value})} style={inp}/>
+          <input type="number" placeholder="Total Compensation ($)" onChange={e=>setFd({...fd, amount:e.target.value})} style={inp}/>
+        </div>
+      )}
+      <button onClick={()=>onSubmit({ type:docType, ...fd })} style={{ width:'100%', marginTop:'16px', padding:'11px', background:'linear-gradient(135deg,#7c3aed,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px', fontSize:'0.85rem' }}>
+        <Zap size={15}/> Generate Document
+      </button>
+      
+      
+    </div>
+  );
+};
+
 const AgentSwarm = ({ data }: { data: any }) => {
   const [step, setStep] = useState(0);
   useEffect(() => {
@@ -97,132 +142,6 @@ const AgentSwarm = ({ data }: { data: any }) => {
             </div>
           </div>
         )}
-      </div>
-    </div>
-  );
-};
-const AgentSwarm = ({ data }: { data: any }) => {
-  const [step, setStep] = useState(0);
-  useEffect(() => {
-    const ts = [setTimeout(()=>setStep(1),1400), setTimeout(()=>setStep(2),2800), setTimeout(()=>setStep(3),4200), setTimeout(()=>setStep(4),5000)];
-    return () => ts.forEach(clearTimeout);
-  }, []);
-  return (
-    <div style={{ background:'linear-gradient(135deg,rgba(15,23,42,0.95),rgba(30,41,59,0.9))', border:'1px solid rgba(99,102,241,0.3)', borderRadius:'16px', overflow:'hidden', width:'100%', backdropFilter:'blur(20px)' }}>
-      <div style={{ padding:'16px 20px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', alignItems:'center', gap:'12px' }}>
-        <div style={{ background:'linear-gradient(135deg,#6366f1,#8b5cf6)', padding:'8px', borderRadius:'10px', display:'flex' }}><Sparkles size={16} color="#fff"/></div>
-        <div>
-          <div style={{ fontSize:'0.65rem', fontWeight:700, color:'#6366f1', textTransform:'uppercase', letterSpacing:'2px' }}>Multi-Agent Swarm</div>
-          <div style={{ fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9', marginTop:'1px' }}>{data.target}</div>
-        </div>
-      </div>
-      <div style={{ padding:'16px', display:'flex', flexDirection:'column', gap:'10px' }}>
-        {data.agents.map((agent: any, i: number) => {
-          const active = step===i, done = step>i;
-          return (
-            <div key={agent.id} style={{ display:'flex', gap:'12px', alignItems:'flex-start', padding:'12px', background: done?'rgba(16,185,129,0.06)':active?'rgba(99,102,241,0.08)':'rgba(255,255,255,0.02)', border:'1px solid', borderColor: done?'rgba(16,185,129,0.2)':active?'rgba(99,102,241,0.3)':'rgba(255,255,255,0.05)', borderRadius:'10px', transition:'all 0.4s' }}>
-              <div style={{ width:'28px', height:'28px', borderRadius:'50%', background: done?'linear-gradient(135deg,#10b981,#059669)':active?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                {done ? <CheckCircle size={14} color="#fff"/> : active ? <Loader2 size={14} color="#fff" className="animate-spin"/> : <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#475569'}}/>}
-              </div>
-              <div style={{ flex:1 }}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                  <div style={{ fontSize:'0.85rem', fontWeight:700, color:'#e2e8f0' }}>{agent.name}</div>
-                  <div style={{ fontSize:'0.65rem', fontWeight:700, color: done?'#10b981':active?'#818cf8':'#475569', background: done?'rgba(16,185,129,0.1)':active?'rgba(99,102,241,0.15)':'rgba(255,255,255,0.05)', padding:'2px 8px', borderRadius:'20px' }}>{agent.role}</div>
-                </div>
-                {active && <div style={{ fontSize:'0.78rem', color:'#818cf8', marginTop:'5px' }}>Scanning data streams...</div>}
-                {done && <div style={{ fontSize:'0.78rem', color:'#94a3b8', marginTop:'5px', paddingLeft:'8px', borderLeft:'2px solid rgba(16,185,129,0.4)' }}>{agent.finding}</div>}
-              </div>
-            </div>
-          );
-        })}
-        {step>=4 && (
-          <div style={{ padding:'14px', background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:'10px', display:'flex', gap:'12px', alignItems:'center' }}>
-            <AlertTriangle size={18} color="#f87171"/>
-            <div style={{ fontSize:'0.83rem', fontWeight:600, color:'#fca5a5' }}>{data.summary}</div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-/* ─────────────────────────── Main Page ──────────────────────────── */
-
-type Message = { role:'user'|'agent'; content:string; uiComponent?:string; uiData?:any; thoughtProcess?:string[] };
-
-
-const BidAnalyzerForm = ({ onSubmit }: { onSubmit: (e: string) => void }) => {
-  const [evt, setEvt] = useState('EVT-992: Q4 Enterprise Laptops');
-  return (
-    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(15,23,42,0.9)', border:'1px solid rgba(244,63,94,0.3)', boxShadow:'0 4px 24px rgba(0,0,0,0.4)' }}>
-      <div style={{ marginBottom:'14px' }}>
-        <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Select Sourcing Event</label>
-        <select value={evt} onChange={e=>setEvt(e.target.value)} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.07)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', cursor:'pointer' }}>
-          <option value="EVT-992: Q4 Enterprise Laptops">EVT-992: Q4 Enterprise Laptops</option>
-          <option value="EVT-993: Cloud Hosting Renewal">EVT-993: Cloud Hosting Renewal</option>
-          <option value="EVT-994: Office Furniture">EVT-994: Office Furniture</option>
-        </select>
-      </div>
-      <button onClick={()=>onSubmit(`Analyze bids for ${evt}`)} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#f43f5e,#e11d48)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px', fontSize:'0.85rem' }}>
-        <BarChart3 size={15}/> Evaluate Proposals
-      </button>
-    </div>
-  );
-};
-
-const BidMatrix = ({ data }: { data: any }) => {
-  const downloadCSV = () => {
-    const headers = ["Vendor", "Price ($)", "Timeline", "Risk", "Compliance", "Overall Score"];
-    const rows = data.bids.map((b:any) => [b.vendor, b.price, b.timeline, b.risk, b.compliance, b.score]);
-    const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `${data.eventName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_bid_analysis.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-  
-  return (
-    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(15,23,42,0.9)', border:'1px solid rgba(244,63,94,0.3)', boxShadow:'0 4px 24px rgba(0,0,0,0.4)' }}>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'16px' }}>
-        <div style={{ fontSize:'0.9rem', fontWeight:700, color:'#e2e8f0' }}>Bid Analysis: {data.eventName}</div>
-        <button onClick={downloadCSV} style={{ padding:'6px 12px', background:'rgba(244,63,94,0.15)', border:'1px solid rgba(244,63,94,0.4)', color:'#fba9bc', borderRadius:'6px', fontSize:'0.75rem', fontWeight:600, cursor:'pointer', display:'flex', alignItems:'center', gap:'6px' }}>
-          <Database size={13}/> Download CSV
-        </button>
-      </div>
-      <div style={{ overflowX:'auto' }}>
-        <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'0.8rem', color:'#cbd5e1' }}>
-          <thead>
-            <tr style={{ borderBottom:'1px solid rgba(255,255,255,0.1)', color:'#94a3b8', textAlign:'left' }}>
-              <th style={{ padding:'8px 4px' }}>Vendor</th>
-              <th style={{ padding:'8px 4px' }}>Price</th>
-              <th style={{ padding:'8px 4px' }}>Timeline</th>
-              <th style={{ padding:'8px 4px' }}>Risk</th>
-              <th style={{ padding:'8px 4px' }}>Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.bids.map((b:any, i:number) => (
-              <tr key={i} style={{ borderBottom:'1px solid rgba(255,255,255,0.05)', background: i===0 ? 'rgba(34,197,94,0.05)' : 'transparent' }}>
-                <td style={{ padding:'10px 4px', fontWeight: i===0?700:400, color: i===0?'#4ade80':'#cbd5e1' }}>{b.vendor} {i===0 && '🏆'}</td>
-                <td style={{ padding:'10px 4px' }}>${b.price.toLocaleString()}</td>
-                <td style={{ padding:'10px 4px' }}>{b.timeline}</td>
-                <td style={{ padding:'10px 4px', color: b.risk==='Low'?'#4ade80':b.risk==='Medium'?'#fbbf24':'#f87171' }}>{b.risk}</td>
-                <td style={{ padding:'10px 4px' }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:'6px' }}>
-                    <div style={{ width:'40px', height:'6px', background:'rgba(255,255,255,0.1)', borderRadius:'3px', overflow:'hidden' }}>
-                      <div style={{ width:`${b.score}%`, height:'100%', background: b.score>90?'#4ade80':b.score>80?'#fbbf24':'#f87171' }} />
-                    </div>
-                    {b.score}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   );

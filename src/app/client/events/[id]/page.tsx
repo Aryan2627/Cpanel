@@ -114,7 +114,7 @@ export default function BuyerEventDetailsPage() {
                  expr = expr.replace(new RegExp(`\\b${vName}\\b`, 'g'), v.toString());
                }
              });
-             // eslint-disable-next-line no-new-func
+              
              const result = new Function('return ' + expr)();
              initData[f.key] = (Number(result) || 0).toString();
            } catch(e) {}
@@ -145,7 +145,7 @@ export default function BuyerEventDetailsPage() {
                  expr = expr.replace(new RegExp(`\\b${vName}\\b`, 'g'), v.toString());
                }
              });
-             // eslint-disable-next-line no-new-func
+              
              const result = new Function('return ' + expr)();
              next[f.key] = (Number(result) || 0).toString();
            } catch(e) {}
@@ -577,7 +577,7 @@ export default function BuyerEventDetailsPage() {
     if (showGhostBidding && processed.length > 0) {
       // Calculate realistic ghost bid values (e.g. 5% better than the best minimums)
       const ghostData: any = {};
-      let ghostUsdAmount = 0;
+      const ghostUsdAmount = 0;
       
       templateFields.forEach((f: any) => {
         if (minVals[f.key]) {
@@ -599,7 +599,7 @@ export default function BuyerEventDetailsPage() {
       score = totalWeight > 0 ? (score / totalWeight) * 100 : 0;
       // Approximate ghost base amount from the lowest human bid * 0.95
       const lowestHumanAmount = Math.min(...processed.map(b => b.baseAmount));
-      let ghostBaseAmount = lowestHumanAmount * 0.95;
+      const ghostBaseAmount = lowestHumanAmount * 0.95;
 
       processed.unshift({
         id: 'ai-ghost-bid',
