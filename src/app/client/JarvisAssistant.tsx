@@ -151,6 +151,12 @@ export default function JarvisAssistant() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true);
+    window.addEventListener('open-cortex', handleOpen);
+    return () => window.removeEventListener('open-cortex', handleOpen);
+  }, []);
+
   // Fetch user info on mount to customize responses
   useEffect(() => {
     fetch('/api/auth/me')
@@ -258,33 +264,27 @@ export default function JarvisAssistant() {
 
   return (
     <>
-      {/* Floating Trigger */}
-      <div 
-        onClick={() => setIsOpen(!isOpen)}
-        style={{
-          position: 'fixed', bottom: '30px', right: '30px',
-          width: '64px', height: '64px',
-          background: 'linear-gradient(135deg, #0f172a 0%, #3b82f6 100%)',
-          borderRadius: '50%',
-          boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 8px 10px -6px rgba(59, 130, 246, 0.5)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', zIndex: 999999,
-          boxShadow: '0 10px 25px rgba(0,0,0,0.3), inset 0 0 0 2px #38bdf8',
-          transition: 'transform 0.2s, box-shadow 0.2s',
-          transform: isOpen ? 'scale(0.9)' : 'scale(1)'
-        }}
-      >
-        <BrainCircuit color="#38bdf8" size={32} />
-      </div>
-
-      {/* Cortex Panel */}
-      <div style={{
-        position: 'fixed',
-        bottom: isOpen ? '110px' : '-800px',
-        right: '30px',
-        width: '400px',
-        height: '600px',
-        backgroundColor: '#f8fafc',
+      {/* Hidden Floating Trigger (Replaced by NavBar) */}
+        {/* Cortex Panel - Fullscreen Modal */}
+      <style>{`
+          @keyframes modalEnter {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+          }
+        `}</style>
+        {isOpen && <div onClick={() => setIsOpen(false)} style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)', zIndex: 999998}} />}
+        <div style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: isOpen ? 'translate(-50%, -50%) scale(1)' : 'translate(-50%, -50%) scale(0.95)',
+          opacity: isOpen ? 1 : 0,
+          pointerEvents: isOpen ? 'auto' : 'none',
+          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          width: '800px',
+          maxWidth: '90vw',
+          height: '80vh',
+          backgroundColor: '#f8fafc',
         borderRadius: '16px',
         border: '1px solid #e2e8f0',
         boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',

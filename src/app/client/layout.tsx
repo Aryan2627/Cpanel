@@ -220,6 +220,23 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              
+              <button 
+                onClick={() => window.dispatchEvent(new CustomEvent('open-cortex'))}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                  border: 'none', borderRadius: '24px',
+                  padding: '6px 14px', color: '#fff', fontSize: '0.8rem', fontWeight: 600,
+                  cursor: 'pointer', boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)',
+                  transition: 'transform 0.2s',
+                }}
+                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <Bot size={14} /> Cortex AI
+              </button>
+
               <div style={{ position: 'relative', cursor: 'pointer' }}>
                 <Bell size={20} color="rgba(255,255,255,0.7)" />
                 <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', border: '2px solid #071330' }} />
