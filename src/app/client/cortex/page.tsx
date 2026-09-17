@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   BrainCircuit, X, Zap, Loader2, Database, Send, Terminal,
-  CheckCircle2, AlertTriangle, CheckCircle, FileText, Settings,
+  CheckCircle2, AlertTriangle, CheckCircle, FileText, Settings, Eye,
   Plus, Sparkles, Shield, ChevronRight, BarChart3, Bot
 } from 'lucide-react';
 
@@ -37,6 +37,19 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => 
       <button onClick={()=>onSubmit({ type:docType, ...fd })} style={{ width:'100%', marginTop:'16px', padding:'11px', background:'linear-gradient(135deg,#7c3aed,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px', fontSize:'0.85rem' }}>
         <Zap size={15}/> Generate Document
       </button>
+      {/* Image Viewer Modal */}
+      {viewImage && (
+        <div style={{ position:'fixed', top:0, left:0, width:'100vw', height:'100vh', background:'rgba(0,0,0,0.85)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(10px)' }}>
+          <div style={{ position:'relative', maxWidth:'90vw', maxHeight:'90vh', background:'#070d1c', padding:'8px', borderRadius:'16px', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <button onClick={()=>setViewImage(null)} style={{ position:'absolute', top:'-40px', right:0, background:'transparent', border:'none', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.9rem', fontWeight:600 }}>
+              <X size={20}/> Close
+            </button>
+            <div style={{ overflow:'hidden', borderRadius:'10px' }}>
+              <img src={viewImage} style={{ maxWidth:'100%', maxHeight:'85vh', display:'block', clipPath:'inset(0px 0px 40px 0px)', marginBottom:'-40px' }} alt="Full View" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -111,6 +124,7 @@ export default function CortexPage() {
   const [vendorForm, setVendorForm] = useState({ name:'', email:'', category:'' });
   const [poForm, setPoForm] = useState({ poNumber:'', amount:'', desc:'' });
   const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'' });
+  const [viewImage, setViewImage] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -415,8 +429,11 @@ export default function CortexPage() {
                         </div>
 
                         {productForm.imageUrl && (
-                          <div style={{ position:'relative', width:'100%', height:'200px', overflow:'hidden', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)' }}>
-                             <img src={productForm.imageUrl} style={{ width:'100%', height:'240px', objectFit:'cover', objectPosition:'top' }} alt="Product Preview" />
+                          <div style={{ position:'relative', width:'100%', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', overflow:'hidden', background:'rgba(0,0,0,0.2)' }}>
+                             <img src={productForm.imageUrl} style={{ width:'100%', height:'auto', display:'block', clipPath:'inset(0px 0px 40px 0px)', marginBottom:'-40px' }} alt="Product Preview" />
+                             <button onClick={() => setViewImage(productForm.imageUrl)} style={{ position:'absolute', top:'10px', right:'10px', background:'rgba(15,23,42,0.8)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:'8px', padding:'6px 10px', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.75rem', backdropFilter:'blur(4px)' }}>
+                               <Eye size={14}/> View Full
+                             </button>
                           </div>
                         )}
 
