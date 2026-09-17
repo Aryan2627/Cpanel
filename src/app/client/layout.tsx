@@ -206,17 +206,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-            {/* Global Spotlight Search Trigger */}
-            <div 
-              style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '8px', cursor: 'text', border: '1px solid rgba(255,255,255,0.1)' }}
-              onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
-            >
-              <Search size={14} color="rgba(255,255,255,0.5)" />
-              <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', fontWeight: 500, width: '150px' }}>Search...</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', fontWeight: 700 }}>
-                <span>⌘K</span>
-              </div>
-            </div>
+            
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               
