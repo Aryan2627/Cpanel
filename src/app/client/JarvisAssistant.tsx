@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { BrainCircuit, X, Zap, Loader2, Database, Send, Terminal, CheckCircle2 } from 'lucide-react';
+import { BrainCircuit, X, Zap, Loader2, Database, Send, Terminal, CheckCircle2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface ToolCall {
