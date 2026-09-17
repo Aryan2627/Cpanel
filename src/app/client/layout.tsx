@@ -59,7 +59,7 @@ const TOP_MENUS = [
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<{ name: string; email: string; companyName?: string; licenseStatus?: string; licensePlan?: string; organizationId?: string; isImpersonating?: boolean } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ name: string; email: string; companyName?: string; licenseStatus?: string; licensePlan?: string; organizationId?: string; features?: string | null; isImpersonating?: boolean } | null>(null);
 
   // Track which dropdown is open
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
@@ -210,7 +210,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               
-              <Link 
+              {(currentUser?.features ? (() => { try { return JSON.parse(currentUser.features).cortex_ai; } catch { return false; } })() : false) && (
+<Link 
                 href="/client/cortex"
                 style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
@@ -224,6 +225,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               >
                 <Bot size={14} /> Cortex AI
               </Link>
+              )}
 
               <div style={{ position: 'relative', cursor: 'pointer' }}>
                 <Bell size={20} color="rgba(255,255,255,0.7)" />
