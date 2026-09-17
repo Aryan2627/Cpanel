@@ -489,6 +489,22 @@ export async function POST(req: Request) {
     }
 
     // --- SLASH COMMAND EXECUTION: /execute-add-product ---
+    if (text.startsWith('/analyze-risk') || text.includes('swarm')) {
+      return NextResponse.json({
+        final_response: "Deploying specialized sub-agents to analyze this request...",
+        ui_component: 'agent_swarm',
+        ui_data: {
+          target: "Global Vendor Risk & Contract Analysis",
+          agents: [
+            { id: 'legal', name: 'Legal AI', role: 'Clause Analysis', finding: 'Found auto-renewal trap in Section 4.2.' },
+            { id: 'finance', name: 'Finance AI', role: 'Cost Benchmarking', finding: 'Pricing is 12% above market average.' },
+            { id: 'risk', name: 'Compliance AI', role: 'Supply Chain Monitoring', finding: 'Detected factory strikes in supplier region.' }
+          ],
+          summary: "Recommendation: DO NOT SIGN. Renegotiate pricing and strike the auto-renewal clause before proceeding."
+        }
+      });
+    }
+
     if (text.startsWith('/execute-add-product')) {
         try {
           const data = JSON.parse(text.replace('/execute-add-product', '').trim());
@@ -504,7 +520,7 @@ export async function POST(req: Request) {
             }
           });
           return NextResponse.json({ final_response: `Product **${newProduct.name}** added to catalog.`, ui_component: 'product_list', ui_data: [newProduct] });
-        } catch(e) { return NextResponse.json({ final_response: "Error adding product." }); }
+        } catch(e) { console.error("PRODUCT ERROR:", e); return NextResponse.json({ final_response: "Error adding product: " + e.message }); }
       }
 
       // --- CONTEXTUAL MEMORY / AFFIRMATION ACTIONS ---

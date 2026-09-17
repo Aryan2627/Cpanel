@@ -80,6 +80,58 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (data: any) => void }) 
   );
 };
 
+
+const AgentSwarm = ({ data }: { data: any }) => {
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setStep(1), 1500); // Legal finishes
+    const t2 = setTimeout(() => setStep(2), 3000); // Finance finishes
+    const t3 = setTimeout(() => setStep(3), 4500); // Risk finishes
+    const t4 = setTimeout(() => setStep(4), 5200); // Summary shows
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+  }, []);
+
+  return (
+    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden', width: '100%', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+      <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)', padding: '16px', color: '#fff' }}>
+        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>Multi-Agent Swarm</div>
+        <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>{data.target}</div>
+      </div>
+      
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {data.agents.map((agent: any, index: number) => {
+          const isProcessing = step === index;
+          const isDone = step > index;
+          
+          return (
+            <div key={agent.id} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '12px', background: isDone ? '#f8fafc' : '#ffffff', border: '1px solid', borderColor: isDone ? '#e2e8f0' : (isProcessing ? '#3b82f6' : '#f1f5f9'), borderRadius: '8px', transition: 'all 0.3s' }}>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: isDone ? '#10b981' : (isProcessing ? '#3b82f6' : '#cbd5e1'), display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+                {isDone ? <CheckCircle size={14} /> : (isProcessing ? <Loader2 size={14} className="animate-spin" /> : <div style={{width: '6px', height: '6px', borderRadius: '50%', background: '#fff'}} />)}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>{agent.name}</div>
+                  <div style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{agent.role}</div>
+                </div>
+                {isProcessing && <div style={{ fontSize: '0.8rem', color: '#3b82f6', marginTop: '4px', animation: 'pulse 2s infinite' }}>Analyzing data...</div>}
+                {isDone && <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '4px', borderLeft: '2px solid #cbd5e1', paddingLeft: '8px' }}>{agent.finding}</div>}
+              </div>
+            </div>
+          );
+        })}
+
+        {step >= 4 && (
+          <div style={{ marginTop: '8px', padding: '12px', background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '8px', display: 'flex', gap: '12px', alignItems: 'center', animation: 'fadeIn 0.5s ease' }}>
+            <AlertTriangle size={20} color="#e11d48" style={{ flexShrink: 0 }} />
+            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#9f1239' }}>{data.summary}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export default function JarvisAssistant() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -151,6 +203,7 @@ export default function JarvisAssistant() {
     if (command.startsWith('/execute-draft-po')) displayMessage = "Draft this purchase order.";
     if (command.startsWith('/execute-add-product')) displayMessage = "Add this product to the catalog.";
     if (command.startsWith('/execute-draft-document')) displayMessage = "Generate this document for me.";
+      if (command.startsWith('/analyze-risk')) displayMessage = "Deploy an AI swarm to analyze this contract's risk profile.";
     
     setMessages(prev => [...prev, { role: 'user', content: displayMessage }]);
 
@@ -378,7 +431,13 @@ export default function JarvisAssistant() {
 
                 
                 
-                {msg.uiComponent === 'document_generator_form' && (
+                {msg.uiComponent === 'agent_swarm' && msg.uiData && (
+                    <div style={{ marginTop: '12px', width: '100%' }}>
+                      <AgentSwarm data={msg.uiData} />
+                    </div>
+                  )}
+
+                  {msg.uiComponent === 'document_generator_form' && (
                   <DocumentGeneratorForm onSubmit={(data) => executeCommand('/execute-draft-document ' + JSON.stringify(data))} />
                 )}
 
