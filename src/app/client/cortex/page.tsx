@@ -336,7 +336,7 @@ export default function CortexPage() {
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef} />
+            <div ref={messagesEndRef} style={{ height: '180px', flexShrink: 0 }} />
           </div>
         </div>
 
