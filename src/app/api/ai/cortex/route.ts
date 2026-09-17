@@ -415,8 +415,31 @@ export async function POST(req: Request) {
       });
     }
 
-    if (text.trim().toLowerCase() === '/analyze-bids') {
-      return NextResponse.json({ final_response: "🧠 **AI Bid Analysis Complete:**\nI analyzed 14 bids across your 3 active auctions. I strongly recommend awarding the 'IT Hardware' contract to **TechCorp**. Their bid of $45,000 is 12% lower than the historical average, and their vendor compliance score is 98%." });
+        if (text.trim().toLowerCase() === '/analyze-bids') {
+      return NextResponse.json({
+        final_response: "I can help you evaluate the vendor proposals. Please select the sourcing event you'd like to analyze.",
+        ui_component: 'bid_analyzer_form',
+        ui_data: {},
+        thought_process: "User requested bid analysis. Prompting for event selection."
+      });
+    }
+
+    if (text.trim().toLowerCase().startsWith('analyze bids for')) {
+      const eventName = text.replace(/Analyze bids for/i, '').trim();
+      return NextResponse.json({
+        final_response: `I've analyzed the proposals for **${eventName}**. I evaluated pricing, delivery timelines, compliance, and risk factors using our multi-agent scoring model. Here is the comparative matrix.`,
+        ui_component: 'bid_matrix',
+        ui_data: {
+          eventName,
+          bids: [
+            { vendor: "Dell Technologies", price: 45000, timeline: "2 Weeks", score: 94, risk: "Low", compliance: "Pass" },
+            { vendor: "Lenovo B2B", price: 41500, timeline: "5 Weeks", score: 85, risk: "Medium", compliance: "Pass" },
+            { vendor: "HP Enterprise", price: 48000, timeline: "1 Week", score: 97, risk: "Low", compliance: "Pass" },
+            { vendor: "Asus Commercial", price: 39000, timeline: "8 Weeks", score: 72, risk: "High", compliance: "Fail" }
+          ].sort((a, b) => b.score - a.score)
+        },
+        thought_process: ["Simulating multi-agent swarm evaluation of 4 vendor proposals.", "Calculating weighted scores based on cost and timeline."]
+      });
     }
 
     if (text.trim().toLowerCase() === '/find-savings') {
