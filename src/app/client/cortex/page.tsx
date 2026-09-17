@@ -467,6 +467,25 @@ export default function CortexPage() {
                       ))}
                     </div>
                   )}
+
+                  {/* AI Generated Image */}
+                  {msg.uiComponent==='generated_image' && msg.uiData && (
+                    <div style={{ marginTop:'14px', borderRadius:'14px', overflow:'hidden', border:'1px solid rgba(99,102,241,0.3)', background:'rgba(15,23,42,0.9)', boxShadow:'0 8px 30px rgba(0,0,0,0.4)' }}>
+                      <div style={{ padding:'14px 18px', borderBottom:'1px solid rgba(99,102,241,0.2)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                        <div style={{ display:'flex', alignItems:'center', gap:'8px', fontWeight:700, color:'#e2e8f0', fontSize:'0.85rem' }}>
+                          <Sparkles size={16} color="#818cf8"/> AI Generation Complete
+                        </div>
+                        <button onClick={()=>{ const a = document.createElement('a'); a.href = msg.uiData.url; a.download = 'cortex-generation.jpg'; a.target = '_blank'; a.click(); }} style={{ padding:'6px 12px', background:'rgba(99,102,241,0.2)', color:'#a5b4fc', borderRadius:'6px', fontSize:'0.75rem', cursor:'pointer', border:'1px solid rgba(99,102,241,0.3)', fontWeight:600 }}>Open Image</button>
+                      </div>
+                      <div style={{ position:'relative', width:'100%', minHeight:'300px', background:'rgba(0,0,0,0.5)', display:'flex', justifyContent:'center', alignItems:'center' }}>
+                        {/* The image takes time to load from pollinations, so we show it directly. It streams down. */}
+                        <img src={msg.uiData.url} alt={msg.uiData.prompt} style={{ width:'100%', height:'auto', display:'block' }} />
+                      </div>
+                      <div style={{ padding:'12px 18px', background:'rgba(0,0,0,0.3)', fontSize:'0.75rem', color:'#94a3b8', fontStyle:'italic' }}>
+                        Prompt: "{msg.uiData.prompt}"
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
