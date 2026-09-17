@@ -335,16 +335,16 @@ export async function POST(req: Request) {
 
         if (data.type === 'NDA') {
           documentHtml = `<div style="text-align: center; margin-bottom: 20px;"><h2>MUTUAL NON-DISCLOSURE AGREEMENT</h2></div>
-          <p>This Mutual Non-Disclosure Agreement (this "Agreement") is entered into as of <strong>${today}</strong>, by and between <strong>ProcGen Enterprise</strong> ("Disclosing Party") and <strong>${data.vendorName || '___________'}</strong> ("Receiving Party").</p>
+          <p>This Mutual Non-Disclosure Agreement (this "Agreement") is entered into as of <strong>${today}</strong>, by and between <strong>ProcGen Enterprise</strong> ("Disclosing Party") and <strong>${data.partyName || data.vendorName || '___________'}</strong> ("Receiving Party").</p>
           <p><strong>1. Purpose.</strong> The parties wish to explore a potential business relationship (the "Purpose") and expect to disclose confidential information.</p>
-          <p><strong>2. Jurisdiction.</strong> This Agreement shall be governed by the laws of the State of <strong>${data.jurisdiction || 'Delaware'}</strong>.</p>
+          <p><strong>2. Jurisdiction.</strong> This Agreement shall be governed by the laws of the State of <strong>${data.state || data.jurisdiction || 'Delaware'}</strong>.</p>
           <br/><br/><p><strong>Signatures:</strong><br/>_______________________<br/>ProcGen Authorized Signatory</p>`;
         } 
         else if (data.type === 'SOW') {
           documentHtml = `<div style="text-align: center; margin-bottom: 20px;"><h2>STATEMENT OF WORK (SOW)</h2></div>
           <p><strong>Project Name:</strong> ${data.projectName || 'Untitled Project'}</p>
-          <p><strong>Vendor:</strong> ${data.vendorName || '___________'}</p>
-          <p><strong>Total Cost:</strong> ${parseFloat(data.cost || 0).toLocaleString()}</p>
+          <p><strong>Vendor:</strong> ${data.partyName || data.vendorName || '___________'}</p>
+          <p><strong>Total Cost:</strong> ${parseFloat(data.amount || data.cost || 0).toLocaleString()}</p>
           <hr style="margin: 15px 0;" />
           <p><strong>1. Scope of Work.</strong> The Vendor agrees to deliver the services outlined in the master agreement for the above project.</p>
           <p><strong>2. Milestones & Payment.</strong> Payment of the Total Cost shall be made upon successful completion and acceptance of all deliverables.</p>
@@ -361,9 +361,9 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json({ 
-          final_response: `I have generated the **${data.type}** for you. You can review the official document below.`, 
-          ui_component: 'pdf_viewer', 
-          ui_data: { html: documentHtml, type: data.type } 
+          final_response: `I have generated the **${data.type}** for you. You can review and edit the document below.`, 
+          ui_component: 'drafted_document', 
+            ui_data: { htmlContent: documentHtml, title: data.type + ' Document' } 
         });
       } catch (e) {
         return NextResponse.json({ final_response: "Error drafting document." });
