@@ -1,48 +1,106 @@
-'use client';
-import { useState, useEffect, useRef } from 'react';
-import {
-  BrainCircuit, X, Zap, Loader2, Database, Send, Terminal,
-  CheckCircle2, AlertTriangle, CheckCircle, FileText, Settings, Eye,
-  Plus, Sparkles, Shield, ChevronRight, BarChart3, Bot
-, Sun, Moon } from 'lucide-react';
+const AgentSwarm = ({ data }: { data: any }) => {
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    // 5 steps now
+    const ts = [
+      setTimeout(()=>setStep(1), 1200), 
+      setTimeout(()=>setStep(2), 2400), 
+      setTimeout(()=>setStep(3), 3600), 
+      setTimeout(()=>setStep(4), 4800),
+      setTimeout(()=>setStep(5), 5500)
+    ];
+    return () => ts.forEach(clearTimeout);
+  }, []);
 
-/* ───────────────────────── Utility sub-components ───────────────────────── */
+  const getRiskColor = (level: string) => {
+    if(level==='HIGH' || level==='CRITICAL') return '#ef4444';
+    if(level==='MEDIUM') return '#f59e0b';
+    return '#10b981';
+  };
 
-const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => {
-  const [docType, setDocType] = useState('NDA');
-  const [fd, setFd] = useState<any>({});
-  const inp = { width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.07)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' };
+  const riskColor = data.riskLevel ? getRiskColor(data.riskLevel) : '#ef4444';
+
   return (
-    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(15,23,42,0.9)', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 4px 24px rgba(0,0,0,0.4)' }}>
-      <div style={{ marginBottom:'14px' }}>
-        <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Document Type</label>
-        <select value={docType} onChange={e=>{ setDocType(e.target.value); setFd({}); }} style={{ ...inp, cursor:'pointer', backgroundColor:'#1e293b', color:'#f1f5f9', border:'1px solid rgba(99,102,241,0.3)' }}>
-          <option value="NDA" style={{ backgroundColor:'#1e293b', color:'#f1f5f9' }}>Non-Disclosure Agreement (NDA)</option>
-          <option value="SOW" style={{ backgroundColor:'#1e293b', color:'#f1f5f9' }}>Statement of Work (SOW)</option>
-          <option value="RFP" style={{ backgroundColor:'#1e293b', color:'#f1f5f9' }}>Request for Proposal (RFP)</option>
-        </select>
+    <div style={{ background:'linear-gradient(135deg,rgba(15,23,42,0.95),rgba(30,41,59,0.9))', border:'1px solid rgba(99,102,241,0.3)', borderRadius:'16px', overflow:'hidden', width:'100%', backdropFilter:'blur(20px)' }}>
+      <div style={{ padding:'16px 20px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', alignItems:'center', gap:'12px' }}>
+        <div style={{ background:'linear-gradient(135deg,#6366f1,#8b5cf6)', padding:'8px', borderRadius:'10px', display:'flex' }}><Sparkles size={16} color="#fff"/></div>
+        <div>
+          <div style={{ fontSize:'0.65rem', fontWeight:700, color:'#6366f1', textTransform:'uppercase', letterSpacing:'2px' }}>Enterprise Risk Swarm</div>
+          <div style={{ fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9', marginTop:'1px' }}>{data.target}</div>
+        </div>
       </div>
-      {docType==='NDA' && (
-        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-          <input type="text" placeholder="Counterparty Name" onChange={e=>setFd({...fd, partyName:e.target.value})} style={inp}/>
-          <input type="text" placeholder="Governing Law State" onChange={e=>setFd({...fd, state:e.target.value})} style={inp}/>
-        </div>
-      )}
-      {docType==='SOW' && (
-        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-          <input type="text" placeholder="Project Name" onChange={e=>setFd({...fd, projectName:e.target.value})} style={inp}/>
-          <input type="number" placeholder="Total Compensation ($)" onChange={e=>setFd({...fd, amount:e.target.value})} style={inp}/>
-        </div>
-      )}
-      <button onClick={()=>onSubmit({ type:docType, ...fd })} style={{ width:'100%', marginTop:'16px', padding:'11px', background:'linear-gradient(135deg,#7c3aed,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px', fontSize:'0.85rem' }}>
-        <Zap size={15}/> Generate Document
-      </button>
-      
-      
+
+      <div style={{ padding:'16px', display:'flex', flexDirection:'column', gap:'10px' }}>
+        {data.agents.map((agent: any, i: number) => {
+          const active = step===i, done = step>i;
+          return (
+            <div key={agent.id} style={{ display:'flex', gap:'12px', alignItems:'flex-start', padding:'12px', background: done?'rgba(16,185,129,0.06)':active?'rgba(99,102,241,0.08)':'rgba(255,255,255,0.02)', border:'1px solid', borderColor: done?'rgba(16,185,129,0.2)':active?'rgba(99,102,241,0.3)':'rgba(255,255,255,0.05)', borderRadius:'10px', transition:'all 0.4s' }}>
+              <div style={{ width:'28px', height:'28px', borderRadius:'50%', background: done?'linear-gradient(135deg,#10b981,#059669)':active?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                {done ? <CheckCircle size={14} color="#fff"/> : active ? <Loader2 size={14} color="#fff" className="animate-spin"/> : <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#475569'}}/>}
+              </div>
+              <div style={{ flex:1 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                  <div style={{ fontSize:'0.85rem', fontWeight:700, color:'#e2e8f0' }}>{agent.name}</div>
+                  <div style={{ fontSize:'0.65rem', fontWeight:700, color: done?'#10b981':active?'#818cf8':'#475569', background: done?'rgba(16,185,129,0.1)':active?'rgba(99,102,241,0.15)':'rgba(255,255,255,0.05)', padding:'2px 8px', borderRadius:'20px' }}>{agent.role}</div>
+                </div>
+                {active && <div style={{ fontSize:'0.78rem', color:'#818cf8', marginTop:'5px' }}>Scanning datalakes and running models...</div>}
+                {done && <div style={{ fontSize:'0.78rem', color:'#94a3b8', marginTop:'5px', paddingLeft:'8px', borderLeft:'2px solid rgba(16,185,129,0.4)' }}>{agent.finding}</div>}
+              </div>
+            </div>
+          );
+        })}
+
+        {step >= data.agents.length && (
+          <div style={{ marginTop:'10px', animation:'fadeSlideIn 0.5s ease-out forwards' }}>
+            <div style={{ display:'flex', gap:'16px', background:'rgba(0,0,0,0.3)', padding:'20px', borderRadius:'12px', border:'1px solid rgba(255,255,255,0.05)' }}>
+              
+              {/* Risk Score Circle */}
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minWidth:'120px' }}>
+                <div style={{ position:'relative', width:'90px', height:'90px', borderRadius:'50%', background:`conic-gradient(${riskColor} ${(data.score || 85)}%, rgba(255,255,255,0.05) 0)`, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:`0 0 30px ${riskColor}33` }}>
+                  <div style={{ position:'absolute', width:'74px', height:'74px', borderRadius:'50%', background:'#0f172a', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
+                    <span style={{ fontSize:'1.6rem', fontWeight:800, color:'#fff', lineHeight:'1' }}>{data.score || 85}</span>
+                    <span style={{ fontSize:'0.55rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', marginTop:'2px' }}>/ 100</span>
+                  </div>
+                </div>
+                <div style={{ marginTop:'12px', fontSize:'0.75rem', fontWeight:700, color:riskColor, textTransform:'uppercase', letterSpacing:'1px', background:`${riskColor}1a`, padding:'4px 12px', borderRadius:'20px', border:`1px solid ${riskColor}40` }}>
+                  {data.riskLevel || 'HIGH RISK'}
+                </div>
+              </div>
+
+              {/* Executive Summary */}
+              <div style={{ flex:1, display:'flex', flexDirection:'column', justifyContent:'center' }}>
+                <div style={{ fontSize:'0.7rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'8px' }}>Executive Synthesis</div>
+                <div style={{ fontSize:'0.85rem', color:'#e2e8f0', lineHeight:'1.6', marginBottom:'12px' }}>
+                  {data.summary}
+                </div>
+                {data.mitigations && data.mitigations.length > 0 && (
+                  <div style={{ display:'flex', flexDirection:'column', gap:'6px' }}>
+                    <div style={{ fontSize:'0.7rem', fontWeight:700, color:'#818cf8', textTransform:'uppercase' }}>Recommended Actions:</div>
+                    {data.mitigations.map((m:string, idx:number) => (
+                       <div key={idx} style={{ display:'flex', alignItems:'flex-start', gap:'8px', fontSize:'0.78rem', color:'#cbd5e1' }}>
+                         <Shield size={14} color="#818cf8" style={{ marginTop:'2px', flexShrink:0 }}/>
+                         <span>{m}</span>
+                       </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div style={{ display:'flex', gap:'10px', marginTop:'16px' }}>
+              <button style={{ flex:1, padding:'10px', background:'linear-gradient(135deg,#6366f1,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:600, fontSize:'0.8rem', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px' }}>
+                <FileText size={14}/> Download Full Risk Dossier (PDF)
+              </button>
+              <button style={{ flex:1, padding:'10px', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'8px', fontWeight:600, fontSize:'0.8rem', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px' }}>
+                <CheckCircle2 size={14}/> Auto-Draft Mitigation Plan
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
-
 const AgentSwarm = ({ data }: { data: any }) => {
   const [step, setStep] = useState(0);
   useEffect(() => {

@@ -541,27 +541,36 @@ export async function POST(req: Request) {
 
     // --- SLASH COMMAND EXECUTION: /execute-add-product ---
     if (text.startsWith('/analyze-risk') || text.includes('swarm')) {
-      return NextResponse.json({
-        thought_process: [
-            "[Agent: Controller] Analyzing user request: Risk profile generation.",
-            "[Agent: Finance] Querying historical pricing benchmarks...",
-            "[Agent: Legal] Checking recent SEC filings for vendor...",
-            "[Agent: Compliance] Searching global supply chain blacklists...",
-            "[Agent: Controller] Aggregating swarm findings..."
-          ],
-          final_response: "Deploying specialized sub-agents to analyze this request...",
-        ui_component: 'agent_swarm',
-        ui_data: {
-          target: "Global Vendor Risk & Contract Analysis",
-          agents: [
-            { id: 'legal', name: 'Legal AI', role: 'Clause Analysis', finding: 'Found auto-renewal trap in Section 4.2.' },
-            { id: 'finance', name: 'Finance AI', role: 'Cost Benchmarking', finding: 'Pricing is 12% above market average.' },
-            { id: 'risk', name: 'Compliance AI', role: 'Supply Chain Monitoring', finding: 'Detected factory strikes in supplier region.' }
-          ],
-          summary: "Recommendation: DO NOT SIGN. Renegotiate pricing and strike the auto-renewal clause before proceeding."
-        }
-      });
-    }
+        return NextResponse.json({
+          thought_process: [
+              "[Agent: Controller] Analyzing user request: Comprehensive risk profile generation.",
+              "[Agent: Finance] Querying historical pricing benchmarks and liquidity ratios...",
+              "[Agent: Legal] Checking recent SEC filings, litigation history, and clause traps...",
+              "[Agent: Compliance] Searching global supply chain blacklists and ESG indices...",
+              "[Agent: Cyber] Scanning vendor endpoints for known CVE vulnerabilities...",
+              "[Agent: Controller] Aggregating swarm findings into unified dashboard..."
+            ],
+            final_response: "I've deployed a multi-agent swarm to analyze the comprehensive risk profile. Here is the executive synthesis and recommended mitigation plan.",
+          ui_component: 'agent_swarm',
+          ui_data: {
+            target: "Global Vendor Risk & Contract Analysis",
+            score: 87,
+            riskLevel: "CRITICAL",
+            agents: [
+              { id: 'legal', name: 'Legal AI', role: 'Clause Analysis', finding: 'Identified auto-renewal trap in Section 4.2 with 90-day strict notice period.' },
+              { id: 'finance', name: 'Finance AI', role: 'Cost Benchmarking', finding: 'Proposed pricing is 12.4% above Q3 market index average.' },
+              { id: 'risk', name: 'Compliance AI', role: 'Supply Chain Monitoring', finding: 'Detected severe factory strikes in primary supplier region (Shenzhen).' },
+              { id: 'cyber', name: 'Cyber Risk AI', role: 'Security Posture', finding: 'Vendor failed SOC-2 Type II audit in Q1 2026.' }
+            ],
+            summary: "The proposed contract poses severe operational and financial risks. The vendor's security posture and supply chain stability are currently compromised, and pricing is above market rate.",
+            mitigations: [
+              "Strike the auto-renewal clause (Section 4.2) and enforce Net-60 payment terms.",
+              "Require SOC-2 Type II remediation proof before finalizing data sharing agreements.",
+              "Mandate a 15% pricing discount to offset identified supply chain volatility."
+            ]
+          }
+        });
+      }
 
     if (text.startsWith('/execute-add-product')) {
         try {
