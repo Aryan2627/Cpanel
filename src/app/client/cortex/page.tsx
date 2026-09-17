@@ -16,10 +16,10 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => 
     <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)' }}>
       <div style={{ marginBottom:'14px' }}>
         <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Document Type</label>
-        <select value={docType} onChange={e=>{ setDocType(e.target.value); setFd({}); }} style={{ ...inp, cursor:'pointer' }}>
-          <option value="NDA">Non-Disclosure Agreement (NDA)</option>
-          <option value="SOW">Statement of Work (SOW)</option>
-          <option value="RFP">Request for Proposal (RFP)</option>
+        <select value={docType} onChange={e=>{ setDocType(e.target.value); setFd({}); }} style={{ ...inp, cursor:'pointer', backgroundColor:'#0f172a', color:'#e2e8f0' }}>
+          <option value="NDA" style={{ backgroundColor:'#0f172a', color:'#e2e8f0' }}>Non-Disclosure Agreement (NDA)</option>
+          <option value="SOW" style={{ backgroundColor:'#0f172a', color:'#e2e8f0' }}>Statement of Work (SOW)</option>
+          <option value="RFP" style={{ backgroundColor:'#0f172a', color:'#e2e8f0' }}>Request for Proposal (RFP)</option>
         </select>
       </div>
       {docType==='NDA' && (
