@@ -823,7 +823,12 @@ export default function JarvisAssistant() {
                   <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/draft-contract</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Dynamic Legal Document Generator</div></div>
                 </button>
 
-                <button type="button" onClick={() => { executeCommand('/approve-all'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                
+                  <button type="button" onClick={() => { executeCommand('/analyze-risk'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ background: '#fee2e2', color: '#e11d48', padding: '6px', borderRadius: '6px' }}><AlertTriangle size={16} /></div>
+                    <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/analyze-risk</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Multi-Agent Risk Swarm</div></div>
+                  </button>
+<button type="button" onClick={() => { executeCommand('/approve-all'); setShowSlashMenu(false); }} style={{ width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', background: 'transparent', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ background: '#dcfce7', color: '#16a34a', padding: '6px', borderRadius: '6px' }}><CheckCircle2 size={16} /></div>
                   <div><div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>/approve-all</div><div style={{ color: '#64748b', fontSize: '0.75rem' }}>Instantly approve all pending requests</div></div>
                 </button>
