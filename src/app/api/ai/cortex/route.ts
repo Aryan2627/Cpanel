@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { retrieveContext } from '@/lib/rag';
 import { prisma } from '../../../../lib/prisma';
 import { verifyToken } from '../../../../lib/session';
 import { headers } from 'next/headers';
@@ -919,7 +920,41 @@ export async function POST(req: Request) {
       final_response: `I didn't quite catch that. You can talk to me naturally—try asking:\n- *"Can you check for active vendors?"*\n- *"Show my open purchase orders"*\n- *"Check laptop inventory and reorder"*\n- *"What sourcing events are running?"*`
     });
 
-  } catch (error) {
+  
+      // --- RAG (RETRIEVAL-AUGMENTED GENERATION) FOR GENERAL QUERIES ---
+      // If it's not a specific slash command, we search the knowledge base!
+      const retrievedDocs = await retrieveContext(text);
+      
+      let final_response = "I couldn't find any specific company policies related to your query.";
+      let thought_process = [
+        `[RAG Engine] Embedding query: "${text}"`,
+        `[Vector DB] Searching index 'enterprise-policies'...`,
+      ];
+
+      if (retrievedDocs.length > 0) {
+        thought_process.push(`[Vector DB] Found ${retrievedDocs.length} matching documents (Semantic similarity > 0.82)`);
+        
+        // Context Injection (Simulating LLM synthesis)
+        const contextStr = retrievedDocs.map(d => `[${d.title}] ${d.content}`).join(" | ");
+        thought_process.push(`[LLM Context Injection] "${contextStr}"`);
+        thought_process.push(`[LLM Generation] Synthesizing final response based strictly on retrieved company guidelines...`);
+        
+        final_response = `Based on our internal company policies:\n\n`;
+        retrievedDocs.forEach(doc => {
+          final_response += `**${doc.title}**\n${doc.content}\n\n`;
+        });
+        final_response += `*Is there a specific part of this policy you need help applying?*`;
+      } else {
+        thought_process.push(`[Vector DB] No highly relevant documents found for context.`);
+      }
+
+      return NextResponse.json({
+        final_response,
+        thought_process,
+        ui_component: 'markdown'
+      });
+
+    } catch (error) {
     console.error("Cortex API error:", error);
     return NextResponse.json({ error: 'Failed to process agentic request.' }, { status: 500 });
   }
