@@ -43,6 +43,86 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => 
   );
 };
 
+
+const S2PProgressAndEvent = ({ data, execute }: { data: any, execute: (c:string)=>void }) => {
+  const [step, setStep] = useState(0);
+  const [form, setForm] = useState({ title: data.defaultTitle || '', quantity: 1, duration: '7', durationUnit: 'days' });
+  
+  useEffect(() => {
+    const ts = [
+      setTimeout(()=>setStep(1), 1000),
+      setTimeout(()=>setStep(2), 2200),
+      setTimeout(()=>setStep(3), 3400)
+    ];
+    return () => ts.forEach(clearTimeout);
+  }, []);
+
+  const inp = { width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' };
+
+  return (
+    <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(15,23,42,0.95)', border:'1px solid rgba(16,185,129,0.3)', boxShadow:'0 8px 30px rgba(0,0,0,0.3)' }}>
+      <div style={{ fontSize:'0.9rem', fontWeight:700, color:'#10b981', marginBottom:'20px', display:'flex', alignItems:'center', gap:'8px' }}>
+        <Database size={18}/> S2P Pipeline Active
+      </div>
+      
+      {/* Branching UI */}
+      <div style={{ display:'flex', flexDirection:'column', gap:'16px', marginBottom:'24px', position:'relative', marginLeft:'8px' }}>
+        <div style={{ position:'absolute', left:'11px', top:'10px', bottom:'10px', width:'2px', background:'rgba(16,185,129,0.2)', zIndex:0 }}/>
+        
+        {[{t:'Intake Created', d:data.intakeRef}, {t:'Routed to PR', d:data.poRef}, {t:'Ready for Sourcing', d:'Awaiting Event Creation'}].map((s, i) => (
+           <div key={i} style={{ display:'flex', gap:'16px', alignItems:'center', position:'relative', zIndex:1, opacity: step>=i ? 1 : 0.3, transform: step>=i ? 'translateX(0)' : 'translateX(-10px)', transition:'all 0.5s' }}>
+             <div style={{ width:'24px', height:'24px', borderRadius:'50%', background: step>i ? '#10b981' : step===i ? '#818cf8' : '#1e293b', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #0f172a', flexShrink:0 }}>
+                {step>i ? <CheckCircle2 size={12} color="#fff"/> : <div style={{width:'6px',height:'6px',background:'#fff',borderRadius:'50%'}}/>}
+             </div>
+             <div>
+               <div style={{ fontSize:'0.82rem', fontWeight:700, color:'#f1f5f9' }}>{s.t}</div>
+               <div style={{ fontSize:'0.7rem', color:'#94a3b8' }}>{s.d}</div>
+             </div>
+           </div>
+        ))}
+      </div>
+
+      
+                    {/* S2P Intake Form */}
+                    {msg.uiComponent==='s2p_intake_form' && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Initiate Source-to-Pay (Intake)</div>
+                        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+                          <input type="text" placeholder="Project / Intake Title" value={s2pForm.title} onChange={e=>setS2pForm({...s2pForm, title:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <input type="text" placeholder="Estimated Budget ($)" value={s2pForm.budget} onChange={e=>setS2pForm({...s2pForm, budget:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <input type="text" placeholder="Requesting Department" value={s2pForm.department} onChange={e=>setS2pForm({...s2pForm, department:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <button onClick={()=>execute('/execute-s2p-intake '+JSON.stringify(s2pForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#10b981,#059669)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Submit Intake</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* S2P Progress & Event Form */}
+                    {msg.uiComponent==='s2p_progress_and_event' && msg.uiData && (
+                      <S2PProgressAndEvent data={msg.uiData} execute={execute} />
+                    )}
+
+                    {/* Event Form */}
+      {step >= 3 && (
+        <div style={{ animation:'fadeSlideIn 0.5s ease-out forwards', paddingTop:'18px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ marginBottom:'12px', fontSize:'0.82rem', fontWeight:600, color:'#e2e8f0' }}>Convert PR to Sourcing Event</div>
+          <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+            <input type="text" placeholder="Event Title" value={form.title} onChange={e=>setForm({...form, title:e.target.value})} style={inp}/>
+            <input type="number" placeholder="Quantity" value={form.quantity} onChange={e=>setForm({...form, quantity:parseInt(e.target.value)||1})} style={inp}/>
+            <div style={{ display:'flex', gap:'10px' }}>
+              <input type="number" placeholder="Duration" value={form.duration} onChange={e=>setForm({...form, duration:e.target.value})} style={{ ...inp, flex:1 }}/>
+              <select value={form.durationUnit} onChange={e=>setForm({...form, durationUnit:e.target.value})} style={{ ...inp, width:'120px', cursor:'pointer' }}>
+                <option value="minutes" style={{background:'#0f172a'}}>Minutes</option>
+                <option value="days" style={{background:'#0f172a'}}>Days</option>
+              </select>
+            </div>
+            <button onClick={()=>execute('/execute-s2p-event '+JSON.stringify({...form, intakeRef: data.intakeRef, poRef: data.poRef}))} style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#3b82f6,#2563eb)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem', marginTop:'4px' }}>Launch Sourcing Event</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AgentSwarm = ({ data }: { data: any }) => {
   const [step, setStep] = useState(0);
   useEffect(() => {
@@ -165,6 +245,7 @@ export default function CortexPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [eventForm, setEventForm] = useState({ title:'', budget:'', vendorId:'', duration:'', durationUnit:'days' });
+  const [s2pForm, setS2pForm] = useState({ title: '', budget: '', department: '' });
   const [vendorForm, setVendorForm] = useState({ name:'', email:'', category:'' });
   const [poForm, setPoForm] = useState({ poNumber:'', amount:'', desc:'' });
   const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'', isGenerating:false });

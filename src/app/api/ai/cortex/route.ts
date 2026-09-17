@@ -572,7 +572,88 @@ export async function POST(req: Request) {
         });
       }
 
-    if (text.startsWith('/execute-add-product')) {
+    
+      if (text.startsWith('/s2p')) {
+        return NextResponse.json({
+          final_response: "Let's initiate a new Source-to-Pay (S2P) workflow. Please provide the intake details below.",
+          ui_component: 's2p_intake_form'
+        });
+      }
+
+      if (text.startsWith('/execute-s2p-intake')) {
+        try {
+          const jsonStr = text.replace('/execute-s2p-intake', '').trim();
+          const d = JSON.parse(jsonStr);
+          
+          // Create Intake
+          const newIntake = await prisma.intake.create({
+            data: {
+              organizationId: orgId,
+              refId: `INT-${Math.floor(1000 + Math.random() * 9000)}`,
+              title: d.title || 'Untitled S2P Intake',
+              reqName: d.department || 'General',
+              status: 'Approved',
+              type: 'S2P Flow',
+              buyer: 'Cortex AI',
+              reqAt: new Date().toISOString()
+            }
+          });
+
+          // Create PR (PurchaseOrder)
+          const newPR = await prisma.purchaseOrder.create({
+            data: {
+              organizationId: orgId,
+              poNumber: `PR-${Math.floor(10000 + Math.random() * 90000)}`,
+              title: `PR for ${d.title || 'Intake'}`,
+              status: 'Approved',
+              total: parseFloat(d.budget) || 0
+            }
+          });
+
+          return NextResponse.json({
+            final_response: "Intake successfully submitted and routed. PR has been generated.",
+            ui_component: 's2p_progress_and_event',
+            ui_data: {
+              intakeRef: newIntake.refId,
+              poRef: newPR.poNumber,
+              defaultTitle: `Event for ${d.title || 'S2P Request'}`
+            }
+          });
+        } catch (err: any) {
+          console.error(err);
+          return NextResponse.json({ final_response: "Error processing S2P intake." });
+        }
+      }
+
+      if (text.startsWith('/execute-s2p-event')) {
+        try {
+          const jsonStr = text.replace('/execute-s2p-event', '').trim();
+          const d = JSON.parse(jsonStr);
+          
+          const newEvent = await prisma.event.create({
+            data: {
+              organizationId: orgId,
+              refId: `EVT-${Math.floor(1000 + Math.random() * 9000)}`,
+              title: d.title || 'S2P Event',
+              type: 'RFQ',
+              itemsCount: parseInt(d.quantity) || 1,
+              baseCurrency: 'USD',
+              endTime: new Date(Date.now() + (parseInt(d.duration) || 7) * (d.durationUnit === 'minutes' ? 60 * 1000 : 24 * 60 * 60 * 1000)),
+              status: 'Draft',
+            }
+          });
+
+          return NextResponse.json({
+            final_response: `Success! The sourcing event **${newEvent.refId}** has been generated for PR **${d.poRef}**.`,
+            ui_component: null
+          });
+        } catch (err: any) {
+          console.error(err);
+          return NextResponse.json({ final_response: "Error creating S2P event." });
+        }
+      }
+
+      if (text.startsWith('/execute-add-product')) {
         try {
           const data = JSON.parse(text.replace('/execute-add-product', '').trim());
           const newProduct = await prisma.product.create({
