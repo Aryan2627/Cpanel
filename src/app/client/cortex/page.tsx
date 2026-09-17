@@ -193,6 +193,7 @@ export default function CortexPage() {
   const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'', isGenerating:false });
   const [viewImage, setViewImage] = useState<string | null>(null);
   const [tutorialVideo, setTutorialVideo] = useState<string | null>(null);
+    const [isDark, setIsDark] = useState(true);
   const endRef = useRef<HTMLDivElement>(null);
   const [isClient, setIsClient] = useState(false);
 
@@ -334,10 +335,13 @@ export default function CortexPage() {
   ];
 
   return (
-    <div style={{ display:'flex', height:'100%', width:'100%', background:'#070d1c', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+    <div className={isDark ? "cortex-dark" : "cortex-light"} style={{ display:'flex', height:'100%', width:'100%', background:'#070d1c', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
       
       {/* Animated Background */}
       <style>{`
+        .cortex-light { filter: invert(1) hue-rotate(180deg); background: #f8fafc !important; }
+        .cortex-light img, .cortex-light video, .cortex-light iframe, .cortex-light .keep-dark { filter: invert(1) hue-rotate(180deg); }
+
         @keyframes bgFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-20px) scale(1.05)} }
         @keyframes pulse2 { 0%,100%{opacity:0.4} 50%{opacity:0.7} }
         @keyframes cortexSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
@@ -425,7 +429,10 @@ export default function CortexPage() {
             <div style={{ fontSize:'0.82rem', fontWeight:600, color:'#e2e8f0', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{userName}</div>
             <div style={{ fontSize:'0.7rem', color:'#475569' }}>Enterprise Plan</div>
           </div>
-          <Settings size={15} color="#334155" style={{ cursor:'pointer', flexShrink:0 }}/>
+          <button onClick={() => setIsDark(!isDark)} className="keep-dark" style={{ background:'transparent', border:'none', color:'#475569', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', padding:'4px', marginRight:'2px', flexShrink:0 }}>
+              {isDark ? <Sun size={15}/> : <Moon size={15}/>}
+            </button>
+            <Settings size={15} color="#334155" style={{ cursor:'pointer', flexShrink:0 }}/>
         </div>
       </div>
 
