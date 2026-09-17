@@ -126,6 +126,45 @@ export default function CortexPage() {
   const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'', isGenerating:false });
   const [viewImage, setViewImage] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    try {
+      const stored = localStorage.getItem('cortex_chats_v2');
+      if (stored) {
+        const { chatsData, timestamp, activeId } = JSON.parse(stored);
+        if (Date.now() - timestamp < 2 * 60 * 60 * 1000) {
+          if (chatsData && chatsData.length > 0) setChats(chatsData);
+          if (activeId) {
+            setActiveChatId(activeId);
+            const activeChat = chatsData.find((c: any) => c.id === activeId);
+            if (activeChat && activeChat.messages && activeChat.messages.length > 0) {
+              setMessages(activeChat.messages);
+            }
+          }
+        } else {
+          localStorage.removeItem('cortex_chats_v2');
+        }
+      }
+    } catch(e) {}
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+    localStorage.setItem('cortex_chats_v2', JSON.stringify({
+      chatsData: chats,
+      activeId: activeChatId,
+      timestamp: Date.now()
+    }));
+  }, [chats, activeChatId, isClient]);
+
+  // Keep chats synced with current messages
+  useEffect(() => {
+    if (activeChatId && messages.length > 0) {
+      setChats(prev => prev.map(c => c.id === activeChatId ? { ...c, messages } : c));
+    }
+  }, [messages, activeChatId]);
 
   useEffect(() => {
     fetch('/api/auth/me').then(r=>r.json()).then(d=>{ if(d?.name) setUserName(d.name); }).catch(()=>{});
