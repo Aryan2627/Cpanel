@@ -688,17 +688,50 @@ export default function JarvisAssistant() {
           ))}
 
           {/* Loading Indicator */}
-          {isProcessing && (
-            <div style={{ alignSelf: 'flex-start', maxWidth: '85%' }}>
-              <div style={{ 
-                background: '#ffffff', color: '#64748b', padding: '12px 16px', 
-                borderRadius: '16px 16px 16px 4px', border: '1px solid #e2e8f0',
-                fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px'
-              }}>
-                <Loader2 size={16} className="animate-spin" /> Cortex is thinking...
+            {isProcessing && (
+              <div style={{ alignSelf: 'flex-start', maxWidth: '85%', display: 'flex', gap: '8px', flexDirection: 'row' }}>
+                <style>{`
+                  @keyframes cortexPulse {
+                    0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+                    70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+                    100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+                  }
+                  @keyframes cortexBlink {
+                    0%, 100% { opacity: 0.3; transform: scale(0.8) translateY(0); }
+                    50% { opacity: 1; transform: scale(1.2) translateY(-2px); }
+                  }
+                  @keyframes cortexGradient {
+                    0% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                    100% { background-position: 0% 50%; }
+                  }
+                `}</style>
+                <div style={{ flexShrink: 0, width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #0f172a, #334155)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.7rem', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                  AI
+                </div>
+                <div style={{ 
+                  background: 'linear-gradient(270deg, #ffffff, #f3e8ff, #ffffff)',
+                  backgroundSize: '200% 200%',
+                  animation: 'cortexGradient 3s ease infinite',
+                  padding: '12px 18px', 
+                  borderRadius: '4px 16px 16px 16px', border: '1px solid rgba(226, 232, 240, 0.8)',
+                  display: 'flex', alignItems: 'center', gap: '14px',
+                  boxShadow: '0 4px 15px -3px rgba(139, 92, 246, 0.15)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', animation: 'cortexPulse 2s infinite' }}></div>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 700, background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '0.5px' }}>
+                      CORTEX IS THINKING
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#8b5cf6', animation: 'cortexBlink 1.4s infinite 0s' }}></div>
+                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#8b5cf6', animation: 'cortexBlink 1.4s infinite 0.2s' }}></div>
+                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#8b5cf6', animation: 'cortexBlink 1.4s infinite 0.4s' }}></div>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           <div ref={messagesEndRef} />
         </div>
 
