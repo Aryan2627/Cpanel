@@ -618,15 +618,22 @@ export default function CortexPage() {
                   <span style={{ fontSize:'0.68rem', fontWeight:800, color:'#475569', textTransform:'uppercase', letterSpacing:'1.5px' }}>Advanced Workflows</span>
                 </div>
                 <div style={{ maxHeight:'320px', overflowY:'auto' }}>
-                  {slashCmds.map((item,i)=>(
-                    <button key={i} className="slash-btn" onClick={()=>{ item.auto ? execute(item.cmd) : setInput(item.cmd); setShowSlash(false); }} style={{ display:'flex', alignItems:'center', gap:'14px', padding:'11px 16px', width:'100%', background:'transparent', border:'none', borderBottom:'1px solid rgba(255,255,255,0.03)', cursor:'pointer', textAlign:'left', transition:'all 0.15s' }}>
-                      <div style={{ background:item.bg, color:item.color, padding:'7px', borderRadius:'8px', display:'flex', flexShrink:0 }}>{item.icon}</div>
-                      <div>
-                        <div style={{ fontWeight:600, color:'#e2e8f0', fontSize:'0.85rem' }}>{item.cmd}</div>
-                        <div style={{ color:'#475569', fontSize:'0.75rem', marginTop:'1px' }}>{item.label}</div>
+                  {slashCmds.map((item: any, i: number)=>(
+                      <div key={i} className="slash-btn" style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%', borderBottom:'1px solid rgba(255,255,255,0.03)', transition:'all 0.15s' }}>
+                        <button onClick={()=>{ item.auto ? execute(item.cmd) : setInput(item.cmd); setShowSlash(false); }} style={{ flex: 1, display:'flex', alignItems:'center', gap:'14px', padding:'11px 16px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left' }}>
+                          <div style={{ background:item.bg, color:item.color, padding:'7px', borderRadius:'8px', display:'flex', flexShrink:0 }}>{item.icon}</div>
+                          <div>
+                            <div style={{ fontWeight:600, color:'#e2e8f0', fontSize:'0.85rem' }}>{item.cmd}</div>
+                            <div style={{ color:'#475569', fontSize:'0.75rem', marginTop:'1px' }}>{item.label}</div>
+                          </div>
+                        </button>
+                        {item.hasTutorial && (
+                           <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTutorialVideo(item.cmd); setShowSlash(false); }} style={{ position:'absolute', right:'16px', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.4)', color:'#a5b4fc', borderRadius:'6px', padding:'5px 8px', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.65rem', fontWeight:600, cursor:'pointer', zIndex: 10, transition:'all 0.2s', textTransform:'uppercase', letterSpacing:'0.5px' }}>
+                             <Eye size={12}/> Tutorial
+                           </button>
+                        )}
                       </div>
-                    </button>
-                  ))}
+                    ))}
                 </div>
               </div>
             )}
