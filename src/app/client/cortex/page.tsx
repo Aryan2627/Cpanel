@@ -31,7 +31,7 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => 
       {docType==='SOW' && (
         <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
           <input type="text" placeholder="Project Name" onChange={e=>setFd({...fd, projectName:e.target.value})} style={inp}/>
-          <input type="number" placeholder="Total Compensation ($)" onChange={e=>setFd({...fd, amount:e.target.value})} style={inp}/>
+          <input type="number" onWheel={(e) => (e.target as any).blur()} placeholder="Total Compensation ($)" onChange={e=>setFd({...fd, amount:e.target.value})} style={inp}/>
         </div>
       )}
       <button onClick={()=>onSubmit({ type:docType, ...fd })} style={{ width:'100%', marginTop:'16px', padding:'11px', background:'linear-gradient(135deg,#7c3aed,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px', fontSize:'0.85rem' }}>
@@ -89,9 +89,9 @@ const S2PProgressAndEvent = ({ data, execute }: { data: any, execute: (c:string)
           <div style={{ marginBottom:'12px', fontSize:'0.82rem', fontWeight:600, color:'#e2e8f0' }}>Convert PR to Sourcing Event</div>
           <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
             <input type="text" placeholder="Event Title" value={form.title} onChange={e=>setForm({...form, title:e.target.value})} style={inp}/>
-            <input type="number" placeholder="Quantity" value={form.quantity} onChange={e=>setForm({...form, quantity:parseInt(e.target.value)||1})} style={inp}/>
+            <input type="number" onWheel={(e) => (e.target as any).blur()} placeholder="Quantity" value={form.quantity} onChange={e=>setForm({...form, quantity:parseInt(e.target.value)||1})} style={inp}/>
             <div style={{ display:'flex', gap:'10px' }}>
-              <input type="number" placeholder="Duration" value={form.duration} onChange={e=>setForm({...form, duration:e.target.value})} style={{ ...inp, flex:1 }}/>
+              <input type="number" onWheel={(e) => (e.target as any).blur()} placeholder="Duration" value={form.duration} onChange={e=>setForm({...form, duration:e.target.value})} style={{ ...inp, flex:1 }}/>
               <select value={form.durationUnit} onChange={e=>setForm({...form, durationUnit:e.target.value})} style={{ ...inp, width:'120px', cursor:'pointer' }}>
                 <option value="minutes" style={{background:'#0f172a'}}>Minutes</option>
                 <option value="days" style={{background:'#0f172a'}}>Days</option>
@@ -582,8 +582,8 @@ export default function CortexPage() {
                           </div>
 
                           <div style={{ display:'flex', gap:'10px' }}>
-                            <input type="number" placeholder="Budget ($) *" value={s2pForm.budget} onChange={e=>setS2pForm({...s2pForm, budget:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                            <input type="number" placeholder="Quantity *" value={s2pForm.quantity || ''} onChange={e=>setS2pForm({...s2pForm, quantity:parseInt(e.target.value) || 1})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                            <input type="number" onWheel={(e) => (e.target as any).blur()} placeholder="Budget ($) *" value={s2pForm.budget} onChange={e=>setS2pForm({...s2pForm, budget:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                            <input type="number" onWheel={(e) => (e.target as any).blur()} placeholder="Quantity *" value={s2pForm.quantity || ''} onChange={e=>setS2pForm({...s2pForm, quantity:parseInt(e.target.value) || 1})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
                           </div>
 
                           <textarea rows={2} placeholder="Item Description *" value={s2pForm.description} onChange={e=>setS2pForm({...s2pForm, description:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', resize:'none' }}/>
@@ -699,7 +699,7 @@ export default function CortexPage() {
                           
                           <div style={{ display:'flex', gap:'10px' }}>
                           <input type="text" placeholder="SKU" value={productForm.sku} onChange={e=>setProductForm({...productForm, sku:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                          <input type="number" placeholder="Price ($)" value={productForm.price} onChange={e=>setProductForm({...productForm, price:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <input type="number" onWheel={(e) => (e.target as any).blur()} placeholder="Price ($)" value={productForm.price} onChange={e=>setProductForm({...productForm, price:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
                         </div>
                         <button onClick={(e)=>{ e.preventDefault(); execute('/execute-add-product '+JSON.stringify(productForm)); }} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#6366f1,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Add to Catalog</button>
                       </div>
