@@ -540,9 +540,13 @@ export default function CortexPage() {
             <div style={{ fontSize:'0.82rem', fontWeight:600, color:'#e2e8f0', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{userName}</div>
             <div style={{ fontSize:'0.7rem', color:'#475569' }}>Enterprise Plan</div>
           </div>
-          <button className="keep-dark" style={{ background:'rgba(99,102,241,0.12)', border:'1px solid rgba(99,102,241,0.2)', color:'#818cf8', cursor:'default', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px', padding:'4px 8px', borderRadius:'6px', fontSize:'0.65rem', fontWeight:700, letterSpacing:'0.05em', flexShrink:0 }}>
-              <Moon size={11}/> DARK
-            </button>
+          <button
+            onClick={() => setIsDark(!isDark)}
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            style={{ background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(245,158,11,0.12)', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(245,158,11,0.3)', color: isDark ? '#94a3b8' : '#f59e0b', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px', padding:'5px 10px', borderRadius:'8px', fontSize:'0.65rem', fontWeight:700, letterSpacing:'0.05em', flexShrink:0, transition:'all 0.25s', fontFamily:'inherit' }}
+          >
+            {isDark ? <><Sun size={12}/>&nbsp;LIGHT</> : <><Moon size={12}/>&nbsp;DARK</>}
+          </button>
             <Settings size={15} color="#334155" style={{ cursor:'pointer', flexShrink:0 }}/>
         </div>
       </div>
