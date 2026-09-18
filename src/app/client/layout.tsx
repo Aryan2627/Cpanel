@@ -56,209 +56,83 @@ const TOP_MENUS = [
   },
 ];
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
 
-  
 const launchPiP = async () => {
-  if (!('documentPictureInPicture' in window)) {
-    alert('Your browser does not support Document Picture-in-Picture.');
-    return;
-  }
+  if (!('documentPictureInPicture' in window)) { alert('Your browser does not support Document Picture-in-Picture.'); return; }
+  if (!window.Tesseract) { const script = document.createElement('script'); script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'; document.head.appendChild(script); }
   try {
     // @ts-ignore
-    const pipWindow = await window.documentPictureInPicture.requestWindow({ width: 380, height: 600 });
-    
+    const pipWindow = await window.documentPictureInPicture.requestWindow({ width: 400, height: 600 });
     const style = document.createElement('style');
     style.textContent = `
       body { margin: 0; background: #0f172a; color: #f1f5f9; font-family: system-ui, sans-serif; overflow: hidden; }
       .container { display: flex; flex-direction: column; height: 100vh; padding: 20px; box-sizing: border-box; }
       .btn { background: linear-gradient(135deg, #00c6ff, #0072ff); border: none; padding: 14px; border-radius: 12px; color: #fff; font-weight: 700; font-size: 0.95rem; cursor: pointer; width: 100%; margin-top: auto; box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3); transition: transform 0.1s; }
-      .btn:active { transform: scale(0.98); }
-      .msg { background: rgba(255,255,255,0.05); padding: 14px 16px; border-radius: 12px; font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.05); animation: fadeIn 0.3s ease-in-out; }
+      .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+      .msg { background: rgba(255,255,255,0.05); padding: 14px 16px; border-radius: 12px; font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.05); }
       .loading-line { display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: 0.8rem; margin-bottom: 6px; }
       .spinner { width: 12px; height: 12px; border: 2px solid #00c6ff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+      pre { white-space: pre-wrap; font-family: monospace; font-size: 0.75rem; background: #070b14; padding: 10px; border-radius: 6px; max-height: 200px; overflow-y: auto; color: #a5b4fc; }
       @keyframes spin { 100% { transform: rotate(360deg); } }
-      @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     `;
     pipWindow.document.head.appendChild(style);
-
     pipWindow.document.body.innerHTML = `
       <div class="container">
-        <h3 style="margin: 0 0 5px 0; color: #00c6ff; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px;">
-          <div style="width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg, #00c6ff, #0072ff); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 15px rgba(0,114,255,0.4);">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-          </div>
-          Cortex Anywhere
-        </h3>
-        <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 24px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Zero-Install Web Copilot</p>
-        
+        <h3 style="margin: 0 0 5px 0; color: #00c6ff; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px;">Cortex Anywhere</h3>
+        <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Live Vision AI (Local OCR)</p>
         <div id="chatArea" style="flex: 1; overflow-y: auto;">
           <div class="msg" style="background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 114, 255, 0.1)); border-color: rgba(0, 114, 255, 0.2);">
-            <strong style="color: #fff; display: block; margin-bottom: 6px;">Ready to Scan</strong>
-            Click "Analyze Screen" and select your Excel window. I will dynamically extract the items and find the best prices.
+            <strong style="color: #fff; display: block; margin-bottom: 6px;">Real Screen Analysis Ready</strong>
+            I have been upgraded to read the actual pixels on your screen using an advanced in-browser OCR engine. Select a window to test me!
           </div>
         </div>
-
-        <button id="scanBtn" class="btn">
-          👁️ Analyze Screen
-        </button>
+        <button id="scanBtn" class="btn">👁️ Analyze Real Screen</button>
       </div>
     `;
-
     pipWindow.document.getElementById('scanBtn').onclick = async () => {
        const btn = pipWindow.document.getElementById('scanBtn');
        const chat = pipWindow.document.getElementById('chatArea');
-       
        if (btn.disabled) return;
-       btn.disabled = true;
-       btn.innerText = 'Requesting permission...';
-       
+       btn.disabled = true; btn.innerText = 'Requesting window...';
        try {
          const stream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'window' } });
-         btn.innerText = 'Analyzing Data...';
-         
-         // 1. Create a dynamic processing UI
          const loadingId = 'load-' + Date.now();
-         chat.innerHTML += `<div id="${loadingId}" class="msg" style="border-color: rgba(255,255,255,0.1);">
-           <div class="loading-line"><div class="spinner"></div> Capturing screen frame...</div>
-         </div>`;
+         chat.innerHTML += `<div id="${loadingId}" class="msg" style="border-color: rgba(255,255,255,0.1);"><div class="loading-line"><div class="spinner"></div> Capturing video frame...</div></div>`;
          chat.scrollTop = chat.scrollHeight;
-
-         // Simulate actual AI processing steps with dynamic timeouts
-         setTimeout(() => {
-           const loader = pipWindow.document.getElementById(loadingId);
-           loader.innerHTML += `<div class="loading-line"><div class="spinner"></div> Extracting tabular data...</div>`;
-           chat.scrollTop = chat.scrollHeight;
-         }, 800);
-
-         setTimeout(() => {
-           const loader = pipWindow.document.getElementById(loadingId);
-           loader.innerHTML += `<div class="loading-line"><div class="spinner"></div> Cross-referencing internal catalog...</div>`;
-           chat.scrollTop = chat.scrollHeight;
-         }, 1800);
-         
-         setTimeout(() => {
-           stream.getTracks().forEach(track => track.stop());
-           
-           // Remove loading message
-           const loader = pipWindow.document.getElementById(loadingId);
+         const video = document.createElement('video'); video.srcObject = stream; await video.play();
+         const canvas = document.createElement('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+         stream.getTracks().forEach(track => track.stop());
+         const loader = pipWindow.document.getElementById(loadingId);
+         loader.innerHTML += `<div class="loading-line"><div class="spinner"></div> Running Local Neural OCR Engine...</div>`;
+         chat.scrollTop = chat.scrollHeight;
+         if (window.Tesseract) {
+           const { data: { text } } = await window.Tesseract.recognize(canvas, 'eng');
            if (loader) loader.remove();
-
-           // Generate Dynamic Randomized Data so it never feels rigid
-           const vendors = ['CDW', 'Dell Direct', 'Insight', 'SHI International', 'Amazon Business', 'WWT', 'Softchoice'];
-           const items = ['Lenovo ThinkPad T14s', 'Cisco Catalyst 9300 Switches', 'Dell PowerEdge R750s', 'Samsung 2TB NVMe SSDs', 'Herman Miller Aeron Chairs', 'Apple MacBook Pro M3', 'APC Smart-UPS'];
-           const randomVendor = vendors[Math.floor(Math.random() * vendors.length)];
-           const randomItem = items[Math.floor(Math.random() * items.length)];
-           const qty = Math.floor(Math.random() * 45) + 5;
-           const unitPrice = Math.floor(Math.random() * 2000) + 150;
-           const total = qty * unitPrice;
-           
-           const fTotal = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(total);
-           const fUnit = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(unitPrice);
-
-           chat.innerHTML += `<div class="msg" style="border-color: rgba(0,198,255,0.3); background: rgba(0,198,255,0.05);">
-            <strong style="color: #00c6ff; display: block; margin-bottom: 6px;">Context Detected: Microsoft Excel</strong>
-            Extracted <strong>${qty}x ${randomItem}</strong> from your active spreadsheet.<br/><br/>
-            💡 <strong>Cortex AI Insights:</strong><br/>
-            I cross-referenced this against our catalog. We have an active enterprise contract with <strong>${randomVendor}</strong> offering these at <strong>${fUnit}</strong> per unit.<br/>
-            <br/>
-            <span style="color: #4ade80; font-weight: 700;">Total Estimated Savings: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(total * 0.15)}</span><br/><br/>
-            <button style="background: #00c6ff; border: none; padding: 8px 12px; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; width: 100%;">Create PR for ${fTotal}</button>
-            </div>`;
-           chat.scrollTop = chat.scrollHeight;
-           btn.innerText = '👁️ Analyze Screen';
-           btn.disabled = false;
-         }, 3200);
-
+           if (!text || text.trim().length === 0) {
+             chat.innerHTML += `<div class="msg" style="border-color: #f59e0b;">Could not detect clear text.</div>`;
+           } else {
+             const cleanText = text.substring(0, 600) + (text.length > 600 ? '... [TRUNCATED]' : '');
+             chat.innerHTML += `<div class="msg" style="border-color: rgba(0,198,255,0.3); background: rgba(0,198,255,0.05);">
+              <strong style="color: #00c6ff; display: block; margin-bottom: 6px;">Real Text Detected!</strong>
+              Here is exactly what I read from your screen using live pixel analysis:<br/>
+              <pre>${cleanText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre><br/><span style="color: #4ade80;">✓ Analysis Complete</span>
+              </div>`;
+           }
+         } else {
+           if (loader) loader.remove(); chat.innerHTML += `<div class="msg" style="color: #f87171;">OCR Engine is still downloading.</div>`;
+         }
+         chat.scrollTop = chat.scrollHeight; btn.innerText = '👁️ Analyze Real Screen'; btn.disabled = false;
        } catch(e) {
-         btn.innerText = '👁️ Analyze Screen';
-         btn.disabled = false;
-         chat.innerHTML += '<div class="msg" style="color: #f87171;">Screen capture cancelled or blocked.</div>';
+         console.error(e); btn.innerText = '👁️ Analyze Real Screen'; btn.disabled = false;
+         chat.innerHTML += '<div class="msg" style="color: #f87171;">Screen capture cancelled or failed.</div>'; chat.scrollTop = chat.scrollHeight;
        }
     };
-  } catch(e) {
-    console.error(e);
-    alert('Failed to launch PiP window.');
-  }
+  } catch(e) { console.error(e); alert('Failed to launch PiP window.'); }
 };
 
+
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
-
-  const launchPiP = async () => {
-    if (!('documentPictureInPicture' in window)) {
-      alert('Your browser does not support Document Picture-in-Picture. Please use Google Chrome or Microsoft Edge (version 116+).');
-      return;
-    }
-    try {
-      // @ts-ignore
-      const pipWindow = await window.documentPictureInPicture.requestWindow({ width: 380, height: 600 });
-      
-      const style = document.createElement('style');
-      style.textContent = `
-        body { margin: 0; background: #0f172a; color: #f1f5f9; font-family: system-ui, sans-serif; overflow: hidden; }
-        .container { display: flex; flex-direction: column; height: 100vh; padding: 20px; box-sizing: border-box; }
-        .btn { background: linear-gradient(135deg, #00c6ff, #0072ff); border: none; padding: 14px; border-radius: 12px; color: #fff; font-weight: 700; font-size: 0.95rem; cursor: pointer; width: 100%; margin-top: auto; box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3); transition: transform 0.1s; }
-        .btn:active { transform: scale(0.98); }
-        .msg { background: rgba(255,255,255,0.05); padding: 14px 16px; border-radius: 12px; font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.05); }
-      `;
-      pipWindow.document.head.appendChild(style);
-
-      pipWindow.document.body.innerHTML = `
-        <div class="container">
-          <h3 style="margin: 0 0 5px 0; color: #00c6ff; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px;">
-            <div style="width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg, #00c6ff, #0072ff); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 15px rgba(0,114,255,0.4);">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-            </div>
-            Cortex Anywhere
-          </h3>
-          <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 24px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Zero-Install Web Copilot</p>
-          
-          <div id="chatArea" style="flex: 1; overflow-y: auto;">
-            <div class="msg" style="background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 114, 255, 0.1)); border-color: rgba(0, 114, 255, 0.2);">
-              <strong style="color: #fff; display: block; margin-bottom: 6px;">Hi there!</strong>
-              Click "Analyze Screen" to grant screen-share permission. I will read your open <strong>Excel spreadsheets</strong> and automatically extract Bills of Materials (BOM).
-            </div>
-          </div>
-
-          <button id="scanBtn" class="btn">
-            👁️ Analyze Screen
-          </button>
-        </div>
-      `;
-
-      pipWindow.document.getElementById('scanBtn').onclick = async () => {
-         const btn = pipWindow.document.getElementById('scanBtn');
-         const chat = pipWindow.document.getElementById('chatArea');
-         btn.innerText = 'Requesting permission...';
-         
-         try {
-           const stream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'window' } });
-           btn.innerText = 'Analyzing stream...';
-           
-           setTimeout(() => {
-             stream.getTracks().forEach(track => track.stop());
-             chat.innerHTML += `<div class="msg" style="border-color: rgba(0,198,255,0.3); background: rgba(0,198,255,0.05);">
-              <strong style="color: #00c6ff; display: block; margin-bottom: 6px;">Context Detected: Microsoft Excel</strong>
-              I see you are looking at an Excel spreadsheet containing a <strong>Bill of Materials</strong> for IT Infrastructure.<br/><br/>
-              💡 <strong>Cortex Insights:</strong><br/>
-              I have instantly cross-referenced the hardware rows visible on your screen against our internal catalog. I can procure the entire list for <strong>$23,200</strong> through our preferred vendors.<br/><br/>
-              <button style="background: #00c6ff; border: none; padding: 8px 12px; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; margin-top: 8px; width: 100%;">Generate PR from Excel Data</button>
-              </div>`;
-             chat.scrollTop = chat.scrollHeight;
-             btn.innerText = '👁️ Analyze Screen';
-           }, 2500);
-
-         } catch(e) {
-           btn.innerText = '👁️ Analyze Screen';
-           chat.innerHTML += '<div class="msg" style="color: #f87171;">Screen capture cancelled or blocked.</div>';
-         }
-      };
-    } catch(e) {
-      console.error(e);
-      alert('Failed to launch PiP window.');
-    }
-  };
-
   const pathname = usePathname();
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string; companyName?: string; licenseStatus?: string; licensePlan?: string; organizationId?: string; features?: string | null; isImpersonating?: boolean } | null>(null);
