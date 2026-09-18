@@ -376,22 +376,26 @@ export default function CortexPage() {
   ];
 
   return (
-    <div className={isDark ? "cortex-dark" : "cortex-light"} style={{ display:'flex', height:'100%', width:'100%', background:'#070d1c', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+    <div className="cortex-dark" style={{ display:'flex', height:'100%', width:'100%', background:'#040810', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
       
       {/* Animated Background */}
       <style>{`
-        .cortex-light { filter: invert(1) hue-rotate(180deg); background: #f8fafc !important; }
-        .cortex-light img, .cortex-light video, .cortex-light iframe, .cortex-light .keep-dark { filter: invert(1) hue-rotate(180deg); }
+        /* ── DRAKE DARK THEME ── */
+        .cortex-dark { --bg-primary: #040810; --bg-secondary: rgba(255,255,255,0.025); --bg-card: rgba(10,14,28,0.95); --border: rgba(255,255,255,0.07); --text-primary: #e2e8f0; --text-secondary: #64748b; --accent: #6366f1; }
+        .cortex-dark input, .cortex-dark textarea, .cortex-dark select { color-scheme: dark; }
+        .cortex-dark input::placeholder, .cortex-dark textarea::placeholder { color: rgba(100,116,139,0.45) !important; }
 
         @keyframes bgFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-20px) scale(1.05)} }
         @keyframes pulse2 { 0%,100%{opacity:0.4} 50%{opacity:0.7} }
         @keyframes cortexSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
         @keyframes fadeSlideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
         @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+        @keyframes drakeGlow { 0%,100%{box-shadow:0 0 30px rgba(99,102,241,0.08)} 50%{box-shadow:0 0 60px rgba(99,102,241,0.14)} }
         .cortex-msg { animation: fadeSlideIn 0.35s ease forwards; }
         .slash-btn:hover { background: rgba(255,255,255,0.06) !important; }
         .hist-item:hover { background: rgba(255,255,255,0.05) !important; } .hist-item:hover .dots-btn { opacity: 1 !important; }
-        ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08); border-radius:4px; }
+        ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(99,102,241,0.2); border-radius:4px; }
+        ::-webkit-scrollbar-thumb:hover { background:rgba(99,102,241,0.35); }
       `}</style>
       <div style={{ position:'fixed', top:'-200px', left:'30%', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', animation:'bgFloat 8s ease-in-out infinite', pointerEvents:'none', zIndex:0 }}/>
       <div style={{ position:'fixed', bottom:'-100px', right:'10%', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)', animation:'bgFloat 12s ease-in-out infinite reverse', pointerEvents:'none', zIndex:0 }}/>
@@ -470,8 +474,8 @@ export default function CortexPage() {
             <div style={{ fontSize:'0.82rem', fontWeight:600, color:'#e2e8f0', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{userName}</div>
             <div style={{ fontSize:'0.7rem', color:'#475569' }}>Enterprise Plan</div>
           </div>
-          <button onClick={() => setIsDark(!isDark)} className="keep-dark" style={{ background:'transparent', border:'none', color:'#475569', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', padding:'4px', marginRight:'2px', flexShrink:0 }}>
-              {isDark ? <Sun size={15}/> : <Moon size={15}/>}
+          <button className="keep-dark" style={{ background:'rgba(99,102,241,0.12)', border:'1px solid rgba(99,102,241,0.2)', color:'#818cf8', cursor:'default', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px', padding:'4px 8px', borderRadius:'6px', fontSize:'0.65rem', fontWeight:700, letterSpacing:'0.05em', flexShrink:0 }}>
+              <Moon size={11}/> DARK
             </button>
             <Settings size={15} color="#334155" style={{ cursor:'pointer', flexShrink:0 }}/>
         </div>
