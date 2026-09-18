@@ -412,6 +412,59 @@ export default function CortexPage() {
     setIsProcessing(false);
   };
 
+  
+  const handleScreenScan = async () => {
+    setShowSlash(false);
+    const msgId = 'scan-' + Date.now();
+    setMessages(p => [...p, 
+      { role: 'user', content: 'Scan my current screen and analyze it.' },
+      { id: msgId, role: 'agent', content: 'Requesting permission to read screen...', isLoading: true }
+    ]);
+    setIsProcessing(true);
+
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'window' } });
+      setMessages(p => p.map(m => m.id === msgId ? { ...m, content: 'Analyzing live video frame with Local OCR...' } : m));
+
+      // @ts-ignore
+      if (!window.Tesseract) {
+        await new Promise((resolve) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+          script.onload = resolve;
+          document.head.appendChild(script);
+        });
+      }
+
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      await video.play();
+
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      stream.getTracks().forEach(t => t.stop());
+
+      // @ts-ignore
+      const { data: { text } } = await window.Tesseract.recognize(canvas, 'eng');
+
+      if (!text || text.trim().length === 0) {
+        setMessages(p => p.map(m => m.id === msgId ? { ...m, content: 'Could not detect clear text on that screen.', isLoading: false } : m));
+      } else {
+        const cleanText = text.substring(0, 1500) + (text.length > 1500 ? '... [TRUNCATED]' : '');
+        setMessages(p => p.map(m => m.id === msgId ? { ...m, content: `**Screen Analysis Complete.**\n\nI successfully scanned your screen using an advanced in-browser local OCR engine. Here is the raw text extracted directly from the pixels:\n\n\`\`\`text\n${cleanText}\n\`\`\``, isLoading: false } : m));
+      }
+    } catch (err) {
+      console.error(err);
+      setMessages(p => p.map(m => m.id === msgId ? { ...m, content: 'Screen capture cancelled or failed.', isLoading: false } : m));
+    }
+    
+    setIsProcessing(false);
+  };
+
   const send = async (e?: React.FormEvent) => {
     if(e) e.preventDefault();
     if(!input.trim()||isProcessing) return;
@@ -451,6 +504,8 @@ export default function CortexPage() {
     { cmd:'/analyze-bids',    label:'AI Bid Recommendation Engine',     icon:<BarChart3 size={14}/>,      color:'#818cf8', bg:'rgba(99,102,241,0.12)',   auto:true  },
     { cmd:'/find-savings',    label:'Scan History for Savings',         icon:<Sparkles size={14}/>,       color:'#f472b6', bg:'rgba(244,114,182,0.12)',  auto:true  },
     { cmd:'/remind-approvers',label:'Nudge Approvers via Email',        icon:<Terminal size={14}/>,       color:'#fb923c', bg:'rgba(249,115,22,0.12)',   auto:true  },
+    
+    { cmd:'/scan',            label:'Analyze Current Screen (OCR)',     icon:<Monitor size={14}/>,        color:'#00c6ff', bg:'rgba(0,198,255,0.12)',    auto:true  },
     { cmd:'/clear',           label:'Clear Conversation',               icon:<X size={14}/>,              color:'#94a3b8', bg:'rgba(148,163,184,0.08)',  auto:true  },
   ];
 
@@ -1209,6 +1264,16 @@ export default function CortexPage() {
                 disabled={isProcessing}
                 className="cx-input-field" style={{ width:'100%', padding:'16px 56px 16px 46px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#e2e8f0', fontSize:'16px', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
               />
+              
+              <button 
+                type="button" 
+                onClick={handleScreenScan}
+                style={{ position:'absolute', right:'56px', width:'38px', height:'38px', borderRadius:'12px', background: isProcessing ? 'transparent' : 'rgba(255,255,255,0.05)', border: isProcessing ? 'none' : '1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', cursor: isProcessing ? 'default' : 'pointer', transition:'all 0.2s', opacity: isProcessing ? 0.5 : 1 }}
+                title="Capture & Scan Screen"
+                disabled={isProcessing}
+              >
+                <Monitor size={16} color="#00c6ff" />
+              </button>
               <button type="submit" disabled={!input.trim()||isProcessing} style={{ position:'absolute', right:'10px', width:'38px', height:'38px', borderRadius:'12px', background: input.trim()&&!isProcessing?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.05)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor: input.trim()&&!isProcessing?'pointer':'default', transition:'all 0.2s', boxShadow: input.trim()&&!isProcessing?'0 0 16px rgba(99,102,241,0.4)':'none' }}>
                 <Send size={15} color={input.trim()&&!isProcessing?'#fff':'#334155'}/>
               </button>
