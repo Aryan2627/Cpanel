@@ -1108,7 +1108,7 @@ export default function CortexPage() {
             {/* Input Box */}
             <form onSubmit={send} style={{ position:'relative', display:'flex', alignItems:'center' }}>
               <div style={{ position:'absolute', left:'18px', zIndex:2, display:'flex', alignItems:'center' }}>
-                <Bot size={16} color={input?'#6366f1':'#334155'} style={{ transition:'color 0.2s' }}/>
+                <Sparkles size={16} color={input?'#0072ff':'#334155'} style={{ transition:'color 0.2s' }}/>
               </div>
               <input
                 type="text" value={input}

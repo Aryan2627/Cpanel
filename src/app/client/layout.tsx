@@ -7,7 +7,7 @@ import TourButton from './TourButton';
 import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
 import JarvisAssistant from './JarvisAssistant';
-import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles } from 'lucide-react';
 
 const TOP_MENUS = [
   { name: 'Dashboard', path: '/client', icon: LayoutDashboard },
@@ -226,7 +226,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 href="/client/cortex"
                 style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
-                  background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                  background: 'linear-gradient(135deg, #00c6ff, #0072ff)',
                   textDecoration: 'none',
                   border: 'none', borderRadius: '24px',
                   padding: '6px 14px', color: '#fff', fontSize: '0.8rem', fontWeight: 600,
@@ -234,7 +234,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   transition: 'transform 0.2s',
                 }}
               >
-                <Bot size={14} /> Cortex AI
+                <Sparkles size={14} /> Cortex AI
               </Link>
               )}
 
