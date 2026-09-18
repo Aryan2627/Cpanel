@@ -642,9 +642,9 @@ export default function CortexPage() {
                       </div>
                       <div style={{ fontSize:'1.05rem', fontWeight:700, color: isDark ? '#f1f5f9' : '#0f172a', marginBottom:'8px' }}>Upload Bill of Materials (BOM)</div>
                       <div style={{ fontSize:'0.85rem', color: isDark ? '#94a3b8' : '#64748b', maxWidth:'300px', marginBottom:'20px', lineHeight:1.5 }}>Drag and drop your Excel (.xlsx) or CSV file here, or click to browse.</div>
-                      <button style={{ background:'linear-gradient(135deg, #2dd4bf, #0d9488)', border:'none', padding:'10px 24px', borderRadius:'24px', color:'#fff', fontWeight:600, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 4px 15px rgba(13,148,136,0.3)', display:'flex', alignItems:'center', gap:'8px' }}>
+                      <div style={{ background:'linear-gradient(135deg, #2dd4bf, #0d9488)', border:'none', padding:'10px 24px', borderRadius:'24px', color:'#fff', fontWeight:600, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 4px 15px rgba(13,148,136,0.3)', display:'flex', alignItems:'center', gap:'8px', pointerEvents:'none' }}>
                          Browse Files
-                      </button>
+                      </div>
                     </label>
                   )}
 
