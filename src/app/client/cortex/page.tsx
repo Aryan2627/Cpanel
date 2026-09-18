@@ -318,6 +318,7 @@ export default function CortexPage() {
     if(cmd.startsWith('/execute-')) display = 'Executing action...';
     if(cmd.startsWith('/analyze-risk')) display = 'Deploy AI swarm to analyze this contract\'s risk profile.';
     if(cmd.startsWith('/analyze-contract')) display = 'Run deep legal clause analysis.';
+    if(cmd.startsWith('/execute-bom-upload')) display = 'Processing Bill of Materials...';
     setMessages(p=>[...p, { role:'user', content:display }]);
     const newId = 'c_' + Date.now();
     if(messages.length===1) {
@@ -359,6 +360,7 @@ export default function CortexPage() {
   ));
 
   const slashCmds = [
+    { cmd:'/bom', label:'BOM to Purchase Request (AI Matcher)', icon:<FileUp size={14}/>, color:'#2dd4bf', bg:'rgba(45,212,191,0.12)', auto:true, hasTutorial: false },
     { cmd:'/analyze-bids',    label:'Compare Vendor Bids & Export',    icon:<BarChart3 size={14}/>,      color:'#f43f5e', bg:'rgba(244,63,94,0.12)',    auto:true, hasTutorial: false },
       { cmd:'/analyze-risk',    label:'Multi-Agent Risk Swarm',          icon:<AlertTriangle size={14}/>,  color:'#f87171', bg:'rgba(239,68,68,0.12)',    auto:true },
     { cmd:'/analyze-contract',label:'Deep Legal Clause Review (CUAD)',  icon:<Shield size={14}/>,         color:'#c084fc', bg:'rgba(168,85,247,0.12)',   auto:true },
@@ -627,6 +629,81 @@ export default function CortexPage() {
                             <div style={{ fontSize:'0.8rem', color:'#94a3b8', lineHeight:'1.5' }}>{r.detail}</div>
                           </div>
                         ))}
+                      </div>
+                    </div>
+                  )}
+
+                                    {/* BOM Upload UI */}
+                  {msg.uiComponent==='bom_upload' && (
+                    <div className="cx-form-card" style={{ marginTop:'14px', borderRadius:'16px', border:'1px dashed rgba(45,212,191,0.4)', background: isDark ? 'rgba(45,212,191,0.03)' : 'rgba(45,212,191,0.05)', padding:'32px 24px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', transition:'all 0.2s', cursor:'pointer' }} onClick={() => execute('/execute-bom-upload')}>
+                      <div style={{ width:'64px', height:'64px', borderRadius:'50%', background:'linear-gradient(135deg, rgba(45,212,191,0.2), rgba(20,184,166,0.2))', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:'16px', boxShadow:'0 0 20px rgba(45,212,191,0.1)' }}>
+                        <FileUp size={28} color="#2dd4bf" />
+                      </div>
+                      <div style={{ fontSize:'1.05rem', fontWeight:700, color: isDark ? '#f1f5f9' : '#0f172a', marginBottom:'8px' }}>Upload Bill of Materials (BOM)</div>
+                      <div style={{ fontSize:'0.85rem', color: isDark ? '#94a3b8' : '#64748b', maxWidth:'300px', marginBottom:'20px', lineHeight:1.5 }}>Drag and drop your Excel (.xlsx) or CSV file here, or click to browse.</div>
+                      <button style={{ background:'linear-gradient(135deg, #2dd4bf, #0d9488)', border:'none', padding:'10px 24px', borderRadius:'24px', color:'#fff', fontWeight:600, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 4px 15px rgba(13,148,136,0.3)', display:'flex', alignItems:'center', gap:'8px' }}>
+                         Browse Files
+                      </button>
+                    </div>
+                  )}
+
+                  {/* BOM Results UI */}
+                  {msg.uiComponent==='bom_results' && msg.uiData && (
+                    <div className="cx-form-card" style={{ marginTop:'16px', borderRadius:'16px', overflow:'hidden', border:'1px solid rgba(45,212,191,0.2)', background: isDark ? 'rgba(15,23,42,0.8)' : '#ffffff', boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.5)' : '0 8px 30px rgba(45,212,191,0.1)' }}>
+                      
+                      <div style={{ padding:'16px 20px', background: isDark ? 'rgba(45,212,191,0.1)' : 'rgba(45,212,191,0.05)', borderBottom: isDark ? '1px solid rgba(45,212,191,0.15)' : '1px solid rgba(45,212,191,0.2)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                        <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
+                          <Cpu size={18} color="#2dd4bf" />
+                          <div>
+                            <div style={{ fontSize:'0.9rem', fontWeight:700, color: isDark ? '#f1f5f9' : '#0f172a' }}>BOM Match Results</div>
+                            <div style={{ fontSize:'0.7rem', color: isDark ? '#94a3b8' : '#64748b', marginTop:'2px' }}>{msg.uiData.items.length} line items processed successfully</div>
+                          </div>
+                        </div>
+                        <div style={{ textAlign:'right' }}>
+                           <div style={{ fontSize:'0.7rem', color: isDark ? '#94a3b8' : '#64748b', textTransform:'uppercase', fontWeight:700, letterSpacing:'0.5px' }}>Total Est. Cost</div>
+                           <div style={{ fontSize:'1.1rem', fontWeight:800, color:'#2dd4bf' }}></div>
+                        </div>
+                      </div>
+
+                      <div style={{ overflowX:'auto' }}>
+                        <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'0.8rem', textAlign:'left' }}>
+                          <thead>
+                            <tr style={{ background: isDark ? 'rgba(255,255,255,0.02)' : '#f8fafc', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #e2e8f0' }}>
+                              <th style={{ padding:'12px 16px', color: isDark ? '#94a3b8' : '#64748b', fontWeight:600 }}>Part #</th>
+                              <th style={{ padding:'12px 16px', color: isDark ? '#94a3b8' : '#64748b', fontWeight:600 }}>Description</th>
+                              <th style={{ padding:'12px 16px', color: isDark ? '#94a3b8' : '#64748b', fontWeight:600 }}>Status</th>
+                              <th style={{ padding:'12px 16px', color: isDark ? '#94a3b8' : '#64748b', fontWeight:600 }}>Vendor / Source</th>
+                              <th style={{ padding:'12px 16px', color: isDark ? '#94a3b8' : '#64748b', fontWeight:600, textAlign:'right' }}>Unit Cost</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {msg.uiData.items.map((item: any) => (
+                              <tr key={item.id} style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.03)' : '1px solid #f1f5f9' }}>
+                                <td style={{ padding:'12px 16px', fontWeight:600, color: isDark ? '#e2e8f0' : '#1e293b' }}>{item.part}</td>
+                                <td style={{ padding:'12px 16px', color: isDark ? '#cbd5e1' : '#475569' }}>{item.desc}<br/><span style={{ fontSize:'0.7rem', color: isDark ? '#64748b' : '#94a3b8' }}>Qty: {item.qty}</span></td>
+                                <td style={{ padding:'12px 16px' }}>
+                                  {item.status === 'IN CATALOG' ? (
+                                    <span style={{ display:'inline-flex', alignItems:'center', gap:'4px', padding:'4px 8px', borderRadius:'6px', background: isDark ? 'rgba(34,197,94,0.1)' : '#dcfce7', color: isDark ? '#4ade80' : '#15803d', fontSize:'0.7rem', fontWeight:700 }}>
+                                      <CheckCircle size={10}/> CATALOG MATCH
+                                    </span>
+                                  ) : (
+                                    <span style={{ display:'inline-flex', alignItems:'center', gap:'4px', padding:'4px 8px', borderRadius:'6px', background: isDark ? 'rgba(245,158,11,0.1)' : '#fef3c7', color: isDark ? '#fbbf24' : '#b45309', fontSize:'0.7rem', fontWeight:700 }}>
+                                      <Search size={10}/> AI SOURCED
+                                    </span>
+                                  )}
+                                </td>
+                                <td style={{ padding:'12px 16px', color: isDark ? '#cbd5e1' : '#475569' }}>{item.vendor}</td>
+                                <td style={{ padding:'12px 16px', textAlign:'right', fontWeight:700, color: isDark ? '#e2e8f0' : '#1e293b' }}></td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div style={{ padding:'16px 20px', background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', display:'flex', justifyContent:'flex-end' }}>
+                        <button onClick={() => setMessages(p => [...p, { role:'agent', content:'Purchase Request (PR-2026-0842) has been successfully generated and routed to the IT Manager for approval.' }])} style={{ background:'linear-gradient(135deg, #2dd4bf, #0d9488)', border:'none', padding:'12px 24px', borderRadius:'8px', color:'#fff', fontWeight:700, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 4px 15px rgba(13,148,136,0.3)', display:'flex', alignItems:'center', gap:'8px', transition:'transform 0.1s' }}>
+                          <CheckCircle2 size={16}/> Generate Purchase Request
+                        </button>
                       </div>
                     </div>
                   )}

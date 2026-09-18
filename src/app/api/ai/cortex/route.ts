@@ -573,7 +573,48 @@ export async function POST(req: Request) {
       }
 
     
-      if (text.startsWith('/s2p')) {
+      
+    if (text.startsWith('/bom')) {
+      return NextResponse.json({
+        final_response: "I've initialized the AI BOM Processor. Please drop your Bill of Materials (.xlsx or .csv) below. I will instantly cross-reference the parts with your internal master catalog and source external vendors for any out-of-stock items.",
+        ui_component: "bom_upload",
+        ui_data: {},
+        thought_process: [
+          "User initiated BOM to PR workflow.",
+          "Loading Generative UI dropzone component.",
+          "Ready to ingest spreadsheet file."
+        ]
+      });
+    }
+
+    if (text.startsWith('/execute-bom-upload')) {
+      return NextResponse.json({
+        final_response: "I have successfully processed your Bill of Materials. I found 3 items in our internal catalog and identified verified suppliers for the 2 missing items. Review the matched matrix below and click 'Generate PR' when ready.",
+        ui_component: "bom_results",
+        ui_data: {
+          items: [
+            { id: 1, part: "SYS-SRV-09", desc: "Dell PowerEdge R750 Server", qty: 2, status: "IN CATALOG", vendor: "Dell Direct", unitCost: 4500, matchConfidence: "99%" },
+            { id: 2, part: "MEM-64G-D4", desc: "64GB DDR4 ECC RAM", qty: 16, status: "IN CATALOG", vendor: "CDW", unitCost: 185, matchConfidence: "98%" },
+            { id: 3, part: "NET-SFP-10G", desc: "10G SFP+ Transceiver Module", qty: 4, status: "NEEDS SOURCING", vendor: "Ingram Micro", unitCost: 45, matchConfidence: "N/A" },
+            { id: 4, part: "CBL-CAT6-3M", desc: "Cat6 Patch Cable 3m Blue", qty: 20, status: "IN CATALOG", vendor: "Amazon Business", unitCost: 5, matchConfidence: "100%" },
+            { id: 5, part: "CAB-RACK-42U", desc: "42U Server Rack Enclosure", qty: 1, status: "NEEDS SOURCING", vendor: "CDW", unitCost: 1200, matchConfidence: "N/A" }
+          ],
+          totalEstimatedCost: 13360
+        },
+        thought_process: [
+          "Ingested uploaded BOM file (14.2 KB).",
+          "Parsed 5 line items from spreadsheet.",
+          "Running semantic similarity search against master product catalog...",
+          "Match found for SYS-SRV-09, MEM-64G-D4, CBL-CAT6-3M (Confidence > 98%).",
+          "Items NET-SFP-10G and CAB-RACK-42U not found in active catalog.",
+          "Querying approved vendor punchouts (CDW, Ingram Micro) for out-of-stock items...",
+          "Found pricing and availability. Estimated total cost: $13,360.",
+          "Rendering BOM results matrix."
+        ]
+      });
+    }
+
+    if (text.startsWith('/s2p')) {
         return NextResponse.json({
           final_response: "Let's initiate a new Source-to-Pay (S2P) workflow. Please provide the intake details below.",
           ui_component: 's2p_intake_form'
