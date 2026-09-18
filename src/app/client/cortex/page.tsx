@@ -559,41 +559,73 @@ export default function CortexPage() {
 
                     {/* S2P Intake Form */}
                     {msg.uiComponent==='s2p_intake_form' && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Initiate Source-to-Pay (Intake)</div>
-                        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-                          <input type="text" placeholder="Request Title *" value={s2pForm.title} onChange={e=>setS2pForm({...s2pForm, title:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                          
-                          <div style={{ display:'flex', gap:'10px' }}>
-                            <select value={s2pForm.category} onChange={e=>setS2pForm({...s2pForm, category:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', cursor:'pointer' }}>
-                              <option value="" disabled style={{background:'#0f172a'}}>Select Category</option>
-                              <option value="IT" style={{background:'#0f172a'}}>IT</option>
-                              <option value="HR" style={{background:'#0f172a'}}>HR</option>
-                              <option value="Marketing" style={{background:'#0f172a'}}>Marketing</option>
-                              <option value="Operations" style={{background:'#0f172a'}}>Operations</option>
-                            </select>
-                            <select value={s2pForm.department} onChange={e=>setS2pForm({...s2pForm, department:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', cursor:'pointer' }}>
-                              <option value="" disabled style={{background:'#0f172a'}}>Select Dept.</option>
-                              <option value="Engineering" style={{background:'#0f172a'}}>Engineering</option>
-                              <option value="Sales" style={{background:'#0f172a'}}>Sales</option>
-                              <option value="Finance" style={{background:'#0f172a'}}>Finance</option>
-                              <option value="Legal" style={{background:'#0f172a'}}>Legal</option>
-                            </select>
+                      <div style={{ marginTop:'16px', borderRadius:'18px', overflow:'hidden', border:'1px solid rgba(99,102,241,0.15)', background:'linear-gradient(145deg,rgba(15,12,35,0.97),rgba(10,8,25,0.98))', boxShadow:'0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05)' }}>
+                        <div style={{ padding:'16px 20px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(99,102,241,0.07)', display:'flex', alignItems:'center', gap:'10px' }}>
+                          <div style={{ width:'30px', height:'30px', borderRadius:'9px', background:'linear-gradient(135deg,#4f46e5,#7c3aed)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.9rem', boxShadow:'0 4px 10px rgba(99,102,241,0.4)', flexShrink:0 }}>📋</div>
+                          <div>
+                            <div style={{ color:'#f1f5f9', fontWeight:700, fontSize:'0.88rem' }}>Source-to-Pay Intake</div>
+                            <div style={{ color:'rgba(148,163,184,0.5)', fontSize:'0.7rem', marginTop:'1px' }}>Fill in the procurement request details</div>
                           </div>
-
-                          <div style={{ display:'flex', gap:'10px' }}>
-                            <input type="number" onWheel={(e) => (e.target as any).blur()} placeholder="Budget ($) *" value={s2pForm.budget} onChange={e=>setS2pForm({...s2pForm, budget:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                            <input type="number" onWheel={(e) => (e.target as any).blur()} placeholder="Quantity *" value={s2pForm.quantity || ''} onChange={e=>setS2pForm({...s2pForm, quantity:parseInt(e.target.value) || 1})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                        </div>
+                        <div style={{ padding:'18px 20px', display:'flex', flexDirection:'column', gap:'13px' }}>
+                          <div>
+                            <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Request Title <span style={{color:'#f87171'}}>*</span></label>
+                            <input type="text" placeholder="e.g. Q4 Marketing Software Licenses" value={s2pForm.title} onChange={e=>setS2pForm({...s2pForm, title:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
                           </div>
-
-                          <textarea rows={2} placeholder="Item Description *" value={s2pForm.description} onChange={e=>setS2pForm({...s2pForm, description:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', resize:'none' }}/>
-                          
-                          <div style={{ display:'flex', gap:'10px' }}>
-                            <input type="date" placeholder="Required Date" value={s2pForm.requiredDate} onChange={e=>setS2pForm({...s2pForm, requiredDate:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', colorScheme: 'dark' }}/>
-                            <input type="text" placeholder="Delivery Address *" value={s2pForm.address} onChange={e=>setS2pForm({...s2pForm, address:e.target.value})} style={{ flex:2, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
+                          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
+                            <div>
+                              <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Category <span style={{color:'#f87171'}}>*</span></label>
+                              <select value={s2pForm.category} onChange={e=>setS2pForm({...s2pForm, category:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(15,12,35,0.95)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', cursor:'pointer', boxSizing:'border-box' }}>
+                                <option value="IT" style={{background:'#0f0c23'}}>IT</option>
+                                <option value="HR" style={{background:'#0f0c23'}}>HR</option>
+                                <option value="Marketing" style={{background:'#0f0c23'}}>Marketing</option>
+                                <option value="Operations" style={{background:'#0f0c23'}}>Operations</option>
+                                <option value="Finance" style={{background:'#0f0c23'}}>Finance</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Department <span style={{color:'#f87171'}}>*</span></label>
+                              <select value={s2pForm.department} onChange={e=>setS2pForm({...s2pForm, department:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(15,12,35,0.95)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', cursor:'pointer', boxSizing:'border-box' }}>
+                                <option value="Engineering" style={{background:'#0f0c23'}}>Engineering</option>
+                                <option value="Sales" style={{background:'#0f0c23'}}>Sales</option>
+                                <option value="Finance" style={{background:'#0f0c23'}}>Finance</option>
+                                <option value="Legal" style={{background:'#0f0c23'}}>Legal</option>
+                                <option value="Operations" style={{background:'#0f0c23'}}>Operations</option>
+                              </select>
+                            </div>
                           </div>
-
-                          <button onClick={()=>execute('/execute-s2p-intake '+JSON.stringify(s2pForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#10b981,#059669)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem', marginTop:'6px' }}>Submit Intake</button>
+                          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
+                            <div>
+                              <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Budget (USD) <span style={{color:'#f87171'}}>*</span></label>
+                              <div style={{position:'relative'}}>
+                                <span style={{position:'absolute',left:'11px',top:'50%',transform:'translateY(-50%)',color:'rgba(148,163,184,0.35)',fontSize:'0.85rem',fontWeight:700,pointerEvents:'none'}}>$</span>
+                                <input type="number" onWheel={(e)=>(e.target as any).blur()} placeholder="0.00" value={s2pForm.budget} onChange={e=>setS2pForm({...s2pForm, budget:e.target.value})} style={{ width:'100%', padding:'10px 13px 10px 24px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                              </div>
+                            </div>
+                            <div>
+                              <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Quantity <span style={{color:'#f87171'}}>*</span></label>
+                              <input type="number" onWheel={(e)=>(e.target as any).blur()} placeholder="1" value={s2pForm.quantity||''} onChange={e=>setS2pForm({...s2pForm, quantity:parseInt(e.target.value)||1})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                            </div>
+                          </div>
+                          <div>
+                            <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Item Description <span style={{color:'#f87171'}}>*</span></label>
+                            <textarea rows={3} placeholder="Describe what you need in detail..." value={s2pForm.description} onChange={e=>setS2pForm({...s2pForm, description:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', resize:'vertical', fontFamily:'inherit', lineHeight:'1.6', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                          </div>
+                          <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:'10px' }}>
+                            <div>
+                              <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Required By</label>
+                              <input type="date" value={s2pForm.requiredDate} onChange={e=>setS2pForm({...s2pForm, requiredDate:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', colorScheme:'dark', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';}}/>
+                            </div>
+                            <div>
+                              <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Delivery Address <span style={{color:'#f87171'}}>*</span></label>
+                              <input type="text" placeholder="123 Main St, City, Country" value={s2pForm.address} onChange={e=>setS2pForm({...s2pForm, address:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                            </div>
+                          </div>
+                          <div style={{ paddingTop:'8px', borderTop:'1px solid rgba(255,255,255,0.05)' }}>
+                            <button onClick={()=>execute('/execute-s2p-intake '+JSON.stringify(s2pForm))} style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#10b981,#059669)', color:'#fff', border:'none', borderRadius:'11px', fontWeight:700, cursor:'pointer', fontSize:'0.87rem', letterSpacing:'0.02em', boxShadow:'0 4px 18px rgba(16,185,129,0.35)', display:'flex', alignItems:'center', justifyContent:'center', gap:'7px', fontFamily:'inherit' }}>
+                              🚀 Submit Intake Request
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -605,19 +637,44 @@ export default function CortexPage() {
 
                   {/* Event Form */}
                   {msg.uiComponent==='event_creation_form' && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem' }}>Create Sourcing Event</div>
-                        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-                          <input type="text" placeholder="Event Title" value={eventForm.title} onChange={e=>setEventForm({...eventForm, title:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                          <input type="text" placeholder="Budget ($)" value={eventForm.budget} onChange={e=>setEventForm({...eventForm, budget:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                          <div style={{ display:'flex', gap:'10px' }}>
-                            <input type="text" placeholder="Duration" value={eventForm.duration} onChange={e=>setEventForm({...eventForm, duration:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
-                            <select value={eventForm.durationUnit} onChange={e=>setEventForm({...eventForm, durationUnit:e.target.value})} style={{ width:'120px', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none', cursor:'pointer' }}>
-                              <option value="minutes" style={{ background:'#0f172a' }}>Minutes</option>
-                              <option value="days" style={{ background:'#0f172a' }}>Days</option>
-                            </select>
+                      <div style={{ marginTop:'16px', borderRadius:'18px', overflow:'hidden', border:'1px solid rgba(234,88,12,0.15)', background:'linear-gradient(145deg,rgba(15,10,5,0.97),rgba(10,7,3,0.98))', boxShadow:'0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.04)' }}>
+                        <div style={{ padding:'16px 20px 14px', borderBottom:'1px solid rgba(255,255,255,0.05)', background:'rgba(234,88,12,0.06)', display:'flex', alignItems:'center', gap:'10px' }}>
+                          <div style={{ width:'30px', height:'30px', borderRadius:'9px', background:'linear-gradient(135deg,#ea580c,#c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.9rem', boxShadow:'0 4px 10px rgba(234,88,12,0.4)', flexShrink:0 }}>⚡</div>
+                          <div>
+                            <div style={{ color:'#f1f5f9', fontWeight:700, fontSize:'0.88rem' }}>Create Sourcing Event</div>
+                            <div style={{ color:'rgba(148,163,184,0.5)', fontSize:'0.7rem', marginTop:'1px' }}>Configure and publish a live procurement event</div>
                           </div>
-                          <button onClick={()=>execute('/execute-create-event '+JSON.stringify(eventForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#ea580c,#c2410c)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Publish Event</button>
+                        </div>
+                        <div style={{ padding:'18px 20px', display:'flex', flexDirection:'column', gap:'13px' }}>
+                          <div>
+                            <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Event Title <span style={{color:'#f87171'}}>*</span></label>
+                            <input type="text" placeholder="e.g. Q4 Cloud Infrastructure RFQ" value={eventForm.title} onChange={e=>setEventForm({...eventForm, title:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(234,88,12,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(234,88,12,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                          </div>
+                          <div>
+                            <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Budget (USD)</label>
+                            <div style={{position:'relative'}}>
+                              <span style={{position:'absolute',left:'11px',top:'50%',transform:'translateY(-50%)',color:'rgba(148,163,184,0.35)',fontSize:'0.85rem',fontWeight:700,pointerEvents:'none'}}>$</span>
+                              <input type="text" placeholder="0.00" value={eventForm.budget} onChange={e=>setEventForm({...eventForm, budget:e.target.value})} style={{ width:'100%', padding:'10px 13px 10px 24px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(234,88,12,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(234,88,12,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                            </div>
+                          </div>
+                          <div>
+                            <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Duration <span style={{color:'#f87171'}}>*</span></label>
+                            <div style={{ display:'grid', gridTemplateColumns:'1fr auto', gap:'8px', alignItems:'center' }}>
+                              <input type="number" onWheel={(e)=>(e.target as any).blur()} placeholder="e.g. 7" value={eventForm.duration} onChange={e=>setEventForm({...eventForm, duration:e.target.value})} style={{ padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(234,88,12,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(234,88,12,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                              <div style={{ display:'flex', gap:'6px' }}>
+                                {(['minutes','days'] as const).map(unit => (
+                                  <button key={unit} onClick={()=>setEventForm({...eventForm, durationUnit:unit})} style={{ padding:'10px 14px', borderRadius:'10px', border:'1px solid', borderColor: eventForm.durationUnit===unit ? 'rgba(234,88,12,0.5)' : 'rgba(255,255,255,0.08)', background: eventForm.durationUnit===unit ? 'rgba(234,88,12,0.15)' : 'rgba(255,255,255,0.04)', color: eventForm.durationUnit===unit ? '#fb923c' : 'rgba(148,163,184,0.55)', fontSize:'0.78rem', fontWeight:700, cursor:'pointer', textTransform:'capitalize', fontFamily:'inherit', transition:'all 0.15s', whiteSpace:'nowrap' }}>
+                                    {unit.charAt(0).toUpperCase()+unit.slice(1)}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div style={{ paddingTop:'8px', borderTop:'1px solid rgba(255,255,255,0.05)' }}>
+                            <button onClick={()=>execute('/execute-create-event '+JSON.stringify(eventForm))} style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#ea580c,#c2410c)', color:'#fff', border:'none', borderRadius:'11px', fontWeight:700, cursor:'pointer', fontSize:'0.87rem', letterSpacing:'0.02em', boxShadow:'0 4px 18px rgba(234,88,12,0.4)', display:'flex', alignItems:'center', justifyContent:'center', gap:'7px', fontFamily:'inherit' }}>
+                              ⚡ Publish Event Now
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )}
