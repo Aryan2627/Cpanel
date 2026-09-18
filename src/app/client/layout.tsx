@@ -7,7 +7,7 @@ import TourButton from './TourButton';
 import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
 import JarvisAssistant from './JarvisAssistant';
-import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X } from 'lucide-react';
 
 const TOP_MENUS = [
   { name: 'Dashboard', path: '/client', icon: LayoutDashboard },
@@ -63,6 +63,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // Track which dropdown is open
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => { if (d?.name) setCurrentUser(d); }).catch(() => null);
@@ -126,14 +127,14 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
         )}
 
-        <div style={{ height: '64px', backgroundColor: '#071330', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'relative', zIndex: 100 }}>
+        <div className="mobile-p-16" style={{ height: '64px', backgroundColor: '#071330', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'relative', zIndex: 100 }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
             <Link href="/client" style={{ color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <img src="/logo.png" alt="ProcGen Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
             </Link>
 
-            <nav style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               {TOP_MENUS.map((menu) => (
                 <div 
                   key={menu.name}
@@ -205,7 +206,17 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             </nav>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          
+          {/* Mobile Menu Button */}
+          <button 
+            className="mobile-hamburger"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            style={{ display: 'none', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px', marginLeft: 'auto', marginRight: '16px' }}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+          
+          <div className="top-bar-right" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
             
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -237,7 +248,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e293b, #334155)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>
                     {(currentUser?.name || 'A')[0]}
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div className="profile-text" style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 600 }}>{currentUser?.name || 'Admin'}</span>
                     <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem' }}>{currentUser?.companyName || 'My Organization'}</span>
                   </div>
@@ -249,6 +260,31 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             </div>
           </div>
         </div>
+
+        
+        {/* Mobile Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div style={{ position: 'absolute', top: '64px', left: 0, width: '100%', background: '#0f172a', zIndex: 9999, borderBottom: '1px solid rgba(255,255,255,0.1)', maxHeight: 'calc(100vh - 64px)', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', padding: '16px' }}>
+              {TOP_MENUS.map(menu => (
+                <div key={menu.name} style={{ marginBottom: '8px' }}>
+                  <Link href={menu.path || '#'} onClick={() => { if(!menu.sub) setMobileMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', color: '#fff', textDecoration: 'none', fontWeight: 600, borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }}>
+                    <menu.icon size={18} /> {menu.name}
+                  </Link>
+                  {menu.sub && (
+                    <div style={{ paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
+                      {menu.sub.map(sub => (
+                        <Link key={sub.name} href={sub.path} onClick={() => setMobileMenuOpen(false)} style={{ padding: '10px', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', display: 'block' }}>
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* The Absolute Backdrop Blur for Cinematic Nav effect */}
         {hoveredMenu && (

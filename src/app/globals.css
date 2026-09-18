@@ -312,3 +312,27 @@ a:hover { color: var(--primary-hover); }
   .kpi-grid { grid-template-columns: 1fr 1fr; }
 }
 
+
+/* ============ RESPONSIVE LAYOUT FIXES ============ */
+@media (max-width: 1024px) {
+  .dashboard-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+  .dashboard-grid-2 { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid-4 { grid-template-columns: 1fr !important; }
+  
+  /* Top Nav Mobile */
+  .desktop-nav { display: none !important; }
+  .mobile-hamburger { display: flex !important; }
+  .top-bar-right { gap: 12px !important; }
+  .profile-text { display: none !important; }
+  
+  /* Layout Adjustments */
+  .mobile-p-16 { padding: 16px !important; }
+  .mobile-mt-0 { margin-top: 0 !important; }
+  .mobile-flex-col { flex-direction: column !important; }
+  
+  /* Typography for mobile */
+  .mobile-h1 { font-size: 1.4rem !important; }
+}
