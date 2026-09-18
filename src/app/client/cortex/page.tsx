@@ -427,7 +427,7 @@ export default function CortexPage() {
       setMessages(p => p.map(m => m.id === msgId ? { ...m, content: 'Analyzing live video frame with Local OCR...' } : m));
 
       // @ts-ignore
-      if (!window.Tesseract) {
+      if (!(window as any).Tesseract) {
         await new Promise((resolve) => {
           const script = document.createElement('script');
           script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
@@ -444,12 +444,12 @@ export default function CortexPage() {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx!.drawImage(video, 0, 0, canvas.width, canvas.height);
       
       stream.getTracks().forEach(t => t.stop());
 
       // @ts-ignore
-      const { data: { text } } = await window.Tesseract.recognize(canvas, 'eng');
+      const { data: { text } } = await (window as any).Tesseract.recognize(canvas, 'eng');
 
       if (!text || text.trim().length === 0) {
         setMessages(p => p.map(m => m.id === msgId ? { ...m, content: 'Could not detect clear text on that screen.', isLoading: false } : m));
@@ -753,7 +753,7 @@ export default function CortexPage() {
                         <ChevronRight size={12}/> Agentic Chain of Thought · {msg.thoughtProcess.length} steps
                       </summary>
                       <div style={{ marginTop:'8px', padding:'12px 14px', background:'rgba(0,0,0,0.4)', border:'1px solid rgba(255,255,255,0.05)', borderRadius:'8px', fontFamily:'monospace', fontSize:'0.72rem', lineHeight:'1.7', color:'#38bdf8' }}>
-                        {msg.thoughtProcess.map((s,i)=>(<div key={i} style={{ opacity:0.8 }}><span style={{ color:'#334155', marginRight:'8px' }}>[{String(i+1).padStart(2,'0')}]</span>{s}</div>))}
+                        {msg.thoughtProcess.map((s: string, i: number)=>(<div key={i} style={{ opacity:0.8 }}><span style={{ color:'#334155', marginRight:'8px' }}>[{String(i+1).padStart(2,'0')}]</span>{s}</div>))}
                       </div>
                     </details>
                   )}

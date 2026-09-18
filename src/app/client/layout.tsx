@@ -59,7 +59,7 @@ const TOP_MENUS = [
 
 const launchPiP = async () => {
   if (!('documentPictureInPicture' in window)) { alert('Your browser does not support Document Picture-in-Picture.'); return; }
-  if (!window.Tesseract) { const script = document.createElement('script'); script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'; document.head.appendChild(script); }
+  if (!(window as any).Tesseract) { const script = document.createElement('script'); script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'; document.head.appendChild(script); }
   try {
     // @ts-ignore
     const pipWindow = await window.documentPictureInPicture.requestWindow({ width: 400, height: 600 });
@@ -101,13 +101,13 @@ const launchPiP = async () => {
          chat.scrollTop = chat.scrollHeight;
          const video = document.createElement('video'); video.srcObject = stream; await video.play();
          const canvas = document.createElement('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+         canvas.getContext('2d')!.drawImage(video, 0, 0, canvas.width, canvas.height);
          stream.getTracks().forEach(track => track.stop());
          const loader = pipWindow.document.getElementById(loadingId);
          loader.innerHTML += `<div class="loading-line"><div class="spinner"></div> Running Local Neural OCR Engine...</div>`;
          chat.scrollTop = chat.scrollHeight;
-         if (window.Tesseract) {
-           const { data: { text } } = await window.Tesseract.recognize(canvas, 'eng');
+         if ((window as any).Tesseract) {
+           const { data: { text } } = await (window as any).Tesseract.recognize(canvas, 'eng');
            if (loader) loader.remove();
            if (!text || text.trim().length === 0) {
              chat.innerHTML += `<div class="msg" style="border-color: #f59e0b;">Could not detect clear text.</div>`;
