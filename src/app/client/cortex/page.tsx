@@ -462,7 +462,6 @@ export default function CortexPage() {
         .hist-item:hover { background: rgba(255,255,255,0.05) !important; } .hist-item:hover .dots-btn { opacity: 1 !important; }
         ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(99,102,241,0.2); border-radius:4px; }
         ::-webkit-scrollbar-thumb:hover { background:rgba(99,102,241,0.35); }
-      `}
         /* ══ MOBILE RESPONSIVENESS ══ */
         @media (max-width: 768px) {
           .cx-wrapper { flex-direction: column !important; }
@@ -485,8 +484,7 @@ export default function CortexPage() {
           /* Slash menu */
           .cx-slash-menu { bottom: 70px !important; width: calc(100% - 24px) !important; left: 12px !important; }
         }
-
-      </style>
+      `}</style>
       <div style={{ position:'fixed', top:'-200px', left:'30%', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', animation:'bgFloat 8s ease-in-out infinite', pointerEvents:'none', zIndex:0 }}/>
       <div style={{ position:'fixed', bottom:'-100px', right:'10%', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)', animation:'bgFloat 12s ease-in-out infinite reverse', pointerEvents:'none', zIndex:0 }}/>
 
