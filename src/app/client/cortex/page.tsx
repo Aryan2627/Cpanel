@@ -4,7 +4,7 @@ import {
   BrainCircuit, X, Zap, Loader2, Database, Send, Terminal,
   CheckCircle2, AlertTriangle, CheckCircle, FileText, Settings, Eye,
   Plus, Sparkles, Shield, ChevronRight, BarChart3, Bot
-, Sun, Moon } from 'lucide-react';
+, Sun, Moon, FileUp, Cpu, Search } from 'lucide-react';
 
 /* ───────────────────────── Utility sub-components ───────────────────────── */
 
