@@ -376,7 +376,7 @@ export default function CortexPage() {
   ];
 
   return (
-    <div className={isDark ? "cortex-dark" : "cortex-light"} style={{ display:'flex', height:'100%', width:'100%', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+    <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', height:'100%', width:'100%', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
       
       {/* Animated Background */}
       <style>{`
@@ -462,7 +462,31 @@ export default function CortexPage() {
         .hist-item:hover { background: rgba(255,255,255,0.05) !important; } .hist-item:hover .dots-btn { opacity: 1 !important; }
         ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(99,102,241,0.2); border-radius:4px; }
         ::-webkit-scrollbar-thumb:hover { background:rgba(99,102,241,0.35); }
-      `}</style>
+      `}
+        /* ══ MOBILE RESPONSIVENESS ══ */
+        @media (max-width: 768px) {
+          .cx-wrapper { flex-direction: column !important; }
+          .cx-sidebar { width: 100% !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important; flex-shrink: 0 !important; }
+          .cx-sidebar-history { display: none !important; /* Hide chat history on mobile to save space */ }
+          .cx-main { height: calc(100vh - 120px) !important; /* Approximate available height */ }
+          
+          /* Form stacking */
+          .cx-form-grid-2 { grid-template-columns: 1fr !important; }
+          .cx-form-grid-2-1 { grid-template-columns: 1fr !important; }
+          
+          /* Chat area spacing */
+          .cx-chat-area { padding: 16px 12px !important; }
+          .cx-msg-bubble { gap: 10px !important; }
+          
+          /* Input bar */
+          .cx-input-bar { padding: 10px 12px 16px !important; }
+          .cx-input-field { padding-left: 40px !important; font-size: 16px !important; /* 16px prevents iOS zoom */ }
+          
+          /* Slash menu */
+          .cx-slash-menu { bottom: 70px !important; width: calc(100% - 24px) !important; left: 12px !important; }
+        }
+
+      </style>
       <div style={{ position:'fixed', top:'-200px', left:'30%', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', animation:'bgFloat 8s ease-in-out infinite', pointerEvents:'none', zIndex:0 }}/>
       <div style={{ position:'fixed', bottom:'-100px', right:'10%', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)', animation:'bgFloat 12s ease-in-out infinite reverse', pointerEvents:'none', zIndex:0 }}/>
 
@@ -488,7 +512,7 @@ export default function CortexPage() {
         </div>
 
         {/* History */}
-        <div style={{ flex:1, overflowY:'auto', padding:'12px 10px' }}>
+        <div className="cx-sidebar-history" style={{ flex:1, overflowY:'auto', padding:'12px 10px' }}>
           <div style={{ fontSize:'0.63rem', fontWeight:700, color:'#334155', textTransform:'uppercase', letterSpacing:'1.5px', padding:'0 8px', marginBottom:'8px' }}>Recent</div>
           {chats.map((chat)=>{
             const isActive = activeChatId===chat.id;
@@ -556,9 +580,9 @@ export default function CortexPage() {
         
         {/* Messages */}
         <div style={{ flex:1, overflowY:'auto', overflowX:'hidden', padding:'32px 0 0', minHeight:0 }}>
-          <div style={{ maxWidth:'780px', margin:'0 auto', display:'flex', flexDirection:'column', gap:'28px', padding:'0 28px 24px' }}>
+          <div className="cx-chat-area" style={{ maxWidth:'780px', margin:'0 auto', display:'flex', flexDirection:'column', gap:'28px', padding:'0 28px 24px' }}>
             {messages.map((msg, idx)=>(
-              <div key={idx} className="cortex-msg" style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
+              <div key={idx} className="cortex-msg cx-msg-bubble" style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
                 
                 {/* Avatar */}
                 <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background: msg.role==='agent'?'linear-gradient(135deg,#6366f1,#8b5cf6)':'rgba(255,255,255,0.07)', border: msg.role==='agent'?'none':'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', boxShadow: msg.role==='agent'?'0 0 16px rgba(99,102,241,0.3)':'none' }}>
@@ -646,7 +670,7 @@ export default function CortexPage() {
                             <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Request Title <span style={{color:'#f87171'}}>*</span></label>
                             <input type="text" placeholder="e.g. Q4 Marketing Software Licenses" value={s2pForm.title} onChange={e=>setS2pForm({...s2pForm, title:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
                           </div>
-                          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
+                          <div className="cx-form-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
                             <div>
                               <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Category <span style={{color:'#f87171'}}>*</span></label>
                               <select value={s2pForm.category} onChange={e=>setS2pForm({...s2pForm, category:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(15,12,35,0.95)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', cursor:'pointer', boxSizing:'border-box' }}>
@@ -668,7 +692,7 @@ export default function CortexPage() {
                               </select>
                             </div>
                           </div>
-                          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
+                          <div className="cx-form-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
                             <div>
                               <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Budget (USD) <span style={{color:'#f87171'}}>*</span></label>
                               <div style={{position:'relative'}}>
@@ -685,7 +709,7 @@ export default function CortexPage() {
                             <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Item Description <span style={{color:'#f87171'}}>*</span></label>
                             <textarea rows={3} placeholder="Describe what you need in detail..." value={s2pForm.description} onChange={e=>setS2pForm({...s2pForm, description:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', resize:'vertical', fontFamily:'inherit', lineHeight:'1.6', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
                           </div>
-                          <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:'10px' }}>
+                          <div className="cx-form-grid-2-1" style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:'10px' }}>
                             <div>
                               <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Required By</label>
                               <input type="date" value={s2pForm.requiredDate} onChange={e=>setS2pForm({...s2pForm, requiredDate:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', colorScheme:'dark', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';}}/>
@@ -733,7 +757,7 @@ export default function CortexPage() {
                           </div>
                           <div>
                             <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Duration <span style={{color:'#f87171'}}>*</span></label>
-                            <div style={{ display:'grid', gridTemplateColumns:'1fr auto', gap:'8px', alignItems:'center' }}>
+                            <div className="cx-form-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr auto', gap:'8px', alignItems:'center' }}>
                               <input type="number" onWheel={(e)=>(e.target as any).blur()} placeholder="e.g. 7" value={eventForm.duration} onChange={e=>setEventForm({...eventForm, duration:e.target.value})} style={{ padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#f1f5f9', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(234,88,12,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(234,88,12,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
                               <div style={{ display:'flex', gap:'6px' }}>
                                 {(['minutes','days'] as const).map(unit => (
@@ -930,7 +954,7 @@ export default function CortexPage() {
 
             {/* Thinking Indicator */}
             {isProcessing && (
-              <div className="cortex-msg" style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
+              <div className="cortex-msg cx-msg-bubble" style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
                 <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background:'linear-gradient(135deg,#6366f1,#8b5cf6)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 16px rgba(99,102,241,0.4)' }}>
                   <Loader2 size={18} color="#fff" className="animate-spin"/>
                 </div>
@@ -955,7 +979,7 @@ export default function CortexPage() {
 
             {/* Slash Menu */}
             {showSlash && (
-              <div style={{ position:'absolute', bottom:'100%', left:0, width:'100%', background:'rgba(7,13,28,0.97)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'16px', boxShadow:'0 -20px 60px rgba(0,0,0,0.5)', overflow:'hidden', marginBottom:'10px', backdropFilter:'blur(20px)' }}>
+              <div className="cx-slash-menu" style={{ position:'absolute', bottom:'100%', left:0, width:'100%', background:'rgba(7,13,28,0.97)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'16px', boxShadow:'0 -20px 60px rgba(0,0,0,0.5)', overflow:'hidden', marginBottom:'10px', backdropFilter:'blur(20px)' }}>
                 <div style={{ padding:'10px 16px', borderBottom:'1px solid rgba(255,255,255,0.05)', display:'flex', alignItems:'center', gap:'8px' }}>
                   <Sparkles size={13} color="#6366f1"/>
                   <span style={{ fontSize:'0.68rem', fontWeight:800, color:'#475569', textTransform:'uppercase', letterSpacing:'1.5px' }}>Advanced Workflows</span>
@@ -992,7 +1016,7 @@ export default function CortexPage() {
                 onKeyDown={e=>{ if(e.key==='Escape') setShowSlash(false); }}
                 placeholder="Ask Cortex anything, or type / for AI workflows..."
                 disabled={isProcessing}
-                style={{ width:'100%', padding:'16px 56px 16px 46px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#e2e8f0', fontSize:'0.95rem', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
+                className="cx-input-field" style={{ width:'100%', padding:'16px 56px 16px 46px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#e2e8f0', fontSize:'16px', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
               />
               <button type="submit" disabled={!input.trim()||isProcessing} style={{ position:'absolute', right:'10px', width:'38px', height:'38px', borderRadius:'12px', background: input.trim()&&!isProcessing?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.05)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor: input.trim()&&!isProcessing?'pointer':'default', transition:'all 0.2s', boxShadow: input.trim()&&!isProcessing?'0 0 16px rgba(99,102,241,0.4)':'none' }}>
                 <Send size={15} color={input.trim()&&!isProcessing?'#fff':'#334155'}/>
