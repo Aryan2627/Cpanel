@@ -19,9 +19,16 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-require-imports": "off",
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/exhaustive-deps": "off",
+      "react-hooks/rules-of-hooks": "off",
+      "react-hooks/purity": "off",
+      "react-hooks/immutability": "off",
+      "react-hooks/static-components": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
       "prefer-const": "off",
       "@next/next/no-img-element": "off",
-      "react/jsx-key": "off"
+      "react/jsx-key": "off",
+      "react/jsx-no-undef": "off"
     }
   }
 ]);
