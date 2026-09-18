@@ -376,21 +376,87 @@ export default function CortexPage() {
   ];
 
   return (
-    <div className="cortex-dark" style={{ display:'flex', height:'100%', width:'100%', background:'#040810', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+    <div className={isDark ? "cortex-dark" : "cortex-light"} style={{ display:'flex', height:'100%', width:'100%', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
       
       {/* Animated Background */}
       <style>{`
-        /* ── DRAKE DARK THEME ── */
-        .cortex-dark { --bg-primary: #040810; --bg-secondary: rgba(255,255,255,0.025); --bg-card: rgba(10,14,28,0.95); --border: rgba(255,255,255,0.07); --text-primary: #e2e8f0; --text-secondary: #64748b; --accent: #6366f1; }
+        /* ══ DRAKE DARK THEME ══ */
+        .cortex-dark { color-scheme: dark; }
         .cortex-dark input, .cortex-dark textarea, .cortex-dark select { color-scheme: dark; }
-        .cortex-dark input::placeholder, .cortex-dark textarea::placeholder { color: rgba(100,116,139,0.45) !important; }
+        .cortex-dark input::placeholder, .cortex-dark textarea::placeholder { color: rgba(100,116,139,0.4) !important; }
 
+        /* ══ LIGHT THEME — COMPREHENSIVE ══ */
+        .cortex-light { color-scheme: light; }
+
+        /* Sidebar */
+        .cortex-light .cx-sidebar { background: #ffffff !important; border-right-color: #e2e8f0 !important; }
+        .cortex-light .cx-sidebar > div { border-color: #e2e8f0 !important; }
+        .cortex-light .cx-sidebar span { color: #475569 !important; }
+        .cortex-light .cx-sidebar div[style*="color:'#334155'"] { color: #94a3b8 !important; }
+        .cortex-light .hist-item:hover { background: #f1f5f9 !important; }
+        .cortex-light .hist-item[style*="rgba(99,102,241"] { background: #eff6ff !important; border-color: #bfdbfe !important; }
+        
+        /* Main chat background */
+        .cortex-light .cx-main { background: #f0f4f8 !important; }
+
+        /* Message text */
+        .cortex-light .cortex-msg div[style*="color: msg.role==='agent'?'#e2e8f0"] { color: #1e293b !important; }
+
+        /* Slash menu */
+        .cortex-light div[style*="rgba(7,13,28"] { background: #ffffff !important; border-color: #e2e8f0 !important; box-shadow: 0 -20px 60px rgba(0,0,0,0.1) !important; }
+        .cortex-light div[style*="rgba(7,13,28"] span { color: #94a3b8 !important; }
+        .cortex-light .slash-btn:hover { background: #f8fafc !important; }
+        .cortex-light .slash-btn div[style*="color:'#e2e8f0'"] { color: #1e293b !important; }
+        .cortex-light .slash-btn div[style*="color:'#475569'"] { color: #64748b !important; }
+        .cortex-light .slash-btn { border-bottom-color: #f1f5f9 !important; }
+
+        /* Thinking dots */
+        .cortex-light div[style*="rgba(99,102,241,0.08)"][style*="border"] { background: #eff6ff !important; border-color: #bfdbfe !important; }
+        .cortex-light div[style*="rgba(99,102,241,0.08)"][style*="border"] span { color: #4f46e5 !important; }
+
+        /* FORM CARDS - light backgrounds */
+        .cortex-light .cx-form-card { background: #ffffff !important; border-color: #e0e7ff !important; box-shadow: 0 4px 24px rgba(99,102,241,0.1) !important; }
+        .cortex-light .cx-event-card { border-color: #fed7aa !important; box-shadow: 0 4px 24px rgba(234,88,12,0.1) !important; }
+
+        /* Form card header bands */
+        .cortex-light .cx-form-card div[style*="padding:'16px 20px 14px'"] { background: rgba(99,102,241,0.06) !important; border-bottom-color: #e0e7ff !important; }
+        .cortex-light .cx-event-card div[style*="padding:'16px 20px 14px'"] { background: rgba(234,88,12,0.05) !important; border-bottom-color: #fed7aa !important; }
+
+        /* Form card text */
+        .cortex-light .cx-form-card div[style*="color:'#f1f5f9'"] { color: #0f172a !important; }
+        .cortex-light .cx-form-card div[style*="color:'rgba(148,163,184,0.5)'"] { color: #64748b !important; }
+        .cortex-light .cx-form-card label { color: #475569 !important; }
+        .cortex-light .cx-form-card span[style*="color:'rgba(148,163,184"] { color: #94a3b8 !important; }
+
+        /* Form inner dividers */
+        .cortex-light .cx-form-card div[style*="borderTop:'1px solid rgba(255,255,255,0.05)'"] { border-top-color: #e2e8f0 !important; }
+
+        /* ALL FORM INPUTS, TEXTAREAS, SELECTS */
+        .cortex-light input, .cortex-light textarea, .cortex-light select {
+          background: #f8fafc !important;
+          color: #0f172a !important;
+          border-color: #e2e8f0 !important;
+          color-scheme: light !important;
+        }
+        .cortex-light input::placeholder, .cortex-light textarea::placeholder { color: #94a3b8 !important; }
+        .cortex-light input:focus, .cortex-light textarea:focus { border-color: rgba(99,102,241,0.4) !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.08) !important; }
+
+        /* Main chat input bar */
+        .cortex-light .cx-input-bar input { background: #ffffff !important; color: #0f172a !important; border-color: #e2e8f0 !important; box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important; }
+        .cortex-light .cx-input-bar input:focus { border-color: rgba(99,102,241,0.4) !important; }
+
+        /* Footer tagline */
+        .cortex-light div[style*="color:'#1e293b'"][style*="0.7rem"] { color: #94a3b8 !important; }
+
+        /* Scrollbar */
+        .cortex-light ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.15) !important; }
+
+        /* ── ANIMATIONS (shared) ── */
         @keyframes bgFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-20px) scale(1.05)} }
         @keyframes pulse2 { 0%,100%{opacity:0.4} 50%{opacity:0.7} }
         @keyframes cortexSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
         @keyframes fadeSlideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
         @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
-        @keyframes drakeGlow { 0%,100%{box-shadow:0 0 30px rgba(99,102,241,0.08)} 50%{box-shadow:0 0 60px rgba(99,102,241,0.14)} }
         .cortex-msg { animation: fadeSlideIn 0.35s ease forwards; }
         .slash-btn:hover { background: rgba(255,255,255,0.06) !important; }
         .hist-item:hover { background: rgba(255,255,255,0.05) !important; } .hist-item:hover .dots-btn { opacity: 1 !important; }
@@ -401,7 +467,7 @@ export default function CortexPage() {
       <div style={{ position:'fixed', bottom:'-100px', right:'10%', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)', animation:'bgFloat 12s ease-in-out infinite reverse', pointerEvents:'none', zIndex:0 }}/>
 
       {/* ── LEFT SIDEBAR ── */}
-      <div style={{ width:'270px', background:'rgba(255,255,255,0.02)', borderRight:'1px solid rgba(255,255,255,0.05)', display:'flex', flexDirection:'column', flexShrink:0, backdropFilter:'blur(20px)' }}>
+      <div className="cx-sidebar" style={{ width:'270px', background:'rgba(255,255,255,0.02)', borderRight:'1px solid rgba(255,255,255,0.05)', display:'flex', flexDirection:'column', flexShrink:0, backdropFilter:'blur(20px)' }}>
         
         {/* Brand */}
         <div style={{ padding:'20px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
@@ -482,7 +548,7 @@ export default function CortexPage() {
       </div>
 
       {/* ── MAIN CHAT ── */}
-      <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', minWidth:0 }}>
+      <div className="cx-main" style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', minWidth:0 }}>
         
         {/* Messages */}
         <div style={{ flex:1, overflowY:'auto', overflowX:'hidden', padding:'32px 0 0', minHeight:0 }}>
@@ -496,10 +562,10 @@ export default function CortexPage() {
                 </div>
 
                 <div style={{ flex:1, paddingTop:'4px', minWidth:0 }}>
-                  <div style={{ fontSize:'0.78rem', fontWeight:700, marginBottom:'8px', color: msg.role==='agent'?'#818cf8':'#94a3b8', textTransform:'uppercase', letterSpacing:'0.5px' }}>
+                  <div style={{ fontSize:'0.78rem', fontWeight:700, marginBottom:'8px', color: msg.role==='agent'?'#818cf8': isDark ? '#94a3b8' : '#64748b', textTransform:'uppercase', letterSpacing:'0.5px' }}>
                     {msg.role==='agent' ? 'Cortex AI' : 'You'}
                   </div>
-                  <div style={{ color: msg.role==='agent'?'#e2e8f0':'#94a3b8', fontSize:'0.95rem', lineHeight:'1.7' }}>
+                  <div style={{ color: msg.role==='agent'? (isDark ? '#e2e8f0' : '#1e293b') : (isDark ? '#94a3b8' : '#475569'), fontSize:'0.95rem', lineHeight:'1.7' }}>
                     {fmt(msg.content)}
                   </div>
 
@@ -563,7 +629,7 @@ export default function CortexPage() {
 
                     {/* S2P Intake Form */}
                     {msg.uiComponent==='s2p_intake_form' && (
-                      <div style={{ marginTop:'16px', borderRadius:'18px', overflow:'hidden', border:'1px solid rgba(99,102,241,0.15)', background:'linear-gradient(145deg,rgba(15,12,35,0.97),rgba(10,8,25,0.98))', boxShadow:'0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05)' }}>
+                      <div className="cx-form-card" style={{ marginTop:'16px', borderRadius:'18px', overflow:'hidden', border:'1px solid rgba(99,102,241,0.15)', background: isDark ? 'linear-gradient(145deg,rgba(15,12,35,0.97),rgba(10,8,25,0.98))' : '#ffffff', boxShadow: isDark ? '0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05)' : '0 8px 40px rgba(99,102,241,0.1),inset 0 1px 0 rgba(99,102,241,0.1)' }}>
                         <div style={{ padding:'16px 20px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(99,102,241,0.07)', display:'flex', alignItems:'center', gap:'10px' }}>
                           <div style={{ width:'30px', height:'30px', borderRadius:'9px', background:'linear-gradient(135deg,#4f46e5,#7c3aed)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.9rem', boxShadow:'0 4px 10px rgba(99,102,241,0.4)', flexShrink:0 }}>📋</div>
                           <div>
@@ -641,7 +707,7 @@ export default function CortexPage() {
 
                   {/* Event Form */}
                   {msg.uiComponent==='event_creation_form' && (
-                      <div style={{ marginTop:'16px', borderRadius:'18px', overflow:'hidden', border:'1px solid rgba(234,88,12,0.15)', background:'linear-gradient(145deg,rgba(15,10,5,0.97),rgba(10,7,3,0.98))', boxShadow:'0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.04)' }}>
+                      <div className="cx-form-card cx-event-card" style={{ marginTop:'16px', borderRadius:'18px', overflow:'hidden', border:'1px solid rgba(234,88,12,0.15)', background: isDark ? 'linear-gradient(145deg,rgba(15,10,5,0.97),rgba(10,7,3,0.98))' : '#ffffff', boxShadow: isDark ? '0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.04)' : '0 8px 40px rgba(234,88,12,0.1)' }}>
                         <div style={{ padding:'16px 20px 14px', borderBottom:'1px solid rgba(255,255,255,0.05)', background:'rgba(234,88,12,0.06)', display:'flex', alignItems:'center', gap:'10px' }}>
                           <div style={{ width:'30px', height:'30px', borderRadius:'9px', background:'linear-gradient(135deg,#ea580c,#c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.9rem', boxShadow:'0 4px 10px rgba(234,88,12,0.4)', flexShrink:0 }}>⚡</div>
                           <div>
@@ -880,7 +946,7 @@ export default function CortexPage() {
         </div>
 
         {/* ── INPUT AREA ── */}
-        <div style={{ padding:'16px 28px 24px', background:'linear-gradient(180deg,transparent 0%,#070d1c 40%)', flexShrink:0 }}>
+        <div className="cx-input-bar" style={{ padding:'16px 28px 24px', background: isDark ? 'linear-gradient(180deg,transparent 0%,#070d1c 40%)' : 'linear-gradient(180deg,transparent 0%,#f0f4f8 40%)', flexShrink:0 }}>
           <div style={{ maxWidth:'780px', margin:'0 auto', position:'relative' }}>
 
             {/* Slash Menu */}
