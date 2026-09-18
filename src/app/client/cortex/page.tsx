@@ -461,6 +461,9 @@ export default function CortexPage() {
         @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
         .cortex-msg { animation: fadeSlideIn 0.35s ease forwards; }
         .slash-btn:hover { background: rgba(255,255,255,0.06) !important; }
+        .bom-row { transition: all 0.2s; }
+        .cortex-dark .bom-row:hover { background: rgba(255,255,255,0.04) !important; }
+        .cortex-light .bom-row:hover { background: rgba(0,0,0,0.02) !important; }
         .hist-item:hover { background: rgba(255,255,255,0.05) !important; } .hist-item:hover .dots-btn { opacity: 1 !important; }
         ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(99,102,241,0.2); border-radius:4px; }
         ::-webkit-scrollbar-thumb:hover { background:rgba(99,102,241,0.35); }
@@ -648,6 +651,25 @@ export default function CortexPage() {
                     </label>
                   )}
 
+                  
+                  {/* PR Success UI */}
+                  {msg.uiComponent==='pr_success' && msg.uiData && (
+                    <div className="cx-form-card" style={{ marginTop:'14px', borderRadius:'16px', border:'1px solid rgba(34,197,94,0.3)', background: isDark ? 'rgba(34,197,94,0.05)' : '#f0fdf4', padding:'24px', display:'flex', alignItems:'center', gap:'20px', animation: 'fadeSlideIn 0.4s ease forwards' }}>
+                      <div style={{ width:'56px', height:'56px', borderRadius:'50%', background:'linear-gradient(135deg, #22c55e, #16a34a)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:'0 8px 20px rgba(34,197,94,0.3)' }}>
+                        <CheckCircle size={28} color="#fff" />
+                      </div>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:'1.1rem', fontWeight:800, color: isDark ? '#4ade80' : '#15803d', marginBottom:'4px' }}>Purchase Request Generated!</div>
+                        <div style={{ fontSize:'0.85rem', color: isDark ? '#cbd5e1' : '#475569', lineHeight:1.5 }}>
+                          <strong>{msg.uiData.prNumber}</strong> for <strong>${msg.uiData.total.toLocaleString()}</strong> has been successfully created and routed to the IT Manager for financial approval.
+                        </div>
+                      </div>
+                      <button style={{ background: isDark ? 'rgba(255,255,255,0.1)' : '#fff', border: isDark ? '1px solid rgba(255,255,255,0.2)' : '1px solid #cbd5e1', padding:'10px 20px', borderRadius:'8px', color: isDark ? '#fff' : '#0f172a', fontWeight:700, fontSize:'0.85rem', cursor:'pointer', whiteSpace:'nowrap', transition:'all 0.2s' }}>
+                        View PR Details
+                      </button>
+                    </div>
+                  )}
+
                   {/* BOM Results UI */}
                   {msg.uiComponent==='bom_results' && msg.uiData && (
                     <div className="cx-form-card" style={{ marginTop:'16px', borderRadius:'16px', overflow:'hidden', border:'1px solid rgba(45,212,191,0.2)', background: isDark ? 'rgba(15,23,42,0.8)' : '#ffffff', boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.5)' : '0 8px 30px rgba(45,212,191,0.1)' }}>
@@ -675,11 +697,12 @@ export default function CortexPage() {
                               <th style={{ padding:'12px 16px', color: isDark ? '#94a3b8' : '#64748b', fontWeight:600 }}>Status</th>
                               <th style={{ padding:'12px 16px', color: isDark ? '#94a3b8' : '#64748b', fontWeight:600 }}>Vendor / Source</th>
                               <th style={{ padding:'12px 16px', color: isDark ? '#94a3b8' : '#64748b', fontWeight:600, textAlign:'right' }}>Unit Cost</th>
+                              <th style={{ padding:'12px 16px', color: isDark ? '#94a3b8' : '#64748b', fontWeight:600, textAlign:'right' }}>Total</th>
                             </tr>
                           </thead>
                           <tbody>
                             {msg.uiData.items.map((item: any) => (
-                              <tr key={item.id} style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.03)' : '1px solid #f1f5f9' }}>
+                              <tr className="bom-row" key={item.id} style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.03)' : '1px solid #f1f5f9' }}>
                                 <td style={{ padding:'12px 16px', fontWeight:600, color: isDark ? '#e2e8f0' : '#1e293b' }}>{item.part}</td>
                                 <td style={{ padding:'12px 16px', color: isDark ? '#cbd5e1' : '#475569' }}>{item.desc}<br/><span style={{ fontSize:'0.7rem', color: isDark ? '#64748b' : '#94a3b8' }}>Qty: {item.qty}</span></td>
                                 <td style={{ padding:'12px 16px' }}>
@@ -694,7 +717,8 @@ export default function CortexPage() {
                                   )}
                                 </td>
                                 <td style={{ padding:'12px 16px', color: isDark ? '#cbd5e1' : '#475569' }}>{item.vendor}</td>
-                                <td style={{ padding:'12px 16px', textAlign:'right', fontWeight:700, color: isDark ? '#e2e8f0' : '#1e293b' }}>${item.unitCost.toLocaleString()}</td>
+                                <td style={{ padding:'12px 16px', textAlign:'right', fontWeight:700, color: isDark ? '#94a3b8' : '#64748b' }}>${item.unitCost.toLocaleString()}</td>
+                                <td style={{ padding:'12px 16px', textAlign:'right', fontWeight:800, color: isDark ? '#e2e8f0' : '#1e293b' }}>${(item.qty * item.unitCost).toLocaleString()}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -702,7 +726,7 @@ export default function CortexPage() {
                       </div>
 
                       <div style={{ padding:'16px 20px', background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', display:'flex', justifyContent:'flex-end' }}>
-                        <button onClick={() => setMessages(p => [...p, { role:'agent', content:'Purchase Request (PR-2026-0842) has been successfully generated and routed to the IT Manager for approval.' }])} style={{ background:'linear-gradient(135deg, #2dd4bf, #0d9488)', border:'none', padding:'12px 24px', borderRadius:'8px', color:'#fff', fontWeight:700, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 4px 15px rgba(13,148,136,0.3)', display:'flex', alignItems:'center', gap:'8px', transition:'transform 0.1s' }}>
+                        <button onClick={() => setMessages(p => [...p, { role:'agent', content:'', uiComponent:'pr_success', uiData: { prNumber: 'PR-2026-0842', total: msg.uiData.totalEstimatedCost } }])} style={{ background:'linear-gradient(135deg, #2dd4bf, #0d9488)', border:'none', padding:'12px 24px', borderRadius:'8px', color:'#fff', fontWeight:700, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 4px 15px rgba(13,148,136,0.3)', display:'flex', alignItems:'center', gap:'8px', transition:'transform 0.1s' }}>
                           <CheckCircle2 size={16}/> Generate Purchase Request
                         </button>
                       </div>
