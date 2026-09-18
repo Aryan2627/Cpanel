@@ -4,7 +4,7 @@ import {
   BrainCircuit, X, Zap, Loader2, Database, Send, Terminal,
   CheckCircle2, AlertTriangle, CheckCircle, FileText, Settings, Eye,
   Plus, Sparkles, Shield, ChevronRight, BarChart3, Bot
-, Sun, Moon, FileUp, Cpu, Search } from 'lucide-react';
+, Sun, Moon, FileUp, Cpu, Search, Monitor, Download } from 'lucide-react';
 
 /* ───────────────────────── Utility sub-components ───────────────────────── */
 
@@ -556,6 +556,21 @@ export default function CortexPage() {
               </div>
             );
           })}
+        </div>
+
+        {/* Desktop App Download */}
+        <div style={{ padding:'12px 14px', borderTop:'1px solid rgba(255,255,255,0.04)' }}>
+          <a href="/downloads/CortexAnywhere.exe" download style={{ textDecoration:'none' }}>
+            <div style={{ background:'linear-gradient(135deg, rgba(0,198,255,0.1), rgba(0,114,255,0.1))', border:'1px solid rgba(0,114,255,0.3)', padding:'12px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'10px', cursor:'pointer', transition:'all 0.2s' }} className="slash-btn">
+               <div style={{ width:'28px', height:'28px', borderRadius:'6px', background:'linear-gradient(135deg, #00c6ff, #0072ff)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                 <Download size={14} color="#fff" />
+               </div>
+               <div>
+                 <div style={{ fontSize:'0.8rem', fontWeight:800, color: isDark ? '#e2e8f0' : '#1e293b' }}>Desktop Copilot</div>
+                 <div style={{ fontSize:'0.65rem', color: isDark ? '#94a3b8' : '#64748b' }}>Download for Windows</div>
+               </div>
+            </div>
+          </a>
         </div>
 
         {/* User / Settings */}
