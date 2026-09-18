@@ -662,7 +662,7 @@ export default function CortexPage() {
                         </div>
                         <div style={{ textAlign:'right' }}>
                            <div style={{ fontSize:'0.7rem', color: isDark ? '#94a3b8' : '#64748b', textTransform:'uppercase', fontWeight:700, letterSpacing:'0.5px' }}>Total Est. Cost</div>
-                           <div style={{ fontSize:'1.1rem', fontWeight:800, color:'#2dd4bf' }}></div>
+                           <div style={{ fontSize:'1.1rem', fontWeight:800, color:'#2dd4bf' }}>${msg.uiData.totalEstimatedCost.toLocaleString()}</div>
                         </div>
                       </div>
 
@@ -694,7 +694,7 @@ export default function CortexPage() {
                                   )}
                                 </td>
                                 <td style={{ padding:'12px 16px', color: isDark ? '#cbd5e1' : '#475569' }}>{item.vendor}</td>
-                                <td style={{ padding:'12px 16px', textAlign:'right', fontWeight:700, color: isDark ? '#e2e8f0' : '#1e293b' }}></td>
+                                <td style={{ padding:'12px 16px', textAlign:'right', fontWeight:700, color: isDark ? '#e2e8f0' : '#1e293b' }}>${item.unitCost.toLocaleString()}</td>
                               </tr>
                             ))}
                           </tbody>
