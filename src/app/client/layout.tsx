@@ -58,6 +58,132 @@ const TOP_MENUS = [
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
 
+  
+const launchPiP = async () => {
+  if (!('documentPictureInPicture' in window)) {
+    alert('Your browser does not support Document Picture-in-Picture.');
+    return;
+  }
+  try {
+    // @ts-ignore
+    const pipWindow = await window.documentPictureInPicture.requestWindow({ width: 380, height: 600 });
+    
+    const style = document.createElement('style');
+    style.textContent = `
+      body { margin: 0; background: #0f172a; color: #f1f5f9; font-family: system-ui, sans-serif; overflow: hidden; }
+      .container { display: flex; flex-direction: column; height: 100vh; padding: 20px; box-sizing: border-box; }
+      .btn { background: linear-gradient(135deg, #00c6ff, #0072ff); border: none; padding: 14px; border-radius: 12px; color: #fff; font-weight: 700; font-size: 0.95rem; cursor: pointer; width: 100%; margin-top: auto; box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3); transition: transform 0.1s; }
+      .btn:active { transform: scale(0.98); }
+      .msg { background: rgba(255,255,255,0.05); padding: 14px 16px; border-radius: 12px; font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.05); animation: fadeIn 0.3s ease-in-out; }
+      .loading-line { display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: 0.8rem; margin-bottom: 6px; }
+      .spinner { width: 12px; height: 12px; border: 2px solid #00c6ff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+      @keyframes spin { 100% { transform: rotate(360deg); } }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    `;
+    pipWindow.document.head.appendChild(style);
+
+    pipWindow.document.body.innerHTML = `
+      <div class="container">
+        <h3 style="margin: 0 0 5px 0; color: #00c6ff; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px;">
+          <div style="width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg, #00c6ff, #0072ff); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 15px rgba(0,114,255,0.4);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          </div>
+          Cortex Anywhere
+        </h3>
+        <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 24px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Zero-Install Web Copilot</p>
+        
+        <div id="chatArea" style="flex: 1; overflow-y: auto;">
+          <div class="msg" style="background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 114, 255, 0.1)); border-color: rgba(0, 114, 255, 0.2);">
+            <strong style="color: #fff; display: block; margin-bottom: 6px;">Ready to Scan</strong>
+            Click "Analyze Screen" and select your Excel window. I will dynamically extract the items and find the best prices.
+          </div>
+        </div>
+
+        <button id="scanBtn" class="btn">
+          👁️ Analyze Screen
+        </button>
+      </div>
+    `;
+
+    pipWindow.document.getElementById('scanBtn').onclick = async () => {
+       const btn = pipWindow.document.getElementById('scanBtn');
+       const chat = pipWindow.document.getElementById('chatArea');
+       
+       if (btn.disabled) return;
+       btn.disabled = true;
+       btn.innerText = 'Requesting permission...';
+       
+       try {
+         const stream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'window' } });
+         btn.innerText = 'Analyzing Data...';
+         
+         // 1. Create a dynamic processing UI
+         const loadingId = 'load-' + Date.now();
+         chat.innerHTML += `<div id="${loadingId}" class="msg" style="border-color: rgba(255,255,255,0.1);">
+           <div class="loading-line"><div class="spinner"></div> Capturing screen frame...</div>
+         </div>`;
+         chat.scrollTop = chat.scrollHeight;
+
+         // Simulate actual AI processing steps with dynamic timeouts
+         setTimeout(() => {
+           const loader = pipWindow.document.getElementById(loadingId);
+           loader.innerHTML += `<div class="loading-line"><div class="spinner"></div> Extracting tabular data...</div>`;
+           chat.scrollTop = chat.scrollHeight;
+         }, 800);
+
+         setTimeout(() => {
+           const loader = pipWindow.document.getElementById(loadingId);
+           loader.innerHTML += `<div class="loading-line"><div class="spinner"></div> Cross-referencing internal catalog...</div>`;
+           chat.scrollTop = chat.scrollHeight;
+         }, 1800);
+         
+         setTimeout(() => {
+           stream.getTracks().forEach(track => track.stop());
+           
+           // Remove loading message
+           const loader = pipWindow.document.getElementById(loadingId);
+           if (loader) loader.remove();
+
+           // Generate Dynamic Randomized Data so it never feels rigid
+           const vendors = ['CDW', 'Dell Direct', 'Insight', 'SHI International', 'Amazon Business', 'WWT', 'Softchoice'];
+           const items = ['Lenovo ThinkPad T14s', 'Cisco Catalyst 9300 Switches', 'Dell PowerEdge R750s', 'Samsung 2TB NVMe SSDs', 'Herman Miller Aeron Chairs', 'Apple MacBook Pro M3', 'APC Smart-UPS'];
+           const randomVendor = vendors[Math.floor(Math.random() * vendors.length)];
+           const randomItem = items[Math.floor(Math.random() * items.length)];
+           const qty = Math.floor(Math.random() * 45) + 5;
+           const unitPrice = Math.floor(Math.random() * 2000) + 150;
+           const total = qty * unitPrice;
+           
+           const fTotal = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(total);
+           const fUnit = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(unitPrice);
+
+           chat.innerHTML += `<div class="msg" style="border-color: rgba(0,198,255,0.3); background: rgba(0,198,255,0.05);">
+            <strong style="color: #00c6ff; display: block; margin-bottom: 6px;">Context Detected: Microsoft Excel</strong>
+            Extracted <strong>${qty}x ${randomItem}</strong> from your active spreadsheet.<br/><br/>
+            💡 <strong>Cortex AI Insights:</strong><br/>
+            I cross-referenced this against our catalog. We have an active enterprise contract with <strong>${randomVendor}</strong> offering these at <strong>${fUnit}</strong> per unit.<br/>
+            <br/>
+            <span style="color: #4ade80; font-weight: 700;">Total Estimated Savings: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(total * 0.15)}</span><br/><br/>
+            <button style="background: #00c6ff; border: none; padding: 8px 12px; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; width: 100%;">Create PR for ${fTotal}</button>
+            </div>`;
+           chat.scrollTop = chat.scrollHeight;
+           btn.innerText = '👁️ Analyze Screen';
+           btn.disabled = false;
+         }, 3200);
+
+       } catch(e) {
+         btn.innerText = '👁️ Analyze Screen';
+         btn.disabled = false;
+         chat.innerHTML += '<div class="msg" style="color: #f87171;">Screen capture cancelled or blocked.</div>';
+       }
+    };
+  } catch(e) {
+    console.error(e);
+    alert('Failed to launch PiP window.');
+  }
+};
+
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
+
   const launchPiP = async () => {
     if (!('documentPictureInPicture' in window)) {
       alert('Your browser does not support Document Picture-in-Picture. Please use Google Chrome or Microsoft Edge (version 116+).');
