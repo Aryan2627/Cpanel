@@ -106,7 +106,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
          btn.innerText = 'Requesting permission...';
          
          try {
-           const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+           const stream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'window' } });
            btn.innerText = 'Analyzing stream...';
            
            setTimeout(() => {
