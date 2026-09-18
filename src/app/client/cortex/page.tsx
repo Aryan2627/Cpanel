@@ -560,7 +560,7 @@ export default function CortexPage() {
 
         {/* Desktop App Download */}
         <div style={{ padding:'12px 14px', borderTop:'1px solid rgba(255,255,255,0.04)' }}>
-          <a href="/downloads/CortexAnywhere.exe" download style={{ textDecoration:'none' }}>
+          <a href="/downloads/CortexAnywhere.zip" download style={{ textDecoration:'none' }}>
             <div style={{ background:'linear-gradient(135deg, rgba(0,198,255,0.1), rgba(0,114,255,0.1))', border:'1px solid rgba(0,114,255,0.3)', padding:'12px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'10px', cursor:'pointer', transition:'all 0.2s' }} className="slash-btn">
                <div style={{ width:'28px', height:'28px', borderRadius:'6px', background:'linear-gradient(135deg, #00c6ff, #0072ff)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                  <Download size={14} color="#fff" />
