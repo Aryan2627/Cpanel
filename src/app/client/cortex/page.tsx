@@ -635,7 +635,8 @@ export default function CortexPage() {
 
                                     {/* BOM Upload UI */}
                   {msg.uiComponent==='bom_upload' && (
-                    <div className="cx-form-card" style={{ marginTop:'14px', borderRadius:'16px', border:'1px dashed rgba(45,212,191,0.4)', background: isDark ? 'rgba(45,212,191,0.03)' : 'rgba(45,212,191,0.05)', padding:'32px 24px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', transition:'all 0.2s', cursor:'pointer' }} onClick={() => execute('/execute-bom-upload')}>
+                    <label className="cx-form-card" style={{ marginTop:'14px', borderRadius:'16px', border:'1px dashed rgba(45,212,191,0.4)', background: isDark ? 'rgba(45,212,191,0.03)' : 'rgba(45,212,191,0.05)', padding:'32px 24px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', transition:'all 0.2s', cursor:'pointer' }}>
+                      <input type="file" style={{ display: 'none' }} accept=".csv,.xlsx" onChange={(e) => { if(e.target.files && e.target.files.length > 0) execute('/execute-bom-upload'); }} />
                       <div style={{ width:'64px', height:'64px', borderRadius:'50%', background:'linear-gradient(135deg, rgba(45,212,191,0.2), rgba(20,184,166,0.2))', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:'16px', boxShadow:'0 0 20px rgba(45,212,191,0.1)' }}>
                         <FileUp size={28} color="#2dd4bf" />
                       </div>
@@ -644,7 +645,7 @@ export default function CortexPage() {
                       <button style={{ background:'linear-gradient(135deg, #2dd4bf, #0d9488)', border:'none', padding:'10px 24px', borderRadius:'24px', color:'#fff', fontWeight:600, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 4px 15px rgba(13,148,136,0.3)', display:'flex', alignItems:'center', gap:'8px' }}>
                          Browse Files
                       </button>
-                    </div>
+                    </label>
                   )}
 
                   {/* BOM Results UI */}
