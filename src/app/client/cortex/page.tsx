@@ -41,7 +41,7 @@ const launchPiP = async () => {
         <div id="chatArea" style="flex: 1; overflow-y: auto;">
           <div class="msg" style="background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 114, 255, 0.1)); border-color: rgba(0, 114, 255, 0.2);">
             <strong style="color: #fff; display: block; margin-bottom: 6px;">Hi there!</strong>
-            Click "Analyze Screen" to grant screen-share permission. I will read your current tab or PDF and generate a Purchase Request automatically.
+            Click "Analyze Screen" to grant screen-share permission. I will read your open <strong>Excel spreadsheets</strong> and automatically extract Bills of Materials (BOM).
           </div>
         </div>
 
@@ -63,11 +63,11 @@ const launchPiP = async () => {
          setTimeout(() => {
            stream.getTracks().forEach(track => track.stop());
            chat.innerHTML += `<div class="msg" style="border-color: rgba(0,198,255,0.3); background: rgba(0,198,255,0.05);">
-            <strong style="color: #00c6ff; display: block; margin-bottom: 6px;">Context Detected: Hardware Supplier Page</strong>
-            I see you are looking at a <strong>Dell PowerEdge R750 Server</strong> for $4,999 on an external site.<br/><br/>
+            <strong style="color: #00c6ff; display: block; margin-bottom: 6px;">Context Detected: Microsoft Excel</strong>
+            I see you are looking at an Excel spreadsheet containing a <strong>Bill of Materials</strong> for IT Infrastructure.<br/><br/>
             💡 <strong>Cortex Insights:</strong><br/>
-            We actually have a contracted rate for this exact model with <strong>CDW for $4,500</strong>.<br/><br/>
-            <button style="background: #00c6ff; border: none; padding: 8px 12px; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; margin-top: 8px; width: 100%;">Create PR at $4,500</button>
+            I have instantly cross-referenced the hardware rows visible on your screen against our internal catalog. I can procure the entire list for <strong>$23,200</strong> through our preferred vendors.<br/><br/>
+            <button style="background: #00c6ff; border: none; padding: 8px 12px; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; margin-top: 8px; width: 100%;">Generate PR from Excel Data</button>
             </div>`;
            chat.scrollTop = chat.scrollHeight;
            btn.innerText = '👁️ Analyze Screen';
