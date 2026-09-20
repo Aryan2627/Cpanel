@@ -270,9 +270,11 @@ export async function POST(req: Request) {
 
     // Verify Session for DB access
     const headersList = await headers();
-    const cookieHeader = headersList.get('cookie') || '';
+        const cookieHeader = headersList.get('cookie') || '';
     const cookies = Object.fromEntries(cookieHeader.split(';').map(c => c.trim().split('=')).filter(([k]) => k).map(([k, ...v]) => [k.trim(), v.join('=').trim()]));
-    const tokenStr = cookies['proc-session'];
+    const authHeader = headersList.get('authorization') || '';
+    const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+    const tokenStr = bearerToken || cookies['proc-session'];
     const payload = await verifyToken(tokenStr);
     const orgId = payload?.organizationId as string | undefined;
 

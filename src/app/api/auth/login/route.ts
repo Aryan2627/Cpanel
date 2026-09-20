@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import bcrypt from 'bcryptjs';
 import { signToken } from '../../../../lib/session';
@@ -26,13 +26,15 @@ export async function POST(req: Request) {
       userId: user.id,
       email: user.email || '',
       organizationId: user.organizationId || '',
-      role: user.role || 'user',
+      role: user.role,
+      token: token || 'user',
     });
 
     const response = NextResponse.json({ 
       success: true, 
       organizationId: user.organizationId,
-      role: user.role 
+      role: user.role,
+      token: token 
     });
 
     response.cookies.set('proc-session', token, {
