@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       email: user.email || '',
       organizationId: user.organizationId || '',
       role: user.role,
-      token: token || 'user',
+      
     });
 
     const response = NextResponse.json({ 
