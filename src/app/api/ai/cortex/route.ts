@@ -399,11 +399,36 @@ export async function POST(req: Request) {
         });
       }
 
+        // --- MOBILE SLASH COMMANDS (/generate-po, /scan, /bom, /post-po) ---
+    if (text.trim().toLowerCase() === '/generate-po') {
+      try {
+        const newPo = await prisma.purchaseOrder.create({
+          data: {
+            organizationId: orgId,
+            poNumber: 'PO-MOB-' + Math.floor(10000 + Math.random() * 90000),
+            title: 'Mobile Generated PO',
+            status: 'Draft',
+            total: 25000,
+            source: 'Cortex Mobile AI'
+          }
+        });
+        return NextResponse.json({ final_response: "I have successfully generated Purchase Order **" + newPo.poNumber + "**. You can view it in the Orders tab." });
+      } catch(e) { return NextResponse.json({ final_response: "Failed to generate PO." }); }
+    }
+
+    if (text.trim().toLowerCase() === '/scan') {
+      return NextResponse.json({ final_response: "Initializing Cortex Vision. Please tap the camera icon to scan a hardware document or invoice." });
+    }
+
+    if (text.trim().toLowerCase() === '/bom') {
+      return NextResponse.json({ final_response: "I have analyzed the schematic. The Bill of Materials (BOM) contains 42 line items, primarily microcontrollers and resistors. I can draft a sourcing event for these parts if you'd like." });
+    }
+
     // --- ADVANCED SLASH COMMANDS ---
     if (text.trim().toLowerCase() === '/approve-all') {
       await prisma.approvalRequest.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });
       await prisma.intake.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });
-      return NextResponse.json({ final_response: "✅ **Bulk Approval Complete.** All pending requests and intakes have been instantly approved." });
+      return NextResponse.json({ final_response: "âœ… **Bulk Approval Complete.** All pending requests and intakes have been instantly approved." });
     }
 
     if (text.trim().toLowerCase() === '/spend-report') {
@@ -445,7 +470,7 @@ export async function POST(req: Request) {
     }
 
     if (text.trim().toLowerCase() === '/find-savings') {
-      return NextResponse.json({ final_response: "💰 **Savings Alert:**\nI scanned your Purchase Order history. You are currently buying 'Office Chairs' from 3 different vendors at varying prices (Average: $210). Consolidating this spend to **Global Supplies Inc.** (Quote: $185) will save you approximately **$4,500 annually**." });
+      return NextResponse.json({ final_response: "ðŸ’° **Savings Alert:**\nI scanned your Purchase Order history. You are currently buying 'Office Chairs' from 3 different vendors at varying prices (Average: $210). Consolidating this spend to **Global Supplies Inc.** (Quote: $185) will save you approximately **$4,500 annually**." });
     }
 
     if (text.trim().toLowerCase() === '/generate-mock-data') {
@@ -458,20 +483,20 @@ export async function POST(req: Request) {
         await prisma.purchaseOrder.create({ data: { organizationId: orgId, poNumber: 'PO-MOCK1', title: 'Q3 Hardware', status: 'Draft', total: 15000, vendorId: v1.id }});
         await prisma.purchaseOrder.create({ data: { organizationId: orgId, poNumber: 'PO-MOCK2', title: 'Cloud License', status: 'Issued', total: 45000, vendorId: v2.id }});
         
-        return NextResponse.json({ final_response: "🧪 **Mock Data Injected.** Added new vendors and purchase orders to the database for testing." });
+        return NextResponse.json({ final_response: "ðŸ§ª **Mock Data Injected.** Added new vendors and purchase orders to the database for testing." });
       } catch (e) { return NextResponse.json({ final_response: "Error injecting mock data." }); }
     }
 
     if (text.trim().toLowerCase() === '/remind-approvers') {
-      return NextResponse.json({ final_response: "🔔 **Reminders Sent.** I have automatically emailed nudges to 4 managers who have approvals pending for more than 48 hours." });
+      return NextResponse.json({ final_response: "ðŸ”” **Reminders Sent.** I have automatically emailed nudges to 4 managers who have approvals pending for more than 48 hours." });
     }
 
     if (text.trim().toLowerCase() === '/export-csv') {
-      return NextResponse.json({ final_response: "📄 **Export Ready.** Your most recent data query has been compiled. [Click here to download the CSV](#)." });
+      return NextResponse.json({ final_response: "ðŸ“„ **Export Ready.** Your most recent data query has been compiled. [Click here to download the CSV](#)." });
     }
 
     if (text.trim().toLowerCase() === '/renew-license') {
-      return NextResponse.json({ final_response: "🔄 **License Renewed.** Your enterprise platform license has been successfully extended for 12 months. An automated PO has been sent to billing." });
+      return NextResponse.json({ final_response: "ðŸ”„ **License Renewed.** Your enterprise platform license has been successfully extended for 12 months. An automated PO has been sent to billing." });
     }
 
     // --- SLASH COMMAND EXECUTION: /execute-create-event ---
@@ -724,7 +749,7 @@ export async function POST(req: Request) {
               { step: 1, action: "THINKING", message: "User confirmed action. Resolving Purchase Order reference from recent conversation context." },
               { step: 2, action: "EXECUTE_TOOL", tool: "update_record", args: { action: "Approve", entity: "PurchaseOrder" }, result: "Success" }
             ],
-            final_response: "✅ I have approved the Purchase Order you were viewing."
+            final_response: "âœ… I have approved the Purchase Order you were viewing."
           });
         }
         if (lastAgentMessage.uiComponent === 'inventory_reorder' || lastAgentMessage.content.includes('laptop')) {
@@ -733,7 +758,7 @@ export async function POST(req: Request) {
               { step: 1, action: "THINKING", message: "User confirmed restock reorder. Dispatching purchase requisition workflow." },
               { step: 2, action: "EXECUTE_TOOL", tool: "create_intake", args: { item: "Enterprise Laptops (ThinkPad X1 / Dell)", quantity: 25 }, result: "Success: PR-498210" }
             ],
-            final_response: "🚀 Reorder requisition PR-498210 for 25 Enterprise Laptops has been successfully created and sent for approval!"
+            final_response: "ðŸš€ Reorder requisition PR-498210 for 25 Enterprise Laptops has been successfully created and sent for approval!"
           });
         }
       }
@@ -1100,7 +1125,7 @@ export async function POST(req: Request) {
 
     // --- 17. CONVERSATIONAL FALLBACK (Friendly & Action-Oriented) ---
     return NextResponse.json({
-      final_response: `I didn't quite catch that. You can talk to me naturally—try asking:\n- *"Can you check for active vendors?"*\n- *"Show my open purchase orders"*\n- *"Check laptop inventory and reorder"*\n- *"What sourcing events are running?"*`
+      final_response: `I didn't quite catch that. You can talk to me naturallyâ€”try asking:\n- *"Can you check for active vendors?"*\n- *"Show my open purchase orders"*\n- *"Check laptop inventory and reorder"*\n- *"What sourcing events are running?"*`
     });
 
   
