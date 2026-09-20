@@ -43,8 +43,8 @@ model User {
   email          String?       @unique
   phone          String?
   role           String?
-  permissions      Json?
-  impersonatedBy   String?
+  permissions    Json?
+  impersonatedBy String?
   password       String?
   erpId          String?
   status         String        @default("Active")
@@ -180,6 +180,9 @@ model Vendor {
 }
 
 model PurchaseOrder {
+  asns           ASN[]
+  grns           GRN[]
+  invoices       Invoice[]
   id             String        @id @default(uuid())
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -319,3 +322,49 @@ model AuditLog {
   @@index([actorEmail])
 }
 
+model ASN {
+  id              String        @id @default(uuid())
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  asnNumber       String
+  trackingId      String?
+  carrier         String?
+  status          String        @default("In Transit")
+  estimatedDate   DateTime?
+  details         String? // JSON
+  createdAt       DateTime      @default(now())
+
+  @@index([purchaseOrderId])
+}
+
+model GRN {
+  id              String        @id @default(uuid())
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  asnId           String?
+  grnNumber       String
+  receivedBy      String?
+  location        String?
+  status          String        @default("Received")
+  details         String? // JSON
+  createdAt       DateTime      @default(now())
+
+  @@index([purchaseOrderId])
+}
+
+model Invoice {
+  id              String        @id @default(uuid())
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  invoiceNumber   String
+  vendorId        String?
+  totalAmount     Float         @default(0)
+  taxAmount       Float         @default(0)
+  dueDate         DateTime?
+  status          String        @default("Pending")
+  matchStatus     String        @default("Unmatched")
+  details         String? // JSON
+  createdAt       DateTime      @default(now())
+
+  @@index([purchaseOrderId])
+}

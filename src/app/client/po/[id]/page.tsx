@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Printer, Download, Gift, QrCode, CheckCircle2, ShieldCheck, FileSignature, Key, Lock, Scale, Globe } from 'lucide-react';
+import { ArrowLeft, Printer, Download, Gift, QrCode, CheckCircle2, ShieldCheck, FileSignature, Key, Lock, Scale, Globe, Package, Truck, Receipt } from 'lucide-react';
 
 export default function PurchaseOrderDetailPage() {
   const params = useParams();
@@ -13,6 +13,21 @@ export default function PurchaseOrderDetailPage() {
   
   const [isSigned, setIsSigned] = useState(false);
   const [signData, setSignData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'details' | 'asn' | 'grn' | 'invoice'>('details');
+  const [asns, setAsns] = useState<any[]>([]);
+  const [grns, setGrns] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<any[]>([]);
+
+  useEffect(() => {
+    if(po && activeTab !== 'details') {
+      fetch('/api/pos/'+params.id+'/'+activeTab).then(r=>r.json()).then(data => {
+        if(activeTab==='asn') setAsns(data);
+        if(activeTab==='grn') setGrns(data);
+        if(activeTab==='invoice') setInvoices(data);
+      }).catch(e=>console.error(e));
+    }
+  }, [activeTab, po]);
+
 
   const [vendorLootDrop, setVendorLootDrop] = useState(false);
 
