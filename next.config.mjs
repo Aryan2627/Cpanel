@@ -2,8 +2,8 @@
 const nextConfig = {
   
   typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
-  poweredByHeader: false, experimental: { after: true },
+  
+  poweredByHeader: false, 
   async headers() {
     return [
       {
