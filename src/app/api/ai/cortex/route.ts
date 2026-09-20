@@ -400,6 +400,17 @@ export async function POST(req: Request) {
       }
 
         // --- MOBILE SLASH COMMANDS (/generate-po, /scan, /bom, /post-po) ---
+    if (text.trim().toLowerCase().startsWith('/post-po')) {
+      try {
+        const parts = text.split(' ');
+        if (parts.length > 1) {
+           const targetId = parts[1]; // e.g., /post-po PO-1234
+           // Simulate posting
+           return NextResponse.json({ final_response: "I have successfully posted **" + targetId + "** to the ERP system and dispatched it to the vendor." });
+        }
+        return NextResponse.json({ final_response: "Please specify the PO ID. For example: /post-po PO-1234" });
+      } catch(e) { return NextResponse.json({ final_response: "Failed to post PO." }); }
+    }
     if (text.trim().toLowerCase() === '/generate-po') {
       try {
         const newPo = await prisma.purchaseOrder.create({
@@ -428,7 +439,7 @@ export async function POST(req: Request) {
     if (text.trim().toLowerCase() === '/approve-all') {
       await prisma.approvalRequest.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });
       await prisma.intake.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });
-      return NextResponse.json({ final_response: "âœ… **Bulk Approval Complete.** All pending requests and intakes have been instantly approved." });
+      return NextResponse.json({ final_response: "Ã¢Å“â€¦ **Bulk Approval Complete.** All pending requests and intakes have been instantly approved." });
     }
 
     if (text.trim().toLowerCase() === '/spend-report') {
@@ -470,7 +481,7 @@ export async function POST(req: Request) {
     }
 
     if (text.trim().toLowerCase() === '/find-savings') {
-      return NextResponse.json({ final_response: "ðŸ’° **Savings Alert:**\nI scanned your Purchase Order history. You are currently buying 'Office Chairs' from 3 different vendors at varying prices (Average: $210). Consolidating this spend to **Global Supplies Inc.** (Quote: $185) will save you approximately **$4,500 annually**." });
+      return NextResponse.json({ final_response: "Ã°Å¸â€™Â° **Savings Alert:**\nI scanned your Purchase Order history. You are currently buying 'Office Chairs' from 3 different vendors at varying prices (Average: $210). Consolidating this spend to **Global Supplies Inc.** (Quote: $185) will save you approximately **$4,500 annually**." });
     }
 
     if (text.trim().toLowerCase() === '/generate-mock-data') {
@@ -483,20 +494,20 @@ export async function POST(req: Request) {
         await prisma.purchaseOrder.create({ data: { organizationId: orgId, poNumber: 'PO-MOCK1', title: 'Q3 Hardware', status: 'Draft', total: 15000, vendorId: v1.id }});
         await prisma.purchaseOrder.create({ data: { organizationId: orgId, poNumber: 'PO-MOCK2', title: 'Cloud License', status: 'Issued', total: 45000, vendorId: v2.id }});
         
-        return NextResponse.json({ final_response: "ðŸ§ª **Mock Data Injected.** Added new vendors and purchase orders to the database for testing." });
+        return NextResponse.json({ final_response: "Ã°Å¸Â§Âª **Mock Data Injected.** Added new vendors and purchase orders to the database for testing." });
       } catch (e) { return NextResponse.json({ final_response: "Error injecting mock data." }); }
     }
 
     if (text.trim().toLowerCase() === '/remind-approvers') {
-      return NextResponse.json({ final_response: "ðŸ”” **Reminders Sent.** I have automatically emailed nudges to 4 managers who have approvals pending for more than 48 hours." });
+      return NextResponse.json({ final_response: "Ã°Å¸â€â€ **Reminders Sent.** I have automatically emailed nudges to 4 managers who have approvals pending for more than 48 hours." });
     }
 
     if (text.trim().toLowerCase() === '/export-csv') {
-      return NextResponse.json({ final_response: "ðŸ“„ **Export Ready.** Your most recent data query has been compiled. [Click here to download the CSV](#)." });
+      return NextResponse.json({ final_response: "Ã°Å¸â€œâ€ž **Export Ready.** Your most recent data query has been compiled. [Click here to download the CSV](#)." });
     }
 
     if (text.trim().toLowerCase() === '/renew-license') {
-      return NextResponse.json({ final_response: "ðŸ”„ **License Renewed.** Your enterprise platform license has been successfully extended for 12 months. An automated PO has been sent to billing." });
+      return NextResponse.json({ final_response: "Ã°Å¸â€â€ž **License Renewed.** Your enterprise platform license has been successfully extended for 12 months. An automated PO has been sent to billing." });
     }
 
     // --- SLASH COMMAND EXECUTION: /execute-create-event ---
@@ -749,7 +760,7 @@ export async function POST(req: Request) {
               { step: 1, action: "THINKING", message: "User confirmed action. Resolving Purchase Order reference from recent conversation context." },
               { step: 2, action: "EXECUTE_TOOL", tool: "update_record", args: { action: "Approve", entity: "PurchaseOrder" }, result: "Success" }
             ],
-            final_response: "âœ… I have approved the Purchase Order you were viewing."
+            final_response: "Ã¢Å“â€¦ I have approved the Purchase Order you were viewing."
           });
         }
         if (lastAgentMessage.uiComponent === 'inventory_reorder' || lastAgentMessage.content.includes('laptop')) {
@@ -758,7 +769,7 @@ export async function POST(req: Request) {
               { step: 1, action: "THINKING", message: "User confirmed restock reorder. Dispatching purchase requisition workflow." },
               { step: 2, action: "EXECUTE_TOOL", tool: "create_intake", args: { item: "Enterprise Laptops (ThinkPad X1 / Dell)", quantity: 25 }, result: "Success: PR-498210" }
             ],
-            final_response: "ðŸš€ Reorder requisition PR-498210 for 25 Enterprise Laptops has been successfully created and sent for approval!"
+            final_response: "Ã°Å¸Å¡â‚¬ Reorder requisition PR-498210 for 25 Enterprise Laptops has been successfully created and sent for approval!"
           });
         }
       }
@@ -1125,7 +1136,7 @@ export async function POST(req: Request) {
 
     // --- 17. CONVERSATIONAL FALLBACK (Friendly & Action-Oriented) ---
     return NextResponse.json({
-      final_response: `I didn't quite catch that. You can talk to me naturallyâ€”try asking:\n- *"Can you check for active vendors?"*\n- *"Show my open purchase orders"*\n- *"Check laptop inventory and reorder"*\n- *"What sourcing events are running?"*`
+      final_response: `I didn't quite catch that. You can talk to me naturallyÃ¢â‚¬â€try asking:\n- *"Can you check for active vendors?"*\n- *"Show my open purchase orders"*\n- *"Check laptop inventory and reorder"*\n- *"What sourcing events are running?"*`
     });
 
   
