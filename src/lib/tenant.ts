@@ -1,4 +1,4 @@
-﻿import { headers } from "next/headers";
+import { headers } from "next/headers";
 import { prisma } from "./prisma";
 import { verifyToken } from "./session";
 import { getToken } from "next-auth/jwt"; // Fallback for old sessions
@@ -6,8 +6,12 @@ import { getToken } from "next-auth/jwt"; // Fallback for old sessions
 export async function getTenantId(): Promise<string> {
   try {
     const headersList = await headers();
-    const cookieHeader = headersList.get("cookie") || "";
+        const cookieHeader = headersList.get("cookie") || "";
     
+    // Support mobile Bearer token
+    const authHeader = headersList.get("authorization") || "";
+    const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
+
     // Parse cookies manually
     const cookies = Object.fromEntries(
       cookieHeader
@@ -17,9 +21,11 @@ export async function getTenantId(): Promise<string> {
         .map(([k, ...v]) => [k.trim(), v.join("=").trim()])
     );
 
+    const tokenStr = bearerToken || cookies['proc-session'];
+
     // 1. Try our new reliable custom JWT
-    if (cookies['proc-session']) {
-      const payload = await verifyToken(cookies['proc-session']);
+    if (tokenStr) {
+      const payload = await verifyToken(tokenStr);
       if (payload && payload.organizationId) {
         return payload.organizationId;
       }
