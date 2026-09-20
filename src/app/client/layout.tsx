@@ -7,6 +7,7 @@ import TourButton from './TourButton';
 import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
 import JarvisAssistant from './JarvisAssistant';
+import CortexWidget from './CortexWidget';
 import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles } from 'lucide-react';
 
 const TOP_MENUS = [
@@ -55,81 +56,6 @@ const TOP_MENUS = [
     ]
   },
 ];
-
-
-const launchPiP = async () => {
-  if (!('documentPictureInPicture' in window)) { alert('Your browser does not support Document Picture-in-Picture.'); return; }
-  if (!(window as any).Tesseract) { const script = document.createElement('script'); script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'; document.head.appendChild(script); }
-  try {
-    // @ts-ignore
-    const pipWindow = await window.documentPictureInPicture.requestWindow({ width: 400, height: 600 });
-    const style = document.createElement('style');
-    style.textContent = `
-      body { margin: 0; background: #0f172a; color: #f1f5f9; font-family: system-ui, sans-serif; overflow: hidden; }
-      .container { display: flex; flex-direction: column; height: 100vh; padding: 20px; box-sizing: border-box; }
-      .btn { background: linear-gradient(135deg, #00c6ff, #0072ff); border: none; padding: 14px; border-radius: 12px; color: #fff; font-weight: 700; font-size: 0.95rem; cursor: pointer; width: 100%; margin-top: auto; box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3); transition: transform 0.1s; }
-      .btn:disabled { opacity: 0.7; cursor: not-allowed; }
-      .msg { background: rgba(255,255,255,0.05); padding: 14px 16px; border-radius: 12px; font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.05); }
-      .loading-line { display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: 0.8rem; margin-bottom: 6px; }
-      .spinner { width: 12px; height: 12px; border: 2px solid #00c6ff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
-      pre { white-space: pre-wrap; font-family: monospace; font-size: 0.75rem; background: #070b14; padding: 10px; border-radius: 6px; max-height: 200px; overflow-y: auto; color: #a5b4fc; }
-      @keyframes spin { 100% { transform: rotate(360deg); } }
-    `;
-    pipWindow.document.head.appendChild(style);
-    pipWindow.document.body.innerHTML = `
-      <div class="container">
-        <h3 style="margin: 0 0 5px 0; color: #00c6ff; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px;">Cortex Anywhere</h3>
-        <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Live Vision AI (Local OCR)</p>
-        <div id="chatArea" style="flex: 1; overflow-y: auto;">
-          <div class="msg" style="background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 114, 255, 0.1)); border-color: rgba(0, 114, 255, 0.2);">
-            <strong style="color: #fff; display: block; margin-bottom: 6px;">Real Screen Analysis Ready</strong>
-            I have been upgraded to read the actual pixels on your screen using an advanced in-browser OCR engine. Select a window to test me!
-          </div>
-        </div>
-        <button id="scanBtn" class="btn">👁️ Analyze Real Screen</button>
-      </div>
-    `;
-    pipWindow.document.getElementById('scanBtn').onclick = async () => {
-       const btn = pipWindow.document.getElementById('scanBtn');
-       const chat = pipWindow.document.getElementById('chatArea');
-       if (btn.disabled) return;
-       btn.disabled = true; btn.innerText = 'Requesting window...';
-       try {
-         const stream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'window' } });
-         const loadingId = 'load-' + Date.now();
-         chat.innerHTML += `<div id="${loadingId}" class="msg" style="border-color: rgba(255,255,255,0.1);"><div class="loading-line"><div class="spinner"></div> Capturing video frame...</div></div>`;
-         chat.scrollTop = chat.scrollHeight;
-         const video = document.createElement('video'); video.srcObject = stream; await video.play();
-         const canvas = document.createElement('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-         canvas.getContext('2d')!.drawImage(video, 0, 0, canvas.width, canvas.height);
-         stream.getTracks().forEach(track => track.stop());
-         const loader = pipWindow.document.getElementById(loadingId);
-         loader.innerHTML += `<div class="loading-line"><div class="spinner"></div> Running Local Neural OCR Engine...</div>`;
-         chat.scrollTop = chat.scrollHeight;
-         if ((window as any).Tesseract) {
-           const { data: { text } } = await (window as any).Tesseract.recognize(canvas, 'eng');
-           if (loader) loader.remove();
-           if (!text || text.trim().length === 0) {
-             chat.innerHTML += `<div class="msg" style="border-color: #f59e0b;">Could not detect clear text.</div>`;
-           } else {
-             const cleanText = text.substring(0, 600) + (text.length > 600 ? '... [TRUNCATED]' : '');
-             chat.innerHTML += `<div class="msg" style="border-color: rgba(0,198,255,0.3); background: rgba(0,198,255,0.05);">
-              <strong style="color: #00c6ff; display: block; margin-bottom: 6px;">Real Text Detected!</strong>
-              Here is exactly what I read from your screen using live pixel analysis:<br/>
-              <pre>${cleanText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre><br/><span style="color: #4ade80;">✓ Analysis Complete</span>
-              </div>`;
-           }
-         } else {
-           if (loader) loader.remove(); chat.innerHTML += `<div class="msg" style="color: #f87171;">OCR Engine is still downloading.</div>`;
-         }
-         chat.scrollTop = chat.scrollHeight; btn.innerText = '👁️ Analyze Real Screen'; btn.disabled = false;
-       } catch(e) {
-         console.error(e); btn.innerText = '👁️ Analyze Real Screen'; btn.disabled = false;
-         chat.innerHTML += '<div class="msg" style="color: #f87171;">Screen capture cancelled or failed.</div>'; chat.scrollTop = chat.scrollHeight;
-       }
-    };
-  } catch(e) { console.error(e); alert('Failed to launch PiP window.'); }
-};
 
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -376,38 +302,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       </div>
       
       
-      {/* Floating Cortex Ring */}
-      <div 
-        onClick={launchPiP}
-        title="Launch Web Copilot"
-        style={{
-          position: 'fixed',
-          bottom: '30px',
-          right: '30px',
-          width: '60px',
-          height: '60px',
-          borderRadius: '50%',
-          background: 'rgba(15, 23, 42, 0.8)',
-          border: '2px solid #00c6ff',
-          boxShadow: '0 0 20px rgba(0, 198, 255, 0.5), inset 0 0 10px rgba(0, 198, 255, 0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          zIndex: 9999,
-          animation: 'pulseRing 2s infinite',
-          backdropFilter: 'blur(10px)'
-        }}
-      >
-        <Sparkles size={28} color="#00c6ff" />
-        <style>{`
-          @keyframes pulseRing {
-            0% { box-shadow: 0 0 15px rgba(0, 198, 255, 0.4), inset 0 0 10px rgba(0, 198, 255, 0.3); }
-            50% { box-shadow: 0 0 25px rgba(0, 198, 255, 0.8), inset 0 0 15px rgba(0, 198, 255, 0.5); }
-            100% { box-shadow: 0 0 15px rgba(0, 198, 255, 0.4), inset 0 0 10px rgba(0, 198, 255, 0.3); }
-          }
-        `}</style>
-      </div>
+      <CortexWidget />
 
       <CartOverlay />
 
