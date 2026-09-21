@@ -294,6 +294,7 @@ export default function CortexPage() {
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSlash, setShowSlash] = useState(false);
+  const [slashCategory, setSlashCategory] = useState('All');
   const [chats, setChats] = useState<{id: string, title: string, messages: Message[]}[]>([
     { id: 'c1', title: 'Risk Swarm — Vendor Contract Q3', messages: [{ role: 'agent', content: 'Multi-Agent Swarm analysis completed for Vendor Contract Q3.' }] },
     { id: 'c2', title: 'Legal Review — NDA Acme Corp', messages: [{ role: 'agent', content: 'Legal clause review completed for Acme Corp NDA.' }] },
@@ -490,25 +491,25 @@ export default function CortexPage() {
   ));
 
     const slashCmds = [
-      { cmd:'/bom', label:'BOM to Purchase Request (AI Matcher)', icon:<FileUp size={14}/>, color:'#2dd4bf', bg:'rgba(45,212,191,0.12)', auto:true, hasTutorial: false },
-      { cmd:'/analyze-bids', label:'Compare Vendor Bids & Export', icon:<BarChart3 size={14}/>, color:'#f43f5e', bg:'rgba(244,63,94,0.12)', auto:true, hasTutorial: false },
-      { cmd:'/analyze-risk', label:'Multi-Agent Risk Swarm', icon:<AlertTriangle size={14}/>, color:'#f87171', bg:'rgba(239,68,68,0.12)', auto:true },
-      { cmd:'/analyze-contract', label:'Deep Legal Clause Review', icon:<Shield size={14}/>, color:'#c084fc', bg:'rgba(168,85,247,0.12)', auto:true },
-      { cmd:'/draft-contract', label:'Generate Legal Document', icon:<FileText size={14}/>, color:'#818cf8', bg:'rgba(99,102,241,0.12)', auto:false, hasTutorial: true },
-      { cmd:'/review-clause', label:'AI Legal Risk Analysis', icon:<Shield size={14}/>, color:'#f43f5e', bg:'rgba(244,63,94,0.12)', auto:true },
-      { cmd:'/track-shipments', label:'Live ASN/GRN Tracking', icon:<Zap size={14}/>, color:'#eab308', bg:'rgba(234,179,8,0.12)', auto:true },
-      { cmd:'/predict-stockout', label:'Inventory Shortage Alerts', icon:<AlertTriangle size={14}/>, color:'#ef4444', bg:'rgba(239,68,68,0.12)', auto:true },
-      { cmd:'/3way-match', label:'Invoice Reconciliation', icon:<Database size={14}/>, color:'#10b981', bg:'rgba(16,185,129,0.12)', auto:true },
-      { cmd:'/esg-audit', label:'Vendor Sustainability Score', icon:<CheckCircle2 size={14}/>, color:'#14b8a6', bg:'rgba(20,184,166,0.12)', auto:true },
-      { cmd:'/market-intel', label:'Live Commodity Pricing Trends', icon:<BarChart3 size={14}/>, color:'#6366f1', bg:'rgba(99,102,241,0.12)', auto:true },
-      { cmd:'/vendor-scorecard', label:'Vendor Performance Grades', icon:<CheckCircle size={14}/>, color:'#3b82f6', bg:'rgba(59,130,246,0.12)', auto:true },
-      { cmd:'/s2p', label:'End-to-End Source to Pay', icon:<Database size={14}/>, color:'#10b981', bg:'rgba(16,185,129,0.12)', auto:true },
-      { cmd:'/create-event', label:'Create Sourcing Event / Auction', icon:<Zap size={14}/>, color:'#fb923c', bg:'rgba(249,115,22,0.12)', auto:false },
-      { cmd:'/create-vendor', label:'Onboard New Supplier', icon:<CheckCircle2 size={14}/>, color:'#34d399', bg:'rgba(16,185,129,0.12)', auto:false },
-      { cmd:'/draft-po', label:'Draft Purchase Order', icon:<Database size={14}/>, color:'#38bdf8', bg:'rgba(14,165,233,0.12)', auto:false },
-      { cmd:'/add-product', label:'Add Item to Catalog', icon:<Plus size={14}/>, color:'#a3e635', bg:'rgba(132,204,22,0.12)', auto:false },
-      { cmd:'/scan', label:'Analyze Current Screen (OCR)', icon:<Monitor size={14}/>, color:'#00c6ff', bg:'rgba(0,198,255,0.12)', auto:true },
-      { cmd:'/clear', label:'Clear Conversation', icon:<X size={14}/>, color:'#94a3b8', bg:'rgba(148,163,184,0.08)', auto:true },
+      { category:'Sourcing', cmd:'/bom', label:'BOM to Purchase Request (AI Matcher)', icon:<FileUp size={14}/>, color:'#2dd4bf', bg:'rgba(45,212,191,0.12)', auto:true, hasTutorial: false },
+      { category:'Sourcing', cmd:'/analyze-bids', label:'Compare Vendor Bids & Export', icon:<BarChart3 size={14}/>, color:'#f43f5e', bg:'rgba(244,63,94,0.12)', auto:true, hasTutorial: false },
+      { category:'System', cmd:'/analyze-risk', label:'Multi-Agent Risk Swarm', icon:<AlertTriangle size={14}/>, color:'#f87171', bg:'rgba(239,68,68,0.12)', auto:true },
+      { category:'Legal', cmd:'/analyze-contract', label:'Deep Legal Clause Review', icon:<Shield size={14}/>, color:'#c084fc', bg:'rgba(168,85,247,0.12)', auto:true },
+      { category:'Legal', cmd:'/draft-contract', label:'Generate Legal Document', icon:<FileText size={14}/>, color:'#818cf8', bg:'rgba(99,102,241,0.12)', auto:false, hasTutorial: true },
+      { category:'Legal', cmd:'/review-clause', label:'AI Legal Risk Analysis', icon:<Shield size={14}/>, color:'#f43f5e', bg:'rgba(244,63,94,0.12)', auto:true },
+      { category:'Logistics', cmd:'/track-shipments', label:'Live ASN/GRN Tracking', icon:<Zap size={14}/>, color:'#eab308', bg:'rgba(234,179,8,0.12)', auto:true },
+      { category:'Logistics', cmd:'/predict-stockout', label:'Inventory Shortage Alerts', icon:<AlertTriangle size={14}/>, color:'#ef4444', bg:'rgba(239,68,68,0.12)', auto:true },
+      { category:'Finance', cmd:'/3way-match', label:'Invoice Reconciliation', icon:<Database size={14}/>, color:'#10b981', bg:'rgba(16,185,129,0.12)', auto:true },
+      { category:'Vendors', cmd:'/esg-audit', label:'Vendor Sustainability Score', icon:<CheckCircle2 size={14}/>, color:'#14b8a6', bg:'rgba(20,184,166,0.12)', auto:true },
+      { category:'System', cmd:'/market-intel', label:'Live Commodity Pricing Trends', icon:<BarChart3 size={14}/>, color:'#6366f1', bg:'rgba(99,102,241,0.12)', auto:true },
+      { category:'Vendors', cmd:'/vendor-scorecard', label:'Vendor Performance Grades', icon:<CheckCircle size={14}/>, color:'#3b82f6', bg:'rgba(59,130,246,0.12)', auto:true },
+      { category:'Sourcing', cmd:'/s2p', label:'End-to-End Source to Pay', icon:<Database size={14}/>, color:'#10b981', bg:'rgba(16,185,129,0.12)', auto:true },
+      { category:'Sourcing', cmd:'/create-event', label:'Create Sourcing Event / Auction', icon:<Zap size={14}/>, color:'#fb923c', bg:'rgba(249,115,22,0.12)', auto:false },
+      { category:'Vendors', cmd:'/create-vendor', label:'Onboard New Supplier', icon:<CheckCircle2 size={14}/>, color:'#34d399', bg:'rgba(16,185,129,0.12)', auto:false },
+      { category:'Finance', cmd:'/draft-po', label:'Draft Purchase Order', icon:<Database size={14}/>, color:'#38bdf8', bg:'rgba(14,165,233,0.12)', auto:false },
+      { category:'System', cmd:'/add-product', label:'Add Item to Catalog', icon:<Plus size={14}/>, color:'#a3e635', bg:'rgba(132,204,22,0.12)', auto:false },
+      { category:'System', cmd:'/scan', label:'Analyze Current Screen (OCR)', icon:<Monitor size={14}/>, color:'#00c6ff', bg:'rgba(0,198,255,0.12)', auto:true },
+      { category:'System', cmd:'/clear', label:'Clear Conversation', icon:<X size={14}/>, color:'#94a3b8', bg:'rgba(148,163,184,0.08)', auto:true },
     ];
 
   return (
@@ -1349,12 +1350,22 @@ export default function CortexPage() {
             {/* Slash Menu */}
             {showSlash && (
               <div className="cx-slash-menu" style={{ position:'absolute', bottom:'100%', left:0, width:'100%', background:'rgba(7,13,28,0.97)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'16px', boxShadow:'0 -20px 60px rgba(0,0,0,0.5)', overflow:'hidden', marginBottom:'10px', backdropFilter:'blur(20px)' }}>
-                <div style={{ padding:'10px 16px', borderBottom:'1px solid rgba(255,255,255,0.05)', display:'flex', alignItems:'center', gap:'8px' }}>
-                  <Sparkles size={13} color="#6366f1"/>
-                  <span style={{ fontSize:'0.68rem', fontWeight:800, color:'#475569', textTransform:'uppercase', letterSpacing:'1.5px' }}>Advanced Workflows</span>
-                </div>
-                <div style={{ maxHeight:'320px', overflowY:'auto' }}>
-                  {slashCmds.map((item: any, i: number)=>(
+                  <div style={{ padding:'8px 12px', borderBottom:'1px solid rgba(255,255,255,0.05)', display:'flex', alignItems:'center', gap:'6px', overflowX:'auto' }}>
+                    {['All', 'Sourcing', 'Legal', 'Logistics', 'Finance', 'Vendors', 'System'].map(cat => (
+                      <button 
+                        key={cat} 
+                        onClick={(e) => { e.preventDefault(); setSlashCategory(cat); }}
+                        style={{ background: slashCategory === cat ? 'rgba(99,102,241,0.15)' : 'transparent', color: slashCategory === cat ? '#818cf8' : '#64748b', padding:'6px 12px', borderRadius:'14px', border:'none', cursor:'pointer', fontSize:'0.75rem', fontWeight:600, whiteSpace:'nowrap', transition:'all 0.2s' }}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ maxHeight:'320px', overflowY:'auto' }}>
+                    {slashCmds
+                      .filter(c => slashCategory === 'All' || c.category === slashCategory)
+                      .filter(c => c.cmd.toLowerCase().includes(inputText.toLowerCase()))
+                      .map((item: any, i: number)=>(
                       <div key={i} className="slash-btn" style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%', borderBottom:'1px solid rgba(255,255,255,0.03)', transition:'all 0.15s' }}>
                         <button onClick={()=>{ item.auto ? execute(item.cmd) : setInput(item.cmd); setShowSlash(false); }} style={{ flex: 1, display:'flex', alignItems:'center', gap:'14px', padding:'11px 16px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left' }}>
                           <div style={{ background:item.bg, color:item.color, padding:'7px', borderRadius:'8px', display:'flex', flexShrink:0 }}>{item.icon}</div>
