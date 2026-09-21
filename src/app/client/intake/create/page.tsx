@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useIntake } from '../../../../context/IntakeContext';
+import DynamicFields from '../../../../components/DynamicFields';
 
 export default function PurchaseIntake() {
   const router = useRouter();
@@ -10,6 +11,7 @@ export default function PurchaseIntake() {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [quantity, setQuantity] = useState<number | string>('');
+  const [customData, setCustomData] = useState<any>({});
   const [categories, setCategories] = useState<string[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);

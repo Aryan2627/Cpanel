@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import DynamicFields from '../../../../../components/DynamicFields';
 
 export default function CreateProductPage() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function CreateProductPage() {
     window.addEventListener('customDropdowns_updated', loadCategories);
     return () => window.removeEventListener('customDropdowns_updated', loadCategories);
   }, []);
+  const [customData, setCustomData] = useState<any>({});
   const [formData, setFormData] = useState({
     name: '',
     uom: '',

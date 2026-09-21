@@ -19,6 +19,7 @@ model Organization {
 
   // Relations
   users          User[]
+  formConfigurations FormConfiguration[]
   teams          Team[]
   locations      Location[]
   categories     Category[]
@@ -78,6 +79,7 @@ model Location {
 }
 
 model Category {
+  customData     Json?
   id             String        @id @default(uuid())
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -92,6 +94,7 @@ model Category {
 }
 
 model Product {
+  customData     Json?
   id             String        @id @default(uuid())
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -114,6 +117,7 @@ model Product {
 }
 
 model Intake {
+  customData     Json?
   id             String        @id @default(uuid())
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -367,4 +371,20 @@ model Invoice {
   createdAt       DateTime      @default(now())
 
   @@index([purchaseOrderId])
+}
+
+model FormConfiguration {
+  id             String        @id @default(uuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  formName       String        // e.g. "Intake", "Product", "Category"
+  fieldName      String        // e.g. "custom_field_1"
+  fieldLabel     String        // The display label
+  fieldType      String        @default("dropdown") // "dropdown", "text", "number"
+  options        String?       // JSON array of options if dropdown
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@unique([organizationId, formName, fieldName])
 }
