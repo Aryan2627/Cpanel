@@ -1364,7 +1364,7 @@ export default function CortexPage() {
                   <div style={{ maxHeight:'320px', overflowY:'auto' }}>
                     {slashCmds
                       .filter(c => slashCategory === 'All' || c.category === slashCategory)
-                      .filter(c => c.cmd.toLowerCase().includes(inputText.toLowerCase()))
+                      .filter(c => c.cmd.toLowerCase().includes(input.toLowerCase()))
                       .map((item: any, i: number)=>(
                       <div key={i} className="slash-btn" style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%', borderBottom:'1px solid rgba(255,255,255,0.03)', transition:'all 0.15s' }}>
                         <button onClick={()=>{ item.auto ? execute(item.cmd) : setInput(item.cmd); setShowSlash(false); }} style={{ flex: 1, display:'flex', alignItems:'center', gap:'14px', padding:'11px 16px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left' }}>
