@@ -1181,24 +1181,24 @@ export default function CortexPage() {
 
                     {/* Draft Contract */}
                     {msg.uiComponent==='draft_contract_form' && msg.uiData && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><FileText size={16} color="#818cf8"/> Contract Editor: {msg.uiData.vendor}</div>
-                        <textarea rows={8} defaultValue={"MASTER SERVICE AGREEMENT\n\nThis Master Service Agreement (\"Agreement\") is made between Your Company and " + msg.uiData.vendor + ".\n\n1. SERVICES\nVendor agrees to provide services as outlined in applicable Statements of Work..."} style={{ width:'100%', padding:'14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(0,0,0,0.3)', color:'#e2e8f0', fontSize:'0.8rem', fontFamily:'monospace', outline:'none', resize:'vertical', lineHeight:'1.5' }}/>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><FileText size={16} color="#2563eb"/> Contract Editor: {msg.uiData.vendor}</div>
+                        <textarea rows={8} defaultValue={"MASTER SERVICE AGREEMENT\n\nThis Master Service Agreement (\"Agreement\") is made between Your Company and " + msg.uiData.vendor + ".\n\n1. SERVICES\nVendor agrees to provide services as outlined in applicable Statements of Work..."} style={{ width:'100%', padding:'14px', borderRadius:'8px', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #cbd5e1', background: isDark ? 'rgba(0,0,0,0.3)' : '#f8fafc', color: isDark ? '#e2e8f0' : '#334155', fontSize:'0.8rem', fontFamily:'monospace', outline:'none', resize:'vertical', lineHeight:'1.5' }}/>
                         <div style={{ display:'flex', gap:'10px', marginTop:'12px' }}>
-                          <button onClick={()=>alert('PDF Downloaded!')} style={{ flex:1, padding:'11px', background:'linear-gradient(135deg,#4f46e5,#4338ca)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Download PDF</button>
-                          <button onClick={()=>alert('Sent for E-Signature')} style={{ flex:1, padding:'11px', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Send via DocuSign</button>
+                          <button onClick={()=>alert('PDF Downloaded!')} style={{ flex:1, padding:'11px', background:'#2563eb', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Download PDF</button>
+                          <button onClick={()=>alert('Sent for E-Signature')} style={{ flex:1, padding:'11px', background: isDark ? 'rgba(255,255,255,0.05)' : '#ffffff', color: isDark ? '#e2e8f0' : '#334155', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #cbd5e1', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Send via DocuSign</button>
                         </div>
                       </div>
                     )}
 
                     {/* Clause Review */}
                     {msg.uiComponent==='clause_review' && msg.uiData && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(244,63,94,0.3)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Shield size={16} color="#f43f5e"/> Risk Analysis: {msg.uiData.riskLevel} Risk</div>
-                        <div style={{ fontSize:'0.8rem', color:'#94a3b8', lineHeight:'1.6', background:'rgba(0,0,0,0.3)', padding:'12px', borderRadius:'8px', borderLeft:'3px solid #f43f5e' }}>
-                          "The Supplier's liability shall be capped at <span style={{backgroundColor:'rgba(244,63,94,0.2)', color:'#fda4af', padding:'2px 4px', borderRadius:'4px'}}>the total amount paid under this SOW</span>, and Supplier shall not be liable for any <span style={{backgroundColor:'rgba(244,63,94,0.2)', color:'#fda4af', padding:'2px 4px', borderRadius:'4px'}}>indirect or consequential damages</span>."
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: '1px solid #f43f5e', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Shield size={16} color="#f43f5e"/> Risk Analysis: {msg.uiData.riskLevel} Risk</div>
+                        <div style={{ fontSize:'0.8rem', color: isDark ? '#94a3b8' : '#334155', lineHeight:'1.6', background: isDark ? 'rgba(0,0,0,0.3)' : '#fff1f2', padding:'12px', borderRadius:'8px', borderLeft:'3px solid #f43f5e' }}>
+                          "The Supplier's liability shall be capped at <span style={{backgroundColor: isDark ? 'rgba(244,63,94,0.2)' : '#ffe4e6', color:'#f43f5e', padding:'2px 4px', borderRadius:'4px'}}>the total amount paid under this SOW</span>, and Supplier shall not be liable for any <span style={{backgroundColor: isDark ? 'rgba(244,63,94,0.2)' : '#ffe4e6', color:'#f43f5e', padding:'2px 4px', borderRadius:'4px'}}>indirect or consequential damages</span>."
                         </div>
-                        <div style={{ marginTop:'12px', fontSize:'0.75rem', color:'#e2e8f0' }}>
+                        <div style={{ marginTop:'12px', fontSize:'0.75rem', color: isDark ? '#e2e8f0' : '#0f172a' }}>
                           <strong style={{color:'#f43f5e'}}>Flag ({msg.uiData.flagged}):</strong> Liability cap is non-standard. Corporate playbook requires cap at 2x contract value.
                         </div>
                       </div>
@@ -1206,17 +1206,17 @@ export default function CortexPage() {
 
                     {/* Shipment Tracker */}
                     {msg.uiComponent==='shipment_tracker' && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Zap size={16} color="#eab308"/> Active Shipments</div>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Zap size={16} color="#eab308"/> Active Shipments</div>
                         <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
                           {[ { id:'ASN-9921', status:'In Transit', prog:'60%', delay:false }, { id:'ASN-9922', status:'Delayed (Port)', prog:'30%', delay:true } ].map(s=>(
-                            <div key={s.id} style={{ padding:'12px', background:'rgba(0,0,0,0.2)', borderRadius:'8px' }}>
+                            <div key={s.id} style={{ padding:'12px', background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', borderRadius:'8px', border: isDark ? 'none' : '1px solid #f1f5f9' }}>
                               <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'8px' }}>
-                                <span style={{ fontSize:'0.8rem', fontWeight:600, color:'#e2e8f0' }}>{s.id}</span>
-                                <span style={{ fontSize:'0.7rem', color: s.delay ? '#f87171' : '#4ade80', fontWeight:600 }}>{s.status}</span>
+                                <span style={{ fontSize:'0.8rem', fontWeight:600, color: isDark ? '#e2e8f0' : '#0f172a' }}>{s.id}</span>
+                                <span style={{ fontSize:'0.7rem', color: s.delay ? '#ef4444' : '#10b981', fontWeight:600 }}>{s.status}</span>
                               </div>
-                              <div style={{ height:'6px', background:'rgba(255,255,255,0.1)', borderRadius:'3px', overflow:'hidden' }}>
-                                <div style={{ width: s.prog, height:'100%', background: s.delay ? '#f87171' : '#4ade80' }} />
+                              <div style={{ height:'6px', background: isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0', borderRadius:'3px', overflow:'hidden' }}>
+                                <div style={{ width: s.prog, height:'100%', background: s.delay ? '#ef4444' : '#10b981' }} />
                               </div>
                             </div>
                           ))}
@@ -1226,30 +1226,30 @@ export default function CortexPage() {
 
                     {/* Stockout Predictions */}
                     {msg.uiComponent==='stockout_predictions' && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(239,68,68,0.3)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><AlertTriangle size={16} color="#ef4444"/> Critical Shortages Predicted</div>
-                        <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:'8px', fontSize:'0.75rem', color:'#94a3b8', paddingBottom:'8px', borderBottom:'1px solid rgba(255,255,255,0.1)' }}>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: '1px solid #ef4444', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><AlertTriangle size={16} color="#ef4444"/> Critical Shortages Predicted</div>
+                        <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:'8px', fontSize:'0.75rem', color: isDark ? '#94a3b8' : '#64748b', paddingBottom:'8px', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}>
                           <div>SKU</div><div>Stock</div><div>Empty In</div>
                         </div>
                         {[ { sku:'Servers (42U)', stock:4, days:12 }, { sku:'Optic Cables', stock:150, days:18 } ].map((s,i)=>(
-                          <div key={i} style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:'8px', fontSize:'0.8rem', color:'#e2e8f0', padding:'10px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
-                            <div style={{fontWeight:600}}>{s.sku}</div><div>{s.stock}</div><div style={{color:'#f87171', fontWeight:700}}>{s.days} days</div>
+                          <div key={i} style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:'8px', fontSize:'0.8rem', color: isDark ? '#e2e8f0' : '#0f172a', padding:'10px 0', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #f1f5f9' }}>
+                            <div style={{fontWeight:600}}>{s.sku}</div><div>{s.stock}</div><div style={{color:'#ef4444', fontWeight:700}}>{s.days} days</div>
                           </div>
                         ))}
-                        <button onClick={()=>execute('/draft-po')} style={{ width:'100%', padding:'10px', marginTop:'12px', background:'rgba(239,68,68,0.15)', color:'#fca5a5', border:'1px solid rgba(239,68,68,0.3)', borderRadius:'8px', fontWeight:600, cursor:'pointer', fontSize:'0.8rem' }}>Auto-Draft POs</button>
+                        <button onClick={()=>execute('/draft-po')} style={{ width:'100%', padding:'10px', marginTop:'12px', background: isDark ? 'rgba(239,68,68,0.15)' : '#fef2f2', color:'#ef4444', border: isDark ? '1px solid rgba(239,68,68,0.3)' : '1px solid #fecaca', borderRadius:'8px', fontWeight:600, cursor:'pointer', fontSize:'0.8rem' }}>Auto-Draft POs</button>
                       </div>
                     )}
 
                     {/* 3Way Match */}
                     {msg.uiComponent==='three_way_match' && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> 3-Way Reconciliation</div>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> 3-Way Reconciliation</div>
                         <div style={{ overflowX:'auto' }}>
                           <table style={{ width:'100%', fontSize:'0.75rem', textAlign:'left', borderCollapse:'collapse' }}>
-                            <thead><tr style={{ color:'#94a3b8', borderBottom:'1px solid rgba(255,255,255,0.1)' }}><th style={{padding:'8px'}}>PO #</th><th style={{padding:'8px'}}>PO Qty</th><th style={{padding:'8px'}}>GRN Qty</th><th style={{padding:'8px'}}>Inv Qty</th><th style={{padding:'8px'}}>Status</th></tr></thead>
+                            <thead><tr style={{ color: isDark ? '#94a3b8' : '#64748b', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}><th style={{padding:'8px'}}>PO #</th><th style={{padding:'8px'}}>PO Qty</th><th style={{padding:'8px'}}>GRN Qty</th><th style={{padding:'8px'}}>Inv Qty</th><th style={{padding:'8px'}}>Status</th></tr></thead>
                             <tbody>
-                              <tr style={{ color:'#e2e8f0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}><td style={{padding:'8px'}}>PO-102</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px',color:'#4ade80'}}>Matched</td></tr>
-                              <tr style={{ color:'#e2e8f0' }}><td style={{padding:'8px'}}>PO-103</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px'}}>180</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px',color:'#f87171'}}>Mismatch</td></tr>
+                              <tr style={{ color: isDark ? '#e2e8f0' : '#0f172a', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #f1f5f9' }}><td style={{padding:'8px'}}>PO-102</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px',color:'#10b981'}}>Matched</td></tr>
+                              <tr style={{ color: isDark ? '#e2e8f0' : '#0f172a' }}><td style={{padding:'8px'}}>PO-103</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px'}}>180</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px',color:'#ef4444'}}>Mismatch</td></tr>
                             </tbody>
                           </table>
                         </div>
@@ -1258,14 +1258,14 @@ export default function CortexPage() {
 
                     {/* ESG Audit */}
                     {msg.uiComponent==='esg_audit' && msg.uiData && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(20,184,166,0.3)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle2 size={16} color="#14b8a6"/> ESG Audit: {msg.uiData.vendor}</div>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: '1px solid #14b8a6', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle2 size={16} color="#14b8a6"/> ESG Audit: {msg.uiData.vendor}</div>
                         <div style={{ display:'flex', alignItems:'center', gap:'16px' }}>
                           <div style={{ width:'60px', height:'60px', borderRadius:'30px', border:'4px solid #14b8a6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.2rem', fontWeight:800, color:'#14b8a6' }}>B+</div>
                           <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'6px' }}>
-                            <div style={{ fontSize:'0.75rem', color:'#e2e8f0', display:'flex', justifyContent:'space-between' }}><span>Environmental</span><span style={{color:'#14b8a6'}}>82/100</span></div>
-                            <div style={{ fontSize:'0.75rem', color:'#e2e8f0', display:'flex', justifyContent:'space-between' }}><span>Social</span><span style={{color:'#eab308'}}>74/100</span></div>
-                            <div style={{ fontSize:'0.75rem', color:'#e2e8f0', display:'flex', justifyContent:'space-between' }}><span>Governance</span><span style={{color:'#14b8a6'}}>90/100</span></div>
+                            <div style={{ fontSize:'0.75rem', color: isDark ? '#e2e8f0' : '#334155', display:'flex', justifyContent:'space-between' }}><span>Environmental</span><span style={{color:'#14b8a6', fontWeight:600}}>82/100</span></div>
+                            <div style={{ fontSize:'0.75rem', color: isDark ? '#e2e8f0' : '#334155', display:'flex', justifyContent:'space-between' }}><span>Social</span><span style={{color:'#eab308', fontWeight:600}}>74/100</span></div>
+                            <div style={{ fontSize:'0.75rem', color: isDark ? '#e2e8f0' : '#334155', display:'flex', justifyContent:'space-between' }}><span>Governance</span><span style={{color:'#14b8a6', fontWeight:600}}>90/100</span></div>
                           </div>
                         </div>
                       </div>
@@ -1273,28 +1273,28 @@ export default function CortexPage() {
 
                     {/* Market Intel */}
                     {msg.uiComponent==='market_intel' && msg.uiData && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(99,102,241,0.3)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><BarChart3 size={16} color="#818cf8"/> Market Trend: {msg.uiData.commodity}</div>
-                        <div style={{ height:'100px', display:'flex', alignItems:'flex-end', gap:'4px', paddingBottom:'10px', borderBottom:'1px solid rgba(255,255,255,0.1)' }}>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(99,102,241,0.3)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><BarChart3 size={16} color="#2563eb"/> Market Trend: {msg.uiData.commodity}</div>
+                        <div style={{ height:'100px', display:'flex', alignItems:'flex-end', gap:'4px', paddingBottom:'10px', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}>
                           {[80, 85, 90, 82, 75, 70, 65].map((val, i)=>(
-                            <div key={i} style={{ flex:1, background: i > 3 ? '#4ade80' : '#f87171', height: val+'%', borderRadius:'4px 4px 0 0', opacity: 0.8 }} />
+                            <div key={i} style={{ flex:1, background: i > 3 ? '#10b981' : '#ef4444', height: val+'%', borderRadius:'4px 4px 0 0', opacity: 0.8 }} />
                           ))}
                         </div>
-                        <div style={{ marginTop:'10px', fontSize:'0.75rem', color:'#94a3b8', textAlign:'center' }}>Price projected to drop 8% in 14 days</div>
+                        <div style={{ marginTop:'10px', fontSize:'0.75rem', color: isDark ? '#94a3b8' : '#64748b', textAlign:'center' }}>Price projected to drop 8% in 14 days</div>
                       </div>
                     )}
 
                     {/* Vendor Scorecard */}
                     {msg.uiComponent==='vendor_scorecard' && msg.uiData && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(59,130,246,0.3)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle size={16} color="#3b82f6"/> Scorecard: {msg.uiData.vendor}</div>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(59,130,246,0.3)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle size={16} color="#2563eb"/> Scorecard: {msg.uiData.vendor}</div>
                         <div style={{ display:'flex', gap:'12px' }}>
-                          <div style={{ width:'70px', height:'70px', background:'linear-gradient(135deg,#3b82f6,#2563eb)', borderRadius:'12px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', fontWeight:900, color:'#fff', boxShadow:'0 4px 12px rgba(59,130,246,0.3)' }}>A</div>
+                          <div style={{ width:'70px', height:'70px', background:'#2563eb', borderRadius:'12px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', fontWeight:900, color:'#fff', boxShadow:'0 4px 12px rgba(37,99,235,0.2)' }}>A</div>
                           <div style={{ flex:1, display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px' }}>
-                            <div style={{ background:'rgba(0,0,0,0.2)', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color:'#94a3b8'}}>On-Time</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#4ade80'}}>98.2%</div></div>
-                            <div style={{ background:'rgba(0,0,0,0.2)', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color:'#94a3b8'}}>Defect Rate</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#4ade80'}}>0.4%</div></div>
-                            <div style={{ background:'rgba(0,0,0,0.2)', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color:'#94a3b8'}}>Responsive</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#eab308'}}>Avg (2d)</div></div>
-                            <div style={{ background:'rgba(0,0,0,0.2)', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color:'#94a3b8'}}>Risk Tier</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#4ade80'}}>Low</div></div>
+                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>On-Time</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#10b981'}}>98.2%</div></div>
+                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>Defect Rate</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#10b981'}}>0.4%</div></div>
+                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>Responsive</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#eab308'}}>Avg (2d)</div></div>
+                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>Risk Tier</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#10b981'}}>Low</div></div>
                           </div>
                         </div>
                       </div>
