@@ -174,7 +174,7 @@ const S2PProgressAndEvent = ({ data, execute }: { data: any, execute: (c:string)
                 <option value="days" style={{background:'#0f172a'}}>Days</option>
               </select>
             </div>
-            <button onClick={()=>execute('/execute-s2p-event '+JSON.stringify({...form, intakeRef: data.intakeRef, poRef: data.poRef}))} style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#3b82f6,#2563eb)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem', marginTop:'4px' }}>Launch Sourcing Event</button>
+            <button onClick={()=>{ if(!form.title || !form.duration) return alert('Please fill all mandatory fields.'); execute('/execute-s2p-event '+JSON.stringify({...form, intakeRef: data.intakeRef, poRef: data.poRef}))}} style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#3b82f6,#2563eb)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem', marginTop:'4px' }}>Launch Sourcing Event</button>
           </div>
         </div>
       )}
@@ -489,25 +489,27 @@ export default function CortexPage() {
     <div key={i} dangerouslySetInnerHTML={{ __html: l.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} style={{ marginBottom:'6px', lineHeight:'1.7' }}/>
   ));
 
-  const slashCmds = [
-    { cmd:'/bom', label:'BOM to Purchase Request (AI Matcher)', icon:<FileUp size={14}/>, color:'#2dd4bf', bg:'rgba(45,212,191,0.12)', auto:true, hasTutorial: false },
-    { cmd:'/analyze-bids',    label:'Compare Vendor Bids & Export',    icon:<BarChart3 size={14}/>,      color:'#f43f5e', bg:'rgba(244,63,94,0.12)',    auto:true, hasTutorial: false },
-      { cmd:'/analyze-risk',    label:'Multi-Agent Risk Swarm',          icon:<AlertTriangle size={14}/>,  color:'#f87171', bg:'rgba(239,68,68,0.12)',    auto:true },
-    { cmd:'/analyze-contract',label:'Deep Legal Clause Review (CUAD)',  icon:<Shield size={14}/>,         color:'#c084fc', bg:'rgba(168,85,247,0.12)',   auto:true },
-    { cmd:'/draft-contract',  label:'Generate Legal Document',          icon:<FileText size={14}/>,       color:'#818cf8', bg:'rgba(99,102,241,0.12)',   auto:false, hasTutorial: true },
-    { cmd:'/s2p',             label:'End-to-End Source to Pay',         icon:<Database size={14}/>,       color:'#10b981', bg:'rgba(16,185,129,0.12)',   auto:true  },
-      { cmd:'/create-event',    label:'Create Sourcing Event / Auction',  icon:<Zap size={14}/>,            color:'#fb923c', bg:'rgba(249,115,22,0.12)',   auto:false },
-    { cmd:'/create-vendor',   label:'Onboard New Supplier',             icon:<CheckCircle2 size={14}/>,   color:'#34d399', bg:'rgba(16,185,129,0.12)',   auto:false },
-    { cmd:'/draft-po',        label:'Draft Purchase Order',             icon:<Database size={14}/>,       color:'#38bdf8', bg:'rgba(14,165,233,0.12)',   auto:false },
-    { cmd:'/add-product',     label:'Add Item to Catalog',              icon:<Plus size={14}/>,           color:'#a3e635', bg:'rgba(132,204,22,0.12)',   auto:false },
-    { cmd:'/approve-all',     label:'Approve All Pending Requests',     icon:<CheckCircle size={14}/>,    color:'#4ade80', bg:'rgba(74,222,128,0.12)',   auto:true  },
-    { cmd:'/analyze-bids',    label:'AI Bid Recommendation Engine',     icon:<BarChart3 size={14}/>,      color:'#818cf8', bg:'rgba(99,102,241,0.12)',   auto:true  },
-    { cmd:'/find-savings',    label:'Scan History for Savings',         icon:<Sparkles size={14}/>,       color:'#f472b6', bg:'rgba(244,114,182,0.12)',  auto:true  },
-    { cmd:'/remind-approvers',label:'Nudge Approvers via Email',        icon:<Terminal size={14}/>,       color:'#fb923c', bg:'rgba(249,115,22,0.12)',   auto:true  },
-    
-    { cmd:'/scan',            label:'Analyze Current Screen (OCR)',     icon:<Monitor size={14}/>,        color:'#00c6ff', bg:'rgba(0,198,255,0.12)',    auto:true  },
-    { cmd:'/clear',           label:'Clear Conversation',               icon:<X size={14}/>,              color:'#94a3b8', bg:'rgba(148,163,184,0.08)',  auto:true  },
-  ];
+    const slashCmds = [
+      { cmd:'/bom', label:'BOM to Purchase Request (AI Matcher)', icon:<FileUp size={14}/>, color:'#2dd4bf', bg:'rgba(45,212,191,0.12)', auto:true, hasTutorial: false },
+      { cmd:'/analyze-bids', label:'Compare Vendor Bids & Export', icon:<BarChart3 size={14}/>, color:'#f43f5e', bg:'rgba(244,63,94,0.12)', auto:true, hasTutorial: false },
+      { cmd:'/analyze-risk', label:'Multi-Agent Risk Swarm', icon:<AlertTriangle size={14}/>, color:'#f87171', bg:'rgba(239,68,68,0.12)', auto:true },
+      { cmd:'/analyze-contract', label:'Deep Legal Clause Review', icon:<Shield size={14}/>, color:'#c084fc', bg:'rgba(168,85,247,0.12)', auto:true },
+      { cmd:'/draft-contract', label:'Generate Legal Document', icon:<FileText size={14}/>, color:'#818cf8', bg:'rgba(99,102,241,0.12)', auto:false, hasTutorial: true },
+      { cmd:'/review-clause', label:'AI Legal Risk Analysis', icon:<Shield size={14}/>, color:'#f43f5e', bg:'rgba(244,63,94,0.12)', auto:true },
+      { cmd:'/track-shipments', label:'Live ASN/GRN Tracking', icon:<Zap size={14}/>, color:'#eab308', bg:'rgba(234,179,8,0.12)', auto:true },
+      { cmd:'/predict-stockout', label:'Inventory Shortage Alerts', icon:<AlertTriangle size={14}/>, color:'#ef4444', bg:'rgba(239,68,68,0.12)', auto:true },
+      { cmd:'/3way-match', label:'Invoice Reconciliation', icon:<Database size={14}/>, color:'#10b981', bg:'rgba(16,185,129,0.12)', auto:true },
+      { cmd:'/esg-audit', label:'Vendor Sustainability Score', icon:<CheckCircle2 size={14}/>, color:'#14b8a6', bg:'rgba(20,184,166,0.12)', auto:true },
+      { cmd:'/market-intel', label:'Live Commodity Pricing Trends', icon:<BarChart3 size={14}/>, color:'#6366f1', bg:'rgba(99,102,241,0.12)', auto:true },
+      { cmd:'/vendor-scorecard', label:'Vendor Performance Grades', icon:<CheckCircle size={14}/>, color:'#3b82f6', bg:'rgba(59,130,246,0.12)', auto:true },
+      { cmd:'/s2p', label:'End-to-End Source to Pay', icon:<Database size={14}/>, color:'#10b981', bg:'rgba(16,185,129,0.12)', auto:true },
+      { cmd:'/create-event', label:'Create Sourcing Event / Auction', icon:<Zap size={14}/>, color:'#fb923c', bg:'rgba(249,115,22,0.12)', auto:false },
+      { cmd:'/create-vendor', label:'Onboard New Supplier', icon:<CheckCircle2 size={14}/>, color:'#34d399', bg:'rgba(16,185,129,0.12)', auto:false },
+      { cmd:'/draft-po', label:'Draft Purchase Order', icon:<Database size={14}/>, color:'#38bdf8', bg:'rgba(14,165,233,0.12)', auto:false },
+      { cmd:'/add-product', label:'Add Item to Catalog', icon:<Plus size={14}/>, color:'#a3e635', bg:'rgba(132,204,22,0.12)', auto:false },
+      { cmd:'/scan', label:'Analyze Current Screen (OCR)', icon:<Monitor size={14}/>, color:'#00c6ff', bg:'rgba(0,198,255,0.12)', auto:true },
+      { cmd:'/clear', label:'Clear Conversation', icon:<X size={14}/>, color:'#94a3b8', bg:'rgba(148,163,184,0.08)', auto:true },
+    ];
 
   return (
     <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', height:'100%', width:'100%', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
@@ -966,7 +968,7 @@ export default function CortexPage() {
                             </div>
                           </div>
                           <div style={{ paddingTop:'8px', borderTop:'1px solid rgba(255,255,255,0.05)' }}>
-                            <button onClick={()=>execute('/execute-s2p-intake '+JSON.stringify(s2pForm))} style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#10b981,#059669)', color:'#fff', border:'none', borderRadius:'11px', fontWeight:700, cursor:'pointer', fontSize:'0.87rem', letterSpacing:'0.02em', boxShadow:'0 4px 18px rgba(16,185,129,0.35)', display:'flex', alignItems:'center', justifyContent:'center', gap:'7px', fontFamily:'inherit' }}>
+                            <button onClick={()=>{ if(!s2pForm.title || !s2pForm.category || !s2pForm.department || !s2pForm.budget || !s2pForm.quantity || !s2pForm.description) return alert('Please fill all mandatory fields.'); execute('/execute-s2p-intake '+JSON.stringify(s2pForm))}} style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#10b981,#059669)', color:'#fff', border:'none', borderRadius:'11px', fontWeight:700, cursor:'pointer', fontSize:'0.87rem', letterSpacing:'0.02em', boxShadow:'0 4px 18px rgba(16,185,129,0.35)', display:'flex', alignItems:'center', justifyContent:'center', gap:'7px', fontFamily:'inherit' }}>
                               🚀 Submit Intake Request
                             </button>
                           </div>
@@ -1015,7 +1017,7 @@ export default function CortexPage() {
                             </div>
                           </div>
                           <div style={{ paddingTop:'16px' }}>
-                            <button onClick={()=>execute('/execute-create-event '+JSON.stringify(eventForm))} style={{ width:'100%', padding:'10px', background:'#2563eb', color:'#ffffff', border:'none', borderRadius:'6px', fontWeight:500, cursor:'pointer', fontSize:'0.875rem', display:'flex', alignItems:'center', justifyContent:'center', gap:'7px', fontFamily:'inherit' }}>
+                            <button onClick={()=>{ if(!eventForm.title || !eventForm.duration) return alert('Please fill all mandatory fields.'); execute('/execute-create-event '+JSON.stringify(eventForm))}} style={{ width:'100%', padding:'10px', background:'#2563eb', color:'#ffffff', border:'none', borderRadius:'6px', fontWeight:500, cursor:'pointer', fontSize:'0.875rem', display:'flex', alignItems:'center', justifyContent:'center', gap:'7px', fontFamily:'inherit' }}>
                               Publish Event Now
                             </button>
                           </div>
@@ -1031,7 +1033,7 @@ export default function CortexPage() {
                         {[{ p:'Company Name', k:'name', t:'text' },{ p:'Contact Email', k:'email', t:'email' },{ p:'Category (e.g. IT, Legal)', k:'category', t:'text' }].map(f=>(
                           <input key={f.k} type={f.t} placeholder={f.p} value={(vendorForm as any)[f.k]} onChange={e=>setVendorForm({...vendorForm, [f.k]:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
                         ))}
-                        <button onClick={()=>execute('/execute-create-vendor '+JSON.stringify(vendorForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#0284c7,#0369a1)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Register Vendor</button>
+                        <button onClick={()=>{ if(!vendorForm.name || !vendorForm.email || !vendorForm.category) return alert('Please fill all mandatory fields.'); execute('/execute-create-vendor '+JSON.stringify(vendorForm))}} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#0284c7,#0369a1)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Register Vendor</button>
                       </div>
                     </div>
                   )}
@@ -1044,7 +1046,7 @@ export default function CortexPage() {
                         {[{ p:'Description / Purpose', k:'desc', t:'text' },{ p:'PO Number (Optional)', k:'poNumber', t:'text' },{ p:'Total Amount ($)', k:'amount', t:'number', min:'0', step:'0.01' }].map(f=>(
                           <input key={f.k} type={f.t} min={f.min} step={f.step} onWheel={f.t==='number'? (e)=>(e.target as any).blur() : undefined} onKeyDown={f.t==='number' ? (e)=>{if(['-','+','e','E'].includes(e.key)){e.preventDefault();}} : undefined} placeholder={f.p} value={(poForm as any)[f.k]} onChange={e=>setPoForm({...poForm, [f.k]:e.target.value})} style={{ width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' }}/>
                         ))}
-                        <button onClick={()=>execute('/execute-draft-po '+JSON.stringify(poForm))} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#059669,#047857)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Generate PO</button>
+                        <button onClick={()=>{ if(!poForm.desc || !poForm.amount) return alert('Please fill all mandatory fields.'); execute('/execute-draft-po '+JSON.stringify(poForm))}} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#059669,#047857)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Generate PO</button>
                       </div>
                     </div>
                   )}
@@ -1175,6 +1177,127 @@ export default function CortexPage() {
                       ))}
                     </div>
                   )}
+
+                    {/* Draft Contract */}
+                    {msg.uiComponent==='draft_contract_form' && msg.uiData && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><FileText size={16} color="#818cf8"/> Contract Editor: {msg.uiData.vendor}</div>
+                        <textarea rows={8} defaultValue={"MASTER SERVICE AGREEMENT\n\nThis Master Service Agreement (\"Agreement\") is made between Your Company and " + msg.uiData.vendor + ".\n\n1. SERVICES\nVendor agrees to provide services as outlined in applicable Statements of Work..."} style={{ width:'100%', padding:'14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(0,0,0,0.3)', color:'#e2e8f0', fontSize:'0.8rem', fontFamily:'monospace', outline:'none', resize:'vertical', lineHeight:'1.5' }}/>
+                        <div style={{ display:'flex', gap:'10px', marginTop:'12px' }}>
+                          <button onClick={()=>alert('PDF Downloaded!')} style={{ flex:1, padding:'11px', background:'linear-gradient(135deg,#4f46e5,#4338ca)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Download PDF</button>
+                          <button onClick={()=>alert('Sent for E-Signature')} style={{ flex:1, padding:'11px', background:'rgba(255,255,255,0.05)', color:'#e2e8f0', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Send via DocuSign</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Clause Review */}
+                    {msg.uiComponent==='clause_review' && msg.uiData && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(244,63,94,0.3)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Shield size={16} color="#f43f5e"/> Risk Analysis: {msg.uiData.riskLevel} Risk</div>
+                        <div style={{ fontSize:'0.8rem', color:'#94a3b8', lineHeight:'1.6', background:'rgba(0,0,0,0.3)', padding:'12px', borderRadius:'8px', borderLeft:'3px solid #f43f5e' }}>
+                          "The Supplier's liability shall be capped at <span style={{backgroundColor:'rgba(244,63,94,0.2)', color:'#fda4af', padding:'2px 4px', borderRadius:'4px'}}>the total amount paid under this SOW</span>, and Supplier shall not be liable for any <span style={{backgroundColor:'rgba(244,63,94,0.2)', color:'#fda4af', padding:'2px 4px', borderRadius:'4px'}}>indirect or consequential damages</span>."
+                        </div>
+                        <div style={{ marginTop:'12px', fontSize:'0.75rem', color:'#e2e8f0' }}>
+                          <strong style={{color:'#f43f5e'}}>Flag ({msg.uiData.flagged}):</strong> Liability cap is non-standard. Corporate playbook requires cap at 2x contract value.
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Shipment Tracker */}
+                    {msg.uiComponent==='shipment_tracker' && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Zap size={16} color="#eab308"/> Active Shipments</div>
+                        <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
+                          {[ { id:'ASN-9921', status:'In Transit', prog:'60%', delay:false }, { id:'ASN-9922', status:'Delayed (Port)', prog:'30%', delay:true } ].map(s=>(
+                            <div key={s.id} style={{ padding:'12px', background:'rgba(0,0,0,0.2)', borderRadius:'8px' }}>
+                              <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'8px' }}>
+                                <span style={{ fontSize:'0.8rem', fontWeight:600, color:'#e2e8f0' }}>{s.id}</span>
+                                <span style={{ fontSize:'0.7rem', color: s.delay ? '#f87171' : '#4ade80', fontWeight:600 }}>{s.status}</span>
+                              </div>
+                              <div style={{ height:'6px', background:'rgba(255,255,255,0.1)', borderRadius:'3px', overflow:'hidden' }}>
+                                <div style={{ width: s.prog, height:'100%', background: s.delay ? '#f87171' : '#4ade80' }} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Stockout Predictions */}
+                    {msg.uiComponent==='stockout_predictions' && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(239,68,68,0.3)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><AlertTriangle size={16} color="#ef4444"/> Critical Shortages Predicted</div>
+                        <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:'8px', fontSize:'0.75rem', color:'#94a3b8', paddingBottom:'8px', borderBottom:'1px solid rgba(255,255,255,0.1)' }}>
+                          <div>SKU</div><div>Stock</div><div>Empty In</div>
+                        </div>
+                        {[ { sku:'Servers (42U)', stock:4, days:12 }, { sku:'Optic Cables', stock:150, days:18 } ].map((s,i)=>(
+                          <div key={i} style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:'8px', fontSize:'0.8rem', color:'#e2e8f0', padding:'10px 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{fontWeight:600}}>{s.sku}</div><div>{s.stock}</div><div style={{color:'#f87171', fontWeight:700}}>{s.days} days</div>
+                          </div>
+                        ))}
+                        <button onClick={()=>execute('/draft-po')} style={{ width:'100%', padding:'10px', marginTop:'12px', background:'rgba(239,68,68,0.15)', color:'#fca5a5', border:'1px solid rgba(239,68,68,0.3)', borderRadius:'8px', fontWeight:600, cursor:'pointer', fontSize:'0.8rem' }}>Auto-Draft POs</button>
+                      </div>
+                    )}
+
+                    {/* 3Way Match */}
+                    {msg.uiComponent==='three_way_match' && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> 3-Way Reconciliation</div>
+                        <div style={{ overflowX:'auto' }}>
+                          <table style={{ width:'100%', fontSize:'0.75rem', textAlign:'left', borderCollapse:'collapse' }}>
+                            <thead><tr style={{ color:'#94a3b8', borderBottom:'1px solid rgba(255,255,255,0.1)' }}><th style={{padding:'8px'}}>PO #</th><th style={{padding:'8px'}}>PO Qty</th><th style={{padding:'8px'}}>GRN Qty</th><th style={{padding:'8px'}}>Inv Qty</th><th style={{padding:'8px'}}>Status</th></tr></thead>
+                            <tbody>
+                              <tr style={{ color:'#e2e8f0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}><td style={{padding:'8px'}}>PO-102</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px',color:'#4ade80'}}>Matched</td></tr>
+                              <tr style={{ color:'#e2e8f0' }}><td style={{padding:'8px'}}>PO-103</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px'}}>180</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px',color:'#f87171'}}>Mismatch</td></tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ESG Audit */}
+                    {msg.uiComponent==='esg_audit' && msg.uiData && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(20,184,166,0.3)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle2 size={16} color="#14b8a6"/> ESG Audit: {msg.uiData.vendor}</div>
+                        <div style={{ display:'flex', alignItems:'center', gap:'16px' }}>
+                          <div style={{ width:'60px', height:'60px', borderRadius:'30px', border:'4px solid #14b8a6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.2rem', fontWeight:800, color:'#14b8a6' }}>B+</div>
+                          <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'6px' }}>
+                            <div style={{ fontSize:'0.75rem', color:'#e2e8f0', display:'flex', justifyContent:'space-between' }}><span>Environmental</span><span style={{color:'#14b8a6'}}>82/100</span></div>
+                            <div style={{ fontSize:'0.75rem', color:'#e2e8f0', display:'flex', justifyContent:'space-between' }}><span>Social</span><span style={{color:'#eab308'}}>74/100</span></div>
+                            <div style={{ fontSize:'0.75rem', color:'#e2e8f0', display:'flex', justifyContent:'space-between' }}><span>Governance</span><span style={{color:'#14b8a6'}}>90/100</span></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Market Intel */}
+                    {msg.uiComponent==='market_intel' && msg.uiData && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(99,102,241,0.3)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><BarChart3 size={16} color="#818cf8"/> Market Trend: {msg.uiData.commodity}</div>
+                        <div style={{ height:'100px', display:'flex', alignItems:'flex-end', gap:'4px', paddingBottom:'10px', borderBottom:'1px solid rgba(255,255,255,0.1)' }}>
+                          {[80, 85, 90, 82, 75, 70, 65].map((val, i)=>(
+                            <div key={i} style={{ flex:1, background: i > 3 ? '#4ade80' : '#f87171', height: val+'%', borderRadius:'4px 4px 0 0', opacity: 0.8 }} />
+                          ))}
+                        </div>
+                        <div style={{ marginTop:'10px', fontSize:'0.75rem', color:'#94a3b8', textAlign:'center' }}>Price projected to drop 8% in 14 days</div>
+                      </div>
+                    )}
+
+                    {/* Vendor Scorecard */}
+                    {msg.uiComponent==='vendor_scorecard' && msg.uiData && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(59,130,246,0.3)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color:'#e2e8f0', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle size={16} color="#3b82f6"/> Scorecard: {msg.uiData.vendor}</div>
+                        <div style={{ display:'flex', gap:'12px' }}>
+                          <div style={{ width:'70px', height:'70px', background:'linear-gradient(135deg,#3b82f6,#2563eb)', borderRadius:'12px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', fontWeight:900, color:'#fff', boxShadow:'0 4px 12px rgba(59,130,246,0.3)' }}>A</div>
+                          <div style={{ flex:1, display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px' }}>
+                            <div style={{ background:'rgba(0,0,0,0.2)', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color:'#94a3b8'}}>On-Time</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#4ade80'}}>98.2%</div></div>
+                            <div style={{ background:'rgba(0,0,0,0.2)', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color:'#94a3b8'}}>Defect Rate</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#4ade80'}}>0.4%</div></div>
+                            <div style={{ background:'rgba(0,0,0,0.2)', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color:'#94a3b8'}}>Responsive</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#eab308'}}>Avg (2d)</div></div>
+                            <div style={{ background:'rgba(0,0,0,0.2)', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color:'#94a3b8'}}>Risk Tier</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#4ade80'}}>Low</div></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                   {/* AI Generated Image */}
                   {msg.uiComponent==='generated_image' && msg.uiData && (

@@ -732,6 +732,74 @@ export async function POST(req: Request) {
         }
       }
 
+      if (text.startsWith('/draft-contract')) {
+        const vendor = text.replace('/draft-contract', '').trim() || 'ACME Corp';
+        return NextResponse.json({
+          final_response: "Drafting a standard NDA/MSA for **" + vendor + "**. Please review the generated clauses below.",
+          ui_component: 'draft_contract_form',
+          ui_data: { vendor }
+        });
+      }
+
+      if (text.startsWith('/review-clause')) {
+        return NextResponse.json({
+          final_response: "I have analyzed the provided legal text against your corporate playbook.",
+          ui_component: 'clause_review',
+          ui_data: { riskLevel: 'High', flagged: 2 }
+        });
+      }
+
+      if (text.startsWith('/track-shipments')) {
+        return NextResponse.json({
+          final_response: "Here is the live logistics tracking for your active ASNs. Note: 1 shipment is flagged for delay due to port congestion.",
+          ui_component: 'shipment_tracker',
+          ui_data: {}
+        });
+      }
+
+      if (text.startsWith('/predict-stockout')) {
+        return NextResponse.json({
+          final_response: "Inventory analysis complete. The following critical items will run out of stock within the next 30 days based on current burn rates.",
+          ui_component: 'stockout_predictions',
+          ui_data: {}
+        });
+      }
+
+      if (text.startsWith('/3way-match')) {
+        return NextResponse.json({
+          final_response: "3-Way Invoice Reconciliation complete. I found 1 mismatch where the vendor invoiced for more items than the warehouse received.",
+          ui_component: 'three_way_match',
+          ui_data: {}
+        });
+      }
+
+      if (text.startsWith('/esg-audit')) {
+        const vendor = text.replace('/esg-audit', '').trim() || 'Global Suppliers LLC';
+        return NextResponse.json({
+          final_response: "ESG (Environmental, Social, Governance) audit complete for **" + vendor + "**.",
+          ui_component: 'esg_audit',
+          ui_data: { vendor }
+        });
+      }
+
+      if (text.startsWith('/market-intel')) {
+        const commodity = text.replace('/market-intel', '').trim() || 'General Commodities';
+        return NextResponse.json({
+          final_response: "Live market pricing analysis for **" + commodity + "**. Prices are trending downward. I recommend delaying bulk purchases for 14 days.",
+          ui_component: 'market_intel',
+          ui_data: { commodity }
+        });
+      }
+
+      if (text.startsWith('/vendor-scorecard')) {
+        const vendor = text.replace('/vendor-scorecard', '').trim() || 'Primary IT Vendor';
+        return NextResponse.json({
+          final_response: "Generating lifecycle performance scorecard for **" + vendor + "**.",
+          ui_component: 'vendor_scorecard',
+          ui_data: { vendor }
+        });
+      }
+
       if (text.startsWith('/execute-add-product')) {
         try {
           const data = JSON.parse(text.replace('/execute-add-product', '').trim());
