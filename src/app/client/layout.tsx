@@ -296,7 +296,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           }} />
         )}
 
-        <div style={{ flex: 1, overflow: 'hidden', position: 'relative', zIndex: 10 }}>
+        <div style={{ flex: 1, overflow: 'auto', position: 'relative', zIndex: 10 }}>
           {children}
         </div>
       </div>
