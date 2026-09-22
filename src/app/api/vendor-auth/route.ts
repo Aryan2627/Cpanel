@@ -22,30 +22,19 @@ export async function OPTIONS() {
 
 let testAccount: nodemailer.TestAccount | null = null;
 async function getEmailTransporter() {
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    return nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: Number(process.env.SMTP_PORT) === 465, 
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-  } else {
-    if (!testAccount) {
-      testAccount = await nodemailer.createTestAccount();
-    }
-    return nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    });
+  // FORCE ETHEREAL FOR UAT
+  if (!testAccount) {
+    testAccount = await nodemailer.createTestAccount();
   }
+  return nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false,
+    auth: {
+      user: testAccount.user,
+      pass: testAccount.pass
+    }
+  });
 }
 
 export async function POST(request: Request) {
