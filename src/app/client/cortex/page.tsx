@@ -4,7 +4,7 @@ import {
   BrainCircuit, X, Zap, Loader2, Database, Send, Terminal,
   CheckCircle2, AlertTriangle, CheckCircle, FileText, Settings, Eye,
   Plus, Sparkles, Shield, ChevronRight, BarChart3, Bot
-, Sun, Moon, FileUp, Cpu, Search, Monitor, Download , Mic, Volume2, VolumeX } from 'lucide-react';
+, Sun, Moon, FileUp, Cpu, Search, Monitor, Download , Mic, Volume2, VolumeX , MessageCircle, Layers, Award, Calculator, CreditCard, PieChart, ShieldAlert, Banknote, Wrench, GitMerge, ShoppingCart, Mail, Users } from 'lucide-react';
 
 /* ───────────────────────── Utility sub-components ───────────────────────── */
 
@@ -353,6 +353,20 @@ export default function DorcPage() {
       else if (transcript.match(/product|catalog|catalogue|master data/i)) matchedCmd = '/add-product';
       else if (transcript.match(/scan|ocr|screen|capture/i)) matchedCmd = '/scan';
       else if (transcript.match(/clear|reset|start over/i)) matchedCmd = '/clear';
+      else if (transcript.match(/discover|find supplier|global supplier/i)) matchedCmd = '/discover-suppliers';
+      else if (transcript.match(/negotiate|counter offer/i)) matchedCmd = '/negotiate';
+      else if (transcript.match(/aggregate|bulk|cross-department/i)) matchedCmd = '/aggregate-demand';
+      else if (transcript.match(/auto award|award winner/i)) matchedCmd = '/auto-award';
+      else if (transcript.match(/should cost|cost model/i)) matchedCmd = '/should-cost';
+      else if (transcript.match(/budget|variance/i)) matchedCmd = '/validate-budget';
+      else if (transcript.match(/spend|tail spend|rogue/i)) matchedCmd = '/spend-analytics';
+      else if (transcript.match(/fraud/i)) matchedCmd = '/detect-fraud';
+      else if (transcript.match(/payment|payout/i)) matchedCmd = '/process-payment';
+      else if (transcript.match(/exception|discrepancy/i)) matchedCmd = '/resolve-exceptions';
+      else if (transcript.match(/approval|route|routing/i)) matchedCmd = '/route-approvals';
+      else if (transcript.match(/communicate|email supplier/i)) matchedCmd = '/communicate';
+      else if (transcript.match(/guided buying|punch out/i)) matchedCmd = '/guided-buying';
+      else if (transcript.match(/supplier ops|relationship/i)) matchedCmd = '/supplier-ops';
       
       if (matchedCmd) {
         execute(matchedCmd);
@@ -588,6 +602,20 @@ export default function DorcPage() {
       { category:'System', cmd:'/add-product', label:'Add Item to Catalog', icon:<Plus size={14}/>, color:'#a3e635', bg:'rgba(132,204,22,0.12)', auto:false },
       { category:'System', cmd:'/scan', label:'Analyze Current Screen (OCR)', icon:<Monitor size={14}/>, color:'#00c6ff', bg:'rgba(0,198,255,0.12)', auto:true },
       { category:'System', cmd:'/clear', label:'Clear Conversation', icon:<X size={14}/>, color:'#94a3b8', bg:'rgba(148,163,184,0.08)', auto:true },
+        { category:'Sourcing', cmd:'/discover-suppliers', label:'Supplier Discovery Agent', icon:<Search size={14}/>, color:'#38bdf8', bg:'rgba(56,189,248,0.12)', auto:true },
+        { category:'Sourcing', cmd:'/negotiate', label:'Autonomous Negotiation Agent', icon:<MessageCircle size={14}/>, color:'#818cf8', bg:'rgba(129,140,248,0.12)', auto:true },
+        { category:'Sourcing', cmd:'/aggregate-demand', label:'Demand Aggregation Agent', icon:<Layers size={14}/>, color:'#10b981', bg:'rgba(16,185,129,0.12)', auto:true },
+        { category:'Sourcing', cmd:'/auto-award', label:'Auto-Award Agent', icon:<Award size={14}/>, color:'#fbbf24', bg:'rgba(251,191,36,0.12)', auto:true },
+        { category:'Sourcing', cmd:'/should-cost', label:'Should-Cost Modeling Agent', icon:<Calculator size={14}/>, color:'#f43f5e', bg:'rgba(244,63,94,0.12)', auto:true },
+        { category:'Finance', cmd:'/validate-budget', label:'Budget Validation Agent', icon:<CreditCard size={14}/>, color:'#eab308', bg:'rgba(234,179,8,0.12)', auto:true },
+        { category:'Finance', cmd:'/spend-analytics', label:'Spend Compliance Agent', icon:<PieChart size={14}/>, color:'#8b5cf6', bg:'rgba(139,92,246,0.12)', auto:true },
+        { category:'Finance', cmd:'/detect-fraud', label:'Fraud Detection Agent', icon:<ShieldAlert size={14}/>, color:'#ef4444', bg:'rgba(239,68,68,0.12)', auto:true },
+        { category:'Finance', cmd:'/process-payment', label:'Payment Processing Agent', icon:<Banknote size={14}/>, color:'#34d399', bg:'rgba(52,211,153,0.12)', auto:true },
+        { category:'Finance', cmd:'/resolve-exceptions', label:'Exception Resolution Agent', icon:<Wrench size={14}/>, color:'#f97316', bg:'rgba(249,115,22,0.12)', auto:true },
+        { category:'System', cmd:'/route-approvals', label:'Approval Routing Agent', icon:<GitMerge size={14}/>, color:'#0ea5e9', bg:'rgba(14,165,233,0.12)', auto:true },
+        { category:'System', cmd:'/guided-buying', label:'Guided Buying Agent', icon:<ShoppingCart size={14}/>, color:'#c084fc', bg:'rgba(192,132,252,0.12)', auto:true },
+        { category:'Vendors', cmd:'/communicate', label:'Communication Agent', icon:<Mail size={14}/>, color:'#3b82f6', bg:'rgba(59,130,246,0.12)', auto:true },
+        { category:'Vendors', cmd:'/supplier-ops', label:'Supplier Ops Agent', icon:<Users size={14}/>, color:'#14b8a6', bg:'rgba(20,184,166,0.12)', auto:true },
     ];
 
   return (

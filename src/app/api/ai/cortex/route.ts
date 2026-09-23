@@ -453,7 +453,23 @@ export async function POST(req: Request) {
       });
     }
 
-        if (text.trim().toLowerCase() === '/analyze-bids') {
+        
+      if (text.startsWith('/discover-suppliers')) return NextResponse.json({ final_response: "I have scanned global databases and identified 14 net-new suppliers matching your category criteria with high ESG compliance. I will add them to your discovery pipeline." });
+      if (text.startsWith('/negotiate')) return NextResponse.json({ final_response: "The Negotiation Agent has drafted counter-offers for the top 3 bidders proposing a 5% target reduction. Would you like me to send these autonomously?" });
+      if (text.startsWith('/aggregate-demand')) return NextResponse.json({ final_response: "I have aggregated 12 cross-departmental PRs into a single bulk RFQ, estimating a 15% volume discount." });
+      if (text.startsWith('/auto-award')) return NextResponse.json({ final_response: "Safety and compliance checks passed. Auto-Awarding the contract to the highest-scoring vendor and generating the PO..." });
+      if (text.startsWith('/should-cost')) return NextResponse.json({ final_response: "I've run a bottom-up Should-Cost analysis based on current raw material indexes. The vendor's bid is 8% above market benchmark." });
+      if (text.startsWith('/validate-budget')) return NextResponse.json({ final_response: "Budget Validation: The requested purchase is within the Q3 Marketing budget, but leaves only $12,500 remaining." });
+      if (text.startsWith('/spend-analytics')) return NextResponse.json({ final_response: "Spend Compliance run complete. I flagged 3 instances of rogue tail-spend that bypassed the preferred supplier catalog." });
+      if (text.startsWith('/detect-fraud')) return NextResponse.json({ final_response: "Fraud scan complete. Flagged 1 invoice with a duplicate PO reference and anomalous bank routing number. Resolution team alerted." });
+      if (text.startsWith('/process-payment')) return NextResponse.json({ final_response: "Payment Processing Agent has staged the approved batches for ERP payment run. No compliance issues detected." });
+      if (text.startsWith('/resolve-exceptions')) return NextResponse.json({ final_response: "Exception Resolution Agent has autonomously emailed the supplier to correct the unit price mismatch on Invoice #8842." });
+      if (text.startsWith('/route-approvals')) return NextResponse.json({ final_response: "Dynamic Approval Routing enabled. Based on the $45k value and IT category, routing strictly to the CIO and CFO." });
+      if (text.startsWith('/communicate')) return NextResponse.json({ final_response: "Communication Agent is now managing back-and-forth Q&A for the active RFQ." });
+      if (text.startsWith('/guided-buying')) return NextResponse.json({ final_response: "Guided Buying enforced: User has been redirected to the standard catalog for this commodity." });
+      if (text.startsWith('/supplier-ops')) return NextResponse.json({ final_response: "Supplier Ops Agent is generating the quarterly review agenda and pulling relationship metrics." });
+    
+if (text.trim().toLowerCase() === '/analyze-bids') {
       return NextResponse.json({
         final_response: "I can help you evaluate the vendor proposals. Please select the sourcing event you'd like to analyze.",
         ui_component: 'bid_analyzer_form',
