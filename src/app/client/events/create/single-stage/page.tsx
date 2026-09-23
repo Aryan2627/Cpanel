@@ -306,16 +306,36 @@ function SingleStageCreateContent() {
   const glassInputStyle = { width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', background: 'rgba(255, 255, 255, 0.9)', outline: 'none', fontSize: '0.95rem', transition: 'all 0.2s', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)' };
   
   return (
-    <div style={{ display: 'flex', height: '100%', minHeight: '100vh', background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', margin: '-32px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div style={{ display: 'flex', height: '100%', minHeight: '100vh', background: '#f8fafc', margin: '-32px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       
       {/* Main Container */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
         
-        {/* Scrollable Content */}
-        <div style={{ flex: 1, padding: '32px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+        
+          {/* Cinematic Hero Banner */}
+          <div style={{ background: 'linear-gradient(135deg, #071330 0%, #0d1f4f 55%, #1a2f6b 100%)', padding: '60px 40px 140px', position: 'relative', overflow: 'hidden', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ position: 'absolute', top: '-40%', right: '5%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(37,99,235,0.25), transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: '-20%', left: '10%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(14,165,233,0.15), transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
+            
+            <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.15)', marginBottom: '16px' }}>
+                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#38bdf8', boxShadow: '0 0 10px rgba(56,189,248,0.8)' }} />
+                <span style={{ color: '#e0f2fe', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Procurement Setup</span>
+              </div>
+              <h1 style={{ margin: 0, fontSize: '2.5rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-1px', marginBottom: '12px' }}>
+                Create Sourcing Event
+              </h1>
+              <p style={{ margin: 0, fontSize: '1.05rem', color: '#94a3b8', maxWidth: '600px', lineHeight: 1.6 }}>
+                Configure your procurement stages, requirements, and invite vendors.
+              </p>
+            </div>
+          </div>
+
+          {/* Scrollable Content Shifted Up */}
+          <div style={{ flex: 1, padding: '0 32px 64px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1200px', margin: '-80px auto 0', width: '100%', position: 'relative', zIndex: 10 }}>
           
           {/* Card 1: Setup */}
-          <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+          <div style={{ background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(20px)', borderRadius: '24px', padding: '32px', boxShadow: '0 10px 40px -10px rgba(37,99,235,0.1)', border: '1px solid rgba(255,255,255,1)' }}>
             <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}><Settings size={20} color="#1e3a8a" /> Event Setup</h3>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
@@ -376,7 +396,7 @@ function SingleStageCreateContent() {
                 </div>
 
                 {/* Multi-Stage Configuration */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', gridColumn: 'span 2' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: '#f8fafc', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.02)', gridColumn: 'span 2' }}>
                 <h4 style={{ margin: 0, fontSize: '1rem', color: '#0f172a' }}>Configure Event Stages</h4>
                 
                 {/* Technical Stage */}
@@ -634,7 +654,7 @@ function SingleStageCreateContent() {
 
           
           {/* Card 3: Participants */}
-          <div style={{ background: '#ffffff', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+          <div style={{ background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(20px)', borderRadius: '24px', padding: '32px', boxShadow: '0 10px 40px -10px rgba(37,99,235,0.1)', border: '1px solid rgba(255,255,255,1)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}><Users size={20} color="#1e3a8a" /> Participants</h3>
               <div style={{ display: 'flex', gap: '12px' }}>
