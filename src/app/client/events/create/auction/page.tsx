@@ -17,6 +17,7 @@ function AuctionCreateContent() {
   const initialTitle = searchParams.get('title') || '';
   const fromPR = searchParams.get('fromPR') === 'true';
   const [lineItems, setLineItems] = useState<any[]>([{ id: Date.now(), values: {}, evaluatorId: '' }]);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   
   const [title, setTitle] = useState(initialTitle);
   const { intakes } = useIntake();
@@ -498,25 +499,39 @@ function AuctionCreateContent() {
             {selectedTemplateObj && (
               <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid #f1f5f9' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid #f1f5f9' }}>
-                  <h4 style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a', margin: 0, paddingBottom: '10px' }}>Template Configuration</h4>
-                  <div style={{ display: 'flex', gap: '16px' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#2563eb', marginBottom: '6px' }}>Min Bid Step</label>
-                      <input 
-                        type="number" min="0" value={minBidStep} onChange={e => setMinBidStep(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                        placeholder="e.g. 50"
-                        style={{ width: '130px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #3b82f6', background: '#eff6ff', color: '#1d4ed8', outline: 'none', fontSize: '0.85rem', fontWeight: '600', boxShadow: 'inset 0 1px 2px rgba(59,130,246,0.1)' }}
-                      />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingBottom: '10px' }}>
+                        <h4 style={{ fontSize: '1rem', fontWeight: '600', color: '#0f172a', margin: 0 }}>Template Configuration</h4>
+                        <button 
+                          type="button" 
+                          onClick={() => setShowAdvanced(!showAdvanced)}
+                          style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '16px', padding: '4px 10px', color: '#2563eb', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                        >
+                          More <ChevronDown size={12} style={{ transform: showAdvanced ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                        </button>
+                      </div>
+                      
+                      {showAdvanced && (
+                        <div style={{ display: 'flex', gap: '16px', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', marginBottom: '6px' }}>Min Bid Step (Optional)</label>
+                            <input 
+                              type="number" min="0" value={minBidStep} onChange={e => setMinBidStep(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                              placeholder="e.g. 50"
+                              style={{ width: '130px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#334155', outline: 'none', fontSize: '0.85rem', fontWeight: '500' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', marginBottom: '6px' }}>Ceiling Price (Optional)</label>
+                            <input 
+                              type="number" min="0" value={ceilingPrice} onChange={e => setCeilingPrice(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                              placeholder="e.g. 10000"
+                              style={{ width: '150px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#334155', outline: 'none', fontSize: '0.85rem', fontWeight: '500' }}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#2563eb', marginBottom: '6px' }}>Ceiling Price</label>
-                      <input 
-                        type="number" min="0" value={ceilingPrice} onChange={e => setCeilingPrice(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                        placeholder="e.g. 10000"
-                        style={{ width: '150px', padding: '10px 14px', borderRadius: '8px', border: '1px solid #3b82f6', background: '#eff6ff', color: '#1d4ed8', outline: 'none', fontSize: '0.85rem', fontWeight: '600', boxShadow: 'inset 0 1px 2px rgba(59,130,246,0.1)' }}
-                      />
-                    </div>
-                  </div>
                 </div>
                 {(() => {
                   try {
