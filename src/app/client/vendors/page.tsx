@@ -52,10 +52,14 @@ export default function VendorManagement() {
     return {background:'#f1f5f9',color:'#475569',border:'1px solid #cbd5e1'};
   };
 
+  const isReviewPending = (s: string) => s === 'Pending Review' || s === 'Approval Pending';
+
   const filtered = vendors.filter(v=>{
     if(filterStatus!=='All'){
       if(filterStatus==='Pending Onboarding'){
         if(v.status!=='Pending Onboarding'&&v.status!=='Onboarding in Progress') return false;
+      } else if(filterStatus==='Pending Review'){
+        if(!isReviewPending(v.status)) return false;
       } else if(v.status!==filterStatus) return false;
     }
     if(!searchQuery) return true;
@@ -66,7 +70,7 @@ export default function VendorManagement() {
   const kpis=[
     {label:'Total Vendors',value:vendors.length,icon:Building2,color:'#2563eb',bg:'#eff6ff'},
     {label:'Onboarded',value:vendors.filter(v=>v.status==='Onboarded').length,icon:BadgeCheck,color:'#16a34a',bg:'#dcfce7'},
-    {label:'Pending Review',value:vendors.filter(v=>v.status==='Pending Review').length,icon:Clock,color:'#d97706',bg:'#fef3c7'},
+    {label:'Pending Review',value:vendors.filter(v=>isReviewPending(v.status)).length,icon:Clock,color:'#d97706',bg:'#fef3c7'},
     {label:'Invited',value:vendors.filter(v=>v.status==='Invited').length,icon:UserPlus,color:'#7c3aed',bg:'#faf5ff'},
   ];
 
@@ -107,7 +111,7 @@ export default function VendorManagement() {
             {statusTabs.map(tab=>(
               <button key={tab} onClick={()=>setFilterStatus(tab)} style={{padding:'14px 12px',border:'none',borderBottom:filterStatus===tab?'2px solid #1e3a8a':'2px solid transparent',background:'transparent',cursor:'pointer',fontSize:'0.78rem',fontWeight:filterStatus===tab?700:500,color:filterStatus===tab?'#1e3a8a':'#64748b',transition:'all 0.15s',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:'6px'}}>
                 {tab}<span style={{padding:'1px 6px',borderRadius:'10px',fontSize:'0.68rem',fontWeight:700,background:filterStatus===tab?'#0d1f4f':'#f1f5f9',color:filterStatus===tab?'#fff':'#94a3b8'}}>
-                  {tab==='All'?vendors.length:tab==='Pending Onboarding'?vendors.filter(v=>v.status==='Pending Onboarding'||v.status==='Onboarding in Progress').length:vendors.filter(v=>v.status===tab).length}
+                  {tab==='All'?vendors.length:tab==='Pending Onboarding'?vendors.filter(v=>v.status==='Pending Onboarding'||v.status==='Onboarding in Progress').length:tab==='Pending Review'?vendors.filter(v=>isReviewPending(v.status)).length:vendors.filter(v=>v.status===tab).length}
                 </span>
               </button>
             ))}
@@ -164,7 +168,7 @@ export default function VendorManagement() {
                   <td style={{padding:'13px 16px'}}>
                     <div style={{display:'flex',gap:'6px',flexWrap:'nowrap'}}>
                       <button onClick={()=>router.push(`/client/vendors/${v.id}`)} style={{display:'flex',alignItems:'center',gap:'4px',padding:'5px 10px',background:'#eff6ff',border:'1px solid #bfdbfe',borderRadius:'7px',color:'#2563eb',fontWeight:700,fontSize:'0.72rem',cursor:'pointer'}}><Eye size={12}/> View</button>
-                      {v.status==='Pending Review'&&(
+                      {isReviewPending(v.status)&&(
                         <button onClick={()=>setSelectedVendorForApproval(v)} style={{display:'flex',alignItems:'center',gap:'4px',padding:'5px 10px',background:'#dcfce7',border:'1px solid #86efac',borderRadius:'7px',color:'#15803d',fontWeight:700,fontSize:'0.72rem',cursor:'pointer'}}><ShieldCheck size={12}/> Review</button>
                       )}
                     </div>
