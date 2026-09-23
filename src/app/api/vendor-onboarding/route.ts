@@ -22,6 +22,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
+    // Verify vendor existence and 15-day validity window
+    const existingVendor = await prisma.vendor.findUnique({ where: { id: decoded.id } });
+    if (!existingVendor) {
+      return NextResponse.json({ error: 'Vendor account not found or has been removed.' }, { status: 404 });
+    }
+
+    const completedStatuses = ['Pending Review', 'Approval Pending', 'Onboarded', 'Active', 'Approved'];
+    const isCompleted = completedStatuses.includes(existingVendor.status || '');
+    const isExpired = (Date.now() - new Date(existingVendor.createdAt).getTime()) > (15 * 24 * 60 * 60 * 1000);
+
+    if (isExpired && !isCompleted) {
+      if (existingVendor.email || existingVendor.phone) {
+        await prisma.verificationToken.deleteMany({
+          where: { identifier: { in: [existingVendor.email, existingVendor.phone].filter(Boolean) as string[] } }
+        });
+      }
+      await prisma.vendor.delete({ where: { id: existingVendor.id } });
+      return NextResponse.json({
+        error: 'Your 15-day onboarding validity period has expired and your registration has been cleared. Please ask your buyer to send a new invitation.'
+      }, { status: 410 });
+    }
+
     const data = await request.json();
     
     const { 
@@ -42,7 +64,6 @@ export async function POST(request: Request) {
     if (gstin && !gstinRegex.test(gstin.toUpperCase())) return NextResponse.json({ error: 'Invalid GSTIN format.' }, { status: 400 });
     if (bankIfsc && !ifscRegex.test(bankIfsc.toUpperCase())) return NextResponse.json({ error: 'Invalid IFSC format.' }, { status: 400 });
     if (bankAccountNumber && !bankAccRegex.test(bankAccountNumber)) return NextResponse.json({ error: 'Invalid Bank Account format.' }, { status: 400 });
-
 
     const onboardingData = {
       entityType, registeredAddress, contactPerson, pan, gstin, cin, msme,

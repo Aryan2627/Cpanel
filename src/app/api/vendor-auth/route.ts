@@ -10,6 +10,42 @@ export const dynamic = 'force-dynamic';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-local-dev';
 
+export const ONBOARDING_VALIDITY_DAYS = 15;
+export const INCOMPLETE_STATUSES = ['Invited', 'Pending Onboarding', 'Onboarding in Progress'];
+
+export async function purgeExpiredVendors() {
+  const cutoff = new Date(Date.now() - ONBOARDING_VALIDITY_DAYS * 24 * 60 * 60 * 1000);
+  try {
+    const expiredVendors = await prisma.vendor.findMany({
+      where: {
+        createdAt: { lt: cutoff },
+        status: { in: INCOMPLETE_STATUSES }
+      },
+      select: { id: true, email: true, phone: true }
+    });
+
+    if (expiredVendors.length > 0) {
+      const expiredIds = expiredVendors.map(v => v.id);
+      const expiredIdentifiers = expiredVendors
+        .flatMap(v => [v.email, v.phone])
+        .filter(Boolean) as string[];
+
+      if (expiredIdentifiers.length > 0) {
+        await prisma.verificationToken.deleteMany({
+          where: { identifier: { in: expiredIdentifiers } }
+        });
+      }
+
+      await prisma.vendor.deleteMany({
+        where: { id: { in: expiredIds } }
+      });
+      console.log(`[purgeExpiredVendors] Purged ${expiredVendors.length} expired incomplete vendors.`);
+    }
+  } catch (err) {
+    console.error('[purgeExpiredVendors] Error cleaning up expired vendors:', err);
+  }
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -39,17 +75,48 @@ async function getEmailTransporter() {
 
 export async function POST(request: Request) {
   try {
+    const authHeader = request.headers.get('authorization');
     const data = await request.json();
     const { action, otp } = data;
+
+    // Handle 'me' session inspection
+    if (action === 'me') {
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
+      }
+      const token = authHeader.split(' ')[1];
+      let decoded: any;
+      try {
+        decoded = jwt.verify(token, JWT_SECRET);
+      } catch (e) {
+        return NextResponse.json({ error: 'Invalid token' }, { status: 401, headers: corsHeaders });
+      }
+
+      await purgeExpiredVendors();
+
+      const v = await prisma.vendor.findUnique({ where: { id: decoded.id } });
+      if (!v) {
+        return NextResponse.json({ error: 'Vendor account not found or 15-day validity has expired.' }, { status: 404, headers: corsHeaders });
+      }
+      return NextResponse.json({
+        vendor: {
+          ...v,
+          hasPassword: Boolean(v.password)
+        }
+      }, { status: 200, headers: corsHeaders });
+    }
+
     const identifier = (data.email || data.identifier || '').trim();
-    
     if (!identifier) {
       return NextResponse.json({ error: 'Email or Phone is required' }, { status: 400, headers: corsHeaders });
     }
 
+    // Always purge expired vendors older than 15 days before performing any auth checks
+    await purgeExpiredVendors();
+
     const isEmail = identifier.includes('@');
 
-    // Try to find the vendor — prefer onboarding-phase vendors over plain Invited records
+    // Find the vendor
     const vendors = await prisma.vendor.findMany();
     const matchingVendors = vendors.filter(v => {
       if (isEmail) {
@@ -59,14 +126,38 @@ export async function POST(request: Request) {
       }
     });
 
-    // If multiple records share the same email/phone, prefer the one that is
-    // actively in the onboarding pipeline (not just 'Invited').
     const onboardingStatuses = ['Onboarding in Progress', 'Pending Onboarding', 'Approval Pending', 'Pending Review'];
     const vendor = matchingVendors.find(v => onboardingStatuses.includes(v.status || '')) ?? matchingVendors[0];
 
+    // Check account status
+    if (action === 'check_account') {
+      if (!vendor) {
+        return NextResponse.json({
+          exists: false,
+          error: 'No supplier account found with this email or phone. Please contact your buyer to receive an invitation.'
+        }, { status: 404, headers: corsHeaders });
+      }
+
+      return NextResponse.json({
+        exists: true,
+        hasPassword: Boolean(vendor.password),
+        vendor: {
+          id: vendor.id,
+          name: vendor.name,
+          email: vendor.email,
+          phone: vendor.phone,
+          status: vendor.status,
+          hasPassword: Boolean(vendor.password),
+          createdAt: vendor.createdAt
+        }
+      }, { status: 200, headers: corsHeaders });
+    }
+
     if (!vendor) {
       console.log(`[vendor-auth] Vendor not found for: ${identifier}`);
-      return NextResponse.json({ error: 'Vendor not found with that email or phone' }, { status: 404, headers: corsHeaders });
+      return NextResponse.json({ 
+        error: 'No supplier account found with this email or phone. Please contact your buyer to receive an invitation.' 
+      }, { status: 404, headers: corsHeaders });
     }
 
     if (action === 'request') {
@@ -113,6 +204,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ 
         success: true, 
         message: 'OTP sent successfully',
+        hasPassword: Boolean(vendor.password),
         previewUrl: previewUrl || null 
       }, { headers: corsHeaders });
     } 
@@ -150,12 +242,57 @@ export async function POST(request: Request) {
         { expiresIn: '24h' }
       );
 
-      return NextResponse.json({ vendor, token }, { status: 200, headers: corsHeaders });
+      const hasPassword = Boolean(vendor.password);
+
+      return NextResponse.json({ 
+        vendor: {
+          ...vendor,
+          hasPassword
+        }, 
+        hasPassword,
+        token 
+      }, { status: 200, headers: corsHeaders });
+    }
+    else if (action === 'set_password') {
+      const { password } = data;
+      if (!password || password.length < 6) {
+        return NextResponse.json({ error: 'Password must be at least 6 characters long' }, { status: 400, headers: corsHeaders });
+      }
+
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      const updatedVendor = await prisma.vendor.update({
+        where: { id: vendor.id },
+        data: {
+          password: hashedPassword,
+          status: vendor.status === 'Invited' ? 'Onboarding in Progress' : vendor.status
+        }
+      });
+
+      const token = jwt.sign(
+        { id: updatedVendor.id, email: updatedVendor.email, phone: updatedVendor.phone, name: updatedVendor.name, status: updatedVendor.status },
+        JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: 'Password created successfully',
+        vendor: {
+          ...updatedVendor,
+          hasPassword: true
+        },
+        hasPassword: true,
+        token
+      }, { status: 200, headers: corsHeaders });
     }
     else if (action === 'reset_password') {
       const { otp, newPassword } = data;
       if (!otp || !newPassword) {
         return NextResponse.json({ error: 'OTP and new password are required' }, { status: 400, headers: corsHeaders });
+      }
+
+      if (newPassword.length < 6) {
+        return NextResponse.json({ error: 'Password must be at least 6 characters long' }, { status: 400, headers: corsHeaders });
       }
 
       const validToken = await prisma.verificationToken.findFirst({
@@ -172,7 +309,7 @@ export async function POST(request: Request) {
       }
 
       const hashedPassword = bcrypt.hashSync(newPassword, 10);
-      await prisma.vendor.update({
+      const updated = await prisma.vendor.update({
         where: { id: vendor.id },
         data: { password: hashedPassword }
       });
@@ -181,7 +318,14 @@ export async function POST(request: Request) {
         where: { identifier: identifier }
       });
 
-      return NextResponse.json({ success: true, message: 'Password updated successfully' }, { status: 200, headers: corsHeaders });
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Password updated successfully',
+        vendor: {
+          ...updated,
+          hasPassword: true
+        }
+      }, { status: 200, headers: corsHeaders });
     }
     else if (action === 'password_login') {
       const { password } = data;
@@ -189,24 +333,17 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Password is required' }, { status: 400, headers: corsHeaders });
       }
 
+      if (!vendor.password) {
+        return NextResponse.json({ 
+          error: 'No password has been set for this account yet. Please create your password below to proceed to onboarding.',
+          hasPassword: false,
+          needsPasswordSetup: true
+        }, { status: 400, headers: corsHeaders });
+      }
 
-
-      // Remove the strict status check so user can always login if they reset their password
-      // We check if they have a DB password set. If yes, use bcrypt. If no, use legacy logic.
-      if (vendor.password) {
-        const isMatch = bcrypt.compareSync(password, vendor.password);
-        if (!isMatch) {
-          return NextResponse.json({ error: 'Invalid password' }, { status: 401, headers: corsHeaders });
-        }
-      } else {
-        const expectedPassword = vendor.email.substring(0, 3).toLowerCase() + '@26';
-        if (password !== expectedPassword) {
-          return NextResponse.json({ error: 'Invalid password' }, { status: 401, headers: corsHeaders });
-        }
-        // Legacy requirement check
-        if (vendor.status !== 'Onboarding in Progress' && vendor.status !== 'Pending Onboarding' && vendor.status !== 'Approval Pending') {
-          return NextResponse.json({ error: 'Password login is only available during the onboarding phase.' }, { status: 403, headers: corsHeaders });
-        }
+      const isMatch = bcrypt.compareSync(password, vendor.password);
+      if (!isMatch) {
+        return NextResponse.json({ error: 'Invalid password' }, { status: 401, headers: corsHeaders });
       }
 
       const token = jwt.sign(
@@ -215,9 +352,14 @@ export async function POST(request: Request) {
         { expiresIn: '24h' }
       );
 
-      return NextResponse.json({ vendor, token }, { status: 200, headers: corsHeaders });
+      return NextResponse.json({ 
+        vendor: {
+          ...vendor,
+          hasPassword: true
+        }, 
+        token 
+      }, { status: 200, headers: corsHeaders });
     }
- 
     else {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400, headers: corsHeaders });
     }

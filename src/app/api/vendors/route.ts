@@ -1,4 +1,5 @@
-﻿import { NextResponse } from 'next/server';
+import { purgeExpiredVendors } from '../vendor-auth/route';
+import { NextResponse } from 'next/server';
 import { getTenantId } from '../../../lib/tenant';
 import { prisma } from '../../../lib/prisma';
 
@@ -8,6 +9,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   try {
     const orgId = await getTenantId();
+    await purgeExpiredVendors();
     if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
 
     const { searchParams } = new URL(request.url);
