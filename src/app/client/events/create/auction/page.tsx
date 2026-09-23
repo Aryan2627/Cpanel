@@ -299,13 +299,7 @@ function AuctionCreateContent() {
         {/* Sticky Header */}
         <div style={{ position: 'sticky', top: 0, zIndex: 50, background: 'linear-gradient(135deg, #071330 0%, #0d1f4f 55%, #1a2f6b 100%)', borderBottom: '1px solid rgba(255,255,255,0.1)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 20px -2px rgba(0,0,0,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', flex: 1, gap: '16px' }}>
-            <input 
-              type="text" 
-              placeholder="Enter Event Title" 
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              style={{ border: 'none', outline: 'none', fontSize: '1.25rem', fontWeight: '600', color: '#0f172a', width: '100%', background: 'transparent' }}
-            />
+            <h2 style={{ margin: 0, color: '#fff', fontSize: '1.25rem', fontWeight: '600', letterSpacing: '-0.5px' }}>Create Reverse Auction</h2>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', padding: '6px', borderRadius: '30px', gap: '4px', border: '1px solid rgba(255,255,255,0.2)' }}>
@@ -323,7 +317,22 @@ function AuctionCreateContent() {
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
               
-              {/* Event Type */}
+              
+                {/* Event Name */}
+                <div id="tour-title" style={{ display: 'flex', flexDirection: 'column', gridColumn: '1 / -1', marginBottom: '8px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Name of the Event</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. Q3 IT Hardware Procurement" 
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', background: 'rgba(255, 255, 255, 0.9)', outline: 'none', fontSize: '0.95rem', transition: 'all 0.2s', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)' }}
+                    onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'} 
+                    onBlur={e => e.currentTarget.style.boxShadow = 'none'}
+                  />
+                </div>
+
+                {/* Event Type */}
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Evaluation Type</label>
                 <div style={{ position: 'relative' }}>
