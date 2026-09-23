@@ -49,15 +49,20 @@ export async function POST(request: Request) {
 
     const isEmail = identifier.includes('@');
 
-    // Try to find the vendor
+    // Try to find the vendor — prefer onboarding-phase vendors over plain Invited records
     const vendors = await prisma.vendor.findMany();
-    const vendor = vendors.find(v => {
+    const matchingVendors = vendors.filter(v => {
       if (isEmail) {
         return v.email?.trim().toLowerCase() === identifier.toLowerCase();
       } else {
         return v.phone?.replace(/\D/g, '') === identifier.replace(/\D/g, '');
       }
     });
+
+    // If multiple records share the same email/phone, prefer the one that is
+    // actively in the onboarding pipeline (not just 'Invited').
+    const onboardingStatuses = ['Onboarding in Progress', 'Pending Onboarding', 'Approval Pending', 'Pending Review'];
+    const vendor = matchingVendors.find(v => onboardingStatuses.includes(v.status || '')) ?? matchingVendors[0];
 
     if (!vendor) {
       console.log(`[vendor-auth] Vendor not found for: ${identifier}`);

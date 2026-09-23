@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -41,17 +41,23 @@ export default function VendorManagement() {
   };
   const handleCopy = (text:string,id:string)=>{navigator.clipboard.writeText(text);setCopiedId(id);setTimeout(()=>setCopiedId(null),2000);};
 
-  const statusTabs = ['All','Onboarded','Invited','Pending Review','Rejected'];
+  const statusTabs = ['All','Onboarded','Invited','Pending Onboarding','Pending Review','Rejected'];
   const statusStyle=(s:string):React.CSSProperties=>{
     if(s==='Onboarded') return {background:'#dcfce7',color:'#15803d',border:'1px solid #86efac'};
     if(s==='Invited') return {background:'#eff6ff',color:'#2563eb',border:'1px solid #bfdbfe'};
     if(s==='Pending Review') return {background:'#fef3c7',color:'#b45309',border:'1px solid #fde68a'};
     if(s==='Rejected') return {background:'#fef2f2',color:'#dc2626',border:'1px solid #fca5a5'};
+    if(s==='Pending Onboarding'||s==='Onboarding in Progress') return {background:'#f0f9ff',color:'#0284c7',border:'1px solid #bae6fd'};
+    if(s==='Approval Pending') return {background:'#fef3c7',color:'#b45309',border:'1px solid #fde68a'};
     return {background:'#f1f5f9',color:'#475569',border:'1px solid #cbd5e1'};
   };
 
   const filtered = vendors.filter(v=>{
-    if(filterStatus!=='All'&&v.status!==filterStatus) return false;
+    if(filterStatus!=='All'){
+      if(filterStatus==='Pending Onboarding'){
+        if(v.status!=='Pending Onboarding'&&v.status!=='Onboarding in Progress') return false;
+      } else if(v.status!==filterStatus) return false;
+    }
     if(!searchQuery) return true;
     const q=searchQuery.toLowerCase();
     return (v.name||'').toLowerCase().includes(q)||(v.email||'').toLowerCase().includes(q)||(v.city||'').toLowerCase().includes(q)||(v.type||'').toLowerCase().includes(q);
@@ -101,7 +107,7 @@ export default function VendorManagement() {
             {statusTabs.map(tab=>(
               <button key={tab} onClick={()=>setFilterStatus(tab)} style={{padding:'14px 12px',border:'none',borderBottom:filterStatus===tab?'2px solid #1e3a8a':'2px solid transparent',background:'transparent',cursor:'pointer',fontSize:'0.78rem',fontWeight:filterStatus===tab?700:500,color:filterStatus===tab?'#1e3a8a':'#64748b',transition:'all 0.15s',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:'6px'}}>
                 {tab}<span style={{padding:'1px 6px',borderRadius:'10px',fontSize:'0.68rem',fontWeight:700,background:filterStatus===tab?'#0d1f4f':'#f1f5f9',color:filterStatus===tab?'#fff':'#94a3b8'}}>
-                  {tab==='All'?vendors.length:vendors.filter(v=>v.status===tab).length}
+                  {tab==='All'?vendors.length:tab==='Pending Onboarding'?vendors.filter(v=>v.status==='Pending Onboarding'||v.status==='Onboarding in Progress').length:vendors.filter(v=>v.status===tab).length}
                 </span>
               </button>
             ))}

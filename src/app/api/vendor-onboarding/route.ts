@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import jwt from 'jsonwebtoken';
 
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
         city,
         phone,
         type,
-        status: 'Approval Pending',
+        status: 'Pending Review',
         onboardingData
       }
     });
