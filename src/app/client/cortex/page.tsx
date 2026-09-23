@@ -334,12 +334,25 @@ export default function CortexPage() {
       setInput(event.results[0][0].transcript);
       
       let matchedCmd = null;
-      if (transcript.includes('event') || transcript.includes('auction')) matchedCmd = '/create-event';
-      else if (transcript.includes('s2p') || transcript.includes('intake')) matchedCmd = '/s2p';
-      else if (transcript.includes('bids') || transcript.includes('compare')) matchedCmd = '/analyze-bids';
-      else if (transcript.includes('bom') || transcript.includes('material')) matchedCmd = '/bom';
-      else if (transcript.includes('vendor') || transcript.includes('onboard') || transcript.includes('supplier')) matchedCmd = '/create-vendor';
-      else if (transcript.includes('po') || transcript.includes('order')) matchedCmd = '/draft-po';
+      if (transcript.match(/bom|material|bill of material|guided intake|purchase request/i)) matchedCmd = '/bom';
+      else if (transcript.match(/compare|bids|bid analysis|award/i)) matchedCmd = '/analyze-bids';
+      else if (transcript.match(/risk|due diligence|swarm/i)) matchedCmd = '/analyze-risk';
+      else if (transcript.match(/draft contract|generate contract|generate legal/i)) matchedCmd = '/draft-contract';
+      else if (transcript.match(/contract|legal review/i)) matchedCmd = '/analyze-contract';
+      else if (transcript.match(/clause|policy validation/i)) matchedCmd = '/review-clause';
+      else if (transcript.match(/shipment|track|asn|grn|transit/i)) matchedCmd = '/track-shipments';
+      else if (transcript.match(/stockout|shortage|inventory|demand forecast/i)) matchedCmd = '/predict-stockout';
+      else if (transcript.match(/3way|three way|invoice match|reconcil/i)) matchedCmd = '/3way-match';
+      else if (transcript.match(/esg|sustainability|green/i)) matchedCmd = '/esg-audit';
+      else if (transcript.match(/market intel|commodity|pricing trend|should cost/i)) matchedCmd = '/market-intel';
+      else if (transcript.match(/scorecard|performance grade/i)) matchedCmd = '/vendor-scorecard';
+      else if (transcript.match(/s2p|source to pay|orchestrat|end to end/i)) matchedCmd = '/s2p';
+      else if (transcript.match(/event|auction|sourcing agent/i)) matchedCmd = '/create-event';
+      else if (transcript.match(/onboard|new vendor|new supplier|discovery/i)) matchedCmd = '/create-vendor';
+      else if (transcript.match(/po|purchase order/i)) matchedCmd = '/draft-po';
+      else if (transcript.match(/product|catalog|catalogue|master data/i)) matchedCmd = '/add-product';
+      else if (transcript.match(/scan|ocr|screen|capture/i)) matchedCmd = '/scan';
+      else if (transcript.match(/clear|reset|start over/i)) matchedCmd = '/clear';
       
       if (matchedCmd) {
         execute(matchedCmd);
