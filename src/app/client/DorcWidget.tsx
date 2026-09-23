@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, X, Loader2, Monitor } from 'lucide-react';
 
-export default function CortexWidget() {
+export default function DorcWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -104,7 +104,7 @@ export default function CortexWidget() {
           }}>
             <div>
               <h3 style={{ margin: '0 0 4px 0', color: '#00c6ff', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '1.1rem' }}>
-                <Sparkles size={18} /> Cortex Anywhere
+                <img src="/dorc-logo.png" style={{ width: 18, height: 18, objectFit: "contain" }} /> Dorc AI
               </h3>
               <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Live Vision AI (Local OCR)
@@ -169,7 +169,7 @@ export default function CortexWidget() {
         </div>
       )}
 
-      {/* Floating Cortex Ring */}
+      {/* Floating Dorc AI Ring */}
       <div 
         onClick={() => setIsOpen(!isOpen)}
         title="Launch Web Copilot"
@@ -192,7 +192,7 @@ export default function CortexWidget() {
           backdropFilter: 'blur(10px)'
         }}
       >
-        {isOpen ? <X size={28} color="#00c6ff" /> : <Sparkles size={28} color="#00c6ff" />}
+        {isOpen ? <X size={28} color="#00c6ff" /> : <img src="/dorc-logo.png" style={{ width: 28, height: 28, objectFit: "contain", filter: "drop-shadow(0 0 10px #00c6ff)" }} />}
         <style>{`
           @keyframes pulseRing {
             0% { box-shadow: 0 0 15px rgba(0, 198, 255, 0.4), inset 0 0 10px rgba(0, 198, 255, 0.3); }

@@ -7,7 +7,7 @@ import TourButton from './TourButton';
 import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
 import JarvisAssistant from './JarvisAssistant';
-import CortexWidget from './CortexWidget';
+import DorcWidget from './DorcWidget';
 import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles } from 'lucide-react';
 
 const TOP_MENUS = [
@@ -236,7 +236,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   transition: 'transform 0.2s',
                 }}
               >
-                <Sparkles size={14} /> Cortex AI
+                <img src="/dorc-logo.png" style={{ width: 14, height: 14, objectFit: "contain" }} /> Dorc AI
               </Link>
               )}
 
@@ -302,7 +302,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       </div>
       
       
-      <CortexWidget />
+      <DorcWidget />
 
       <CartOverlay />
 

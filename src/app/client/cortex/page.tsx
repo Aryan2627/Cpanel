@@ -34,7 +34,7 @@ const launchPiP = async () => {
           <div style="width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg, #00c6ff, #0072ff); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 15px rgba(0,114,255,0.4);">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
           </div>
-          Cortex Anywhere
+          Dorc AI Anywhere
         </h3>
         <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 24px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Zero-Install Web Copilot</p>
         
@@ -65,7 +65,7 @@ const launchPiP = async () => {
            chat.innerHTML += `<div class="msg" style="border-color: rgba(0,198,255,0.3); background: rgba(0,198,255,0.05);">
             <strong style="color: #00c6ff; display: block; margin-bottom: 6px;">Context Detected: Microsoft Excel</strong>
             I see you are looking at an Excel spreadsheet containing a <strong>Bill of Materials</strong> for IT Infrastructure.<br/><br/>
-            💡 <strong>Cortex Insights:</strong><br/>
+            💡 <strong>Dorc AI Insights:</strong><br/>
             I have instantly cross-referenced the hardware rows visible on your screen against our internal catalog. I can procure the entire list for <strong>$23,200</strong> through our preferred vendors.<br/><br/>
             <button style="background: #00c6ff; border: none; padding: 8px 12px; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; margin-top: 8px; width: 100%;">Generate PR from Excel Data</button>
             </div>`;
@@ -286,7 +286,7 @@ const AgentSwarm = ({ data }: { data: any }) => {
   );
 };
 
-export default function CortexPage() {
+export default function DorcPage() {
   const [input, setInput] = useState('');
 
   const [isListening, setIsListening] = useState(false);
@@ -367,7 +367,7 @@ export default function CortexPage() {
 
   const [userName, setUserName] = useState('Admin');
   const [messages, setanys] = useState<any[]>([
-    { role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }
+    { role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSlash, setShowSlash] = useState(false);
@@ -560,7 +560,7 @@ export default function CortexPage() {
       const r = await fetch('/api/ai/cortex',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ prompt:q, userName, history:messages.slice(-5) }) });
       const d = await r.json();
       setanys(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
-    } catch(e) { setanys(p=>[...p,{ role:'agent', content:'Connection to Cortex Core failed.' }]); }
+    } catch(e) { setanys(p=>[...p,{ role:'agent', content:'Connection to Dorc AI Core failed.' }]); }
     setIsProcessing(false);
   };
 
@@ -716,13 +716,13 @@ export default function CortexPage() {
               <BrainCircuit size={18} color="#fff"/>
             </div>
             <div>
-              <div style={{ fontSize:'0.9rem', fontWeight:800, color:'#f1f5f9', letterSpacing:'-0.5px' }}>Cortex AI</div>
+              <div style={{ fontSize:'0.9rem', fontWeight:800, color:'#f1f5f9', letterSpacing:'-0.5px' }}>Dorc AI</div>
               <div style={{ fontSize:'0.65rem', color:'#4ade80', fontWeight:600, display:'flex', alignItems:'center', gap:'4px' }}>
                 <span style={{ width:'5px', height:'5px', borderRadius:'50%', background:'#4ade80', display:'inline-block', animation:'pulse2 2s infinite' }}/>Online · RAG Active
               </div>
             </div>
           </div>
-          <button onClick={()=>{ setanys([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); setActiveChatId(null); setMenuOpenId(null); }} style={{ width:'100%', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#a5b4fc', transition:'all 0.2s' }}>
+          <button onClick={()=>{ setanys([{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); setActiveChatId(null); setMenuOpenId(null); }} style={{ width:'100%', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#a5b4fc', transition:'all 0.2s' }}>
             <Plus size={15}/> New Chat
           </button>
         </div>
@@ -736,7 +736,7 @@ export default function CortexPage() {
             const isEditing = editingId===chat.id;
             return (
               <div key={chat.id} className="hist-item" style={{ padding:'9px 12px', paddingRight:'8px', background: isActive?'rgba(99,102,241,0.12)':'transparent', border: isActive?'1px solid rgba(99,102,241,0.25)':'1px solid transparent', borderRadius:'8px', fontSize:'0.8rem', cursor:'pointer', marginBottom:'3px', transition:'all 0.2s', position:'relative', display:'flex', alignItems:'center', gap:'6px' }}
-                onClick={()=>{ if(!isEditing){ setActiveChatId(chat.id); setanys(chat.messages.length>0?chat.messages:[{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setMenuOpenId(null); } }}
+                onClick={()=>{ if(!isEditing){ setActiveChatId(chat.id); setanys(chat.messages.length>0?chat.messages:[{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setMenuOpenId(null); } }}
               >
                 {isEditing ? (
                   <input
@@ -761,7 +761,7 @@ export default function CortexPage() {
                     <button onClick={()=>{ setEditTitle(chat.title); setEditingId(chat.id); setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#e2e8f0', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
                       ✏️ Rename
                     </button>
-                    <button onClick={()=>{ setChats(p=>p.filter(c=>c.id!==chat.id)); if(activeChatId===chat.id){ setActiveChatId(null); setanys([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); } setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#f87171', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
+                    <button onClick={()=>{ setChats(p=>p.filter(c=>c.id!==chat.id)); if(activeChatId===chat.id){ setActiveChatId(null); setanys([{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); } setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#f87171', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
                       🗑️ Delete
                     </button>
                   </div>
@@ -816,12 +816,12 @@ export default function CortexPage() {
                 
                 {/* Avatar */}
                 <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background: msg.role==='agent'?'linear-gradient(135deg,#6366f1,#8b5cf6)':'rgba(255,255,255,0.07)', border: msg.role==='agent'?'none':'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', boxShadow: msg.role==='agent'?'0 0 16px rgba(99,102,241,0.3)':'none' }}>
-                  {msg.role==='agent' ? <BrainCircuit size={18}/> : <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{userName.charAt(0)}</span>}
+                  {msg.role==='agent' ? <img src="/dorc-logo.png" style={{ width: 18, height: 18, objectFit: "contain" }} /> : <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{userName.charAt(0)}</span>}
                 </div>
 
                 <div style={{ flex:1, paddingTop:'4px', minWidth:0 }}>
                   <div style={{ fontSize:'0.78rem', fontWeight:700, marginBottom:'8px', color: msg.role==='agent'?'#818cf8': isDark ? '#94a3b8' : '#64748b', textTransform:'uppercase', letterSpacing:'0.5px' }}>
-                    {msg.role==='agent' ? 'Cortex AI' : 'You'}
+                    {msg.role==='agent' ? 'Dorc AI' : 'You'}
                   </div>
                   <div style={{ color: msg.role==='agent'? (isDark ? '#e2e8f0' : '#1e293b') : (isDark ? '#94a3b8' : '#475569'), fontSize:'0.95rem', lineHeight:'1.7' }}>
                     {fmt(msg.content)}
@@ -1407,12 +1407,12 @@ export default function CortexPage() {
                   <Loader2 size={18} color="#fff" className="animate-spin"/>
                 </div>
                 <div style={{ paddingTop:'8px' }}>
-                  <div style={{ fontSize:'0.78rem', fontWeight:700, color:'#818cf8', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'8px' }}>Cortex AI</div>
+                  <div style={{ fontSize:'0.78rem', fontWeight:700, color:'#818cf8', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'8px' }}>Dorc AI</div>
                   <div style={{ display:'flex', alignItems:'center', gap:'10px', background:'rgba(99,102,241,0.08)', border:'1px solid rgba(99,102,241,0.15)', padding:'10px 16px', borderRadius:'12px' }}>
                     <div style={{ display:'flex', gap:'4px' }}>
                       {[0,1,2].map(i=><div key={i} style={{ width:'6px', height:'6px', borderRadius:'50%', background:'#6366f1', animation:`pulse2 1.4s ease-in-out ${i*0.2}s infinite` }}/>)}
                     </div>
-                    <span style={{ fontSize:'0.83rem', color:'#818cf8', fontWeight:500 }}>Cortex is thinking...</span>
+                    <span style={{ fontSize:'0.83rem', color:'#818cf8', fontWeight:500 }}>Dorc AI is thinking...</span>
                   </div>
                 </div>
               </div>
@@ -1488,7 +1488,7 @@ export default function CortexPage() {
                 type="text" value={input}
                 onChange={e=>{ setInput(e.target.value); setShowSlash(e.target.value=='/'); }}
                 onKeyDown={e=>{ if(e.key==='Escape') setShowSlash(false); }}
-                placeholder="Ask Cortex anything, or type / for AI workflows..."
+                placeholder="Ask Dorc AI anything, or type / for AI workflows..."
                 disabled={isProcessing}
                 className="cx-input-field" style={{ width:'100%', padding:'16px 100px 16px 50px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#e2e8f0', fontSize:'16px', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
               />
@@ -1510,7 +1510,7 @@ export default function CortexPage() {
               </button>
             </form>
             <div style={{ textAlign:'center', color:'#1e293b', fontSize:'0.7rem', marginTop:'10px' }}>
-              Cortex · Enterprise RAG · Multi-Agent Swarm · Legal AI · Chain of Thought
+              Dorc AI · Enterprise RAG · Multi-Agent Swarm · Legal AI · Chain of Thought
             </div>
           </div>
         </div>
