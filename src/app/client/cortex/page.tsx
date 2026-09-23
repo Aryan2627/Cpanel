@@ -4,7 +4,7 @@ import {
   BrainCircuit, X, Zap, Loader2, Database, Send, Terminal,
   CheckCircle2, AlertTriangle, CheckCircle, FileText, Settings, Eye,
   Plus, Sparkles, Shield, ChevronRight, BarChart3, Bot
-, Sun, Moon, FileUp, Cpu, Search, Monitor, Download } from 'lucide-react';
+, Sun, Moon, FileUp, Cpu, Search, Monitor, Download , Mic, Volume2, VolumeX } from 'lucide-react';
 
 /* ───────────────────────── Utility sub-components ───────────────────────── */
 
@@ -288,14 +288,78 @@ const AgentSwarm = ({ data }: { data: any }) => {
 
 export default function CortexPage() {
   const [input, setInput] = useState('');
+
+  const [isListening, setIsListening] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [voiceGender, setVoiceGender] = useState<'female'|'male'>('female');
+  const voiceEnabledRef = useRef(false);
+  const voiceGenderRef = useRef<'female'|'male'>('female');
+  
+  useEffect(() => { voiceEnabledRef.current = voiceEnabled; }, [voiceEnabled]);
+  useEffect(() => { voiceGenderRef.current = voiceGender; }, [voiceGender]);
+  
+  const speakText = (text: string) => {
+    if (!voiceEnabledRef.current || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text.replace(/[*_#]/g, ''));
+    const voices = window.speechSynthesis.getVoices();
+    const gender = voiceGenderRef.current;
+    let voice = voices.find(v => v.name.toLowerCase().includes(gender));
+    if (!voice) {
+       if (gender === 'female') {
+         voice = voices.find(v => v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Google US English'));
+       } else {
+         voice = voices.find(v => v.name.includes('David') || v.name.includes('Daniel') || v.name.includes('Google UK English Male'));
+       }
+    }
+    if (voice) utterance.voice = voice;
+    window.speechSynthesis.speak(utterance);
+  };
+  
+  const startListening = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return alert('Voice recognition not supported in this browser.');
+    if (isListening) return;
+    
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+    
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript.toLowerCase();
+      setInput(event.results[0][0].transcript);
+      
+      let matchedCmd = null;
+      if (transcript.includes('event') || transcript.includes('auction')) matchedCmd = '/create-event';
+      else if (transcript.includes('s2p') || transcript.includes('intake')) matchedCmd = '/s2p';
+      else if (transcript.includes('bids') || transcript.includes('compare')) matchedCmd = '/analyze-bids';
+      else if (transcript.includes('bom') || transcript.includes('material')) matchedCmd = '/bom';
+      else if (transcript.includes('vendor') || transcript.includes('onboard') || transcript.includes('supplier')) matchedCmd = '/create-vendor';
+      else if (transcript.includes('po') || transcript.includes('order')) matchedCmd = '/draft-po';
+      
+      if (matchedCmd) {
+        execute(matchedCmd);
+        setInput('');
+      } else {
+        execute(transcript);
+        setInput('');
+      }
+    };
+    recognition.start();
+  };
+
   const [userName, setUserName] = useState('Admin');
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setanys] = useState<any[]>([
     { role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSlash, setShowSlash] = useState(false);
   const [slashCategory, setSlashCategory] = useState('All');
-  const [chats, setChats] = useState<{id: string, title: string, messages: Message[]}[]>([
+  const [chats, setChats] = useState<{id: string, title: string, messages: any[]}[]>([
     { id: 'c1', title: 'Risk Swarm — Vendor Contract Q3', messages: [{ role: 'agent', content: 'Multi-Agent Swarm analysis completed for Vendor Contract Q3.' }] },
     { id: 'c2', title: 'Legal Review — NDA Acme Corp', messages: [{ role: 'agent', content: 'Legal clause review completed for Acme Corp NDA.' }] },
     { id: 'c3', title: 'Procurement Savings Analysis', messages: [{ role: 'agent', content: 'Savings analysis: Found 12% cost reduction opportunities.' }] },
@@ -359,7 +423,7 @@ export default function CortexPage() {
             setActiveChatId(activeId);
             const activeChat = chatsData.find((c: any) => c.id === activeId);
             if (activeChat && activeChat.messages && activeChat.messages.length > 0) {
-              setMessages(activeChat.messages);
+              setanys(activeChat.messages);
             }
           }
         } else {
@@ -397,7 +461,7 @@ export default function CortexPage() {
     if(cmd.startsWith('/analyze-risk')) display = 'Deploy AI swarm to analyze this contract\'s risk profile.';
     if(cmd.startsWith('/analyze-contract')) display = 'Run deep legal clause analysis.';
     if(cmd.startsWith('/execute-bom-upload')) display = 'Processing Bill of Materials...';
-    setMessages(p=>[...p, { role:'user', content:display }]);
+    setanys(p=>[...p, { role:'user', content:display }]);
     const newId = 'c_' + Date.now();
     if(messages.length===1) {
       const title = display.substring(0, 40);
@@ -408,8 +472,9 @@ export default function CortexPage() {
     try {
       const r = await fetch('/api/ai/cortex',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ prompt:cmd, userName, history:messages.slice(-5) }) });
       const d = await r.json();
-      setMessages(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
-    } catch(e) { setMessages(p=>[...p,{ role:'agent', content:'Connection error.' }]); }
+      setanys(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
+        if (d && d.final_response) speakText(d.final_response);
+    } catch(e) { setanys(p=>[...p,{ role:'agent', content:'Connection error.' }]); }
     setIsProcessing(false);
   };
 
@@ -417,7 +482,7 @@ export default function CortexPage() {
   const handleScreenScan = async () => {
     setShowSlash(false);
     const msgId = 'scan-' + Date.now();
-    setMessages(p => [...p, 
+    setanys(p => [...p, 
       { role: 'user', content: 'Scan my current screen and analyze it.' },
       { id: msgId, role: 'agent', content: 'Requesting permission to read screen...', isLoading: true }
     ]);
@@ -425,7 +490,7 @@ export default function CortexPage() {
 
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'window' } });
-      setMessages(p => p.map(m => m.id === msgId ? { ...m, content: 'Analyzing live video frame with Local OCR...' } : m));
+      setanys(p => p.map(m => m.id === msgId ? { ...m, content: 'Analyzing live video frame with Local OCR...' } : m));
 
       // @ts-ignore
       if (!(window as any).Tesseract) {
@@ -453,14 +518,14 @@ export default function CortexPage() {
       const { data: { text } } = await (window as any).Tesseract.recognize(canvas, 'eng');
 
       if (!text || text.trim().length === 0) {
-        setMessages(p => p.map(m => m.id === msgId ? { ...m, content: 'Could not detect clear text on that screen.', isLoading: false } : m));
+        setanys(p => p.map(m => m.id === msgId ? { ...m, content: 'Could not detect clear text on that screen.', isLoading: false } : m));
       } else {
         const cleanText = text.substring(0, 1500) + (text.length > 1500 ? '... [TRUNCATED]' : '');
-        setMessages(p => p.map(m => m.id === msgId ? { ...m, content: `**Screen Analysis Complete.**\n\nI successfully scanned your screen using an advanced in-browser local OCR engine. Here is the raw text extracted directly from the pixels:\n\n\`\`\`text\n${cleanText}\n\`\`\``, isLoading: false } : m));
+        setanys(p => p.map(m => m.id === msgId ? { ...m, content: `**Screen Analysis Complete.**\n\nI successfully scanned your screen using an advanced in-browser local OCR engine. Here is the raw text extracted directly from the pixels:\n\n\`\`\`text\n${cleanText}\n\`\`\``, isLoading: false } : m));
       }
     } catch (err) {
       console.error(err);
-      setMessages(p => p.map(m => m.id === msgId ? { ...m, content: 'Screen capture cancelled or failed.', isLoading: false } : m));
+      setanys(p => p.map(m => m.id === msgId ? { ...m, content: 'Screen capture cancelled or failed.', isLoading: false } : m));
     }
     
     setIsProcessing(false);
@@ -470,7 +535,7 @@ export default function CortexPage() {
     if(e) e.preventDefault();
     if(!input.trim()||isProcessing) return;
     const q = input.trim(); setInput('');
-    setMessages(p=>[...p,{ role:'user', content:q }]);
+    setanys(p=>[...p,{ role:'user', content:q }]);
     const newId2 = 'c_' + Date.now();
     if(messages.length===1) {
       const title2 = q.substring(0, 40);
@@ -481,8 +546,8 @@ export default function CortexPage() {
     try {
       const r = await fetch('/api/ai/cortex',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ prompt:q, userName, history:messages.slice(-5) }) });
       const d = await r.json();
-      setMessages(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
-    } catch(e) { setMessages(p=>[...p,{ role:'agent', content:'Connection to Cortex Core failed.' }]); }
+      setanys(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
+    } catch(e) { setanys(p=>[...p,{ role:'agent', content:'Connection to Cortex Core failed.' }]); }
     setIsProcessing(false);
   };
 
@@ -536,7 +601,7 @@ export default function CortexPage() {
         /* Main chat background */
         .cortex-light .cx-main { background: #f0f4f8 !important; }
 
-        /* Message text */
+        /* any text */
         .cortex-light .cortex-msg div[style*="color: msg.role==='agent'?'#e2e8f0"] { color: #1e293b !important; }
 
         /* Slash menu */
@@ -644,7 +709,7 @@ export default function CortexPage() {
               </div>
             </div>
           </div>
-          <button onClick={()=>{ setMessages([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); setActiveChatId(null); setMenuOpenId(null); }} style={{ width:'100%', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#a5b4fc', transition:'all 0.2s' }}>
+          <button onClick={()=>{ setanys([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); setActiveChatId(null); setMenuOpenId(null); }} style={{ width:'100%', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#a5b4fc', transition:'all 0.2s' }}>
             <Plus size={15}/> New Chat
           </button>
         </div>
@@ -658,7 +723,7 @@ export default function CortexPage() {
             const isEditing = editingId===chat.id;
             return (
               <div key={chat.id} className="hist-item" style={{ padding:'9px 12px', paddingRight:'8px', background: isActive?'rgba(99,102,241,0.12)':'transparent', border: isActive?'1px solid rgba(99,102,241,0.25)':'1px solid transparent', borderRadius:'8px', fontSize:'0.8rem', cursor:'pointer', marginBottom:'3px', transition:'all 0.2s', position:'relative', display:'flex', alignItems:'center', gap:'6px' }}
-                onClick={()=>{ if(!isEditing){ setActiveChatId(chat.id); setMessages(chat.messages.length>0?chat.messages:[{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setMenuOpenId(null); } }}
+                onClick={()=>{ if(!isEditing){ setActiveChatId(chat.id); setanys(chat.messages.length>0?chat.messages:[{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setMenuOpenId(null); } }}
               >
                 {isEditing ? (
                   <input
@@ -683,7 +748,7 @@ export default function CortexPage() {
                     <button onClick={()=>{ setEditTitle(chat.title); setEditingId(chat.id); setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#e2e8f0', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
                       ✏️ Rename
                     </button>
-                    <button onClick={()=>{ setChats(p=>p.filter(c=>c.id!==chat.id)); if(activeChatId===chat.id){ setActiveChatId(null); setMessages([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); } setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#f87171', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
+                    <button onClick={()=>{ setChats(p=>p.filter(c=>c.id!==chat.id)); if(activeChatId===chat.id){ setActiveChatId(null); setanys([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); } setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#f87171', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
                       🗑️ Delete
                     </button>
                   </div>
@@ -730,7 +795,7 @@ export default function CortexPage() {
       {/* ── MAIN CHAT ── */}
       <div className="cx-main" style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', minWidth:0 }}>
         
-        {/* Messages */}
+        {/* anys */}
         <div style={{ flex:1, overflowY:'auto', overflowX:'hidden', padding:'32px 0 0', minHeight:0 }}>
           <div className="cx-chat-area" style={{ maxWidth:'780px', margin:'0 auto', display:'flex', flexDirection:'column', gap:'28px', padding:'0 28px 24px' }}>
             {messages.map((msg, idx)=>(
@@ -875,7 +940,7 @@ export default function CortexPage() {
                       </div>
 
                       <div style={{ padding:'16px 20px', background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', display:'flex', justifyContent:'flex-end' }}>
-                        <button onClick={() => setMessages(p => [...p, { role:'agent', content:'', uiComponent:'pr_success', uiData: { prNumber: 'PR-2026-0842', total: msg.uiData.totalEstimatedCost } }])} style={{ background:'linear-gradient(135deg, #2dd4bf, #0d9488)', border:'none', padding:'12px 24px', borderRadius:'8px', color:'#fff', fontWeight:700, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 4px 15px rgba(13,148,136,0.3)', display:'flex', alignItems:'center', gap:'8px', transition:'transform 0.1s' }}>
+                        <button onClick={() => setanys(p => [...p, { role:'agent', content:'', uiComponent:'pr_success', uiData: { prNumber: 'PR-2026-0842', total: msg.uiData.totalEstimatedCost } }])} style={{ background:'linear-gradient(135deg, #2dd4bf, #0d9488)', border:'none', padding:'12px 24px', borderRadius:'8px', color:'#fff', fontWeight:700, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 4px 15px rgba(13,148,136,0.3)', display:'flex', alignItems:'center', gap:'8px', transition:'transform 0.1s' }}>
                           <CheckCircle2 size={16}/> Generate Purchase Request
                         </button>
                       </div>
@@ -1386,7 +1451,20 @@ export default function CortexPage() {
             )}
 
             {/* Input Box */}
-            <form onSubmit={send} style={{ position:'relative', display:'flex', alignItems:'center' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'8px', padding:'0 4px' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+                  <button onClick={() => setVoiceEnabled(!voiceEnabled)} style={{ background:'none', border:'none', color: voiceEnabled ? '#10b981' : '#64748b', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.75rem', fontWeight:600 }}>
+                    {voiceEnabled ? <Volume2 size={14}/> : <VolumeX size={14}/>} {voiceEnabled ? 'Voice Active' : 'Voice Muted'}
+                  </button>
+                  {voiceEnabled && (
+                    <select value={voiceGender} onChange={(e) => setVoiceGender(e.target.value as any)} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#e2e8f0', borderRadius:'6px', fontSize:'0.7rem', padding:'2px 6px', outline:'none', cursor:'pointer' }}>
+                      <option value="female" style={{background:'#0f172a'}}>Female Voice</option>
+                      <option value="male" style={{background:'#0f172a'}}>Male Voice</option>
+                    </select>
+                  )}
+                </div>
+              </div>
+              <form onSubmit={send} style={{ position:'relative', display:'flex', alignItems:'center' }}>
               <div style={{ position:'absolute', left:'18px', zIndex:2, display:'flex', alignItems:'center' }}>
                 <Sparkles size={16} color={input?'#0072ff':'#334155'} style={{ transition:'color 0.2s' }}/>
               </div>
@@ -1396,7 +1474,7 @@ export default function CortexPage() {
                 onKeyDown={e=>{ if(e.key==='Escape') setShowSlash(false); }}
                 placeholder="Ask Cortex anything, or type / for AI workflows..."
                 disabled={isProcessing}
-                className="cx-input-field" style={{ width:'100%', padding:'16px 56px 16px 46px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#e2e8f0', fontSize:'16px', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
+                className="cx-input-field" style={{ width:'100%', padding:'16px 145px 16px 46px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#e2e8f0', fontSize:'16px', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
               />
               
               <button 
@@ -1408,7 +1486,18 @@ export default function CortexPage() {
               >
                 <Monitor size={16} color="#00c6ff" />
               </button>
-              <button type="submit" disabled={!input.trim()||isProcessing} style={{ position:'absolute', right:'10px', width:'38px', height:'38px', borderRadius:'12px', background: input.trim()&&!isProcessing?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.05)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor: input.trim()&&!isProcessing?'pointer':'default', transition:'all 0.2s', boxShadow: input.trim()&&!isProcessing?'0 0 16px rgba(99,102,241,0.4)':'none' }}>
+              
+                
+                {/* Voice Input Button */}
+                <button 
+                  type="button" 
+                  onClick={startListening}
+                  style={{ position:'absolute', right:'100px', width:'38px', height:'38px', borderRadius:'12px', background: isListening ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.05)', border: isListening ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', cursor: isListening ? 'default' : 'pointer', transition:'all 0.2s' }}
+                  title="Speak to Cortex"
+                >
+                  <Mic size={16} color={isListening ? '#ef4444' : '#94a3b8'} className={isListening ? 'animate-pulse' : ''} />
+                </button>
+                <button type="submit" disabled={!input.trim()||isProcessing} style={{ position:'absolute', right:'10px', width:'38px', height:'38px', borderRadius:'12px', background: input.trim()&&!isProcessing?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.05)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor: input.trim()&&!isProcessing?'pointer':'default', transition:'all 0.2s', boxShadow: input.trim()&&!isProcessing?'0 0 16px rgba(99,102,241,0.4)':'none' }}>
                 <Send size={15} color={input.trim()&&!isProcessing?'#fff':'#334155'}/>
               </button>
             </form>
