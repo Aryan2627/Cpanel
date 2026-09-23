@@ -1478,16 +1478,19 @@ export default function CortexPage() {
                 </div>
               </div>
               <form onSubmit={send} style={{ position:'relative', display:'flex', alignItems:'center' }}>
-              <div style={{ position:'absolute', left:'18px', zIndex:2, display:'flex', alignItems:'center' }}>
-                <Sparkles size={16} color={input?'#0072ff':'#334155'} style={{ transition:'color 0.2s' }}/>
-              </div>
+              <div style={{ position:'absolute', left:'12px', zIndex:2, display:'flex', alignItems:'center', justifyContent:'center', width:'32px', height:'32px' }}>
+                 <button type="button" onClick={startListening} style={{ background: isListening ? 'rgba(99,102,241,0.2)' : 'transparent', border:'none', width:'100%', height:'100%', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', position:'relative', transition:'all 0.3s' }}>
+                   {isListening && <div className="animate-ping" style={{ position:'absolute', width:'100%', height:'100%', borderRadius:'50%', border:'2px solid #818cf8', opacity: 0.6 }} />}
+                   <Sparkles size={16} color={isListening ? '#818cf8' : input ? '#0072ff' : '#334155'} style={{ transition:'color 0.2s', position:'relative', zIndex:3 }}/>
+                 </button>
+                </div>
               <input
                 type="text" value={input}
                 onChange={e=>{ setInput(e.target.value); setShowSlash(e.target.value=='/'); }}
                 onKeyDown={e=>{ if(e.key==='Escape') setShowSlash(false); }}
                 placeholder="Ask Cortex anything, or type / for AI workflows..."
                 disabled={isProcessing}
-                className="cx-input-field" style={{ width:'100%', padding:'16px 145px 16px 46px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#e2e8f0', fontSize:'16px', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
+                className="cx-input-field" style={{ width:'100%', padding:'16px 100px 16px 50px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#e2e8f0', fontSize:'16px', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
               />
               
               <button 
@@ -1501,15 +1504,7 @@ export default function CortexPage() {
               </button>
               
                 
-                {/* Voice Input Button */}
-                <button 
-                  type="button" 
-                  onClick={startListening}
-                  style={{ position:'absolute', right:'100px', width:'38px', height:'38px', borderRadius:'12px', background: isListening ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.05)', border: isListening ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', cursor: isListening ? 'default' : 'pointer', transition:'all 0.2s' }}
-                  title="Speak to Cortex"
-                >
-                  <Mic size={16} color={isListening ? '#ef4444' : '#94a3b8'} className={isListening ? 'animate-pulse' : ''} />
-                </button>
+                
                 <button type="submit" disabled={!input.trim()||isProcessing} style={{ position:'absolute', right:'10px', width:'38px', height:'38px', borderRadius:'12px', background: input.trim()&&!isProcessing?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.05)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor: input.trim()&&!isProcessing?'pointer':'default', transition:'all 0.2s', boxShadow: input.trim()&&!isProcessing?'0 0 16px rgba(99,102,241,0.4)':'none' }}>
                 <Send size={15} color={input.trim()&&!isProcessing?'#fff':'#334155'}/>
               </button>
