@@ -311,21 +311,6 @@ function SingleStageCreateContent() {
       {/* Main Container */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
         
-        {/* Sticky Header */}
-        <div style={{ position: 'sticky', top: 0, zIndex: 50, background: 'linear-gradient(135deg, #071330 0%, #0d1f4f 55%, #1a2f6b 100%)', borderBottom: '1px solid rgba(255,255,255,0.1)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 20px -2px rgba(0,0,0,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
-            <h2 style={{ margin: 0, color: '#fff', fontSize: '1.25rem', fontWeight: '600', letterSpacing: '-0.5px' }}>Create Sourcing Event</h2>
-            
-            
-          </div>
-
-          
-          <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', padding: '6px', borderRadius: '30px', gap: '4px', border: '1px solid rgba(255,255,255,0.2)' }}>
-            
-            
-          </div>
-        </div>
-
         {/* Scrollable Content */}
         <div style={{ flex: 1, padding: '32px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
           
