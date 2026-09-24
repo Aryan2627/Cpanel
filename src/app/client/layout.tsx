@@ -205,6 +205,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   )}
                 </div>
               ))}
+              
+              <TourButton />
+              
             </nav>
           </div>
 
@@ -306,7 +309,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
       <CartOverlay />
 
-      <TourButton />
+      
       <SpotlightSearch />
       
     </IntakeProvider>
