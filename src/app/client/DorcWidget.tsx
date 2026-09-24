@@ -192,7 +192,7 @@ export default function DorcWidget() {
           backdropFilter: 'blur(10px)'
         }}
       >
-        {isOpen ? <X size={28} color="#00c6ff" /> : <img src="/dorc-logo.png" style={{ width: 28, height: 28, objectFit: "contain", filter: "drop-shadow(0 0 10px #00c6ff)" }} />}
+        {isOpen ? <X size={28} color="#00c6ff" /> : <img src="/dorc-logo.png" style={{ width: 44, height: 44, objectFit: "contain", filter: "drop-shadow(0 0 10px #00c6ff)" }} />}
         <style>{`
           @keyframes pulseRing {
             0% { box-shadow: 0 0 15px rgba(0, 198, 255, 0.4), inset 0 0 10px rgba(0, 198, 255, 0.3); }
