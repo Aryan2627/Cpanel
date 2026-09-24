@@ -708,7 +708,7 @@ export default function BuyerEventDetailsPage() {
                   <BarChart3 size={18} color="#2563eb" /> Bidding Summary & Best Value Scoring
                 </h2>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <button onClick={() => setIsCompareModalOpen(true)} style={{ backgroundColor: '#10b981', color: '#fff', padding: '6px 16px', border: 'none', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(16, 185, 129, 0.2)' }}>
+                  <button onClick={() => setIsCompareModalOpen(true)} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)' }}>
                     <BarChart3 size={16} /> Compare Matrix
                   </button>
                   <button onClick={() => {
@@ -732,14 +732,14 @@ export default function BuyerEventDetailsPage() {
                       setSplitSelections(initialSelections);
                       setIsSplitAwardOpen(true);
                     }} 
-                    style={{ backgroundColor: '#6366f1', color: '#fff', padding: '6px 16px', border: 'none', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(99, 102, 241, 0.2)' }}
+                    style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)' }}
                   >
                     <Layers size={16} /> Split Award
                   </button>
-                  <button onClick={handleAiEvaluation} style={{ backgroundColor: '#0f172a', color: '#38bdf8', padding: '6px 16px', border: '1px solid #38bdf8', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 0 10px rgba(56,189,248,0.2)' }}>
+                  <button onClick={handleAiEvaluation} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)' }}>
                       <Brain size={16} /> AI Board Evaluation
                     </button>
-                    <button onClick={() => setIsSurrogateOpen(true)} style={{ backgroundColor: '#f59e0b', color: '#fff', padding: '6px 16px', border: 'none', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(245, 158, 11, 0.2)' }}>
+                    <button onClick={() => setIsSurrogateOpen(true)} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)' }}>
                     <User size={16} /> Proxy Bid
                   </button>
                   <div style={{ backgroundColor: '#f8fafc', color: '#475569', border: '1px solid #e2e8f0', padding: '4px 12px', borderRadius: '16px', fontSize: '0.85rem', fontWeight: 500 }}>
@@ -832,10 +832,10 @@ export default function BuyerEventDetailsPage() {
                         }
                         
                         return (
-                          <tr key={bid.id} style={{ backgroundColor: isBest ? '#f8fafc' : '#ffffff', border: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', boxShadow: isBest ? '0 10px 25px -5px rgba(16, 185, 129, 0.2)' : '0 4px 6px -1px rgba(0,0,0,0.05)', borderRadius: '12px', transition: 'all 0.2s ease', position: 'relative' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = isBest ? '0 15px 30px -5px rgba(16, 185, 129, 0.3)' : '0 10px 15px -3px rgba(0,0,0,0.1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = isBest ? '0 10px 25px -5px rgba(16, 185, 129, 0.2)' : '0 4px 6px -1px rgba(0,0,0,0.05)'; }}>
+                          <tr key={bid.id} style={{ backgroundColor: isBest ? '#f8fafc' : '#ffffff', border: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', boxShadow: isBest ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 1px 3px rgba(0,0,0,0.05)', borderRadius: '12px', transition: 'all 0.2s ease', position: 'relative' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = isBest ? '0 15px 30px -5px rgba(16, 185, 129, 0.3)' : '0 10px 15px -3px rgba(0,0,0,0.1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = isBest ? '0 10px 25px -5px rgba(16, 185, 129, 0.2)' : '0 4px 6px -1px rgba(0,0,0,0.05)'; }}>
                             <td style={{ padding: '20px 24px', fontWeight: 600, color: '#0f172a', borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px', border: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderRight: 'none', position: 'relative' }}>
                               {isBest && (
-                                <div style={{ position: 'absolute', top: '-12px', left: '24px', backgroundColor: '#10b981', color: '#fff', padding: '2px 12px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.5px', boxShadow: '0 2px 4px rgba(16,185,129,0.3)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <div style={{ position: 'absolute', top: '-12px', left: '24px', backgroundColor: '#475569', color: '#fff', padding: '2px 12px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.5px', boxShadow: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                   <Target size={12} /> TOP CHOICE
                                 </div>
                               )}
@@ -845,7 +845,7 @@ export default function BuyerEventDetailsPage() {
                                 {bid.riskLevel === 'Moderate Risk' && <span title="Moderate Supply Chain Risk" style={{ display: 'flex' }}><AlertTriangle size={16} color="#f59e0b" /></span>}
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
-                                <div style={{ fontSize: '0.8rem', color: bid.trustScore > 4 ? '#10b981' : bid.trustScore < 3 ? '#ef4444' : '#f59e0b', fontWeight: 700, backgroundColor: bid.trustScore > 4 ? '#ecfdf5' : bid.trustScore < 3 ? '#fef2f2' : '#fffbeb', padding: '4px 8px', borderRadius: '6px', border: `1px solid ${bid.trustScore > 4 ? '#a7f3d0' : bid.trustScore < 3 ? '#fecaca' : '#fde68a'}` }}>
+                                <div style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 700, backgroundColor: '#f8fafc', padding: '4px 8px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
                                    {bid.trustScore} Trust
                                 </div>
                                 {showBankruptcyPredictor && bid.financialHealth === 'Critical' && (
@@ -856,7 +856,7 @@ export default function BuyerEventDetailsPage() {
                               </div>
                             </td>
                             <td style={{ padding: '20px 24px', borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>
-                              <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '54px', height: '54px', borderRadius: '50%', backgroundColor: isBest ? '#10b981' : '#f1f5f9', color: isBest ? '#fff' : '#334155', fontWeight: 800, fontSize: '1.1rem', boxShadow: isBest ? '0 4px 10px rgba(16,185,129,0.3)' : 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
+                              <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '54px', height: '54px', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#334155', fontWeight: 700, fontSize: '1rem', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)' }}>
                                 {bid.score > 0 ? bid.score : '-'}
                               </div>
                             </td>
