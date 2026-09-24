@@ -789,7 +789,7 @@ export default function BuyerEventDetailsPage() {
                     <thead>
                       <tr>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Vendor</th>
-                        {event?.type === 'Rank based' && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Rank</th>}
+                        {(event?.type?.toLowerCase().includes('rank') || event?.feedbackMode?.toLowerCase().includes('rank')) && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Rank</th>}
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Score</th>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Total Amount ({event.baseCurrency || 'INR'})</th>
                         {enableESG && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Carbon Footprint</th>}
@@ -811,7 +811,7 @@ export default function BuyerEventDetailsPage() {
                                   Generative Market Baseline
                                 </div>
                               </td>
-                              {event?.type === 'Rank based' && (
+                              {(event?.type?.toLowerCase().includes('rank') || event?.feedbackMode?.toLowerCase().includes('rank')) && (
                                 <td style={{ padding: '20px 24px', fontWeight: 800, color: '#64748b', fontSize: '1.2rem', borderTop: '1px solid #e9d5ff', borderBottom: '1px solid #e9d5ff' }}>
                                   -
                                 </td>
@@ -860,7 +860,7 @@ export default function BuyerEventDetailsPage() {
                                 )}
                               </div>
                             </td>
-                            {event?.type === 'Rank based' && (
+                            {(event?.type?.toLowerCase().includes('rank') || event?.feedbackMode?.toLowerCase().includes('rank')) && (
                                 <td style={{ padding: '20px 24px', fontWeight: 800, color: '#475569', fontSize: '1.2rem', borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>
                                   #{bid.priceRank}
                                 </td>
