@@ -619,7 +619,7 @@ export default function DorcPage() {
     ];
 
   return (
-    <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', height:'100%', width:'100%', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+    <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', flex: 1, width: '100%', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
       
       {/* Animated Background */}
       <style>{`
@@ -1197,7 +1197,7 @@ export default function DorcPage() {
                                    // High-end fallback if pollinations fails or rate-limits
                                    e.currentTarget.src = `https://loremflickr.com/800/500/${encodeURIComponent(productForm.name)}?lock=${Math.floor(Math.random()*1000)}`; 
                                  }}
-                                 style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', clipPath:'inset(0px 0px 8% 0px)', transition:'opacity 0.5s ease-in' }} 
+                                 style={{ width:'100%', flex: 1, width: '100%', objectFit:'cover', objectPosition:'center', clipPath:'inset(0px 0px 8% 0px)', transition:'opacity 0.5s ease-in' }} 
                                  alt="Product Preview" 
                                />
                                
