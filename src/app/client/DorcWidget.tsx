@@ -104,7 +104,7 @@ export default function DorcWidget() {
           }}>
             <div>
               <h3 style={{ margin: '0 0 4px 0', color: '#00c6ff', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '1.1rem' }}>
-                <img src="/dorc-logo.png" style={{ width: 18, height: 18, objectFit: "contain" }} /> Dorc AI
+                <img src="/dorc-logo.png" style={{ width: 22, height: 22, objectFit: "contain", filter: "brightness(0) invert(1)" }} /> Dorc AI
               </h3>
               <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Live Vision AI (Local OCR)

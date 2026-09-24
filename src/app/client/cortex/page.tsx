@@ -844,7 +844,7 @@ export default function DorcPage() {
                 
                 {/* Avatar */}
                 <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background: msg.role==='agent'?'linear-gradient(135deg,#6366f1,#8b5cf6)':'rgba(255,255,255,0.07)', border: msg.role==='agent'?'none':'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', boxShadow: msg.role==='agent'?'0 0 16px rgba(99,102,241,0.3)':'none' }}>
-                  {msg.role==='agent' ? <img src="/dorc-logo.png" style={{ width: 18, height: 18, objectFit: "contain" }} /> : <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{userName.charAt(0)}</span>}
+                  {msg.role==='agent' ? <img src="/dorc-logo.png" style={{ width: 22, height: 22, objectFit: "contain", filter: "brightness(0) invert(1)" }} /> : <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{userName.charAt(0)}</span>}
                 </div>
 
                 <div style={{ flex:1, paddingTop:'4px', minWidth:0 }}>

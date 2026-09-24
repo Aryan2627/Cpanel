@@ -239,7 +239,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   transition: 'transform 0.2s',
                 }}
               >
-                <img src="/dorc-logo.png" style={{ width: 14, height: 14, objectFit: "contain" }} /> Dorc AI
+                <img src="/dorc-logo.png" style={{ width: 16, height: 16, objectFit: "contain", filter: "brightness(0) invert(1)" }} /> Dorc AI
               </Link>
               )}
 
