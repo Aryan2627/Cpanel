@@ -129,7 +129,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
         )}
 
-        <div className="mobile-p-16" style={{ height: '64px', backgroundColor: '#071330', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div className="mobile-p-16" style={{ height: '64px', backgroundColor: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'sticky', top: 0, zIndex: 100 }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
             <Link href="/client" style={{ color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
