@@ -708,7 +708,7 @@ export default function BuyerEventDetailsPage() {
                   <BarChart3 size={18} color="#2563eb" /> Bidding Summary & Best Value Scoring
                 </h2>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <button onClick={() => setIsCompareModalOpen(true)} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)' }}>
+                  <button onClick={() => setIsCompareModalOpen(true)} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', transition: 'background-color 0.2s ease' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f1f5f9'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}>
                     <BarChart3 size={16} /> Compare Matrix
                   </button>
                   <button onClick={() => {
@@ -732,14 +732,14 @@ export default function BuyerEventDetailsPage() {
                       setSplitSelections(initialSelections);
                       setIsSplitAwardOpen(true);
                     }} 
-                    style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)' }}
+                    style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', transition: 'background-color 0.2s ease' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f1f5f9'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
                   >
                     <Layers size={16} /> Split Award
                   </button>
-                  <button onClick={handleAiEvaluation} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)' }}>
+                  <button onClick={handleAiEvaluation} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', transition: 'background-color 0.2s ease' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f1f5f9'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}>
                       <Brain size={16} /> AI Board Evaluation
                     </button>
-                    <button onClick={() => setIsSurrogateOpen(true)} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)' }}>
+                    <button onClick={() => setIsSurrogateOpen(true)} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', transition: 'background-color 0.2s ease' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f1f5f9'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}>
                     <User size={16} /> Proxy Bid
                   </button>
                   <div style={{ backgroundColor: '#f8fafc', color: '#475569', border: '1px solid #e2e8f0', padding: '4px 12px', borderRadius: '16px', fontSize: '0.85rem', fontWeight: 500 }}>
