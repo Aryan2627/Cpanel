@@ -789,7 +789,7 @@ export default function BuyerEventDetailsPage() {
                     <thead>
                       <tr>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Vendor</th>
-                        {(event?.type?.toLowerCase().includes('rank') || event?.feedbackMode?.toLowerCase().includes('rank')) && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Rank</th>}
+                        <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Rank</th>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Score</th>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Total Amount ({event.baseCurrency || 'INR'})</th>
                         {enableESG && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Carbon Footprint</th>}
@@ -811,11 +811,7 @@ export default function BuyerEventDetailsPage() {
                                   Generative Market Baseline
                                 </div>
                               </td>
-                              {(event?.type?.toLowerCase().includes('rank') || event?.feedbackMode?.toLowerCase().includes('rank')) && (
-                                <td style={{ padding: '20px 24px', fontWeight: 800, color: '#64748b', fontSize: '1.2rem', borderTop: '1px solid #e9d5ff', borderBottom: '1px solid #e9d5ff' }}>
-                                  -
-                                </td>
-                              )}
+                              <td style={{ padding: '20px 24px', fontWeight: 800, color: '#64748b', fontSize: '1.2rem', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>-</td>
                               <td style={{ padding: '20px 24px', borderTop: '1px solid #e9d5ff', borderBottom: '1px solid #e9d5ff' }}>
                                 <span style={{ padding: '6px 12px', borderRadius: '16px', fontSize: '0.85rem', fontWeight: 700, backgroundColor: '#d8b4fe', color: '#581c87', boxShadow: '0 2px 4px rgba(147,51,234,0.2)' }}>
                                   {bid.score > 0 ? `${bid.score}/100` : 'N/A'}
@@ -860,11 +856,7 @@ export default function BuyerEventDetailsPage() {
                                 )}
                               </div>
                             </td>
-                            {(event?.type?.toLowerCase().includes('rank') || event?.feedbackMode?.toLowerCase().includes('rank')) && (
-                                <td style={{ padding: '20px 24px', fontWeight: 800, color: '#475569', fontSize: '1.2rem', borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>
-                                  #{bid.priceRank}
-                                </td>
-                              )}
+                            <td style={{ padding: '20px 24px', fontWeight: 800, color: '#475569', fontSize: '1.2rem', borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>#{bid.priceRank}</td>
                               <td style={{ padding: '20px 24px', borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>
                                 <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '54px', height: '54px', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#334155', fontWeight: 700, fontSize: '1rem', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)' }}>
                                 {bid.score > 0 ? bid.score : '-'}
@@ -893,7 +885,7 @@ export default function BuyerEventDetailsPage() {
                                 {(!showBankruptcyPredictor || bid.financialHealth !== 'Critical') && (
                                   <button onClick={() => handleAward(bid)} style={{ 
                                     padding: '10px 20px', 
-                                    background: isBest ? 'linear-gradient(to right, #10b981, #059669)' : '#fff', 
+                                    background: isBest ? '#0f172a' : '#fff', 
                                     color: isBest ? '#fff' : '#0f172a', 
                                     border: isBest ? 'none' : '1px solid #cbd5e1', 
                                     borderRadius: '8px', 
@@ -903,9 +895,9 @@ export default function BuyerEventDetailsPage() {
                                     display: 'flex', 
                                     alignItems: 'center', 
                                     gap: '6px', 
-                                    boxShadow: isBest ? '0 4px 10px rgba(16,185,129,0.4)' : '0 1px 2px rgba(0,0,0,0.05)', 
+                                    boxShadow: isBest ? '0 1px 2px rgba(0,0,0,0.1)' : '0 1px 2px rgba(0,0,0,0.05)', 
                                     transition: 'all 0.2s' 
-                                  }} onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = isBest ? '0 6px 15px rgba(16,185,129,0.5)' : '0 4px 6px -1px rgba(0,0,0,0.1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = isBest ? '0 4px 10px rgba(16,185,129,0.4)' : '0 1px 2px rgba(0,0,0,0.05)'; }}>
+                                  }} onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = isBest ? '0 2px 4px rgba(0,0,0,0.1)' : '0 4px 6px -1px rgba(0,0,0,0.1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = isBest ? '0 4px 10px rgba(16,185,129,0.4)' : '0 1px 2px rgba(0,0,0,0.05)'; }}>
                                     {isBest ? ' Award Best Bid' : 'Award Vendor'}
                                   </button>
                                 )}
