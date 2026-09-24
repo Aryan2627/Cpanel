@@ -569,9 +569,14 @@ export default function BuyerEventDetailsPage() {
 
       return { ...bid, baseAmount, score: Math.round(score * 10) / 10, esgScore, parsedData: data, trustScore, riskLevel, financialHealth };
     }).sort((a: any, b: any) => {
-      if (b.score !== a.score) return b.score - a.score;
-      return a.baseAmount - b.baseAmount; // Lowest amount wins if scores tie
-    });
+        if (b.score !== a.score) return b.score - a.score;
+        return a.baseAmount - b.baseAmount; // Lowest amount wins if scores tie
+      });
+      
+      const byPrice = [...processed].sort((a,b) => a.baseAmount - b.baseAmount);
+      processed.forEach(p => {
+        p.priceRank = byPrice.findIndex(x => x.id === p.id) + 1;
+      });
     
     // Add AI Ghost Bid if enabled
     if (showGhostBidding && processed.length > 0) {
@@ -855,8 +860,13 @@ export default function BuyerEventDetailsPage() {
                                 )}
                               </div>
                             </td>
-                            <td style={{ padding: '20px 24px', borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>
-                              <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '54px', height: '54px', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#334155', fontWeight: 700, fontSize: '1rem', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)' }}>
+                            {event?.type === 'Rank based' && (
+                                <td style={{ padding: '20px 24px', fontWeight: 800, color: '#475569', fontSize: '1.2rem', borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>
+                                  #{bid.priceRank}
+                                </td>
+                              )}
+                              <td style={{ padding: '20px 24px', borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>
+                                <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '54px', height: '54px', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#334155', fontWeight: 700, fontSize: '1rem', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)' }}>
                                 {bid.score > 0 ? bid.score : '-'}
                               </div>
                             </td>
