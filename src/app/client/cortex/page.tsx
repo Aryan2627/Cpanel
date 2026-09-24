@@ -619,7 +619,7 @@ export default function DorcPage() {
     ];
 
   return (
-    <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', flex: 1, width: '100%', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+    <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', flex: 1, width: '100%', height: 'calc(100vh - 64px)', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
         <style>{`
           @keyframes voiceRing1 {
             0% { transform: scale(1); opacity: 0.8; }
