@@ -180,9 +180,9 @@ export default function DorcWidget() {
           width: '60px',
           height: '60px',
           borderRadius: '50%',
-          background: 'rgba(15, 23, 42, 0.8)',
+          background: 'linear-gradient(135deg, #f8fafc, #e0f2fe)',
           border: '2px solid #00c6ff',
-          boxShadow: '0 0 20px rgba(0, 198, 255, 0.5), inset 0 0 10px rgba(0, 198, 255, 0.3)',
+          boxShadow: '0 0 20px rgba(0, 198, 255, 0.6)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -192,7 +192,7 @@ export default function DorcWidget() {
           backdropFilter: 'blur(10px)'
         }}
       >
-        {isOpen ? <X size={28} color="#00c6ff" /> : <img src="/dorc-logo.png" style={{ width: 44, height: 44, objectFit: "contain", filter: "drop-shadow(0 0 10px #00c6ff)" }} />}
+        {isOpen ? <X size={28} color="#00c6ff" /> : <img src="/dorc-logo.png" style={{ width: 44, height: 44, objectFit: "contain", filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.2))" }} />}
         <style>{`
           @keyframes pulseRing {
             0% { box-shadow: 0 0 15px rgba(0, 198, 255, 0.4), inset 0 0 10px rgba(0, 198, 255, 0.3); }
