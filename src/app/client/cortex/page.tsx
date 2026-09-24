@@ -620,6 +620,28 @@ export default function DorcPage() {
 
   return (
     <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', flex: 1, width: '100%', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+        <style>{`
+          @keyframes voiceRing1 {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(3.5); opacity: 0; }
+          }
+          @keyframes voiceRing2 {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.5); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 0.6; }
+          }
+        `}</style>
+        <style>{`
+          @keyframes voiceRing1 {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(2.5); opacity: 0; }
+          }
+          @keyframes voiceRing2 {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.3); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 0.6; }
+          }
+        `}</style>
       
       {/* Animated Background */}
       <style>{`
@@ -1197,7 +1219,7 @@ export default function DorcPage() {
                                    // High-end fallback if pollinations fails or rate-limits
                                    e.currentTarget.src = `https://loremflickr.com/800/500/${encodeURIComponent(productForm.name)}?lock=${Math.floor(Math.random()*1000)}`; 
                                  }}
-                                 style={{ width:'100%', flex: 1, width: '100%', objectFit:'cover', objectPosition:'center', clipPath:'inset(0px 0px 8% 0px)', transition:'opacity 0.5s ease-in' }} 
+                                 style={{ flex: 1, width: '100%', objectFit:'cover', objectPosition:'center', clipPath:'inset(0px 0px 8% 0px)', transition:'opacity 0.5s ease-in' }} 
                                  alt="Product Preview" 
                                />
                                
@@ -1519,10 +1541,16 @@ export default function DorcPage() {
               </div>
               <form onSubmit={send} style={{ position:'relative', display:'flex', alignItems:'center' }}>
               <div style={{ position:'absolute', left:'12px', zIndex:2, display:'flex', alignItems:'center', justifyContent:'center', width:'32px', height:'32px' }}>
-                 <button type="button" onClick={startListening} style={{ background: isListening ? 'rgba(99,102,241,0.2)' : 'transparent', border:'none', width:'100%', height:'100%', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', position:'relative', transition:'all 0.3s' }}>
-                   {isListening && <div className="animate-ping" style={{ position:'absolute', width:'100%', height:'100%', borderRadius:'50%', border:'2px solid #818cf8', opacity: 0.6 }} />}
-                   <Sparkles size={16} color={isListening ? '#818cf8' : input ? '#0072ff' : '#334155'} style={{ transition:'color 0.2s', position:'relative', zIndex:3 }}/>
-                 </button>
+                 <button type="button" onClick={startListening} style={{ background: isListening ? 'rgba(0,198,255,0.2)' : 'transparent', border:'none', width:'100%', height:'100%', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', position:'relative', transition:'all 0.3s' }}>
+                     {isListening && (
+                       <>
+                         <div style={{ position:'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius:'50%', border:'2px solid #00c6ff', animation: 'voiceRing1 1.5s infinite ease-out' }} />
+                         <div style={{ position:'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius:'50%', border:'2px solid #00c6ff', animation: 'voiceRing1 1.5s infinite ease-out 0.75s' }} />
+                         <div style={{ position:'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius:'50%', background: 'rgba(0,198,255,0.3)', animation: 'voiceRing2 1.2s infinite ease-in-out' }} />
+                       </>
+                     )}
+                     <Sparkles size={16} color={isListening ? '#00c6ff' : input ? '#0072ff' : '#64748b'} style={{ transition:'all 0.2s', position:'relative', zIndex:3, transform: isListening ? 'scale(1.2)' : 'scale(1)' }}/>
+                   </button>
                 </div>
               <input
                 type="text" value={input}
