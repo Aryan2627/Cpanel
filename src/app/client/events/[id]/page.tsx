@@ -331,9 +331,9 @@ export default function BuyerEventDetailsPage() {
     csv += templateFields.map((f: any) => f.name).join(',') + '\n';
     bids.forEach(bid => {
       let templateData: any = {};
-      try { templateData = JSON.parse(bid.templateData); } catch(e) {}
+      try { let _tmp = JSON.parse(bid.templateData); if (typeof _tmp === 'string') _tmp = JSON.parse(_tmp); templateData = _tmp || {}; } catch(e) {}
       let row = `"${bid.vendorName}",${bid.score || 0},${bid.amount},${bid.currency || 'INR'},"${bid.esgScore || 'N/A'}",`;
-      const tVals = templateFields.map((f: any) => `"${templateData[f.key] || ''}"`);
+      const tVals = templateFields.map((f: any) => `"${templateData[f.key] || templateData[f.name] || ''}"`);
       row += tVals.join(',') + '\n';
       csv += row;
     });
@@ -415,7 +415,7 @@ export default function BuyerEventDetailsPage() {
   const proceedWithAward = async (bid: any, quantities: Record<string, number>) => {
     try {
       let bidTemplateData: any = {};
-      try { bidTemplateData = JSON.parse(bid.templateData); } catch(e) {}
+      try { let _tmp = JSON.parse(bid.templateData); if (typeof _tmp === 'string') _tmp = JSON.parse(_tmp); bidTemplateData = _tmp || {}; } catch(e) {}
       const poDetails = { templateFields, bidData: bidTemplateData, vendorEmail: bid.vendorId || 'vendor@example.com', awardedPrs: quantities };
       const poRes = await fetch('/api/pos', {
         method: 'POST',
@@ -470,11 +470,11 @@ export default function BuyerEventDetailsPage() {
         
         let splitTotal = 0;
         let bidTemplateData: any = {};
-        try { bidTemplateData = JSON.parse(vendorBid.templateData); } catch(e) {}
+        try { let _tmp = JSON.parse(vendorBid.templateData); if (typeof _tmp === 'string') _tmp = JSON.parse(_tmp); bidTemplateData = _tmp || {}; } catch(e) {}
         
         vendorTemplateFields.forEach((f: any) => {
           if (f.type === 'number') {
-             const val = parseFloat(bidTemplateData[f.key]) || 0;
+             const val = parseFloat(bidTemplateData[f.key] || bidTemplateData[f.name]) || 0;
              splitTotal += val;
           }
         });
@@ -519,8 +519,8 @@ export default function BuyerEventDetailsPage() {
       if (f.weight > 0) {
         const vals = bids.map(b => {
           let data: any = {};
-          try { data = JSON.parse(b.templateData) } catch(e) {}
-          const val = parseFloat(data[f.key]);
+          try { let _tmp = JSON.parse(b.templateData); if (typeof _tmp === 'string') _tmp = JSON.parse(_tmp); data = _tmp || {}; } catch(e) {}
+          const val = parseFloat(data[f.key] || data[f.name]);
           return isNaN(val) ? null : val;
         }).filter(v => v !== null) as number[];
         if (vals.length > 0) minVals[f.key] = Math.min(...vals);
@@ -529,7 +529,7 @@ export default function BuyerEventDetailsPage() {
 
     const processed = bids.map(bid => {
       let data: any = {};
-      try { data = JSON.parse(bid.templateData); } catch(e) {}
+      try { let _tmp = JSON.parse(bid.templateData); if (typeof _tmp === 'string') _tmp = JSON.parse(_tmp); data = _tmp || {}; } catch(e) {}
       
       const currency = bid.currency || 'INR';
       // bid.amount is already converted to baseCurrency by the vendor portal
@@ -539,7 +539,7 @@ export default function BuyerEventDetailsPage() {
       let score = 0;
       templateFields.forEach((f: any) => {
         if (f.weight > 0) {
-          const val = parseFloat(data[f.key]);
+          const val = parseFloat(data[f.key] || data[f.name]);
           if (!isNaN(val) && minVals[f.key]) {
             // Lower is better: (Min / VendorVal) * Weight
             score += (minVals[f.key] / val) * f.weight;
@@ -1282,7 +1282,7 @@ export default function BuyerEventDetailsPage() {
                           {enableESG && <td style={{ padding: '16px', color: '#16a34a', fontWeight: 500 }}>{bid.esgScore}</td>}
                           {templateFields.map((f: any) => (
                             <td key={f.key} style={{ padding: '16px', color: '#64748b', fontStyle: 'italic' }}>
-                              {bid.parsedData[f.key] || '-'}
+                              {bid.parsedData[f.key] || bid.parsedData[f.name] || '-'}
                             </td>
                           ))}
                         </tr>
@@ -1300,7 +1300,7 @@ export default function BuyerEventDetailsPage() {
                         {enableESG && <td style={{ padding: '16px', color: '#16a34a', fontWeight: 500 }}>{bid.esgScore}</td>}
                         
                         {templateFields.map((f: any) => {
-                          const rawVal = bid.parsedData[f.key];
+                          const rawVal = bid.parsedData[f.key] || bid.parsedData[f.name];
                           const val = parseFloat(rawVal);
                           const isNumeric = !isNaN(val);
                           const target = parseFloat(f.targetPrice);
