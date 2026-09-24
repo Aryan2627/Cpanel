@@ -1493,17 +1493,29 @@ export default function DorcPage() {
 
             {/* Input Box */}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'8px', padding:'0 4px' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
-                  <button onClick={() => setVoiceEnabled(!voiceEnabled)} style={{ background:'none', border:'none', color: voiceEnabled ? '#10b981' : '#64748b', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.75rem', fontWeight:600 }}>
-                    {voiceEnabled ? <Volume2 size={14}/> : <VolumeX size={14}/>} {voiceEnabled ? 'Voice Active' : 'Voice Muted'}
-                  </button>
-                  {voiceEnabled && (
-                    <select value={voiceGender} onChange={(e) => setVoiceGender(e.target.value as any)} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#e2e8f0', borderRadius:'6px', fontSize:'0.7rem', padding:'2px 6px', outline:'none', cursor:'pointer' }}>
-                      <option value="female" style={{background:'#0f172a'}}>Female Voice</option>
-                      <option value="male" style={{background:'#0f172a'}}>Male Voice</option>
-                    </select>
-                  )}
-                </div>
+                <div style={{ display:'flex', alignItems:'center', gap:'10px', background:'rgba(15,23,42,0.6)', border:'1px solid rgba(255,255,255,0.05)', padding:'4px 10px', borderRadius:'20px', backdropFilter:'blur(10px)', boxShadow:'0 4px 12px rgba(0,0,0,0.1)', width:'fit-content' }}>
+                    <button onClick={() => setVoiceEnabled(!voiceEnabled)} type="button" style={{ background:'none', border:'none', color: voiceEnabled ? '#10b981' : '#64748b', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.7rem', fontWeight:700, padding:'2px 4px', transition:'all 0.2s' }}>
+                      {voiceEnabled ? <Volume2 size={14} className="animate-pulse" /> : <VolumeX size={14}/>} {voiceEnabled ? 'Voice Active' : 'Voice Muted'}
+                    </button>
+                    
+                    {voiceEnabled && (
+                      <>
+                        <div style={{ width:'1px', height:'14px', background:'rgba(255,255,255,0.1)' }} />
+                        <div style={{ display:'flex', alignItems:'center', gap:'4px' }}>
+                          <button 
+                            onClick={() => setVoiceGender('female')}
+                            type="button"
+                            style={{ padding: '4px 10px', borderRadius: '12px', border: 'none', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', background: voiceGender === 'female' ? 'rgba(16,185,129,0.15)' : 'transparent', color: voiceGender === 'female' ? '#10b981' : '#64748b', transition: 'all 0.2s' }}
+                          >Female</button>
+                          <button 
+                            onClick={() => setVoiceGender('male')}
+                            type="button"
+                            style={{ padding: '4px 10px', borderRadius: '12px', border: 'none', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', background: voiceGender === 'male' ? 'rgba(16,185,129,0.15)' : 'transparent', color: voiceGender === 'male' ? '#10b981' : '#64748b', transition: 'all 0.2s' }}
+                          >Male</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
               </div>
               <form onSubmit={send} style={{ position:'relative', display:'flex', alignItems:'center' }}>
               <div style={{ position:'absolute', left:'12px', zIndex:2, display:'flex', alignItems:'center', justifyContent:'center', width:'32px', height:'32px' }}>
