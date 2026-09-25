@@ -469,7 +469,12 @@ export async function POST(req: Request) {
       if (text.startsWith('/guided-buying')) return NextResponse.json({ final_response: "Guided Buying enforced: User has been redirected to the standard catalog for this commodity." });
                   if (text.startsWith('/supplier-ops') || text.toLowerCase().startsWith('supplier ops')) {
         const match = text.match(/\/?supplier[- ]ops\s+(.+)/i);
-        const searchName = match ? match[1].trim() : 'Global Supplies Inc.';
+        if (!match || !match[1].trim()) {
+            return NextResponse.json({ 
+              final_response: "Please specify which vendor you want to analyze. For example: **/supplier-ops Acme Corp**" 
+            });
+          }
+          const searchName = match[1].trim();
         
         // 1. Search the actual database for the vendor
         let vendor = await prisma.vendor.findFirst({
