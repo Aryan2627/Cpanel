@@ -20,7 +20,8 @@ model Organization {
   // Licensing
   licenseStart  DateTime?
   licenseEnd    DateTime?
-  licenseStatus String?   @default("Active") // Active, Expired, Suspended
+  licenseStatus String?   @default("Active")
+  licensePlan   String?   @default("Enterprise") // Active, Expired, Suspended
 
   // Relations
   users          User[]
