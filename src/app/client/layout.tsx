@@ -8,7 +8,7 @@ import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
 import JarvisAssistant from './JarvisAssistant';
 import DorcWidget from './DorcWidget';
-import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles, Command } from 'lucide-react';
 
 const TOP_MENUS = [
   { name: 'Dashboard', path: '/client', icon: LayoutDashboard },
@@ -225,6 +225,20 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {/* Atlan-style Search Button to trigger Cmd+K */}
+                <button 
+                  onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px 12px', color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem', cursor: 'pointer', transition: 'all 0.2s ease', marginRight: '8px' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+                >
+                  <Search size={14} />
+                  <span>Search...</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '2px', background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', marginLeft: '12px', fontWeight: 600 }}>
+                    <Command size={10} />K
+                  </div>
+                </button>
+
               
               {(currentUser?.features ? (() => { try { return JSON.parse(currentUser.features).cortex_ai; } catch { return false; } })() : false) && (
 <Link 
