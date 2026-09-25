@@ -615,7 +615,7 @@ export default function DorcPage() {
         { category:'System', cmd:'/route-approvals', label:'Approval Routing Agent', icon:<GitMerge size={14}/>, color:'#0ea5e9', bg:'rgba(14,165,233,0.12)', auto:true },
         { category:'System', cmd:'/guided-buying', label:'Guided Buying Agent', icon:<ShoppingCart size={14}/>, color:'#c084fc', bg:'rgba(192,132,252,0.12)', auto:true },
         { category:'Vendors', cmd:'/communicate', label:'Communication Agent', icon:<Mail size={14}/>, color:'#3b82f6', bg:'rgba(59,130,246,0.12)', auto:true },
-        { category:'Vendors', cmd:'/supplier-ops', label:'Supplier Ops Agent', icon:<Users size={14}/>, color:'#14b8a6', bg:'rgba(20,184,166,0.12)', auto:true },
+        { category:'Vendors', cmd:'/supplier-ops', label:'Supplier Ops Agent', icon:<Users size={14}/>, color:'#14b8a6', bg:'rgba(20,184,166,0.12)', auto:false },
     ];
 
   return (
@@ -1495,7 +1495,7 @@ export default function DorcPage() {
                       .filter(c => c.cmd.toLowerCase().includes(input.toLowerCase()))
                       .map((item: any, i: number)=>(
                       <div key={i} className="slash-btn" style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%', borderBottom:'1px solid rgba(255,255,255,0.03)', transition:'all 0.15s' }}>
-                        <button onClick={()=>{ item.auto ? execute(item.cmd) : setInput(item.cmd); setShowSlash(false); }} style={{ flex: 1, display:'flex', alignItems:'center', gap:'14px', padding:'11px 16px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left' }}>
+                        <button onClick={()=>{ item.auto ? execute(item.cmd) : setInput(item.cmd + ' '); setShowSlash(false); }} style={{ flex: 1, display:'flex', alignItems:'center', gap:'14px', padding:'11px 16px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left' }}>
                           <div style={{ background:item.bg, color:item.color, padding:'7px', borderRadius:'8px', display:'flex', flexShrink:0 }}>{item.icon}</div>
                           <div>
                             <div style={{ fontWeight:600, color:'#e2e8f0', fontSize:'0.85rem' }}>{item.cmd}</div>
