@@ -16,6 +16,11 @@ model Organization {
   features  String? // JSON string for feature toggles
   industry  String?
   createdAt DateTime @default(now())
+  
+  // Licensing
+  licenseStart  DateTime?
+  licenseEnd    DateTime?
+  licenseStatus String?   @default("Active") // Active, Expired, Suspended
 
   // Relations
   users          User[]
