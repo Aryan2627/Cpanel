@@ -30,6 +30,9 @@ export async function GET() {
     });
     
     if (user) {
+      // Dynamic license expiration check
+      const isExpired = user.organization?.licenseEnd && new Date(user.organization.licenseEnd) < new Date();
+      
       return NextResponse.json({ 
         id: user.id,
         name: user.name || user.email, 
@@ -37,9 +40,10 @@ export async function GET() {
         role: user.role,
         organizationId: user.organizationId,
         companyName: user.organization?.name || 'My Organization',
-        licenseStatus: user.organization?.licenseStatus || 'Active',
+        licenseStatus: isExpired ? 'Expired' : (user.organization?.licenseStatus || 'Active'),
         licensePlan: user.organization?.licensePlan || 'Enterprise',
-        licenseExpiry: user.organization?.licenseExpiry || null,
+        licenseStart: user.organization?.licenseStart || null,
+        licenseEnd: user.organization?.licenseEnd || null,
         features: user.organization?.features || null,
         permissions: user.permissions || {},
         isImpersonating: !!payload.impersonatorId,
