@@ -151,13 +151,15 @@ export default function IntakeTablePage() {
             <p style={{ color: '#475569', margin: 0, fontSize: '0.9rem' }}>Manage and track all procurement requests.</p>
           </div>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <button onClick={() => setIsImportModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 18px', background: '#eff6ff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', color: '#fff', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', backdropFilter: 'blur(8px)', transition: 'all 0.15s' }}
-              onMouseOver={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.18)'}
-              onMouseOut={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'}>
+            <button onClick={() => setIsImportModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 18px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', color: '#0f172a', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', backdropFilter: 'blur(8px)', transition: 'all 0.15s' }}
+              onMouseOver={e => (e.currentTarget as HTMLElement).style.background = '#f8faff'}
+              onMouseOut={e => (e.currentTarget as HTMLElement).style.background = '#fff'}>
               <FileUp size={16} /> Import
             </button>
             {exportEnabled && (
-              <button onClick={handleExport} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 18px', background: '#eff6ff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', color: '#fff', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}>
+              <button onClick={handleExport} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 18px', background: '#fff', border: '1px solid #e5edff', borderRadius: '10px', color: '#0f172a', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}
+                onMouseOver={e => (e.currentTarget as HTMLElement).style.background = '#f8faff'}
+                onMouseOut={e => (e.currentTarget as HTMLElement).style.background = '#fff'}>
                 <FileDown size={16} /> Export
               </button>
             )}
@@ -341,8 +343,8 @@ export default function IntakeTablePage() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setIsImportModalOpen(false)}>
           <div style={{ background: '#fff', borderRadius: '20px', width: '480px', maxWidth: '92vw', boxShadow: '0 30px 60px rgba(0,0,0,0.2)', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
             <div style={{ background: '#f8faff', borderBottom: '1px solid #e5edff', padding: '22px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>Import Requests</h2>
-              <button onClick={() => setIsImportModalOpen(false)} style={{ background: '#eff6ff', border: 'none', cursor: 'pointer', color: '#fff', width: '30px', height: '30px', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
+              <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>Import Requests</h2>
+              <button onClick={() => setIsImportModalOpen(false)} style={{ background: '#f1f5f9', border: 'none', cursor: 'pointer', color: '#0f172a', width: '30px', height: '30px', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
             </div>
             <div style={{ padding: '24px' }}>
               <p style={{ margin: '0 0 16px', color: '#475569', fontSize: '0.875rem', lineHeight: 1.6 }}>Upload an Excel file to bulk import purchase requests. Use the template for the correct column format.</p>
