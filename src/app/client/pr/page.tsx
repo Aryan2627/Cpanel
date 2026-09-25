@@ -115,11 +115,11 @@ export default function PRPage() {
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-              <ShieldCheck size={18} color="rgba(255,255,255,0.55)" />
-              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Procurement</p>
+              <ShieldCheck size={18} color="#64748b" />
+              <p style={{ color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Procurement</p>
             </div>
-            <h1 style={{ color: '#fff', fontSize: '1.8rem', fontWeight: 800, margin: '0 0 6px', letterSpacing: '-0.5px' }}>Purchase Requisitions</h1>
-            <p style={{ color: 'rgba(255,255,255,0.5)', margin: 0, fontSize: '0.9rem' }}>Review and convert ERP requisitions into procurement projects.</p>
+            <h1 style={{ color: '#0f172a', fontSize: '1.8rem', fontWeight: 800, margin: '0 0 6px', letterSpacing: '-0.5px' }}>Purchase Requisitions</h1>
+            <p style={{ color: '#64748b', margin: 0, fontSize: '0.9rem' }}>Review and convert ERP requisitions into procurement projects.</p>
           </div>
           
         </div>
@@ -132,16 +132,14 @@ export default function PRPage() {
           {kpis.map((k, i) => {
             const Icon = k.icon;
             return (
-              <div key={i} style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '20px 22px', boxShadow: '0 4px 12px rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', transition: 'all 0.2s', cursor: 'pointer' }}
-                onMouseOver={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
+              <div key={i} style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '20px 22px', boxShadow: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', transition: 'all 0.2s', cursor: 'pointer' }}
+                onMouseOver={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
                 onMouseOut={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(0,0,0,0.06)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
                 <div>
                   <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>{k.label}</div>
                   <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.05em', lineHeight: 1 }}>{k.value}</div>
                 </div>
-                <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: k.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon size={22} color={k.color} />
-                </div>
+                
               </div>
             );
           })}
@@ -153,9 +151,9 @@ export default function PRPage() {
           {/* Tabs */}
           <div style={{ padding: '0 20px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '2px', background: '#fafbfc' }}>
             {tabs.map(tab => (
-              <button key={tab.label} onClick={() => { setActiveTab(tab.label); }} style={{ padding: '14px 16px', border: 'none', borderBottom: activeTab === tab.label ? '2px solid #1e3a8a' : '2px solid transparent', background: 'transparent', cursor: 'pointer', fontSize: '0.82rem', fontWeight: activeTab === tab.label ? 700 : 500, color: activeTab === tab.label ? '#1e3a8a' : '#64748b', display: 'flex', alignItems: 'center', gap: '7px', transition: 'all 0.15s', whiteSpace: 'nowrap' }}>
+              <button key={tab.label} onClick={() => { setActiveTab(tab.label); }} style={{ padding: '14px 16px', border: 'none', borderBottom: activeTab === tab.label ? '2px solid #1e3a8a' : '2px solid transparent', background: '#fff', borderBottom: '1px solid #e2e8f0', cursor: 'pointer', fontSize: '0.82rem', fontWeight: activeTab === tab.label ? 700 : 500, color: activeTab === tab.label ? '#1e3a8a' : '#64748b', display: 'flex', alignItems: 'center', gap: '7px', transition: 'all 0.15s', whiteSpace: 'nowrap' }}>
                 {tab.label}
-                <span style={{ padding: '2px 7px', borderRadius: '10px', fontSize: '0.7rem', fontWeight: 700, background: activeTab === tab.label ? '#0d1f4f' : '#f1f5f9', color: activeTab === tab.label ? '#fff' : '#64748b' }}>{tab.count}</span>
+                <span style={{ padding: '2px 7px', borderRadius: '10px', fontSize: '0.7rem', fontWeight: 700, background: activeTab === tab.label ? '#e2e8f0' : '#f1f5f9', color: activeTab === tab.label ? '#0f172a' : '#64748b' }}>{tab.count}</span>
               </button>
             ))}
             <div style={{ flex: 1 }} />
@@ -163,7 +161,7 @@ export default function PRPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '0 12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', margin: '8px 0' }}>
               <Search size={14} color="#94a3b8" />
               <input type="text" placeholder="Search PRs..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '0.82rem', color: '#0f172a', padding: '8px 0', width: '200px' }} />
+                style={{ border: 'none', outline: 'none', background: '#fff', borderBottom: '1px solid #e2e8f0', fontSize: '0.82rem', color: '#0f172a', padding: '8px 0', width: '200px' }} />
               {searchQuery && <button onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex', padding: 0 }}><X size={13} /></button>}
             </div>
           </div>
@@ -171,17 +169,17 @@ export default function PRPage() {
           {/* Table */}
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: 'linear-gradient(90deg, #0d1f4f, #1a2f6b)' }}>
+              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                 <th style={{ padding: '13px 16px', width: '44px' }}>
                   <input type="checkbox" checked={selectedRows.size === filteredData.length && filteredData.length > 0} onChange={handleSelectAll} style={{ accentColor: '#2563eb', cursor: 'pointer' }} />
                 </th>
                 <th style={{ padding: '13px 8px', width: '36px' }}></th>
                 {[['refId', 'PR No (Ref ID)'], ['title', 'Title / Material'], ['quantity', 'Quantity'], ['reqName', 'Requester'], ['priority', 'Priority'], ['storageLocation', 'Location']].map(([key, label]) => (
-                  <th key={key} style={{ padding: '13px 16px', textAlign: 'left', color: 'rgba(255,255,255,0.75)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', whiteSpace: 'nowrap' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>{label} <ArrowUpDown size={10} color="rgba(255,255,255,0.3)" /></span>
+                  <th key={key} style={{ padding: '13px 16px', textAlign: 'left', color: '#475569', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', whiteSpace: 'nowrap' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>{label} <ArrowUpDown size={10} color="#cbd5e1" /></span>
                   </th>
                 ))}
-                <th style={{ padding: '13px 16px', color: 'rgba(255,255,255,0.75)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actions</th>
+                <th style={{ padding: '13px 16px', color: '#475569', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -190,9 +188,9 @@ export default function PRPage() {
                 const isExpanded = expandedRows.has(item.refId);
                 return (
                   <React.Fragment key={item.refId}>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9', background: isSelected ? '#eff6ff' : idx % 2 === 0 ? '#fff' : '#fafbfc', borderLeft: isSelected ? '3px solid #2563eb' : '3px solid transparent', transition: 'all 0.12s' }}
-                      onMouseOver={e => { if (!isSelected) { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; (e.currentTarget as HTMLElement).style.borderLeft = '3px solid #3b82f6'; } }}
-                      onMouseOut={e => { if (!isSelected) { (e.currentTarget as HTMLElement).style.background = idx % 2 === 0 ? '#fff' : '#fafbfc'; (e.currentTarget as HTMLElement).style.borderLeft = '3px solid transparent'; } }}>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9', background: isSelected ? '#f1f5f9' : '#fff', borderLeft: isSelected ? '1px solid transparent' : '1px solid transparent', transition: 'all 0.12s' }}
+                      onMouseOver={e => { if (!isSelected) { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; (e.currentTarget as HTMLElement).style.borderLeft = '1px solid transparent'; } }}
+                      onMouseOut={e => { if (!isSelected) { (e.currentTarget as HTMLElement).style.background = idx % 2 === 0 ? '#fff' : '#fafbfc'; (e.currentTarget as HTMLElement).style.borderLeft = '1px solid transparent'; } }}>
                       <td style={{ padding: '13px 16px' }}>
                         <input type="checkbox" checked={isSelected} onChange={() => { const s = new Set(selectedRows); isSelected ? s.delete(item.refId) : s.add(item.refId); setSelectedRows(s); }} style={{ accentColor: '#2563eb', cursor: 'pointer' }} />
                       </td>
@@ -210,7 +208,7 @@ export default function PRPage() {
                       </td>
                       <td style={{ padding: '13px 16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #0d1f4f, #2563eb)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.65rem', flexShrink: 0 }}>
+                          <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #0d1f4f, #2563eb)', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.65rem', flexShrink: 0 }}>
                             {(item.reqName || 'U').charAt(0).toUpperCase()}
                           </div>
                           <span style={{ fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>{item.reqName || '—'}</span>
@@ -290,7 +288,7 @@ export default function PRPage() {
                 {selectedRows.size > 0 && <span style={{ marginLeft: '12px', color: '#2563eb', fontWeight: 600 }}>· {selectedRows.size} selected</span>}
               </div>
               {selectedRows.size > 0 && (
-                <button onClick={openWizard} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '8px 18px', background: '#2563eb', border: 'none', borderRadius: '8px', color: '#fff', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}>
+                <button onClick={openWizard} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '8px 18px', background: '#0f172a', border: 'none', borderRadius: '6px', color: '#fff', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}>
                   <Plus size={15} /> Create Project from {selectedRows.size} PR{selectedRows.size > 1 ? 's' : ''}
                 </button>
               )}
@@ -303,12 +301,12 @@ export default function PRPage() {
       {isModalOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setIsModalOpen(false)}>
           <div style={{ background: '#fff', borderRadius: '20px', width: '520px', maxWidth: '92vw', boxShadow: '0 30px 60px rgba(0,0,0,0.2)', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
-            <div style={{ background: 'linear-gradient(135deg, #071330, #0d1f4f)', padding: '22px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '22px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Step {wizardStep} of 2</div>
-                <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>{wizardStep === 1 ? 'Project Setup' : 'Configure Stages'}</h2>
+                <div style={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Step {wizardStep} of 2</div>
+                <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>{wizardStep === 1 ? 'Project Setup' : 'Configure Stages'}</h2>
               </div>
-              <button onClick={() => setIsModalOpen(false)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', color: '#fff', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
+              <button onClick={() => setIsModalOpen(false)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', color: '#0f172a', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
             </div>
 
             <div style={{ padding: '24px' }}>
