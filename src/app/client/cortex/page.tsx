@@ -723,7 +723,25 @@ export default function DorcPage() {
         @keyframes pulse2 { 0%,100%{opacity:0.4} 50%{opacity:0.7} }
         @keyframes cortexSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
         @keyframes fadeSlideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+                  @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+          @keyframes branchAnim {
+            0% { transform: translate(6px, 12px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(34px, 4px); opacity: 0; }
+          }
+          @keyframes branchAnim2 {
+            0% { transform: translate(6px, 12px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(34px, 12px); opacity: 0; }
+          }
+          @keyframes branchAnim3 {
+            0% { transform: translate(6px, 12px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(34px, 20px); opacity: 0; }
+          }
         .cortex-msg { animation: fadeSlideIn 0.35s ease forwards; }
         .slash-btn:hover { background: rgba(255,255,255,0.06) !important; }
         .bom-row { transition: all 0.2s; }
@@ -1511,7 +1529,31 @@ export default function DorcPage() {
                   <div style={{ fontSize:'0.78rem', fontWeight:700, color:'#818cf8', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'8px' }}>Dorc AI</div>
                   <div style={{ display:'flex', alignItems:'center', gap:'10px', background:'rgba(99,102,241,0.08)', border:'1px solid rgba(99,102,241,0.15)', padding:'10px 16px', borderRadius:'12px' }}>
                     <div style={{ display:'flex', gap:'4px' }}>
-                      {[0,1,2].map(i=><div key={i} style={{ width:'6px', height:'6px', borderRadius:'50%', background:'#6366f1', animation:`pulse2 1.4s ease-in-out ${i*0.2}s infinite` }}/>)}
+                                            <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
+                        <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="6" cy="12" r="3" fill="#6366f1" />
+                          <circle cx="34" cy="4" r="3" fill="#8b5cf6" />
+                          <circle cx="34" cy="12" r="3" fill="#ec4899" />
+                          <circle cx="34" cy="20" r="3" fill="#14b8a6" />
+                          
+                          <path id="path1" d="M 6 12 C 18 12, 22 4, 34 4" stroke="rgba(99,102,241,0.3)" strokeWidth="1.5" fill="none"/>
+                          <path id="path2" d="M 6 12 L 34 12" stroke="rgba(99,102,241,0.3)" strokeWidth="1.5" fill="none"/>
+                          <path id="path3" d="M 6 12 C 18 12, 22 20, 34 20" stroke="rgba(99,102,241,0.3)" strokeWidth="1.5" fill="none"/>
+
+                          <circle r="1.5" fill="#fff">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 6 12 C 18 12, 22 4, 34 4" />
+                            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="1.5s" repeatCount="indefinite" />
+                          </circle>
+                          <circle r="1.5" fill="#fff">
+                            <animateMotion dur="1.5s" begin="0.3s" repeatCount="indefinite" path="M 6 12 L 34 12" />
+                            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="1.5s" begin="0.3s" repeatCount="indefinite" />
+                          </circle>
+                          <circle r="1.5" fill="#fff">
+                            <animateMotion dur="1.5s" begin="0.6s" repeatCount="indefinite" path="M 6 12 C 18 12, 22 20, 34 20" />
+                            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="1.5s" begin="0.6s" repeatCount="indefinite" />
+                          </circle>
+                        </svg>
+                      </div>
                     </div>
                     <span style={{ fontSize:'0.83rem', color:'#818cf8', fontWeight:500 }}>Dorc AI is thinking...</span>
                   </div>
