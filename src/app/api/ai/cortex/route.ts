@@ -968,10 +968,17 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
       if (/\b(product|item|catalog)\b/i.test(text)) {
         return NextResponse.json({ final_response: "Let's add a new item to your Product Catalog:", ui_component: 'product_creation_form' });
       }
+      
       if (/\b(contract|document|nda|sow)\b/i.test(text)) {
         return NextResponse.json({ final_response: "Let's draft a legal document. What type of document do you need?", ui_component: 'document_generator_form' });
       }
     }
+    
+    // 1b. BUY / PURCHASE / NEED INTENT -> INTAKE FORM
+    if (/\b(buy|purchase|order|need|procure)\b/i.test(text) && !/\b(po|purchase order)\b/i.test(text)) {
+      return NextResponse.json({ final_response: "I can help you procure that. Let's start a new Purchase Request (Intake) so we can capture the requirements and find the best supplier:", ui_component: 's2p_intake_form' });
+    }
+    
 
     // 2. LIVE DATABASE APPROVALS (e.g. "Approve PR-1234")
     const approveMatch = /\b(approve|authorize|accept|sign off on)\b\s+(PR-\d+|PO-\d+|INT-\d+)/i.exec(text);
