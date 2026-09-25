@@ -16,11 +16,11 @@ const TOP_MENUS = [
     name: 'Procurement',
     icon: ShoppingCart,
     sub: [
-      { name: 'Purchase Requests', path: '/client/intake' },
-      { name: 'Requisitions', path: '/client/pr' },
-      { name: 'Tenders & Auctions', path: '/client/events' },
-      { name: 'Purchase Orders', path: '/client/po' },
-      { name: 'Approvals', path: '/client/approvals' },
+      { name: 'Intake Desk', path: '/client/intake' },
+      { name: 'Requisitions (PR)', path: '/client/pr' },
+      { name: 'Sourcing Events (RFx)', path: '/client/events' },
+      { name: 'Purchase Orders (PO)', path: '/client/po' },
+      { name: 'My Approvals', path: '/client/approvals' },
     ]
   },
   {
