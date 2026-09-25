@@ -409,12 +409,12 @@ export default function DorcPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const playGreeting = () => {
-        if (!sessionStorage.getItem('cortex_greeted_v2')) {
+        if (!sessionStorage.getItem('dorc_greeted_v1')) {
           try {
             const audio = new Audio('/greeting.mp3');
             audio.volume = 1.0;
             audio.play().then(() => {
-              sessionStorage.setItem('cortex_greeted_v2', 'true');
+              sessionStorage.setItem('dorc_greeted_v1', 'true');
               document.removeEventListener('click', playGreeting);
               document.removeEventListener('keydown', playGreeting);
             }).catch(e => {
@@ -441,7 +441,7 @@ export default function DorcPage() {
   useEffect(() => {
     setIsClient(true);
     try {
-      const stored = localStorage.getItem('cortex_chats_v2');
+      const stored = localStorage.getItem('dorc_chats_v1');
       if (stored) {
         const { chatsData, timestamp, activeId } = JSON.parse(stored);
         if (Date.now() - timestamp < 2 * 60 * 60 * 1000) {
@@ -454,7 +454,7 @@ export default function DorcPage() {
             }
           }
         } else {
-          localStorage.removeItem('cortex_chats_v2');
+          localStorage.removeItem('dorc_chats_v1');
         }
       }
     } catch(e) {}
@@ -462,7 +462,7 @@ export default function DorcPage() {
 
   useEffect(() => {
     if (!isClient) return;
-    localStorage.setItem('cortex_chats_v2', JSON.stringify({
+    localStorage.setItem('dorc_chats_v1', JSON.stringify({
       chatsData: chats,
       activeId: activeChatId,
       timestamp: Date.now()

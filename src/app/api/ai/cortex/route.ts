@@ -305,7 +305,7 @@ export async function POST(req: Request) {
         const pendingApprovals = await prisma.approvalRequest.count({ where: orgId ? { organizationId: orgId, status: 'Pending' } : { status: 'Pending' } });
         const draftPos = await prisma.purchaseOrder.count({ where: orgId ? { organizationId: orgId, status: 'Draft' } : { status: 'Draft' } });
         
-        let greeting = `Hello ${userName ? userName.split(' ')[0] : 'there'}! I am ProcGen Cortex.`;
+        let greeting = `Hello ${userName ? userName.split(' ')[0] : 'there'}! I am Dorc AI.`;
         
         const alerts = [];
         if (pendingApprovals > 0) alerts.push(`**${pendingApprovals} pending approvals**`);
@@ -319,7 +319,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ final_response: greeting });
       } catch (e) {
-        return NextResponse.json({ final_response: `Hello ${userName ? userName.split(' ')[0] : ''}! I am ProcGen Cortex, your AI agent. How can I assist you today?` });
+        return NextResponse.json({ final_response: `Hello ${userName ? userName.split(' ')[0] : ''}! I am Dorc AI, your AI agent. How can I assist you today?` });
       }
     }
 
@@ -420,7 +420,7 @@ export async function POST(req: Request) {
             title: 'Mobile Generated PO',
             status: 'Draft',
             total: 25000,
-            source: 'Cortex Mobile AI'
+            source: 'Dorc Mobile AI'
           }
         });
         return NextResponse.json({ final_response: "I have successfully generated Purchase Order **" + newPo.poNumber + "**. You can view it in the Orders tab." });
@@ -428,7 +428,7 @@ export async function POST(req: Request) {
     }
 
     if (text.trim().toLowerCase() === '/scan') {
-      return NextResponse.json({ final_response: "Initializing Cortex Vision. Please tap the camera icon to scan a hardware document or invoice." });
+      return NextResponse.json({ final_response: "Initializing Dorc AI Vision. Please tap the camera icon to scan a hardware document or invoice." });
     }
 
     if (text.trim().toLowerCase() === '/bom') {
@@ -586,7 +586,7 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
             title: data.title || 'Standard PO',
             status: 'Draft',
             total: parseFloat(data.amount) || 0,
-            source: 'Cortex AI'
+            source: 'Dorc AI'
           }
         });
         return NextResponse.json({ final_response: `Purchase Order **${newPo.poNumber}** drafted successfully.`, ui_component: 'po_list', ui_data: [newPo] });
@@ -689,7 +689,7 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
               reqName: d.department || 'General',
               status: 'Approved',
               type: 'S2P Flow',
-              buyer: 'Cortex AI',
+              buyer: 'Dorc AI',
               reqAt: new Date().toISOString()
             }
           });
@@ -865,7 +865,7 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
     // 1. IDENTITY & CAPABILITIES
     if (intentResult.entity === 'identity') {
       return NextResponse.json({
-        final_response: "Yes! I am **ProcGen Cortex**, your autonomous AI procurement agent. Unlike standard chatbots, I connect directly and securely to your database to query vendors, purchase orders, sourcing events, and execute automated workflows directly from our conversation. How can I help you today?"
+        final_response: "Yes! I am **Dorc AI**, your autonomous AI procurement agent. Unlike standard chatbots, I connect directly and securely to your database to query vendors, purchase orders, sourcing events, and execute automated workflows directly from our conversation. How can I help you today?"
       });
     }
 
@@ -1190,7 +1190,7 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
     // --- 15. GREETINGS ---
     if (/^(hi|hello|hey|greetings|good\s*(?:morning|afternoon|evening))\b/i.test(lowerText)) {
       return NextResponse.json({
-        final_response: `Hello ${firstName}! I am ProcGen Cortex, your autonomous AI procurement assistant.\n\nI can execute live database actions and workflows directly in our chat. You can ask me naturally, such as:\n- *"Can you please check for active vendors?"*\n- *"Show my recent purchase orders"*\n- *"Check laptop inventory and reorder"*`
+        final_response: `Hello ${firstName}! I am Dorc AI, your autonomous AI procurement assistant.\n\nI can execute live database actions and workflows directly in our chat. You can ask me naturally, such as:\n- *"Can you please check for active vendors?"*\n- *"Show my recent purchase orders"*\n- *"Check laptop inventory and reorder"*`
       });
     }
 
