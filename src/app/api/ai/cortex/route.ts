@@ -467,7 +467,18 @@ export async function POST(req: Request) {
       if (text.startsWith('/route-approvals')) return NextResponse.json({ final_response: "Dynamic Approval Routing enabled. Based on the $45k value and IT category, routing strictly to the CIO and CFO." });
       if (text.startsWith('/communicate')) return NextResponse.json({ final_response: "Communication Agent is now managing back-and-forth Q&A for the active RFQ." });
       if (text.startsWith('/guided-buying')) return NextResponse.json({ final_response: "Guided Buying enforced: User has been redirected to the standard catalog for this commodity." });
-      if (text.startsWith('/supplier-ops')) return NextResponse.json({ final_response: "Supplier Ops Agent is generating the quarterly review agenda and pulling relationship metrics." });
+            if (text.startsWith('/supplier-ops')) {
+        const match = text.match(/\/supplier-ops\s+(.+)/i);
+        const vendor = match ? match[1].trim() : 'Global Supplies Inc.';
+        
+        const responseText = `I have run a full Supplier Operations analysis on **${vendor}**.\n\n### 1. Supplier Scorecard\n**SLA Adherence:** 98.2% On-Time Delivery (Target: 95%)\n**Quality/Defect Rate:** 0.4% (Industry Avg: 1.2%)\n**Financial Risk:** Low. No major alerts detected.\n\n### 2. QBR Prep (Quarterly Business Review)\nI have auto-generated a QBR agenda for your upcoming meeting. It highlights 3 delayed shipments from last month and flags a 2% price variance on standard components. **[Download QBR Draft](#)**\n\n### 3. ESG & Compliance Tracking\nISO 14001 certification is valid. However, their **Carbon Emissions Report** expires in 14 days. I have automatically flagged this to their compliance officer.\n\n### 4. Automated Dispute Resolution\nI detected 1 pending invoice (INV-9021) with a 3-way mismatch (Quantity mismatch against PO-4001). I have automatically emailed ${vendor} requesting a corrected invoice.`;
+
+        return NextResponse.json({ 
+          final_response: responseText,
+          ui_component: 'vendor_scorecard',
+          ui_data: { vendor }
+        });
+      }
     
 if (text.trim().toLowerCase() === '/analyze-bids') {
       return NextResponse.json({
