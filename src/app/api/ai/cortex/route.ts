@@ -955,33 +955,33 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
     // =====================================================================
     
     // 1. DYNAMIC FORMS / CREATION
-    if (/\b(create|draft|new|make|build|open|initiate)\b/i.test(text)) {
-      if (/\b(event|sourcing|auction|rfp|rfq)\b/i.test(text)) {
+    if (/\b(create|draft|new|make|build|open|initiate|start|generate|setup|set up|add|onboard)\b/i.test(text)) {
+      if (/\b(event|events|sourcing|auction|rfp|rfq|rfi|rfx|tender|bid|bidding|campaign)\b/i.test(text)) {
         return NextResponse.json({ final_response: "Let's build that event. Fill in the important details below:", ui_component: 'event_creation_form' });
       }
-      if (/\b(vendor|supplier|contractor)\b/i.test(text)) {
+      if (/\b(vendor|vendors|supplier|suppliers|contractor|seller|merchant|provider|partner)\b/i.test(text)) {
         return NextResponse.json({ final_response: "Let's onboard a new vendor. Please provide the details:", ui_component: 'vendor_creation_form' });
       }
-      if (/\b(po|purchase order)\b/i.test(text)) {
+      if (/\b(po|pos|purchase order|purchase orders)\b/i.test(text)) {
         return NextResponse.json({ final_response: "Let's draft a new Purchase Order:", ui_component: 'po_creation_form' });
       }
-      if (/\b(product|item|catalog)\b/i.test(text)) {
+      if (/\b(product|products|item|items|catalog|catalogue|part|sku|material|goods)\b/i.test(text)) {
         return NextResponse.json({ final_response: "Let's add a new item to your Product Catalog:", ui_component: 'product_creation_form' });
       }
       
-      if (/\b(contract|document|nda|sow)\b/i.test(text)) {
+      if (/\b(contract|contracts|document|docs|doc|nda|sow|msa|agreement|letter)\b/i.test(text)) {
         return NextResponse.json({ final_response: "Let's draft a legal document. What type of document do you need?", ui_component: 'document_generator_form' });
       }
     }
     
     // 1b. BUY / PURCHASE / NEED INTENT -> INTAKE FORM
-    if (/\b(buy|purchase|order|need|procure)\b/i.test(text) && !/\b(po|purchase order)\b/i.test(text)) {
+    if (/\b(buy|purchase|order|need|procure|get|acquire|source|want|shopping for|looking to buy)\b/i.test(text) && !/\b(po|purchase order)\b/i.test(text)) {
       return NextResponse.json({ final_response: "I can help you procure that. Let's start a new Purchase Request (Intake) so we can capture the requirements and find the best supplier:", ui_component: 's2p_intake_form' });
     }
     
 
     // 2. LIVE DATABASE APPROVALS (e.g. "Approve PR-1234")
-    const approveMatch = /\b(approve|authorize|accept|sign off on)\b\s+(PR-\d+|PO-\d+|INT-\d+)/i.exec(text);
+    const approveMatch = /\b(approve|authorize|accept|sign off on|ok|greenlight|endorse|clear|validate|pass)\b\s*(PR-\d+|PO-\d+|INT-\d+)/i.exec(text);
     if (approveMatch) {
       const recordId = approveMatch[2].toUpperCase();
       // Execute the approval in the database dynamically!
@@ -998,7 +998,7 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
     }
 
     // 3. VENDOR COMPARISON / MATRIX
-    if (/\b(compare|evaluate|matrix)\b/i.test(text) && /\b(vendor|vendors|supplier|suppliers|bids)\b/i.test(text)) {
+    if (/\b(compare|evaluate|matrix|benchmark|contrast|vs|versus)\b/i.test(text) && /\b(vendor|vendors|supplier|suppliers|bids|options|proposals)\b/i.test(text)) {
       return NextResponse.json({
         agentic_loop: [
           { step: 1, action: "THINKING", message: "Fetching active vendor profiles..." },
@@ -1011,7 +1011,7 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
     }
 
     // 4. DIRECT SUPPLIER OPS TRIGGER
-    const supplierOpsMatch = /\b(analyze|investigate|audit|score|health check)\b\s+(vendor|supplier)?\s*([a-zA-Z0-9 ]+)/i.exec(text);
+    const supplierOpsMatch = /\b(analyze|investigate|audit|score|health check|review|inspect|check up on|qbr|report on)\b\s+(vendor|supplier)?\s*([a-zA-Z0-9 ]+)/i.exec(text);
     if (supplierOpsMatch && !/\b(spend|cost)\b/i.test(text)) { // avoid colliding with spend analysis
       const vendorName = supplierOpsMatch[3].trim();
       if (vendorName.length > 2 && vendorName.toLowerCase() !== 'vendors') {
