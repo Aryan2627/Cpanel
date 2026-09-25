@@ -27,7 +27,7 @@ export default function IntakeTablePage() {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setExportEnabled(localStorage.getItem('exportIntake') === 'true');
     const h = () =>  
     setExportEnabled(localStorage.getItem('exportIntake') === 'true');
@@ -120,14 +120,14 @@ export default function IntakeTablePage() {
 
   const statusStyle = (s: string): React.CSSProperties => {
     if (s === 'Approved') return { background: '#dcfce7', color: '#15803d', border: '1px solid #86efac' };
-    if (s === 'Open') return { background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' };
+    if (s === 'Open') return { background: '#f8fafc', color: '#334155', border: '1px solid #e2e8f0' };
     if (s === 'Rejected') return { background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5' };
     if (s === 'In Progress') return { background: '#faf5ff', color: '#7c3aed', border: '1px solid #c4b5fd' };
     return { background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a' }; // Draft
   };
 
   const kpis = [
-    { label: 'Total Requests', value: totalRequests, icon: FileText, color: '#2563eb', bg: '#eff6ff' },
+    { label: 'Total Requests', value: totalRequests, icon: FileText, color: '#0f172a', bg: '#f8fafc' },
     { label: 'Pending Approval', value: pendingRequests, icon: Clock, color: '#d97706', bg: '#fef3c7' },
     { label: 'Approved', value: approvedRequests, icon: CheckCircle2, color: '#16a34a', bg: '#dcfce7' },
     { label: 'Rejected', value: rejectedRequests, icon: AlertCircle, color: '#dc2626', bg: '#fef2f2' },
@@ -139,29 +139,29 @@ export default function IntakeTablePage() {
     <div style={{ backgroundColor: '#f0f4f8', minHeight: '100%', fontFamily: 'system-ui, sans-serif' }}>
 
       {/* -- Premium Header -- */}
-      <div style={{ background: 'linear-gradient(135deg, #071330 0%, #0d1f4f 55%, #1a2f6b 100%)', padding: '28px 32px 40px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: 0, right: 0, width: '380px', height: '100%', background: 'radial-gradient(circle at 70% 50%, rgba(59,130,246,0.12), transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '28px 32px 40px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, right: 0, width: '380px', height: '100%', background: 'transparent', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
               <FileCheck size={20} color="rgba(255,255,255,0.6)" />
-              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Procurement</p>
+              <p style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Procurement</p>
             </div>
-            <h1 style={{ color: '#fff', fontSize: '1.8rem', fontWeight: 800, margin: '0 0 6px', letterSpacing: '-0.5px' }}>Purchase Intake</h1>
-            <p style={{ color: 'rgba(255,255,255,0.5)', margin: 0, fontSize: '0.9rem' }}>Manage and track all procurement requests.</p>
+            <h1 style={{ color: '#0f172a', fontSize: '1.8rem', fontWeight: 800, margin: '0 0 6px', letterSpacing: '-0.5px' }}>Purchase Intake</h1>
+            <p style={{ color: '#64748b', margin: 0, fontSize: '0.9rem' }}>Manage and track all procurement requests.</p>
           </div>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <button onClick={() => setIsImportModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 18px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', color: '#fff', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', backdropFilter: 'blur(8px)', transition: 'all 0.15s' }}
+            <button onClick={() => setIsImportModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 18px', background: '#f1f5f9', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', color: '#fff', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', backdropFilter: 'blur(8px)', transition: 'all 0.15s' }}
               onMouseOver={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.18)'}
               onMouseOut={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'}>
               <FileUp size={16} /> Import
             </button>
             {exportEnabled && (
-              <button onClick={handleExport} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 18px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', color: '#fff', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}>
+              <button onClick={handleExport} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 18px', background: '#f1f5f9', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', color: '#fff', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}>
                 <FileDown size={16} /> Export
               </button>
             )}
-            <Link href="/client/intake/create" style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 20px', background: '#2563eb', border: 'none', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '0.875rem', textDecoration: 'none', boxShadow: '0 4px 14px rgba(37,99,235,0.35)' }}>
+            <Link href="/client/intake/create" style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '10px 20px', background: '#0f172a', border: 'none', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '0.875rem', textDecoration: 'none', boxShadow: '0 4px 14px rgba(37,99,235,0.35)' }}>
               <Plus size={17} /> Create Request
             </Link>
           </div>
@@ -216,11 +216,11 @@ export default function IntakeTablePage() {
         <div style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: 'linear-gradient(90deg, #0d1f4f, #1a2f6b)' }}>
+              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                 <th style={{ padding: '13px 16px', width: '40px' }}>
                   <input type="checkbox" checked={selectedIds.size === paginated.length && paginated.length > 0}
                     onChange={e => setSelectedIds(e.target.checked ? new Set(paginated.map(i => i.refId)) : new Set())}
-                    style={{ accentColor: '#2563eb', cursor: 'pointer' }} />
+                    style={{ accentColor: '#0f172a', cursor: 'pointer' }} />
                 </th>
                 {[['refId', 'Ref ID'], ['title', 'Title'], ['reqName', 'Requester'], ['status', 'Status'], ['quantity', 'Qty'], ['reqAt', 'Requested At']].map(([key, label]) => (
                   <th key={key} onClick={() => toggleSort(key)} style={{ padding: '13px 16px', textAlign: 'left', color: 'rgba(255,255,255,0.75)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
@@ -236,29 +236,29 @@ export default function IntakeTablePage() {
               {paginated.length > 0 ? paginated.map((item, idx) => {
                 const isSelected = selectedIds.has(item.refId);
                 return (
-                  <tr key={item.refId} style={{ borderBottom: '1px solid #f1f5f9', background: isSelected ? '#eff6ff' : idx % 2 === 0 ? '#fff' : '#fafbfc', borderLeft: isSelected ? '3px solid #2563eb' : '3px solid transparent', transition: 'all 0.12s' }}
-                    onMouseOver={e => { if (!isSelected) { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; (e.currentTarget as HTMLElement).style.borderLeft = '3px solid #2563eb'; } }}
+                  <tr key={item.refId} style={{ borderBottom: '1px solid #f1f5f9', background: isSelected ? '#f8fafc' : idx % 2 === 0 ? '#fff' : '#fafbfc', borderLeft: isSelected ? '3px solid #0f172a' : '3px solid transparent', transition: 'all 0.12s' }}
+                    onMouseOver={e => { if (!isSelected) { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; (e.currentTarget as HTMLElement).style.borderLeft = '3px solid #0f172a'; } }}
                     onMouseOut={e => { if (!isSelected) { (e.currentTarget as HTMLElement).style.background = idx % 2 === 0 ? '#fff' : '#fafbfc'; (e.currentTarget as HTMLElement).style.borderLeft = '3px solid transparent'; } }}>
                     <td style={{ padding: '13px 16px' }}>
                       <input type="checkbox" checked={isSelected} onChange={e => {
                         const n = new Set(selectedIds);
                         e.target.checked ? n.add(item.refId) : n.delete(item.refId);
                         setSelectedIds(n);
-                      }} style={{ accentColor: '#2563eb', cursor: 'pointer' }} />
+                      }} style={{ accentColor: '#0f172a', cursor: 'pointer' }} />
                     </td>
                     <td style={{ padding: '13px 16px' }}>
-                      <span style={{ background: '#eff6ff', color: '#1d4ed8', padding: '3px 8px', borderRadius: '5px', fontFamily: 'monospace', fontSize: '0.72rem', fontWeight: 700 }}>{item.refId}</span>
+                      <span style={{ background: '#f8fafc', color: '#334155', padding: '3px 8px', borderRadius: '5px', fontFamily: 'monospace', fontSize: '0.72rem', fontWeight: 700 }}>{item.refId}</span>
                     </td>
                     <td style={{ padding: '13px 16px' }}>
-                      <Link href={`/client/intake`} style={{ fontWeight: 700, color: '#1e3a8a', textDecoration: 'none', fontSize: '0.875rem' }}
-                        onMouseOver={e => (e.currentTarget as HTMLElement).style.color = '#2563eb'}
-                        onMouseOut={e => (e.currentTarget as HTMLElement).style.color = '#1e3a8a'}>
+                      <Link href={`/client/intake`} style={{ fontWeight: 700, color: '#0f172a', textDecoration: 'none', fontSize: '0.875rem' }}
+                        onMouseOver={e => (e.currentTarget as HTMLElement).style.color = '#0f172a'}
+                        onMouseOut={e => (e.currentTarget as HTMLElement).style.color = '#0f172a'}>
                         {item.title}
                       </Link>
                     </td>
                     <td style={{ padding: '13px 16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #0d1f4f, #2563eb)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.65rem', flexShrink: 0 }}>
+                        <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#e2e8f0', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.65rem', flexShrink: 0 }}>
                           {(item.reqName || 'U').charAt(0).toUpperCase()}
                         </div>
                         <span style={{ fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>{item.reqName || '�'}</span>
@@ -272,14 +272,14 @@ export default function IntakeTablePage() {
                     <td style={{ padding: '13px 16px', textAlign: 'center', position: 'relative' }}>
                       <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
                         <button onClick={() => router.push('/client/intake')} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '7px', padding: '5px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', fontWeight: 600, color: '#475569', transition: 'all 0.15s' }}
-                          onMouseOver={e => { (e.currentTarget as HTMLElement).style.background = '#eff6ff'; (e.currentTarget as HTMLElement).style.color = '#2563eb'; }}
+                          onMouseOver={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; (e.currentTarget as HTMLElement).style.color = '#0f172a'; }}
                           onMouseOut={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; (e.currentTarget as HTMLElement).style.color = '#475569'; }}>
                           <Eye size={13} /> View
                         </button>
                         <button onClick={() => router.push(`/client/events/create/single-stage?title=${encodeURIComponent(item.title)}`)}
-                          style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '7px', padding: '5px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', fontWeight: 700, color: '#2563eb', transition: 'all 0.15s' }}
-                          onMouseOver={e => { (e.currentTarget as HTMLElement).style.background = '#dbeafe'; }}
-                          onMouseOut={e => { (e.currentTarget as HTMLElement).style.background = '#eff6ff'; }}>
+                          style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '7px', padding: '5px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', fontWeight: 700, color: '#0f172a', transition: 'all 0.15s' }}
+                          onMouseOver={e => { (e.currentTarget as HTMLElement).style.background = '#f1f5f9'; }}
+                          onMouseOut={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}>
                           <ArrowUpRight size={13} /> RFQ
                         </button>
                       </div>
@@ -295,7 +295,7 @@ export default function IntakeTablePage() {
                       </div>
                       <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '1rem' }}>No requests found</div>
                       <div style={{ color: '#64748b', fontSize: '0.875rem' }}>Try adjusting your search or filters, or create a new request.</div>
-                      <Link href="/client/intake/create" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '8px', padding: '10px 20px', background: '#1e3a8a', color: '#fff', borderRadius: '9px', textDecoration: 'none', fontWeight: 700, fontSize: '0.875rem' }}>
+                      <Link href="/client/intake/create" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '8px', padding: '10px 20px', background: '#0f172a', color: '#fff', borderRadius: '9px', textDecoration: 'none', fontWeight: 700, fontSize: '0.875rem' }}>
                         <Plus size={16} /> Create Request
                       </Link>
                     </div>
@@ -310,7 +310,7 @@ export default function IntakeTablePage() {
             <div style={{ padding: '14px 20px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fafbfc' }}>
               <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
                 Showing <strong style={{ color: '#0f172a' }}>{Math.min((currentPage - 1) * itemsPerPage + 1, filtered.length)}�{Math.min(currentPage * itemsPerPage, filtered.length)}</strong> of <strong style={{ color: '#0f172a' }}>{filtered.length}</strong> results
-                {selectedIds.size > 0 && <span style={{ marginLeft: '12px', color: '#2563eb', fontWeight: 600 }}>� {selectedIds.size} selected</span>}
+                {selectedIds.size > 0 && <span style={{ marginLeft: '12px', color: '#0f172a', fontWeight: 600 }}>� {selectedIds.size} selected</span>}
               </div>
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
@@ -321,7 +321,7 @@ export default function IntakeTablePage() {
                   const page = i + 1;
                   return (
                     <button key={page} onClick={() => setCurrentPage(page)}
-                      style={{ width: '32px', height: '32px', borderRadius: '7px', border: '1px solid ' + (currentPage === page ? '#1e3a8a' : '#e2e8f0'), background: currentPage === page ? '#0d1f4f' : '#fff', color: currentPage === page ? '#fff' : '#475569', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700 }}>
+                      style={{ width: '32px', height: '32px', borderRadius: '7px', border: '1px solid ' + (currentPage === page ? '#0f172a' : '#e2e8f0'), background: currentPage === page ? '#0d1f4f' : '#fff', color: currentPage === page ? '#fff' : '#475569', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700 }}>
                       {page}
                     </button>
                   );
@@ -340,18 +340,18 @@ export default function IntakeTablePage() {
       {isImportModalOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setIsImportModalOpen(false)}>
           <div style={{ background: '#fff', borderRadius: '20px', width: '480px', maxWidth: '92vw', boxShadow: '0 30px 60px rgba(0,0,0,0.2)', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
-            <div style={{ background: 'linear-gradient(135deg, #071330, #0d1f4f)', padding: '22px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '22px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>Import Requests</h2>
-              <button onClick={() => setIsImportModalOpen(false)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', color: '#fff', width: '30px', height: '30px', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
+              <button onClick={() => setIsImportModalOpen(false)} style={{ background: '#f1f5f9', border: 'none', cursor: 'pointer', color: '#fff', width: '30px', height: '30px', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
             </div>
             <div style={{ padding: '24px' }}>
               <p style={{ margin: '0 0 16px', color: '#64748b', fontSize: '0.875rem', lineHeight: 1.6 }}>Upload an Excel file to bulk import purchase requests. Use the template for the correct column format.</p>
               {importError && <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px', padding: '10px 14px', color: '#dc2626', fontSize: '0.8rem', marginBottom: '14px' }}>{importError}</div>}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <button onClick={handleDownloadTemplate} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '11px 16px', border: '1px solid #e2e8f0', borderRadius: '9px', background: '#f8fafc', cursor: 'pointer', fontWeight: 600, color: '#0f172a', fontSize: '0.875rem' }}>
-                  <FileDown size={17} color="#2563eb" /> Download Import Template
+                  <FileDown size={17} color="#0f172a" /> Download Import Template
                 </button>
-                <button onClick={() => fileInputRef.current?.click()} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '11px 16px', border: '1px solid #bfdbfe', borderRadius: '9px', background: '#eff6ff', cursor: 'pointer', fontWeight: 700, color: '#1d4ed8', fontSize: '0.875rem' }}>
+                <button onClick={() => fileInputRef.current?.click()} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '11px 16px', border: '1px solid #e2e8f0', borderRadius: '9px', background: '#f8fafc', cursor: 'pointer', fontWeight: 700, color: '#334155', fontSize: '0.875rem' }}>
                   <FileUp size={17} /> Choose Excel File
                 </button>
                 <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleImport} style={{ display: 'none' }} />

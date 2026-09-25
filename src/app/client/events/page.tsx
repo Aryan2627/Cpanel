@@ -9,7 +9,7 @@ const Countdown = ({ endTime }: { endTime: string | Date }) => {
   const diff = new Date(endTime).getTime() - now.getTime();
   if (diff <= 0) return <span style={{ color: '#dc2626', fontWeight: 700 }}>Ended</span>;
   const d = Math.floor(diff / 86400000), h = Math.floor((diff / 3600000) % 24), m = Math.floor((diff / 60000) % 60), s = Math.floor((diff / 1000) % 60);
-  return <span style={{ color: '#2563eb', fontWeight: 700 }}>{d > 0 ? d + 'd ' : ''}{h > 0 || d > 0 ? h + 'h ' : ''}{m}m {s}s</span>;
+  return <span style={{ color: '#0f172a', fontWeight: 700 }}>{d > 0 ? d + 'd ' : ''}{h > 0 || d > 0 ? h + 'h ' : ''}{m}m {s}s</span>;
 };
 
 export default function EventsPage() {
@@ -38,7 +38,7 @@ export default function EventsPage() {
         setDbEvents(data.map(e => ({
           id: e.refId, dbId: e.id, account: e.account || 'Internal', refId: e.refId, itemsCount: e.itemsCount || 1,
           title: e.title || 'Untitled', endTime: e.endTime, participants: e.participants,
-          stages: [{ name: 'Live RFQ', statusIcon: <Activity size={16} color="#10b981" />, timeText: 'Live', timeColor: '#10b981', participants: 'View Bids', participantsColor: '#2563eb', actionText: 'Evaluate Bids', actionBadge: 'New', actionType: 'success' }]
+          stages: [{ name: 'Live RFQ', statusIcon: <Activity size={16} color="#10b981" />, timeText: 'Live', timeColor: '#10b981', participants: 'View Bids', participantsColor: '#0f172a', actionText: 'Evaluate Bids', actionBadge: 'New', actionType: 'success' }]
         })));
       }
     }).catch(err => setFetchError(err.message));
@@ -72,31 +72,31 @@ export default function EventsPage() {
   const statusBadge = (type: string) => {
     if (type === 'warning') return { bg: '#fef3c7', color: '#b45309', border: '#fde68a' };
     if (type === 'success') return { bg: '#dcfce7', color: '#15803d', border: '#86efac' };
-    return { bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe' };
+    return { bg: '#f8fafc', color: '#334155', border: '#e2e8f0' };
   };
 
   return (
     <div style={{ backgroundColor: '#f0f4f8', minHeight: '100%', fontFamily: 'system-ui, sans-serif' }}>
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #071330 0%, #0d1f4f 55%, #1a2f6b 100%)', padding: '28px 32px 40px', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '28px 32px 40px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, right: 0, width: '400px', height: '100%', background: 'radial-gradient(circle at 70% 50%, rgba(59,130,246,0.15), transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
               <Gavel size={22} color="rgba(255,255,255,0.7)" />
-              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Sourcing Events</p>
+              <p style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Sourcing Events</p>
             </div>
-            <h1 style={{ color: '#fff', fontSize: '1.8rem', fontWeight: 800, margin: '0 0 6px', letterSpacing: '-0.5px' }}>Tenders &amp; Auctions</h1>
-            <p style={{ color: 'rgba(255,255,255,0.55)', margin: 0, fontSize: '0.9rem' }}>Manage RFQs, reverse auctions, and vendor bids in real-time.</p>
+            <h1 style={{ color: '#0f172a', fontSize: '1.8rem', fontWeight: 800, margin: '0 0 6px', letterSpacing: '-0.5px' }}>Tenders &amp; Auctions</h1>
+            <p style={{ color: '#64748b', margin: 0, fontSize: '0.9rem' }}>Manage RFQs, reverse auctions, and vendor bids in real-time.</p>
           </div>
           <div style={{ position: 'relative' }}>
-            <button onClick={() => setIsCreateMenuOpen(!isCreateMenuOpen)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#fff', color: '#1e3a8a', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+            <button onClick={() => setIsCreateMenuOpen(!isCreateMenuOpen)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#fff', color: '#0f172a', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
               <Plus size={16} /> Create Event <ChevronDown size={14} />
             </button>
             {isCreateMenuOpen && (
               <div style={{ position: 'absolute', top: '110%', right: 0, background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 12px 32px rgba(0,0,0,0.12)', zIndex: 50, minWidth: '210px', overflow: 'hidden' }}>
                 <div onClick={() => router.push('/client/events/create/single-stage')} style={{ padding: '13px 18px', fontSize: '0.875rem', color: '#0f172a', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }} onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8fafc'} onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = '#fff'}>
-                  <FileCheck size={16} color="#2563eb" /> Single Stage Event
+                  <FileCheck size={16} color="#0f172a" /> Single Stage Event
                 </div>
                 <div onClick={() => router.push('/client/events/create/auction')} style={{ padding: '13px 18px', fontSize: '0.875rem', color: '#0f172a', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', borderTop: '1px solid #f1f5f9' }} onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8fafc'} onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = '#fff'}>
                   <TrendingUp size={16} color="#7c3aed" /> Reverse Auction
@@ -111,7 +111,7 @@ export default function EventsPage() {
         {/* KPI Row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '16px', marginBottom: '20px' }}>
           {[
-            { label: 'Total Events', value: totalEvents, icon: Gavel, color: '#2563eb', bg: '#eff6ff' },
+            { label: 'Total Events', value: totalEvents, icon: Gavel, color: '#0f172a', bg: '#f8fafc' },
             { label: 'Live Events', value: liveCount, icon: Activity, color: '#16a34a', bg: '#dcfce7' },
             { label: 'Completed', value: histCount, icon: CheckCircle2, color: '#64748b', bg: '#f8fafc' },
           ].map((s, i) => {
@@ -142,7 +142,7 @@ export default function EventsPage() {
           <div style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', gap: '4px', padding: '4px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
               {['LIVE', 'HISTORY', 'ALL'].map(tab => (
-                <div key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '7px 18px', borderRadius: '7px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', background: activeTab === tab ? '#1e3a8a' : 'transparent', color: activeTab === tab ? '#fff' : '#64748b', transition: 'all 0.15s', letterSpacing: '0.04em' }}>
+                <div key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '7px 18px', borderRadius: '7px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', background: activeTab === tab ? '#0f172a' : 'transparent', color: activeTab === tab ? '#fff' : '#64748b', transition: 'all 0.15s', letterSpacing: '0.04em' }}>
                   {tab}
                 </div>
               ))}
@@ -160,10 +160,10 @@ export default function EventsPage() {
               return (
                 <div key={event.id} style={{ backgroundColor: '#fff', marginBottom: '1px', borderBottom: '1px solid #f1f5f9' }}>
                   {/* Row Header */}
-                  <div style={{ padding: '18px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: '4px solid ' + (ended ? '#cbd5e1' : '#2563eb') }}>
+                  <div style={{ padding: '18px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: '4px solid ' + (ended ? '#cbd5e1' : '#0f172a') }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.72rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '5px' }}>
-                        <span style={{ padding: '2px 8px', borderRadius: '4px', background: '#eff6ff', color: '#2563eb' }}>{event.refId}</span>
+                        <span style={{ padding: '2px 8px', borderRadius: '4px', background: '#f8fafc', color: '#0f172a' }}>{event.refId}</span>
                         <span style={{ color: '#cbd5e1' }}>•</span>{event.account}
                         <span style={{ color: '#cbd5e1' }}>•</span>{event.itemsCount} items
                         {ended && <span style={{ padding: '2px 8px', borderRadius: '4px', background: '#f8fafc', color: '#64748b' }}>Closed</span>}
@@ -174,7 +174,7 @@ export default function EventsPage() {
                       <button onClick={() => setSelectedEventForDetails(event)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, color: '#475569', cursor: 'pointer' }}>
                         <Eye size={14} /> Details
                       </button>
-                      <button onClick={() => router.push('/client/events/' + event.id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: '#1e3a8a', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
+                      <button onClick={() => router.push('/client/events/' + event.id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: '#0f172a', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
                         View Bids <Eye size={14} />
                       </button>
                     </div>
@@ -198,7 +198,7 @@ export default function EventsPage() {
                           ) : (
                             <>
                               {event.endTime ? <Countdown endTime={event.endTime} /> : stage.timeText}
-                              <button onClick={() => { setEditingTimeFor({ eventId: event.id, sIdx }); setNewTimeVal(''); }} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.15s' }} onMouseOver={e => (e.currentTarget as HTMLElement).style.color = '#2563eb'} onMouseOut={e => (e.currentTarget as HTMLElement).style.color = '#94a3b8'}><Edit2 size={13} /></button>
+                              <button onClick={() => { setEditingTimeFor({ eventId: event.id, sIdx }); setNewTimeVal(''); }} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.15s' }} onMouseOver={e => (e.currentTarget as HTMLElement).style.color = '#0f172a'} onMouseOut={e => (e.currentTarget as HTMLElement).style.color = '#94a3b8'}><Edit2 size={13} /></button>
                             </>
                           )}
                         </div>
@@ -233,12 +233,12 @@ export default function EventsPage() {
       {selectedEventForDetails && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setSelectedEventForDetails(null)}>
           <div style={{ background: '#fff', borderRadius: '20px', width: '560px', maxWidth: '92vw', boxShadow: '0 30px 60px rgba(0,0,0,0.2)', overflow: 'hidden', animation: 'slideUp 0.25s ease' }} onClick={e => e.stopPropagation()}>
-            <div style={{ background: 'linear-gradient(135deg, #071330, #0d1f4f)', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#fff' }}>Event Details</h2>
-                <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>{selectedEventForDetails.refId}</p>
+                <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#0f172a' }}>Event Details</h2>
+                <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: '#64748b' }}>{selectedEventForDetails.refId}</p>
               </div>
-              <button onClick={() => setSelectedEventForDetails(null)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', color: '#fff', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={18} /></button>
+              <button onClick={() => setSelectedEventForDetails(null)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', color: '#0f172a', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={18} /></button>
             </div>
             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -268,7 +268,7 @@ export default function EventsPage() {
                     <p style={{ margin: '0 0 10px', fontSize: '0.72rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Invited Vendors</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                       {vendors.map((v: any, i: number) => (
-                        <span key={i} style={{ padding: '5px 12px', borderRadius: '20px', background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', fontSize: '0.8rem', fontWeight: 600 }}>{v.name || v.email || 'Vendor'}</span>
+                        <span key={i} style={{ padding: '5px 12px', borderRadius: '20px', background: '#f8fafc', color: '#0f172a', border: '1px solid #e2e8f0', fontSize: '0.8rem', fontWeight: 600 }}>{v.name || v.email || 'Vendor'}</span>
                       ))}
                     </div>
                   </div>
@@ -276,7 +276,7 @@ export default function EventsPage() {
               })()}
               <div style={{ display: 'flex', gap: '10px', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
                 <button onClick={() => setSelectedEventForDetails(null)} style={{ flex: 1, padding: '11px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '9px', fontWeight: 600, color: '#475569', cursor: 'pointer', fontSize: '0.875rem' }}>Close</button>
-                <button onClick={() => { setSelectedEventForDetails(null); router.push('/client/events/' + selectedEventForDetails.id); }} style={{ flex: 1, padding: '11px', background: '#1e3a8a', border: 'none', borderRadius: '9px', fontWeight: 700, color: '#fff', cursor: 'pointer', fontSize: '0.875rem', display: 'flex', justifyContent: 'center', gap: '6px', alignItems: 'center' }}>
+                <button onClick={() => { setSelectedEventForDetails(null); router.push('/client/events/' + selectedEventForDetails.id); }} style={{ flex: 1, padding: '11px', background: '#0f172a', border: 'none', borderRadius: '9px', fontWeight: 700, color: '#fff', cursor: 'pointer', fontSize: '0.875rem', display: 'flex', justifyContent: 'center', gap: '6px', alignItems: 'center' }}>
                   View Bids <Eye size={15} />
                 </button>
               </div>

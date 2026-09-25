@@ -100,7 +100,7 @@ export default function PRPage() {
   };
 
   const kpis = [
-    { label: 'Total PRs', value: prData.length, icon: ClipboardList, color: '#2563eb', bg: '#eff6ff' },
+    { label: 'Total PRs', value: prData.length, icon: ClipboardList, color: '#0f172a', bg: '#f8fafc' },
     { label: 'Open', value: prData.filter(d => d.tabStatus === 'Open').length, icon: Clock, color: '#d97706', bg: '#fef3c7' },
     { label: 'In Progress', value: prData.filter(d => d.tabStatus === 'In Progress').length, icon: Layers, color: '#7c3aed', bg: '#faf5ff' },
     { label: 'Completed', value: prData.filter(d => d.tabStatus === 'Completed').length, icon: CheckCircle2, color: '#16a34a', bg: '#dcfce7' },
@@ -110,8 +110,8 @@ export default function PRPage() {
     <div style={{ backgroundColor: '#f0f4f8', minHeight: '100%', fontFamily: 'system-ui, sans-serif' }}>
 
       {/* ── Premium Header ── */}
-      <div style={{ background: 'linear-gradient(135deg, #071330 0%, #0d1f4f 55%, #1a2f6b 100%)', padding: '28px 32px 40px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: 0, right: 0, width: '400px', height: '100%', background: 'radial-gradient(circle at 70% 50%, rgba(59,130,246,0.12), transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '28px 32px 40px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, right: 0, width: '400px', height: '100%', background: 'transparent', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
@@ -151,7 +151,7 @@ export default function PRPage() {
           {/* Tabs */}
           <div style={{ padding: '0 20px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '2px', background: '#fafbfc' }}>
             {tabs.map(tab => (
-              <button key={tab.label} onClick={() => { setActiveTab(tab.label); }} style={{ padding: '14px 16px', border: 'none', borderBottom: activeTab === tab.label ? '2px solid #1e3a8a' : '2px solid transparent', background: '#fff', borderBottom: '1px solid #e2e8f0', cursor: 'pointer', fontSize: '0.82rem', fontWeight: activeTab === tab.label ? 700 : 500, color: activeTab === tab.label ? '#1e3a8a' : '#64748b', display: 'flex', alignItems: 'center', gap: '7px', transition: 'all 0.15s', whiteSpace: 'nowrap' }}>
+              <button key={tab.label} onClick={() => { setActiveTab(tab.label); }} style={{ padding: '14px 16px', border: 'none', borderBottom: activeTab === tab.label ? '2px solid #0f172a' : '2px solid transparent', background: '#fff', borderBottom: '1px solid #e2e8f0', cursor: 'pointer', fontSize: '0.82rem', fontWeight: activeTab === tab.label ? 700 : 500, color: activeTab === tab.label ? '#0f172a' : '#64748b', display: 'flex', alignItems: 'center', gap: '7px', transition: 'all 0.15s', whiteSpace: 'nowrap' }}>
                 {tab.label}
                 <span style={{ padding: '2px 7px', borderRadius: '10px', fontSize: '0.7rem', fontWeight: 700, background: activeTab === tab.label ? '#e2e8f0' : '#f1f5f9', color: activeTab === tab.label ? '#0f172a' : '#64748b' }}>{tab.count}</span>
               </button>
@@ -171,7 +171,7 @@ export default function PRPage() {
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                 <th style={{ padding: '13px 16px', width: '44px' }}>
-                  <input type="checkbox" checked={selectedRows.size === filteredData.length && filteredData.length > 0} onChange={handleSelectAll} style={{ accentColor: '#2563eb', cursor: 'pointer' }} />
+                  <input type="checkbox" checked={selectedRows.size === filteredData.length && filteredData.length > 0} onChange={handleSelectAll} style={{ accentColor: '#0f172a', cursor: 'pointer' }} />
                 </th>
                 <th style={{ padding: '13px 8px', width: '36px' }}></th>
                 {[['refId', 'PR No (Ref ID)'], ['title', 'Title / Material'], ['quantity', 'Quantity'], ['reqName', 'Requester'], ['priority', 'Priority'], ['storageLocation', 'Location']].map(([key, label]) => (
@@ -192,7 +192,7 @@ export default function PRPage() {
                       onMouseOver={e => { if (!isSelected) { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; (e.currentTarget as HTMLElement).style.borderLeft = '1px solid transparent'; } }}
                       onMouseOut={e => { if (!isSelected) { (e.currentTarget as HTMLElement).style.background = idx % 2 === 0 ? '#fff' : '#fafbfc'; (e.currentTarget as HTMLElement).style.borderLeft = '1px solid transparent'; } }}>
                       <td style={{ padding: '13px 16px' }}>
-                        <input type="checkbox" checked={isSelected} onChange={() => { const s = new Set(selectedRows); isSelected ? s.delete(item.refId) : s.add(item.refId); setSelectedRows(s); }} style={{ accentColor: '#2563eb', cursor: 'pointer' }} />
+                        <input type="checkbox" checked={isSelected} onChange={() => { const s = new Set(selectedRows); isSelected ? s.delete(item.refId) : s.add(item.refId); setSelectedRows(s); }} style={{ accentColor: '#0f172a', cursor: 'pointer' }} />
                       </td>
                       <td style={{ padding: '13px 8px' }}>
                         <button onClick={() => toggleExpand(item.refId)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px', display: 'flex', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(90deg)' : 'none' }}>
@@ -200,15 +200,15 @@ export default function PRPage() {
                         </button>
                       </td>
                       <td style={{ padding: '13px 16px' }}>
-                        <span style={{ background: '#eff6ff', color: '#1d4ed8', padding: '3px 8px', borderRadius: '5px', fontFamily: 'monospace', fontSize: '0.72rem', fontWeight: 700 }}>{item.refId}</span>
+                        <span style={{ background: '#f8fafc', color: '#334155', padding: '3px 8px', borderRadius: '5px', fontFamily: 'monospace', fontSize: '0.72rem', fontWeight: 700 }}>{item.refId}</span>
                       </td>
-                      <td style={{ padding: '13px 16px', fontWeight: 700, color: '#1e3a8a', fontSize: '0.875rem' }}>{item.title || '—'}</td>
+                      <td style={{ padding: '13px 16px', fontWeight: 700, color: '#0f172a', fontSize: '0.875rem' }}>{item.title || '—'}</td>
                       <td style={{ padding: '13px 16px', fontWeight: 600, color: '#0f172a', fontSize: '0.875rem' }}>
                         <span style={{ background: '#f1f5f9', padding: '3px 10px', borderRadius: '6px', fontSize: '0.82rem' }}>{item.quantity || 1} <span style={{ color: '#94a3b8', fontWeight: 400 }}>EA</span></span>
                       </td>
                       <td style={{ padding: '13px 16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #0d1f4f, #2563eb)', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.65rem', flexShrink: 0 }}>
+                          <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#e2e8f0', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.65rem', flexShrink: 0 }}>
                             {(item.reqName || 'U').charAt(0).toUpperCase()}
                           </div>
                           <span style={{ fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>{item.reqName || '—'}</span>
@@ -222,9 +222,9 @@ export default function PRPage() {
                       </td>
                       <td style={{ padding: '13px 16px' }}>
                         <button onClick={() => { setSelectedRows(new Set([item.refId])); openWizard(); }}
-                          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '7px', color: '#2563eb', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s' }}
-                          onMouseOver={e => (e.currentTarget as HTMLElement).style.background = '#dbeafe'}
-                          onMouseOut={e => (e.currentTarget as HTMLElement).style.background = '#eff6ff'}>
+                          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '7px', color: '#0f172a', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s' }}
+                          onMouseOver={e => (e.currentTarget as HTMLElement).style.background = '#f1f5f9'}
+                          onMouseOut={e => (e.currentTarget as HTMLElement).style.background = '#f8fafc'}>
                           <ArrowRight size={13} /> Create Project
                         </button>
                       </td>
@@ -234,7 +234,7 @@ export default function PRPage() {
                     {isExpanded && (
                       <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
                         <td colSpan={9} style={{ padding: 0 }}>
-                          <div style={{ background: 'linear-gradient(135deg, #f8faff, #eff6ff)', borderTop: '1px solid #bfdbfe', padding: '12px 24px 12px 72px' }}>
+                          <div style={{ background: 'linear-gradient(135deg, #f8faff, #f8fafc)', borderTop: '1px solid #e2e8f0', padding: '12px 24px 12px 72px' }}>
                             <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Line Items</div>
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
                               <thead>
@@ -248,7 +248,7 @@ export default function PRPage() {
                                 {item.items.map((li: any, lIdx: number) => (
                                   <tr key={li.id} style={{ borderTop: '1px solid rgba(191,219,254,0.4)' }}>
                                     <td style={{ padding: '8px 10px', color: '#64748b', fontWeight: 600 }}>#{lIdx + 1}</td>
-                                    <td style={{ padding: '8px 10px', color: '#1e3a8a', fontWeight: 700 }}>{li.name}</td>
+                                    <td style={{ padding: '8px 10px', color: '#0f172a', fontWeight: 700 }}>{li.name}</td>
                                     <td style={{ padding: '8px 10px', color: '#0f172a', fontWeight: 600 }}>{li.qty}</td>
                                     <td style={{ padding: '8px 10px', color: '#64748b' }}>{li.uom}</td>
                                     <td style={{ padding: '8px 10px' }}>
@@ -285,10 +285,10 @@ export default function PRPage() {
             <div style={{ padding: '12px 20px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fafbfc' }}>
               <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
                 <strong style={{ color: '#0f172a' }}>{filteredData.length}</strong> requisition{filteredData.length !== 1 ? 's' : ''}
-                {selectedRows.size > 0 && <span style={{ marginLeft: '12px', color: '#2563eb', fontWeight: 600 }}>· {selectedRows.size} selected</span>}
+                {selectedRows.size > 0 && <span style={{ marginLeft: '12px', color: '#0f172a', fontWeight: 600 }}>· {selectedRows.size} selected</span>}
               </div>
               {selectedRows.size > 0 && (
-                <button onClick={openWizard} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '8px 18px', background: '#0f172a', border: 'none', borderRadius: '6px', color: '#fff', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(37,99,235,0.3)' }}>
+                <button onClick={openWizard} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '8px 18px', background: '#0f172a', border: 'none', borderRadius: '6px', color: '#fff', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', boxShadow: 'none' }}>
                   <Plus size={15} /> Create Project from {selectedRows.size} PR{selectedRows.size > 1 ? 's' : ''}
                 </button>
               )}
@@ -316,7 +316,7 @@ export default function PRPage() {
                     Creating a sourcing project from <strong style={{ color: '#0f172a' }}>{selectedRows.size}</strong> selected PR{selectedRows.size > 1 ? 's' : ''}. Choose how you want to proceed:
                   </p>
                   {[
-                    { key: 'new', icon: Plus, title: 'Create New Project', desc: 'Start fresh — configure stages, templates, and vendors.', color: '#2563eb', bg: '#eff6ff' },
+                    { key: 'new', icon: Plus, title: 'Create New Project', desc: 'Start fresh — configure stages, templates, and vendors.', color: '#0f172a', bg: '#f8fafc' },
                     { key: 'draft', icon: FileText, title: 'Save as Draft', desc: 'Save this PR set as a draft to configure later.', color: '#7c3aed', bg: '#faf5ff' },
                   ].map(opt => {
                     const Icon = opt.icon;
@@ -336,7 +336,7 @@ export default function PRPage() {
                     );
                   })}
                   <button onClick={() => { if (projectType) setWizardStep(2); }} disabled={!projectType}
-                    style={{ marginTop: '8px', width: '100%', padding: '12px', background: projectType ? '#1e3a8a' : '#e2e8f0', color: projectType ? '#fff' : '#94a3b8', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '0.9rem', cursor: projectType ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    style={{ marginTop: '8px', width: '100%', padding: '12px', background: projectType ? '#0f172a' : '#e2e8f0', color: projectType ? '#fff' : '#94a3b8', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '0.9rem', cursor: projectType ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     Next: Configure Stages <ArrowRight size={16} />
                   </button>
                 </div>
@@ -345,7 +345,7 @@ export default function PRPage() {
                   <p style={{ color: '#64748b', fontSize: '0.875rem', margin: '0 0 8px', lineHeight: 1.6 }}>Select the bidding stages for this sourcing event:</p>
                   {[
                     { state: techStage, setter: setTechStage, label: 'Technical Validation', desc: 'Qualify vendors on spec compliance before pricing.', color: '#7c3aed', bg: '#faf5ff' },
-                    { state: rfq, setter: setRfq, label: 'RFQ / Reverse Auction', desc: 'Collect price quotes from invited vendors.', color: '#2563eb', bg: '#eff6ff' },
+                    { state: rfq, setter: setRfq, label: 'RFQ / Reverse Auction', desc: 'Collect price quotes from invited vendors.', color: '#0f172a', bg: '#f8fafc' },
                     { state: auction, setter: handleAuctionToggle as any, label: 'Live Auction Only', desc: 'Real-time competitive bidding (disables above stages).', color: '#d97706', bg: '#fef3c7' },
                   ].map((opt, i) => (
                     <div key={i} onClick={() => opt.setter(!opt.state)}
@@ -362,7 +362,7 @@ export default function PRPage() {
                   <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
                     <button onClick={() => setWizardStep(1)} style={{ flex: 1, padding: '11px', border: '1px solid #e2e8f0', borderRadius: '10px', background: '#fff', color: '#475569', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer' }}>← Back</button>
                     <button onClick={handleWizardSubmit} disabled={!techStage && !rfq && !auction}
-                      style={{ flex: 2, padding: '11px', background: (techStage || rfq || auction) ? '#1e3a8a' : '#e2e8f0', color: (techStage || rfq || auction) ? '#fff' : '#94a3b8', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '0.875rem', cursor: (techStage || rfq || auction) ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                      style={{ flex: 2, padding: '11px', background: (techStage || rfq || auction) ? '#0f172a' : '#e2e8f0', color: (techStage || rfq || auction) ? '#fff' : '#94a3b8', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '0.875rem', cursor: (techStage || rfq || auction) ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                       <Plus size={16} /> Launch Event
                     </button>
                   </div>
