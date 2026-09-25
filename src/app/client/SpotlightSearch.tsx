@@ -104,15 +104,15 @@ export default function SpotlightSearch() {
   if (!isOpen) return null;
 
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(4, 8, 16, 0.6)', backdropFilter: 'blur(12px)', zIndex: 100000, display: 'flex', justifyContent: 'center', paddingTop: '12vh' }}>
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(12px)', zIndex: 100000, display: 'flex', justifyContent: 'center', paddingTop: '12vh' }}>
       <div 
         style={{ 
           width: '640px', 
-          backgroundColor: 'rgba(15, 23, 42, 0.85)', 
+          backgroundColor: '#ffffff', 
           backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.1)',
+          border: '1px solid #e2e8f0',
           borderRadius: '16px', 
-          boxShadow: '0 30px 60px -15px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.15) inset', 
+          boxShadow: '0 20px 40px rgba(0,0,0,0.1)', 
           overflow: 'hidden', 
           display: 'flex', 
           flexDirection: 'column', 
@@ -120,8 +120,8 @@ export default function SpotlightSearch() {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ display: 'flex', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <Search size={22} color="#818cf8" style={{ marginRight: '16px' }} />
+        <div style={{ display: 'flex', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #e2e8f0' }}>
+          <Search size={22} color="#64748b" style={{ marginRight: '16px' }} />
           <input 
             ref={inputRef}
             type="text" 
@@ -129,11 +129,11 @@ export default function SpotlightSearch() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleInputKeyDown}
-            style={{ flex: 1, border: 'none', outline: 'none', fontSize: '1.25rem', color: '#f8fafc', backgroundColor: 'transparent', fontWeight: 500 }}
+            style={{ flex: 1, border: 'none', outline: 'none', fontSize: '1.25rem', color: '#0f172a', backgroundColor: 'transparent', fontWeight: 500 }}
           />
-          {isSearching && <span style={{fontSize: '0.8rem', color: '#818cf8', marginRight: '12px', animation: 'pulse 1.5s infinite'}}>Searching...</span>}
+          {isSearching && <span style={{fontSize: '0.8rem', color: '#64748b', marginRight: '12px', animation: 'pulse 1.5s infinite'}}>Searching...</span>}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px' }}>
-            <span style={{ padding: '4px 8px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px' }}>ESC</span>
+            <span style={{ padding: '4px 8px', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '6px' }}>ESC</span>
           </div>
         </div>
 
@@ -148,37 +148,37 @@ export default function SpotlightSearch() {
                   onMouseEnter={() => setSelectedIndex(idx)}
                   style={{ 
                     display: 'flex', alignItems: 'center', padding: '14px 16px', borderRadius: '10px', cursor: 'pointer', transition: 'all 0.15s ease',
-                    backgroundColor: isSelected ? 'rgba(99,102,241,0.15)' : 'transparent',
-                    border: isSelected ? '1px solid rgba(99,102,241,0.3)' : '1px solid transparent',
-                    color: isSelected ? '#ffffff' : '#94a3b8'
+                    backgroundColor: isSelected ? '#f8faff' : 'transparent',
+                    border: isSelected ? '1px solid #e5edff' : '1px solid transparent',
+                    color: isSelected ? '#0f172a' : '#475569'
                   }}
                 >
                   <div style={{ 
                     width: '32px', height: '32px', borderRadius: '8px', 
-                    background: isSelected ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'rgba(255,255,255,0.05)', 
+                    background: isSelected ? '#e5edff' : '#f1f5f9', 
                     display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '16px',
-                    color: isSelected ? '#fff' : '#64748b'
+                    color: isSelected ? '#0f172a' : '#64748b'
                   }}>
                     {cmd.icon}
                   </div>
                   <span style={{ flex: 1, fontWeight: isSelected ? 600 : 500, fontSize: '0.95rem' }}>{cmd.title}</span>
-                  {isSelected && <ArrowRight size={18} color="#a5b4fc" />}
+                  {isSelected && <ArrowRight size={18} color="#0f172a" />}
                 </div>
               )
             })
           ) : (
             <div style={{ padding: '48px 32px', textAlign: 'center', color: '#64748b', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-              <Command size={48} color="rgba(255,255,255,0.05)" />
+              <Command size={48} color="#f1f5f9" />
               <div style={{ fontSize: '1rem', fontWeight: 500 }}>No results found for "{query}"</div>
               <div style={{ fontSize: '0.8rem', color: '#475569' }}>Try searching for "events", "vendors", or "dashboard"</div>
             </div>
           )}
         </div>
         
-        <div style={{ padding: '14px 24px', borderTop: '1px solid rgba(255,255,255,0.08)', backgroundColor: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ padding: '14px 24px', borderTop: '1px solid #e2e8f0', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px', fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span>Navigate</span> <span style={{display: 'flex', gap: '2px'}}><ArrowRight size={12} style={{transform: 'rotate(90deg)'}}/><ArrowRight size={12} style={{transform: 'rotate(-90deg)'}}/></span></span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span>Select</span> <span style={{ padding: '2px 6px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', color: '#cbd5e1' }}>↵</span></span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span>Select</span> <span style={{ padding: '2px 6px', backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '4px', color: '#475569' }}>↵</span></span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 700, color: '#818cf8', letterSpacing: '0.5px' }}>
             <Command size={14} /> PROCGEN COMMAND
