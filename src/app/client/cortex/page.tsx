@@ -1497,7 +1497,32 @@ export default function DorcPage() {
                       </div>
                     )}
 
-                  {/* AI Generated Image */}
+                  
+                    {/* Vendor Comparison Matrix */}
+                    {msg.uiComponent==='vendor_compare_matrix' && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(59,130,246,0.3)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)', overflowX: 'auto' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}>
+                          <Users size={16} color="#2563eb"/> Vendor Comparison Matrix
+                        </div>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
+                          <thead>
+                            <tr style={{ background: isDark ? 'rgba(255,255,255,0.05)' : '#f8faff' }}>
+                              <th style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.2)' }}>Metric</th>
+                              <th style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.2)' }}>Foxconn</th>
+                              <th style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.2)' }}>Pegatron</th>
+                              <th style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.2)' }}>Wistron</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>Avg Unit Cost</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>$890</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>$875</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>$910</td></tr>
+                            <tr><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>SLA Adherence</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>94%</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>89%</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>98%</td></tr>
+                            <tr><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>ESG Score</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)', color: '#10b981' }}>85 (High)</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)', color: '#eab308' }}>62 (Med)</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)', color: '#10b981' }}>92 (High)</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+
+                    {/* AI Generated Image */}
                   {msg.uiComponent==='generated_image' && msg.uiData && (
                     <div style={{ marginTop:'14px', borderRadius:'14px', overflow:'hidden', border:'1px solid rgba(99,102,241,0.3)', background:'rgba(15,23,42,0.9)', boxShadow:'0 8px 30px rgba(0,0,0,0.4)' }}>
                       <div style={{ padding:'14px 18px', borderBottom:'1px solid rgba(99,102,241,0.2)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
