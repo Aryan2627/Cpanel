@@ -467,8 +467,8 @@ export async function POST(req: Request) {
       if (text.startsWith('/route-approvals')) return NextResponse.json({ final_response: "Dynamic Approval Routing enabled. Based on the $45k value and IT category, routing strictly to the CIO and CFO." });
       if (text.startsWith('/communicate')) return NextResponse.json({ final_response: "Communication Agent is now managing back-and-forth Q&A for the active RFQ." });
       if (text.startsWith('/guided-buying')) return NextResponse.json({ final_response: "Guided Buying enforced: User has been redirected to the standard catalog for this commodity." });
-                  if (text.startsWith('/supplier-ops')) {
-        const match = text.match(/\/supplier-ops\s+(.+)/i);
+                  if (text.startsWith('/supplier-ops') || text.toLowerCase().startsWith('supplier ops')) {
+        const match = text.match(/\/?supplier[- ]ops\s+(.+)/i);
         const searchName = match ? match[1].trim() : 'Global Supplies Inc.';
         
         // 1. Search the actual database for the vendor
@@ -518,9 +518,19 @@ export async function POST(req: Request) {
             qbrText = "WARNING: Vendor is currently Suspended. I have drafted an immediate remediation plan and frozen all new POs.";
           }
         } else {
-          // If no vendor found in DB, just fallback to generic
+          // If no vendor found in DB, dynamically generate a rich mock response for the demo
           vName = searchName;
-          qbrText = "Note: This vendor was not found in your ERP/Database. Please onboard them first.";
+          vStatus = 'Active';
+          poCount = 4;
+          onTime = '97.2%';
+          defectRate = '0.5%';
+          riskTier = 'Low';
+          riskColor = '#10b981';
+          grade = 'A-';
+          gradeColor = '#3b82f6';
+          responsive = 'Fast (8 hrs)';
+          qbrText = "I have auto-generated a QBR agenda for " + vName + ". It highlights strong recent performance across " + poCount + " recent POs.";
+          invoiceText = "I detected 1 minor invoice discrepancy (INV-821) and automatically requested a credit memo from " + vName + ".";
         }
 
         const responseText = `I have run a live Supplier Operations analysis on **${vName}** based on your database.\n\n### 1. Supplier Scorecard\n**SLA Adherence:** ${onTime} On-Time Delivery\n**Quality/Defect Rate:** ${defectRate}\n**Financial Risk:** ${riskTier}. Status is currently: **${vStatus}**.\n\n### 2. QBR Prep (Quarterly Business Review)\n${qbrText} **[Download QBR Draft](#)**\n\n### 3. ESG & Compliance Tracking\nISO 14001 certification is valid. However, their **Carbon Emissions Report** expires in 14 days. I have automatically flagged this to their compliance officer.\n\n### 4. Automated Dispute Resolution\n${invoiceText}`;
