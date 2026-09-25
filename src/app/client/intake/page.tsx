@@ -223,13 +223,13 @@ export default function IntakeTablePage() {
                     style={{ accentColor: '#0f172a', cursor: 'pointer' }} />
                 </th>
                 {[['refId', 'Ref ID'], ['title', 'Title'], ['reqName', 'Requester'], ['status', 'Status'], ['quantity', 'Qty'], ['reqAt', 'Requested At']].map(([key, label]) => (
-                  <th key={key} onClick={() => toggleSort(key)} style={{ padding: '13px 16px', textAlign: 'left', color: 'rgba(255,255,255,0.75)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
+                  <th key={key} onClick={() => toggleSort(key)} style={{ padding: '13px 16px', textAlign: 'left', color: '#475569', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                      {label} <ArrowUpDown size={11} color="rgba(255,255,255,0.35)" />
+                      {label} <ArrowUpDown size={11} color="#94a3b8" />
                     </span>
                   </th>
                 ))}
-                <th style={{ padding: '13px 16px', color: 'rgba(255,255,255,0.75)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', textAlign: 'center' }}>Actions</th>
+                <th style={{ padding: '13px 16px', color: '#475569', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>

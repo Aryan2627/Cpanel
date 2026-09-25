@@ -129,11 +129,11 @@ export default function VendorManagement() {
               <tr style={{background: '#f8faff', borderBottom: '1px solid #e5edff'}}>
                 {[['name','Vendor Name'],['type','Type'],['email','Email'],['city','Location'],['status','Status'],['rating','Rating']].map(([k,l])=>(
                   <th key={k} onClick={()=>setSortConfig(prev=>prev?.key===k?{key:k,direction:prev.direction==='asc'?'desc':'asc'}:{key:k,direction:'asc'})}
-                    style={{padding:'13px 16px',textAlign:'left',color:'rgba(255,255,255,0.75)',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.07em',cursor:'pointer',whiteSpace:'nowrap'}}>
+                    style={{padding:'13px 16px',textAlign:'left',color: '#475569',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.07em',cursor:'pointer',whiteSpace:'nowrap'}}>
                     <span style={{display:'flex',alignItems:'center',gap:'5px'}}>{l}<ArrowUpDown size={10} color="rgba(255,255,255,0.3)"/></span>
                   </th>
                 ))}
-                <th style={{padding:'13px 16px',color:'rgba(255,255,255,0.75)',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase'}}>Actions</th>
+                <th style={{padding:'13px 16px',color: '#475569',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase'}}>Actions</th>
               </tr>
             </thead>
             <tbody>

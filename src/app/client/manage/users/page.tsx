@@ -123,11 +123,11 @@ export default function UsersPage() {
                 </th>
                 {[['name','Name'],['email','Email'],['department','Department'],['role','Role'],['status','Status'],['erpId','ERP ID']].map(([key,label])=>(
                   <th key={key} onClick={()=>setSortConfig(prev=>prev?.key===key?{key,direction:prev.direction==='asc'?'desc':'asc'}:{key,direction:'asc'})}
-                    style={{ padding:'13px 16px',textAlign:'left',color:'rgba(255,255,255,0.75)',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.07em',cursor:'pointer',whiteSpace:'nowrap' }}>
+                    style={{ padding:'13px 16px',textAlign:'left',color: '#475569',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.07em',cursor:'pointer',whiteSpace:'nowrap' }}>
                     <span style={{ display:'flex',alignItems:'center',gap:'5px' }}>{label} <ArrowUpDown size={10} color="rgba(255,255,255,0.3)" /></span>
                   </th>
                 ))}
-                <th style={{ padding:'13px 16px',color:'rgba(255,255,255,0.75)',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.07em' }}>Actions</th>
+                <th style={{ padding:'13px 16px',color: '#475569',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.07em' }}>Actions</th>
               </tr>
             </thead>
             <tbody>

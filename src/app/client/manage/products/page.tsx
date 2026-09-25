@@ -82,11 +82,11 @@ export default function ProductsPage() {
                 <th style={{ padding:'13px 16px',width:'44px' }}><input type="checkbox" checked={selectedIds.size===filtered.length&&filtered.length>0} onChange={e=>setSelectedIds(e.target.checked?new Set(filtered.map(p=>p.id)):new Set())} style={{ accentColor:'#0f172a',cursor:'pointer' }} /></th>
                 {[['code','Code'],['name','Name'],['category','Category'],['unitPrice','Unit Price'],['uom','UOM'],['stock','Stock']].map(([k,l])=>(
                   <th key={k} onClick={()=>setSortConfig(prev=>prev?.key===k?{key:k,direction:prev.direction==='asc'?'desc':'asc'}:{key:k,direction:'asc'})}
-                    style={{ padding:'13px 16px',textAlign:'left',color:'rgba(255,255,255,0.75)',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.07em',cursor:'pointer',whiteSpace:'nowrap' }}>
+                    style={{ padding:'13px 16px',textAlign:'left',color: '#475569',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.07em',cursor:'pointer',whiteSpace:'nowrap' }}>
                     <span style={{ display:'flex',alignItems:'center',gap:'5px' }}>{l} <ArrowUpDown size={10} color="rgba(255,255,255,0.3)" /></span>
                   </th>
                 ))}
-                <th style={{ padding:'13px 16px',color:'rgba(255,255,255,0.75)',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase' }}>Actions</th>
+                <th style={{ padding:'13px 16px',color: '#475569',fontSize:'0.68rem',fontWeight:700,textTransform:'uppercase' }}>Actions</th>
               </tr>
             </thead>
             <tbody>

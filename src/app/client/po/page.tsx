@@ -160,11 +160,11 @@ export default function PurchaseOrdersPage() {
                     style={{ accentColor: '#0f172a', cursor: 'pointer' }} />
                 </th>
                 {[['poNumber', 'PO Number'], ['title', 'Title'], ['vendorName', 'Vendor'], ['total', 'Total Value'], ['createdAt', 'Date Issued'], ['status', 'Status']].map(([key, label]) => (
-                  <th key={key} onClick={() => toggleSort(key)} style={{ padding: '13px 16px', textAlign: 'left', color: 'rgba(255,255,255,0.75)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
+                  <th key={key} onClick={() => toggleSort(key)} style={{ padding: '13px 16px', textAlign: 'left', color: '#475569', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>{label} <ArrowUpDown size={10} color="rgba(255,255,255,0.3)" /></span>
                   </th>
                 ))}
-                <th style={{ padding: '13px 16px', color: 'rgba(255,255,255,0.75)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actions</th>
+                <th style={{ padding: '13px 16px', color: '#475569', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
