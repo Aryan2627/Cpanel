@@ -1,45 +1,49 @@
-
-'use client';
-import React from 'react';
+"use client";
+import React, { useEffect, useState } from 'react';
 
 export default function Page() {
+  const [session, setSession] = useState<any>(null);
+  const [features, setFeatures] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(d => {
+        setSession(d);
+        if (d.features) {
+          try {
+            setFeatures(JSON.parse(d.features));
+          } catch(e) {}
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div style={{ padding: '40px', color: '#64748b', textAlign: 'center' }}>Loading...</div>;
+
   return (
-    <div style={{ padding: '40px', backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', color: '#111827' }}>
+    <div style={{ padding: '40px', backgroundColor: '#f8faff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 600, margin: '0 0 8px 0' }}>ProcGen Modules</h1>
-        <p style={{ fontSize: '1.1rem', color: '#6b7280', margin: '0 0 40px 0' }}>Review the specific ProcGen platform modules your organization has licensed.</p>
+        <h1 style={{ fontSize: '2rem', fontWeight: 700, margin: '0 0 8px 0', color: '#0f172a' }}>Product Summary</h1>
+        <p style={{ fontSize: '1.05rem', color: '#64748b', margin: '0 0 40px 0' }}>Overview of ProcGen software products provisioned to your organization.</p>
         
-  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-    <thead>
-      <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
-        <th style={{ padding: '16px 8px', fontWeight: 500, color: '#6b7280' }}>Module Name</th>
-        <th style={{ padding: '16px 8px', fontWeight: 500, color: '#6b7280' }}>Access Level</th>
-        <th style={{ padding: '16px 8px', fontWeight: 500, color: '#6b7280' }}>Seats Used</th>
-        <th style={{ padding: '16px 8px', fontWeight: 500, color: '#6b7280' }}>Total Seats</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-        <td style={{ padding: '16px 8px' }}>Procurement Core</td>
-        <td style={{ padding: '16px 8px', color: '#6b7280' }}>Full Access</td>
-        <td style={{ padding: '16px 8px' }}>142</td>
-        <td style={{ padding: '16px 8px' }}>150</td>
-      </tr>
-      <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-        <td style={{ padding: '16px 8px' }}>AI Negotiator Add-on</td>
-        <td style={{ padding: '16px 8px', color: '#6b7280' }}>Premium</td>
-        <td style={{ padding: '16px 8px' }}>15</td>
-        <td style={{ padding: '16px 8px' }}>25</td>
-      </tr>
-      <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-        <td style={{ padding: '16px 8px' }}>ERP Sync (C-Panel)</td>
-        <td style={{ padding: '16px 8px', color: '#6b7280' }}>API Only</td>
-        <td style={{ padding: '16px 8px' }}>Unlimited</td>
-        <td style={{ padding: '16px 8px' }}>Unlimited</td>
-      </tr>
-    </tbody>
-  </table>
-  
+        <div style={{ background: '#fff', padding: '32px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
+          
+          <h3 style={{ marginTop: 0, color: '#0f172a' }}>Enabled Modules</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+            {['cortex_ai', 's2p', 'advanced_analytics', 'vendor_portal', 'contract_analyzer', 'erp_integration', 'supplier_risk_scoring', 'license_manager'].map(mod => (
+              features[mod] ? (
+                <div key={mod} style={{ padding: '12px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }} />
+                  <span style={{ fontWeight: 600, color: '#334155' }}>{mod.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</span>
+                </div>
+              ) : null
+            ))}
+          </div>
+    
+        </div>
       </div>
     </div>
   );

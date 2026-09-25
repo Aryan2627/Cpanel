@@ -1,20 +1,49 @@
-
-'use client';
-import React from 'react';
+"use client";
+import React, { useEffect, useState } from 'react';
 
 export default function Page() {
+  const [session, setSession] = useState<any>(null);
+  const [features, setFeatures] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(d => {
+        setSession(d);
+        if (d.features) {
+          try {
+            setFeatures(JSON.parse(d.features));
+          } catch(e) {}
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div style={{ padding: '40px', color: '#64748b', textAlign: 'center' }}>Loading...</div>;
+
   return (
-    <div style={{ padding: '40px', backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', color: '#111827' }}>
+    <div style={{ padding: '40px', backgroundColor: '#f8faff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 600, margin: '0 0 8px 0' }}>ProcGen Contracts</h1>
-        <p style={{ fontSize: '1.1rem', color: '#6b7280', margin: '0 0 40px 0' }}>Master Service Agreements (MSAs) and Terms of Service with ProcGen Technologies.</p>
+        <h1 style={{ fontSize: '2rem', fontWeight: 700, margin: '0 0 8px 0', color: '#0f172a' }}>Contract Expiry</h1>
+        <p style={{ fontSize: '1.05rem', color: '#64748b', margin: '0 0 40px 0' }}>Master service agreements and legal contract expiration dates.</p>
         
-  <div style={{ padding: '24px', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fca5a5' }}>
-    <h3 style={{ margin: '0 0 8px 0', color: '#991b1b', fontSize: '1.1rem' }}>ProcGen Enterprise Platform MSA</h3>
-    <div style={{ color: '#7f1d1d', marginBottom: '16px' }}>MSA-2024-991 • Expires Nov 30 (Next 30 Days)</div>
-    <button style={{ padding: '8px 16px', backgroundColor: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Review Contract Terms</button>
-  </div>
-  
+        <div style={{ background: '#fff', padding: '32px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '24px', borderBottom: '1px solid #e2e8f0', marginBottom: '24px' }}>
+            <div>
+              <div style={{ color: '#475569', fontSize: '0.9rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Master Service Agreement</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 600, color: '#0f172a' }}>ProcGen Global EULA</div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ color: '#475569', fontSize: '0.9rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Expiration Date</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 600, color: '#ef4444' }}>{features.contract_expiry || 'No Expiry Set'}</div>
+            </div>
+          </div>
+          <p style={{ color: '#64748b', fontSize: '0.95rem' }}>If your contract is nearing expiration, please contact your account representative to initiate the renewal process to prevent service disruption.</p>
+    
+        </div>
       </div>
     </div>
   );

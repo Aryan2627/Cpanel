@@ -1,26 +1,51 @@
-
-'use client';
-import React from 'react';
+"use client";
+import React, { useEffect, useState } from 'react';
 
 export default function Page() {
+  const [session, setSession] = useState<any>(null);
+  const [features, setFeatures] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(d => {
+        setSession(d);
+        if (d.features) {
+          try {
+            setFeatures(JSON.parse(d.features));
+          } catch(e) {}
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div style={{ padding: '40px', color: '#64748b', textAlign: 'center' }}>Loading...</div>;
+
   return (
-    <div style={{ padding: '40px', backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', color: '#111827' }}>
+    <div style={{ padding: '40px', backgroundColor: '#f8faff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 600, margin: '0 0 8px 0' }}>Support SLAs</h1>
-        <p style={{ fontSize: '1.1rem', color: '#6b7280', margin: '0 0 40px 0' }}>Upcoming expirations for your dedicated ProcGen support tiers.</p>
+        <h1 style={{ fontSize: '2rem', fontWeight: 700, margin: '0 0 8px 0', color: '#0f172a' }}>Maintenance Expiry</h1>
+        <p style={{ fontSize: '1.05rem', color: '#64748b', margin: '0 0 40px 0' }}>View your current support SLA tier and upcoming maintenance renewals.</p>
         
-  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-    <li style={{ padding: '24px 0', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between' }}>
-      <div>
-        <div style={{ fontSize: '1.1rem', fontWeight: 500 }}>ProcGen Premium 24/7 Support SLA</div>
-        <div style={{ color: '#6b7280', fontSize: '0.95rem' }}>Your dedicated account manager SLA is expiring.</div>
-      </div>
-      <div style={{ color: '#dc2626', fontWeight: 500, textAlign: 'right' }}>
-        Renew By: Nov 15, 2026<br/><span style={{ fontSize: '0.85rem' }}>12 Days</span>
-      </div>
-    </li>
-  </ul>
-  
+        <div style={{ background: '#fff', padding: '32px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
+          
+          <div style={{ color: '#475569', fontSize: '0.9rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Active Support Tier</div>
+          <div style={{ fontSize: '2rem', fontWeight: 700, color: '#10b981', marginBottom: '32px' }}>{features.sla_tier || 'Standard'} SLA</div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+            <div style={{ padding: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+              <div style={{ fontWeight: 600, color: '#0f172a' }}>Guaranteed Response Time</div>
+              <div style={{ color: '#64748b', fontSize: '0.9rem' }}>{features.sla_tier === 'Platinum' ? '< 4 hours (24/7/365)' : (features.sla_tier === 'Premium' ? '< 24 hours' : '< 48 hours')}</div>
+            </div>
+            <div style={{ padding: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+              <div style={{ fontWeight: 600, color: '#0f172a' }}>Dedicated Customer Success Manager</div>
+              <div style={{ color: '#64748b', fontSize: '0.9rem' }}>{features.sla_tier === 'Platinum' ? 'Included' : 'Available as add-on'}</div>
+            </div>
+          </div>
+    
+        </div>
       </div>
     </div>
   );
