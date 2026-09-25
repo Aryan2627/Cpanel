@@ -97,7 +97,7 @@ export default function VendorProfileDashboard() {
               <span style={{ padding: '4px 10px', backgroundColor: '#fee2e2', color: '#b91c1c', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>Blacklisted</span>
             )}
           </div>
-          <p style={{ color: '#64748b', margin: '4px 0 0 0', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <p style={{ color: '#475569', margin: '4px 0 0 0', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '16px' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={14} /> {vendor.city}</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Globe size={14} /> {vendor.type}</span>
           </p>
@@ -139,11 +139,11 @@ export default function VendorProfileDashboard() {
                   <h2 style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <DollarSign size={20} color="#0f172a" /> Financial Health & Insolvency AI
                   </h2>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: '#64748b' }}>Live analysis of SEC filings, credit scores, and news.</p>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: '#475569' }}>Live analysis of SEC filings, credit scores, and news.</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: '1.75rem', fontWeight: 700, color: financialHealth.color, display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
-                    {financialHealth.score} <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 500 }}>/ 100</span>
+                    {financialHealth.score} <span style={{ fontSize: '0.9rem', color: '#475569', fontWeight: 500 }}>/ 100</span>
                   </div>
                   <div style={{ fontSize: '0.8rem', fontWeight: 600, color: financialHealth.color, backgroundColor: financialHealth.bg, padding: '2px 8px', borderRadius: '4px', display: 'inline-block', marginTop: '4px' }}>
                     {financialHealth.risk} Risk
@@ -170,7 +170,7 @@ export default function VendorProfileDashboard() {
                 <Activity size={20} color="#8b5cf6" /> Supplier Relationship Management (SRM)
               </h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.5rem', fontWeight: 700, color: vendor.trustScore > 4 ? '#10b981' : vendor.trustScore < 3 ? '#ef4444' : '#f59e0b' }}>
-                <Star size={24} fill="currentColor" /> {vendor.trustScore} <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 500 }}>/ 5.0</span>
+                <Star size={24} fill="currentColor" /> {vendor.trustScore} <span style={{ fontSize: '0.9rem', color: '#475569', fontWeight: 500 }}>/ 5.0</span>
               </div>
             </div>
 
@@ -198,7 +198,7 @@ export default function VendorProfileDashboard() {
                 <div key={i} style={{ padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>{po.id} <span style={{ color: '#94a3b8', fontWeight: 400, marginLeft: '8px' }}>{po.date}</span></div>
-                    <div style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '4px' }}>"{po.notes}"</div>
+                    <div style={{ color: '#475569', fontSize: '0.85rem', marginTop: '4px' }}>"{po.notes}"</div>
                   </div>
                   <div style={{ display: 'flex', gap: '2px', color: po.rating > 3 ? '#10b981' : '#ef4444' }}>
                     {[1,2,3,4,5].map(star => <Star key={star} size={14} fill={star <= po.rating ? 'currentColor' : 'none'} color={star <= po.rating ? 'currentColor' : '#cbd5e1'} />)}
@@ -219,7 +219,7 @@ export default function VendorProfileDashboard() {
                 <h2 style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Share2 size={20} color="#10b981" /> Multi-Tier Scope 3 Supply Chain
                 </h2>
-                <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: '#64748b' }}>Declared Sub-Contractors & Raw Material Sources</p>
+                <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: '#475569' }}>Declared Sub-Contractors & Raw Material Sources</p>
               </div>
               <button style={{ padding: '6px 12px', backgroundColor: '#ecfdf5', color: '#10b981', border: '1px solid #a7f3d0', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Leaf size={14} /> ESG Compliant
@@ -234,11 +234,11 @@ export default function VendorProfileDashboard() {
 
               {/* Tier 1 (This Vendor) */}
               <div style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 1 }}>
-                <div style={{ width: '60px', height: '60px', borderRadius: '12px', backgroundColor: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 4px 6px rgba(37,99,235,0.3)', flexShrink: 0 }}>T1</div>
-                <div style={{ flex: 1, backgroundColor: '#fff', padding: '12px 16px', borderRadius: '8px', border: '2px solid #2563eb', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#2563eb', textTransform: 'uppercase', marginBottom: '2px' }}>Direct Supplier (Tier 1)</div>
+                <div style={{ width: '60px', height: '60px', borderRadius: '12px', backgroundColor: '#0f172a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 4px 6px rgba(37,99,235,0.3)', flexShrink: 0 }}>T1</div>
+                <div style={{ flex: 1, backgroundColor: '#fff', padding: '12px 16px', borderRadius: '8px', border: '2px solid #0f172a', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', textTransform: 'uppercase', marginBottom: '2px' }}>Direct Supplier (Tier 1)</div>
                   <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '1rem' }}>{vendor.name}</div>
-                  <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Final Assembly & Manufacturing</div>
+                  <div style={{ fontSize: '0.85rem', color: '#475569' }}>Final Assembly & Manufacturing</div>
                 </div>
               </div>
 
@@ -248,7 +248,7 @@ export default function VendorProfileDashboard() {
                 <div style={{ flex: 1, backgroundColor: '#fff', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
                   <div style={{ fontSize: '0.7rem', fontWeight: 600, color: '#8b5cf6', textTransform: 'uppercase', marginBottom: '2px' }}>Sub-Assembly (Tier 2)</div>
                   <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.95rem' }}>Shenzhen Circuit Corp.</div>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Provides logic boards. Location: Shenzhen, China.</div>
+                  <div style={{ fontSize: '0.8rem', color: '#475569' }}>Provides logic boards. Location: Shenzhen, China.</div>
                 </div>
               </div>
 
@@ -258,16 +258,16 @@ export default function VendorProfileDashboard() {
                 <div style={{ flex: 1, backgroundColor: '#fff', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
                   <div style={{ fontSize: '0.7rem', fontWeight: 600, color: '#f59e0b', textTransform: 'uppercase', marginBottom: '2px' }}>Raw Material (Tier 3)</div>
                   <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.95rem' }}>Global Lithium Mines Ltd.</div>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Provides raw lithium for batteries. Location: Perth, Australia.</div>
+                  <div style={{ fontSize: '0.8rem', color: '#475569' }}>Provides raw lithium for batteries. Location: Perth, Australia.</div>
                 </div>
               </div>
 
             </div>
 
-            <div style={{ marginTop: '24px', padding: '16px', backgroundColor: '#eff6ff', borderRadius: '8px', border: '1px solid #bfdbfe', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+            <div style={{ marginTop: '24px', padding: '16px', backgroundColor: '#f8faff', borderRadius: '8px', border: '1px solid #e5edff', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
               <LinkIcon size={20} color="#3b82f6" style={{ marginTop: '2px' }} />
               <div>
-                <h4 style={{ margin: '0 0 4px 0', color: '#1d4ed8', fontSize: '0.9rem' }}>Blockchain Verified</h4>
+                <h4 style={{ margin: '0 0 4px 0', color: '#1e3a8a', fontSize: '0.9rem' }}>Blockchain Verified</h4>
                 <p style={{ margin: 0, color: '#3b82f6', fontSize: '0.8rem', lineHeight: '1.4' }}>This vendor has securely attested their supply chain via the Vendor Portal. Tier 2 and Tier 3 sources are verified against global conflict-mineral databases.</p>
               </div>
             </div>
