@@ -1,25 +1,18 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { useSession } from '../../../../context/SessionContext';
 
 export default function Page() {
-  const [session, setSession] = useState<any>(null);
+  const { session, loading } = useSession();
   const [features, setFeatures] = useState<any>({});
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/auth/me')
-      .then(r => r.json())
-      .then(d => {
-        setSession(d);
-        if (d.features) {
-          try {
-            setFeatures(JSON.parse(d.features));
-          } catch(e) {}
-        }
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+    if (session?.features) {
+      try {
+        setFeatures(JSON.parse(session.features));
+      } catch(e) {}
+    }
+  }, [session]);
 
   if (loading) return <div style={{ padding: '40px', color: '#64748b', textAlign: 'center' }}>Loading...</div>;
 

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { IntakeProvider } from '../../context/IntakeContext';
+import { SessionContext } from '../../context/SessionContext';
 import TourButton from './TourButton';
 import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
@@ -114,7 +115,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   };
 
   return (
-    <IntakeProvider>
+    <SessionContext.Provider value={{ session: currentUser, loading: currentUser === null }}>
+            <IntakeProvider>
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
         
         {currentUser?.isImpersonating && (
@@ -327,6 +329,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       <SpotlightSearch />
       
     </IntakeProvider>
+            </SessionContext.Provider>
   );
 }
 
