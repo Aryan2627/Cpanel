@@ -398,6 +398,8 @@ export default function DorcPage() {
   const [eventForm, setEventForm] = useState({ title:'', budget:'', vendorId:'', duration:'', durationUnit:'days' });
   const [s2pForm, setS2pForm] = useState({ title: '', category: 'IT', department: 'Engineering', budget: '', description: '', quantity: 1, requiredDate: '', address: '' });
   const [vendorForm, setVendorForm] = useState({ name:'', email:'', category:'' });
+  const [opsSearch, setOpsSearch] = useState('');
+  const [opsVendors, setOpsVendors] = useState<any[]>([]);
   const [poForm, setPoForm] = useState({ poNumber:'', amount:'', desc:'' });
   const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'', isGenerating:false });
   const [viewImage, setViewImage] = useState<string | null>(null);
@@ -1413,6 +1415,55 @@ export default function DorcPage() {
                     )}
 
                     {/* Vendor Scorecard */}
+                                        {msg.uiComponent==='supplier_ops_form' && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(20,184,166,0.3)' : '1px solid #e2e8f0' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Users size={16} color="#14b8a6"/> Select Vendor for Analysis</div>
+                        <div style={{ position: 'relative' }}>
+                          <input 
+                            type="text" 
+                            placeholder="Type to search vendors..." 
+                            value={opsSearch}
+                            onChange={async (e) => {
+                              const val = e.target.value;
+                              setOpsSearch(val);
+                              if (val.length > 1) {
+                                try {
+                                  const r = await fetch('/api/vendors');
+                                  if (r.ok) {
+                                    const data = await r.json();
+                                    setOpsVendors(data.filter((v: any) => v.name && v.name.toLowerCase().includes(val.toLowerCase())).slice(0, 5));
+                                  }
+                                } catch (e) {}
+                              } else {
+                                setOpsVendors([]);
+                              }
+                            }}
+                            style={{ width:'100%', padding:'12px 14px', borderRadius:'8px', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #cbd5e1', background: isDark ? 'rgba(255,255,255,0.05)' : '#fff', color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.85rem', outline:'none' }}
+                          />
+                          {opsVendors.length > 0 && (
+                            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '4px', background: isDark ? '#1e293b' : '#fff', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0', borderRadius: '8px', zIndex: 10, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                              {opsVendors.map(v => (
+                                <button 
+                                  key={v.id}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setOpsSearch('');
+                                    setOpsVendors([]);
+                                    execute('/supplier-ops ' + v.name);
+                                  }}
+                                  style={{ width: '100%', padding: '10px 14px', textAlign: 'left', background: 'transparent', border: 'none', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #f1f5f9', cursor: 'pointer', color: isDark ? '#e2e8f0' : '#0f172a', fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between' }}
+                                  onMouseEnter={(e) => (e.target as any).style.background = isDark ? 'rgba(255,255,255,0.05)' : '#f8fafc'}
+                                  onMouseLeave={(e) => (e.target as any).style.background = 'transparent'}
+                                >
+                                  <span style={{ fontWeight: 600 }}>{v.name}</span>
+                                  <span style={{ color: '#64748b', fontSize: '0.75rem' }}>{v.type || v.status}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     {msg.uiComponent==='vendor_scorecard' && msg.uiData && (
                       <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(59,130,246,0.3)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
                         <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle size={16} color="#2563eb"/> Scorecard: {msg.uiData.vendor}</div>

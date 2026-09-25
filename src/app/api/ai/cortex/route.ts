@@ -471,7 +471,8 @@ export async function POST(req: Request) {
         const match = text.match(/\/?supplier[- ]ops\s+(.+)/i);
         if (!match || !match[1].trim()) {
             return NextResponse.json({ 
-              final_response: "Please specify which vendor you want to analyze. For example: **/supplier-ops Acme Corp**" 
+              final_response: "Please select the vendor you want to analyze from your database:",
+              ui_component: "supplier_ops_form"
             });
           }
           const searchName = match[1].trim();
