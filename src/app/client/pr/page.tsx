@@ -179,7 +179,7 @@ export default function PRPage() {
                     <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>{label} <ArrowUpDown size={10} color="#cbd5e1" /></span>
                   </th>
                 ))}
-                <th style={{ padding: '13px 16px', color: '#475569', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Actions</th>
+                
               </tr>
             </thead>
             <tbody>
@@ -220,20 +220,13 @@ export default function PRPage() {
                       <td style={{ padding: '13px 16px', color: '#475569', fontSize: '0.82rem', fontWeight: 500 }}>
                         <span style={{ background: '#f8faff', border: '1px solid #e5edff', padding: '3px 9px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600 }}>{item.storageLocation}</span>
                       </td>
-                      <td style={{ padding: '13px 16px' }}>
-                        <button onClick={() => { setSelectedRows(new Set([item.refId])); openWizard(); }}
-                          style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px', background: '#f8faff', border: '1px solid #e5edff', borderRadius: '7px', color: '#0f172a', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s' }}
-                          onMouseOver={e => (e.currentTarget as HTMLElement).style.background = '#eff6ff'}
-                          onMouseOut={e => (e.currentTarget as HTMLElement).style.background = '#f8faff'}>
-                          <ArrowRight size={13} /> Create Project
-                        </button>
-                      </td>
+                      
                     </tr>
 
                     {/* Expanded Sub-items */}
                     {isExpanded && (
                       <tr style={{ borderBottom: '1px solid #eff6ff' }}>
-                        <td colSpan={9} style={{ padding: 0 }}>
+                        <td colSpan={8} style={{ padding: 0 }}>
                           <div style={{ background: 'linear-gradient(135deg, #f8faff, #f8faff)', borderTop: '1px solid #e5edff', padding: '12px 24px 12px 72px' }}>
                             <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Line Items</div>
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
@@ -266,7 +259,7 @@ export default function PRPage() {
                 );
               }) : (
                 <tr>
-                  <td colSpan={9} style={{ padding: '64px', textAlign: 'center' }}>
+                  <td colSpan={8} style={{ padding: '64px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <FileText size={28} color="#cbd5e1" />
