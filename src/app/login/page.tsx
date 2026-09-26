@@ -297,9 +297,28 @@ export default function Login() {
                 />
               </div>
               
-              <button 
+              
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>Security Verification</label>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ flex: '0 0 auto', padding: '12px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '1rem', fontWeight: '600', color: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100px' }}>
+                      {captchaNum1} + {captchaNum2}
+                    </div>
+                    <input
+                      type="text"
+                      value={captchaInput}
+                      onChange={(e) => setCaptchaInput(e.target.value.replace(/\D/g, ''))}
+                      required
+                      placeholder="Result"
+                      className="input-field"
+                      style={{ flex: '1' }}
+                    />
+                  </div>
+                </div>
+
+                <button 
                 type="submit" 
-                disabled={loading}
+                disabled={loading || !captchaInput}
                 className="btn-primary"
                 style={{ background: loading ? '#93c5fd' : '', cursor: loading ? 'not-allowed' : 'pointer' }}
               >
