@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import ClickTracker from "@/components/ClickTracker";
+import AutoLogout from "@/components/AutoLogout";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -20,7 +21,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={outfit.className}>
         <Providers>
-          <ClickTracker />{children}</Providers>
+          <ClickTracker />
+          <AutoLogout />{children}</Providers>
       </body>
     </html>
   );
