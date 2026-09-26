@@ -1,5 +1,5 @@
 ﻿"use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Login() {
@@ -13,6 +13,21 @@ export default function Login() {
   const [previewUrl, setPreviewUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // CAPTCHA State
+  const [captchaNum1, setCaptchaNum1] = useState(0);
+  const [captchaNum2, setCaptchaNum2] = useState(0);
+  const [captchaInput, setCaptchaInput] = useState('');
+
+  const generateCaptcha = () => {
+    setCaptchaNum1(Math.floor(Math.random() * 10) + 1);
+    setCaptchaNum2(Math.floor(Math.random() * 10) + 1);
+    setCaptchaInput('');
+  };
+
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
 
   
   const handleRequestOTP = async (e: React.FormEvent) => {
