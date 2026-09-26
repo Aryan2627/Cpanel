@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import ClickTracker from "@/components/ClickTracker";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -18,7 +19,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={outfit.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <ClickTracker />{children}</Providers>
       </body>
     </html>
   );
