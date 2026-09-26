@@ -61,7 +61,7 @@ export async function POST(req: Request) {
       }, { status: 429 });
     }
 
-    const inputId = identifier.trim();
+    
     const isEmail = inputId.includes('@');
 
     // STRICT CHECK: The email or phone MUST exist in the User or Vendor table
