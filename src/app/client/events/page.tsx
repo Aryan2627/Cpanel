@@ -18,6 +18,7 @@ export default function EventsPage() {
   const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [dbEvents, setDbEvents] = useState<any[]>([]);
   const [selectedEventForDetails, setSelectedEventForDetails] = useState<any>(null);
   const [editingTimeFor, setEditingTimeFor] = useState<{ eventId: string; sIdx: number } | null>(null);
@@ -29,6 +30,7 @@ export default function EventsPage() {
   ]);
 
   useEffect(() => {
+    setIsLoading(true);
     fetch('/api/events').then(async res => {
       if (!res.ok) throw new Error('Server ' + res.status);
       if ((res.headers.get('content-type') || '').includes('application/json')) return res.json();
@@ -155,7 +157,23 @@ export default function EventsPage() {
 
           {/* Event Rows */}
           <div style={{ backgroundColor: '#f8faff' }}>
-            {filteredEvents.length > 0 ? filteredEvents.map(event => {
+            {isLoading ? (
+                [1,2,3,4].map(n => (
+                  <div key={n} className="animate-pulse" style={{ backgroundColor: '#fff', marginBottom: '1px', borderBottom: '1px solid #eff6ff', padding: '18px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div style={{ width: '220px', height: '14px', backgroundColor: '#e5edff', borderRadius: '4px' }} />
+                        <div style={{ width: '350px', height: '22px', backgroundColor: '#e2e8f0', borderRadius: '6px' }} />
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <div style={{ width: '80px', height: '36px', backgroundColor: '#f1f5f9', borderRadius: '8px' }} />
+                        <div style={{ width: '100px', height: '36px', backgroundColor: '#e2e8f0', borderRadius: '8px' }} />
+                      </div>
+                    </div>
+                    <div style={{ width: '100%', height: '48px', backgroundColor: '#f8faff', border: '1px solid #eff6ff', borderRadius: '8px' }} />
+                  </div>
+                ))
+              ) : filteredEvents.length > 0 ? filteredEvents.map(event => {
               const ended = isHistorical(event);
               return (
                 <div key={event.id} style={{ backgroundColor: '#fff', marginBottom: '1px', borderBottom: '1px solid #eff6ff' }}>
