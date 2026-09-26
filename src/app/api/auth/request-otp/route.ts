@@ -44,6 +44,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Email/Phone is required' }, { status: 400 });
     }
 
+
+    // 1. Security: Anti-Spam Rate Limiting for OTP generation (Max 3 per 15 mins)
+    const inputId = identifier.trim().toLowerCase();
+    const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000);
+    const recentRequests = await prisma.verificationToken.count({
+      where: {
+        identifier: inputId,
+        expires: { gte: fifteenMinsAgo }
+      }
+    });
+
+    if (recentRequests >= 3) {
+      return NextResponse.json({ 
+        error: 'Too many OTP requests. Please wait 15 minutes before requesting another code.' 
+      }, { status: 429 });
+    }
+
     const inputId = identifier.trim();
     const isEmail = inputId.includes('@');
 
