@@ -29,21 +29,41 @@ export default function EventsPage() {
     { id: 'mock-2', account: 'Global Industries', refId: 'RFX-20009', itemsCount: 5, title: 'Software Licensing Renewal', stages: [{ name: 'RFQ Commercials', statusIcon: <Clock size={16} color="#3b82f6" />, timeText: 'Ends in 11 days', timeColor: '#475569', participants: '3/5', participantsColor: '#10b981', actionText: 'Evaluate Quotes', actionBadge: '3', actionType: 'primary' }] },
   ]);
 
-  useEffect(() => {
-    setIsLoading(true);
+    useEffect(() => {
+    // Ultra-fast Local Cache Strategy
+    const cachedStr = localStorage.getItem('events_db_cache');
+    if (cachedStr) {
+      try {
+        const parsedData = JSON.parse(cachedStr);
+        setDbEvents(parsedData.map((e: any) => ({
+          ...e,
+          stages: [{ name: 'Live RFQ', statusIcon: <Activity size={16} color="#10b981" />, timeText: 'Live', timeColor: '#10b981', participants: 'View Bids', participantsColor: '#0f172a', actionText: 'Evaluate Bids', actionBadge: 'New', actionType: 'success' }]
+        })));
+        setIsLoading(false); // Render instantly
+      } catch(e) {}
+    } else {
+      setIsLoading(true);
+    }
+
+    // Background fetch for fresh data
     fetch('/api/events').then(async res => {
       if (!res.ok) throw new Error('Server ' + res.status);
       if ((res.headers.get('content-type') || '').includes('application/json')) return res.json();
       throw new Error('Invalid response');
     }).then(data => {
       if (Array.isArray(data)) {
-        setDbEvents(data.map(e => ({
+        const rawMapped = data.map(e => ({
           id: e.refId, dbId: e.id, account: e.account || 'Internal', refId: e.refId, itemsCount: e.itemsCount || 1,
-          title: e.title || 'Untitled', endTime: e.endTime, participants: e.participants,
+          title: e.title || 'Untitled', endTime: e.endTime, participants: e.participants
+        }));
+        localStorage.setItem('events_db_cache', JSON.stringify(rawMapped));
+        
+        setDbEvents(rawMapped.map((e: any) => ({
+          ...e,
           stages: [{ name: 'Live RFQ', statusIcon: <Activity size={16} color="#10b981" />, timeText: 'Live', timeColor: '#10b981', participants: 'View Bids', participantsColor: '#0f172a', actionText: 'Evaluate Bids', actionBadge: 'New', actionType: 'success' }]
         })));
       }
-    }).catch(err => setFetchError(err.message));
+    }).catch(err => setFetchError(err.message)).finally(() => setIsLoading(false));
   }, []);
 
   const allEvents = useMemo(() => [...dbEvents, ...mockEvents], [dbEvents]);
