@@ -21,7 +21,9 @@ export default function VendorManagement() {
   const [formData, setFormData] = useState({ name:'', email:'', type:'Manufacturer/Trader', vendorCode:'', dealsIn:'', city:'' });
 
   useEffect(() => {
-    fetch('/api/vendors').then(r=>r.ok?r.json():Promise.reject()).then(d=>{ if(Array.isArray(d)) setVendors(d); }).catch(()=>{}).finally(()=>setIsLoading(false));
+    const cached = localStorage.getItem('vendors_db_cache');
+    if (cached) { try { setVendors(JSON.parse(cached)); setIsLoading(false); } catch(e){} }
+    fetch('/api/vendors').then(r=>r.ok?r.json():Promise.reject()).then(d=>{ if(Array.isArray(d)) { setVendors(d); localStorage.setItem('vendors_db_cache', JSON.stringify(d)); } }).catch(()=>{}).finally(()=>setIsLoading(false));
   }, []);
 
   const handleApproveVendor = async (id: string) => {

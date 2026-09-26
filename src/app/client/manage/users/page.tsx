@@ -16,7 +16,9 @@ export default function UsersPage() {
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
-    fetch('/api/users').then(r => r.json()).then(d => { setUsers(Array.isArray(d) ? d : []); setLoading(false); }).catch(() => setLoading(false));
+    const cached = localStorage.getItem('users_db_cache');
+    if (cached) { try { setUsers(JSON.parse(cached)); setLoading(false); } catch(e){} }
+    fetch('/api/users').then(r=>r.json()).then(d=>{ const arr = Array.isArray(d)?d:[]; setUsers(arr); localStorage.setItem('users_db_cache', JSON.stringify(arr)); setLoading(false); }).catch(()=>setLoading(false));
   }, []);
 
   const roles = ['All', 'Admin', 'Manager', 'Buyer', 'Finance', 'Viewer'];

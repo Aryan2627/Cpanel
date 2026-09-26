@@ -11,8 +11,13 @@ export default function ClientDashboard() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    const cachedAuth = localStorage.getItem('auth_me_cache');
+    if (cachedAuth) { try { setUser(JSON.parse(cachedAuth)); } catch(e){} }
+    const cachedStats = localStorage.getItem('dashboard_stats_cache');
+    if (cachedStats) { try { setStats(JSON.parse(cachedStats)); setLoading(false); } catch(e){} }
+
     fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => { if (d) setUser(d); });
-    fetch('/api/dashboard/stats').then(r => r.json()).then(d => { setStats(d); setLoading(false); }).catch(() => setLoading(false));
+    fetch('/api/dashboard/stats').then(r => r.json()).then(d => { setStats(d); localStorage.setItem('dashboard_stats_cache', JSON.stringify(d)); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
   const kpis = [

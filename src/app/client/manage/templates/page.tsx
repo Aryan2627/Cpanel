@@ -12,8 +12,12 @@ export default function TemplatesPage() {
   useEffect(() => {
     const load = async () => {
       try {
+        const cached = localStorage.getItem('templates_db_cache');
+        if (cached) { try { setTemplates(JSON.parse(cached)); setLoading(false); } catch(e){} }
         const r = await fetch('/api/templates'); const d = await r.json();
-        setTemplates(Array.isArray(d)?d:[]);
+        const arr = Array.isArray(d)?d:[];
+        setTemplates(arr);
+        localStorage.setItem('templates_db_cache', JSON.stringify(arr));
       } catch { setTemplates([]); } finally { setLoading(false); }
     }; load();
   }, []);

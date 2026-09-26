@@ -13,7 +13,9 @@ export default function ProductsPage() {
   const [sortConfig, setSortConfig] = useState<{key:string;direction:'asc'|'desc'}|null>(null);
 
   useEffect(() => {
-    fetch('/api/products').then(r=>r.json()).then(d=>{ setProducts(Array.isArray(d)?d:[]); setLoading(false); }).catch(()=>setLoading(false));
+    const cached = localStorage.getItem('products_db_cache');
+    if (cached) { try { setProducts(JSON.parse(cached)); setLoading(false); } catch(e){} }
+    fetch('/api/products').then(r=>r.json()).then(d=>{ const arr = Array.isArray(d)?d:[]; setProducts(arr); localStorage.setItem('products_db_cache', JSON.stringify(arr)); setLoading(false); }).catch(()=>setLoading(false));
   }, []);
 
   const categories = useMemo(() => ['All', ...Array.from(new Set(products.map(p=>p.category||'Uncategorised').filter(Boolean)))], [products]);
