@@ -250,7 +250,18 @@ export default function ApprovalsPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
             {workflows.map(w => {
               let approverList: string[] = [];
-              try { approverList = JSON.parse(w.approvers || '[]'); } catch (e) {}
+              try { 
+                let parsed = JSON.parse(w.approvers || '[]'); 
+                if (Array.isArray(parsed)) {
+                  approverList = parsed;
+                } else if (typeof parsed === 'string') {
+                  approverList = [parsed];
+                }
+              } catch (e) {
+                if (typeof w.approvers === 'string' && w.approvers.length > 0) {
+                  approverList = [w.approvers];
+                }
+              }
               
               return (
                 <div key={w.id} style={{ backgroundColor: '#fff', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '28px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', transition: 'all 0.2s', cursor: 'pointer', position: 'relative', overflow: 'hidden' }} onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 20px 40px -10px rgba(0,0,0,0.08)'; e.currentTarget.style.borderColor = '#cbd5e1'; }} onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0,0,0,0.02)'; e.currentTarget.style.borderColor = '#e2e8f0'; }}>
