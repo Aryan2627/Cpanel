@@ -12,7 +12,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(searchParam);
     
     const whereConditions: any = [
-      { refId: { equals: searchParam, mode: 'insensitive' } },
+      { refId: { contains: searchParam, mode: 'insensitive' } },
       { title: { contains: searchParam, mode: 'insensitive' } }
     ];
     if (isUuid) whereConditions.push({ id: searchParam });
