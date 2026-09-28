@@ -222,76 +222,83 @@ export default function ApprovalsPage() {
 
   // List Mode (Default)
   return (
-    <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+    <div style={{ padding: '40px', maxWidth: '1400px', margin: '0 auto', fontFamily: 'Inter, system-ui, sans-serif', minHeight: '100vh', background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', background: '#fff', padding: '32px', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.05)' }}>
         <div>
-          <h1 style={{ margin: '0 0 8px 0', fontSize: '1.8rem', color: '#0f172a', fontWeight: 800 }}>Workflow & Approvals</h1>
-          <p style={{ margin: 0, color: '#64748b', fontSize: '0.95rem' }}>Design visual, automated workflows for procurement processes.</p>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: '#eff6ff', color: '#2563eb', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, marginBottom: '16px' }}>
+            <Server size={14} /> Workflow Automation Engine
+          </div>
+          <h1 style={{ margin: '0 0 12px 0', fontSize: '2.2rem', color: '#0f172a', fontWeight: 800, letterSpacing: '-0.02em' }}>Flow & Approvals</h1>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '1.05rem', maxWidth: '600px', lineHeight: 1.5 }}>Design visual, automated workflows for procurement processes. Build complex multi-stage approvals, conditionals, and system actions instantly.</p>
         </div>
         <button onClick={() => {
           setNodes(initialNodes); setEdges(initialEdges); setFlowName('New Visual Flow'); setMode('builder');
-        }} style={{ padding: '12px 24px', backgroundColor: '#0f172a', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 600, fontSize: '0.95rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', transition: 'transform 0.1s' }}>
+        }} style={{ padding: '14px 28px', backgroundColor: '#0f172a', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.4)', transition: 'all 0.2s', backgroundImage: 'linear-gradient(to right, #0f172a, #1e293b)' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
           <Plus size={18} /> Open Flow Designer
         </button>
       </div>
 
       {loading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '64px' }}><div className="spinner"></div></div>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '64px' }}>
+          <div style={{ width: '40px', height: '40px', border: '3px solid #e2e8f0', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
       ) : (
         workflows.length > 0 ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
             {workflows.map(w => {
               let approverList: string[] = [];
               try { approverList = JSON.parse(w.approvers || '[]'); } catch (e) {}
               
               return (
-                <div key={w.id} style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                <div key={w.id} style={{ backgroundColor: '#fff', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '28px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', transition: 'all 0.2s', cursor: 'pointer', position: 'relative', overflow: 'hidden' }} onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 20px 40px -10px rgba(0,0,0,0.08)'; e.currentTarget.style.borderColor = '#cbd5e1'; }} onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0,0,0,0.02)'; e.currentTarget.style.borderColor = '#e2e8f0'; }}>
+                  
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(to right, #3b82f6, #8b5cf6)' }}></div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
                     <div>
-                      <div style={{ display: 'inline-block', padding: '4px 10px', background: '#eff6ff', color: '#2563eb', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 700, marginBottom: '10px' }}>{w.category}</div>
-                      <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', color: '#0f172a', fontWeight: 700 }}>{w.name}</h3>
-                      <div style={{ color: '#64748b', fontSize: '0.8rem' }}>Created: {new Date(w.createdAt).toLocaleDateString()}</div>
+                      <div style={{ display: 'inline-flex', padding: '4px 10px', background: '#f1f5f9', color: '#475569', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 700, marginBottom: '12px', border: '1px solid #e2e8f0' }}>{w.category || 'Custom Flow'}</div>
+                      <h3 style={{ margin: '0 0 6px 0', fontSize: '1.2rem', color: '#0f172a', fontWeight: 800 }}>{w.name}</h3>
+                      <div style={{ color: '#94a3b8', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}>Updated {new Date(w.createdAt).toLocaleDateString()}</div>
                     </div>
                   </div>
                   
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Visual Flow Path</div>
+                  <div style={{ flex: 1, background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '6px' }}><GitMerge size={12} /> Execution Path</div>
                     {approverList.length > 0 ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                           <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Play size={10} /></div>
-                           <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Trigger Start</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                           <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(37,99,235,0.1)' }}><Play size={12} /></div>
+                           <div style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>Trigger Event</div>
                         </div>
                         {approverList.map((ap: string, i: number) => (
-                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px', borderLeft: '2px solid #e2e8f0', paddingLeft: '16px' }}>
-                            <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#f8faff', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.6rem', flexShrink: 0 }}>{i + 1}</div>
-                            <div style={{ flex: 1, background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '7px', padding: '6px 10px', fontSize: '0.8rem', color: '#334155', fontWeight: 500 }}>{ap}</div>
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '13px', borderLeft: '2px dashed #cbd5e1', paddingLeft: '14px' }}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#f8faff', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.7rem', flexShrink: 0, border: '1px solid #e2e8f0' }}>{i + 1}</div>
+                            <div style={{ flex: 1, background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '8px 12px', fontSize: '0.85rem', color: '#0f172a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}><User size={14} color="#64748b" /> {ap}</div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '8px', textAlign: 'center', color: '#94a3b8', fontSize: '0.8rem', marginBottom: '16px' }}>Flow contains non-user actions</div>
+                      <div style={{ padding: '16px', background: '#fff', border: '1px dashed #cbd5e1', borderRadius: '12px', textAlign: 'center', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600 }}>Flow contains non-user actions</div>
                     )}
                   </div>
                   
-                  <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
-                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 10px', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 700, color: '#15803d' }}><CheckCircle2 size={12} /> Active</div>
-                    <button onClick={() => handleDelete(w.id)} style={{ padding: '6px 12px', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '7px', cursor: 'pointer', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.72rem', fontWeight: 600 }}><Trash2 size={12} /> Delete</button>
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700, color: '#059669' }}><CheckCircle2 size={14} /> Active</div>
+                    <button onClick={(e) => { e.stopPropagation(); handleDelete(w.id); }} style={{ padding: '10px 16px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', cursor: 'pointer', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 600, transition: 'all 0.1s' }} onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'} onMouseLeave={e => e.currentTarget.style.background = '#fff'}><Trash2 size={14} /> Delete</button>
                   </div>
                 </div>
               );
             })}
           </div>
         ) : (
-          <div style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '64px', textAlign: 'center', boxShadow: 'none' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ShieldAlert size={30} color="#cbd5e1" /></div>
-              <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.1rem' }}>No workflows configured</div>
-              <div style={{ color: '#475569', fontSize: '0.875rem', maxWidth: '380px' }}>Build your first visual approval flow to route PRs automatically.</div>
-              <button onClick={() => {
-                setNodes(initialNodes); setEdges(initialEdges); setFlowName('New Visual Flow'); setMode('builder');
-              }} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '12px', padding: '12px 24px', background: '#0f172a', color: '#fff', borderRadius: '10px', border: 'none', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}><Plus size={18} /> Open Flow Designer</button>
-            </div>
+          <div style={{ backgroundColor: '#fff', borderRadius: '24px', border: '1px solid #e2e8f0', padding: '80px', textAlign: 'center', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: '80px', height: '80px', borderRadius: '24px', background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px', boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.5)' }}><GitMerge size={36} color="#64748b" /></div>
+            <h2 style={{ fontWeight: 800, color: '#0f172a', fontSize: '1.5rem', margin: '0 0 12px 0' }}>No workflows configured</h2>
+            <p style={{ color: '#64748b', fontSize: '1.05rem', maxWidth: '400px', margin: '0 0 32px 0', lineHeight: 1.5 }}>Build your first visual approval flow to route purchase requests automatically through your organization.</p>
+            <button onClick={() => {
+              setNodes(initialNodes); setEdges(initialEdges); setFlowName('New Visual Flow'); setMode('builder');
+            }} style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '16px 32px', background: '#2563eb', color: '#fff', borderRadius: '14px', border: 'none', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(37,99,235,0.4)', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}><Plus size={20} /> Open Flow Designer</button>
           </div>
         )
       )}
