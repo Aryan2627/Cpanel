@@ -84,6 +84,31 @@ const launchPiP = async () => {
   }
 };
 
+const BidAnalyzerForm = ({ onSubmit }: { onSubmit: (eventId: string) => void }) => {
+  const [eventId, setEventId] = useState('');
+  const inp = { width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.07)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' };
+  return (
+    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(15,23,42,0.9)', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 4px 24px rgba(0,0,0,0.4)' }}>
+      <div style={{ marginBottom:'14px' }}>
+        <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Target Event ID / Name</label>
+        <input 
+          type="text" 
+          placeholder="e.g. EVT-1234 or Laptop Procurement" 
+          value={eventId} 
+          onChange={e=>setEventId(e.target.value)} 
+          style={inp}
+        />
+      </div>
+      <button 
+        onClick={() => { if(eventId.trim()) onSubmit(eventId.trim()); }} 
+        style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#3b82f6,#2563eb)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}
+      >
+        Analyze Bids
+      </button>
+    </div>
+  );
+};
+
 const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => {
   const [docType, setDocType] = useState('NDA');
   const [fd, setFd] = useState<any>({});
@@ -1036,7 +1061,13 @@ export default function DorcPage() {
                   )}
 
                   {/* Document Generator Form */}
-                  {msg.uiComponent==='document_generator_form' && (
+                  
+                    {/* Bid Analyzer Form */}
+                    {msg.uiComponent==='bid_analyzer_form' && (
+                      <BidAnalyzerForm onSubmit={e => execute('/analyze bids for ' + e)}/>
+                    )}
+
+{msg.uiComponent==='document_generator_form' && (
                     <DocumentGeneratorForm onSubmit={d=>execute('/execute-draft-document '+JSON.stringify(d))}/>
                   )}
 
@@ -1389,7 +1420,40 @@ export default function DorcPage() {
                     )}
 
                     {/* 3Way Match */}
-                    {msg.uiComponent==='three_way_match' && (
+                    
+                    {/* Bid Matrix */}
+                    {msg.uiComponent==='bid_matrix' && msg.uiData && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> Vendor Bid Matrix - {msg.uiData.eventName}</div>
+                        <div style={{ overflowX:'auto' }}>
+                          <table style={{ width:'100%', fontSize:'0.75rem', textAlign:'left', borderCollapse:'collapse' }}>
+                            <thead>
+                              <tr style={{ color: isDark ? '#94a3b8' : '#64748b', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}>
+                                <th style={{padding:'8px'}}>Vendor</th>
+                                <th style={{padding:'8px'}}>Total Price</th>
+                                <th style={{padding:'8px'}}>Quoted Lines</th>
+                                <th style={{padding:'8px'}}>Compliance</th>
+                                <th style={{padding:'8px'}}>Risk</th>
+                                <th style={{padding:'8px'}}>Dorc Score</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {msg.uiData.bids.map((b: any, idx: number) => (
+                                <tr key={idx} style={{ color: isDark ? '#e2e8f0' : '#0f172a', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #f1f5f9' }}>
+                                  <td style={{padding:'8px', fontWeight:600}}>{b.vendor}</td>
+                                  <td style={{padding:'8px', color: idx===0 ? '#10b981' : 'inherit', fontWeight: idx===0 ? 700 : 400}}>${b.price.toLocaleString()}</td>
+                                  <td style={{padding:'8px'}}>{b.timeline}</td>
+                                  <td style={{padding:'8px', color: b.compliance==='Pass'?'#10b981':'#ef4444'}}>{b.compliance}</td>
+                                  <td style={{padding:'8px'}}>{b.risk}</td>
+                                  <td style={{padding:'8px', color:'#3b82f6', fontWeight:600}}>{b.score}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+{msg.uiComponent==='three_way_match' && (
                       <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
                         <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> 3-Way Reconciliation</div>
                         <div style={{ overflowX:'auto' }}>
