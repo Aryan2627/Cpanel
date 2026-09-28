@@ -82,6 +82,8 @@ export default function PRPage() {
     const selectedPRData = filteredData.filter(d => selectedRows.has(d.refId));
     const prs = selectedPRData.map(d => d.refId).join(',');
     
+    const allItems = selectedPRData.flatMap(d => d.items.map(item => ({ ...item, _source: d.refId })));
+    localStorage.setItem('prToEventItems', JSON.stringify(allItems));
     const params = new URLSearchParams();
     if (prs) params.append('prs', prs);
     params.append('fromPR', 'true');
