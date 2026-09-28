@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect, useRef } from 'react';
 import { Search, Send, Paperclip, FileText, IndianRupee, Clock, CheckCircle2, Building2, MessageSquare, X } from 'lucide-react';
 
@@ -23,11 +23,11 @@ export default function VendorMessagesPage() {
     const fetch_ = async () => {
       if (!debouncedEventId.trim()) { setVendors([]); setActiveVendor(''); setActiveEvent(null); setAllBids([]); return; }
       try {
-        const er = await fetch(`/api/events/${debouncedEventId}`); if(!er.ok) throw new Error('Not found');
+        const er = await fetch(`/api/events/${encodeURIComponent(debouncedEventId)}`); if(!er.ok) throw new Error('Not found');
         const ed = await er.json(); setActiveEvent(ed);
-        const vr = await fetch(`/api/vendors?eventId=${debouncedEventId}`);
+        const vr = await fetch(`/api/vendors?eventId=${encodeURIComponent(ed.refId)}`);
         let vd:any[]=[]; if(vr.ok){vd=await vr.json();setVendors(vd);}
-        const br = await fetch(`/api/bids?eventId=${ed.id}`); if(br.ok){setAllBids(await br.json());}
+        const br = await fetch(`/api/bids?eventId=${encodeURIComponent(ed.id)}`); if(br.ok){setAllBids(await br.json());}
         if(vd.length>0) setActiveVendor(vd[0].name); else setActiveVendor('');
       } catch { setVendors([]); setActiveEvent(null); setAllBids([]); }
     }; fetch_();
