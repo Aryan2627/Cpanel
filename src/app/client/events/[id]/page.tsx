@@ -1035,13 +1035,28 @@ export default function BuyerEventDetailsPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Awarded Qty:</div>
                     <input 
-                      type="number" 
-                      min="0" 
-                      max={intake.quantity} 
-                      value={awardQuantities[intake.refId] || 0}
-                      onChange={(e) => setAwardQuantities({...awardQuantities, [intake.refId]: parseInt(e.target.value) || 0})}
-                      style={{ width: '80px', padding: '8px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', textAlign: 'center' }}
-                    />
+                        type="number" 
+                        min="0" 
+                        max={intake.quantity} 
+                        value={awardQuantities[intake.refId] !== undefined ? awardQuantities[intake.refId] : 0}
+                        onChange={(e) => {
+                          let val = parseInt(e.target.value) || 0;
+                          if (val > (intake.quantity || 0)) {
+                            val = intake.quantity || 0;
+                            e.target.value = val;
+                          }
+                          setAwardQuantities({...awardQuantities, [intake.refId]: val});
+                        }}
+                        onBlur={(e) => {
+                          let val = parseInt(e.target.value) || 0;
+                          if (val > (intake.quantity || 0)) {
+                            val = intake.quantity || 0;
+                            e.target.value = val;
+                            setAwardQuantities({...awardQuantities, [intake.refId]: val});
+                          }
+                        }}
+                        style={{ width: '80px', padding: '8px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', textAlign: 'center' }}
+                      />
                     <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>/ {intake.quantity}</div>
                   </div>
                 </div>
