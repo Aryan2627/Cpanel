@@ -651,12 +651,19 @@ function SingleStageCreateContent() {
                                               let val = e.target.value;
                                               if (isQty && maxQty !== undefined && Number(val) > maxQty) {
                                                 val = maxQty.toString();
+                                                e.target.value = val;
                                               }
                                               setCreatorData({ ...creatorData, [f.key]: val });
                                             }}
                                             style={isReadOnly ? { ...glassInputStyle, background: '#f1f5f9', cursor: 'not-allowed', color: '#64748b' } : glassInputStyle} 
                                             onFocus={e => !isReadOnly && (e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)')} 
-                                            onBlur={e => !isReadOnly && (e.currentTarget.style.boxShadow = 'none')}
+                                            onBlur={e => {
+                                              if (!isReadOnly) e.currentTarget.style.boxShadow = 'none';
+                                              if (isQty && maxQty !== undefined && Number(e.target.value) > maxQty) {
+                                                e.target.value = maxQty.toString();
+                                                setCreatorData({ ...creatorData, [f.key]: maxQty.toString() });
+                                              }
+                                            }}
                                           />
                                         );
                                       })()}
