@@ -130,9 +130,10 @@ export default function ApprovalsPage() {
                   }}></div>
 
                   <div style={{ padding: '24px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    {/* Editable Step Title */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
                       <div style={{ 
-                        width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: '40px', height: '40px', borderRadius: '12px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
                         background: step.type === 'trigger' ? '#eff6ff' : step.type === 'approval' ? '#f5f3ff' : step.type === 'condition' ? '#fffbeb' : '#ecfdf5',
                         color: step.type === 'trigger' ? '#3b82f6' : step.type === 'approval' ? '#8b5cf6' : step.type === 'condition' ? '#f59e0b' : '#10b981'
                       }}>
@@ -141,27 +142,83 @@ export default function ApprovalsPage() {
                         {step.type === 'condition' && <GitMerge size={20} />}
                         {step.type === 'action' && <Server size={20} />}
                       </div>
-                      <div>
-                        <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          {step.type === 'trigger' ? '1. Trigger Event' : `${index + 1}. ${step.type} Step`}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '2px' }}>
+                          {step.type === 'trigger' ? 'Trigger' : step.type === 'approval' ? 'Approval Step' : step.type === 'condition' ? 'Logic Condition' : 'System Action'}
                         </div>
                         <input 
                           value={step.label}
                           onChange={(e) => updateStep(step.id, 'label', e.target.value)}
-                          style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0f172a', border: 'none', outline: 'none', background: 'transparent', padding: '4px 0', width: '100%' }}
+                          placeholder="Enter step name..."
+                          style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', border: 'none', borderBottom: '2px solid #e2e8f0', outline: 'none', background: 'transparent', padding: '2px 0', width: '100%' }}
                         />
                       </div>
                     </div>
 
+                    {/* TRIGGER fields */}
+                    {step.type === 'trigger' && (
+                      <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '16px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1d4ed8', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Trigger Description</label>
+                        <input value={step.description || ''} onChange={e => updateStep(step.id, 'description', e.target.value)} placeholder="e.g. Fires when a new PR is submitted..." style={{ width: '100%', padding: '10px 14px', border: '1px solid #bfdbfe', borderRadius: '8px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', background: '#fff' }} />
+                      </div>
+                    )}
+
+                    {/* APPROVAL fields */}
                     {step.type === 'approval' && (
-                      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#475569' }}>Assigned To:</div>
-                        <input 
-                          value={step.assignee}
-                          onChange={(e) => updateStep(step.id, 'assignee', e.target.value)}
-                          placeholder="e.g. Finance Manager"
-                          style={{ flex: 1, padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.9rem', outline: 'none' }}
-                        />
+                      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Assigned Role / User</label>
+                          <input value={step.assignee || ''} onChange={e => updateStep(step.id, 'assignee', e.target.value)} placeholder="e.g. Finance Manager, VP of Operations..." style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', background: '#fff' }} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>SLA / Deadline</label>
+                          <input value={step.sla || ''} onChange={e => updateStep(step.id, 'sla', e.target.value)} placeholder="e.g. 2 business days" style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', background: '#fff' }} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Instructions for Approver</label>
+                          <input value={step.instructions || ''} onChange={e => updateStep(step.id, 'instructions', e.target.value)} placeholder="e.g. Review all attached quotes before approving..." style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', background: '#fff' }} />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* CONDITION fields */}
+                    {step.type === 'condition' && (
+                      <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#92400e', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Condition / Criteria (IF)</label>
+                          <input value={step.ifCondition || ''} onChange={e => updateStep(step.id, 'ifCondition', e.target.value)} placeholder="e.g. PR Total Amount > $50,000" style={{ width: '100%', padding: '10px 14px', border: '1px solid #fde68a', borderRadius: '8px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', background: '#fff' }} />
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                          <div>
+                            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>If TRUE → Route To</label>
+                            <input value={step.trueRoute || ''} onChange={e => updateStep(step.id, 'trueRoute', e.target.value)} placeholder="e.g. VP Approval" style={{ width: '100%', padding: '10px 14px', border: '1px solid #a7f3d0', borderRadius: '8px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', background: '#fff' }} />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#dc2626', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>If FALSE → Route To</label>
+                            <input value={step.falseRoute || ''} onChange={e => updateStep(step.id, 'falseRoute', e.target.value)} placeholder="e.g. Auto-Approve" style={{ width: '100%', padding: '10px 14px', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', background: '#fff' }} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ACTION fields */}
+                    {step.type === 'action' && (
+                      <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#065f46', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Action Type</label>
+                          <select value={step.actionType || 'notify'} onChange={e => updateStep(step.id, 'actionType', e.target.value)} style={{ width: '100%', padding: '10px 14px', border: '1px solid #a7f3d0', borderRadius: '8px', fontSize: '0.9rem', outline: 'none', background: '#fff', cursor: 'pointer' }}>
+                            <option value="notify">Send Email Notification</option>
+                            <option value="po">Auto-Generate Purchase Order</option>
+                            <option value="erp">Sync to ERP System</option>
+                            <option value="reject">Auto-Reject Request</option>
+                            <option value="escalate">Escalate to Senior Manager</option>
+                            <option value="close">Close & Archive Request</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#065f46', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Notes / Details</label>
+                          <input value={step.actionNote || ''} onChange={e => updateStep(step.id, 'actionNote', e.target.value)} placeholder="e.g. Notify requester with rejection reason..." style={{ width: '100%', padding: '10px 14px', border: '1px solid #a7f3d0', borderRadius: '8px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', background: '#fff' }} />
+                        </div>
                       </div>
                     )}
                   </div>
