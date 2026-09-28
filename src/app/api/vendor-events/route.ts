@@ -42,6 +42,7 @@ export async function GET(request: Request) {
     }
 
     const allEvents = await prisma.event.findMany({
+      include: { organization: true },
       orderBy: { createdAt: 'desc' }
     });
     
