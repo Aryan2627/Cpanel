@@ -140,7 +140,7 @@ export default function ApprovalsPage() {
 
   if (mode === 'builder') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '100vh', background: '#f8fafc', margin: '-32px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: '#f8fafc', zIndex: 1000 }}>
         {/* Builder Header */}
         <div style={{ height: '70px', background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -164,7 +164,7 @@ export default function ApprovalsPage() {
         </div>
 
         {/* Builder Canvas + Sidebar */}
-        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', flex: 1, height: '100%', overflow: 'hidden', position: 'relative' }}>
           {/* Sidebar Tools */}
           <div style={{ width: '280px', background: '#fff', borderRight: '1px solid #e2e8f0', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', overflowY: 'auto', zIndex: 10 }}>
             <div>
