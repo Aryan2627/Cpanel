@@ -17,51 +17,54 @@ const initialEdges: Edge[] = [];
 
 // Custom Node Components
 const TriggerNode = ({ data }: any) => (
-  <div style={{ padding: '12px 20px', borderRadius: '8px', background: '#f8fafc', border: '2px solid #3b82f6', minWidth: '180px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#1d4ed8', fontWeight: 700, fontSize: '0.85rem', marginBottom: '4px' }}>
-      <Play size={14} /> TRIGGER
+  <div style={{ padding: '16px 24px', borderRadius: '16px', background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)', color: '#fff', minWidth: '220px', textAlign: 'center', boxShadow: '0 20px 40px -10px rgba(59, 130, 246, 0.5)', border: '1px solid rgba(255,255,255,0.2)' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#93c5fd', fontWeight: 800, fontSize: '0.75rem', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <Play size={14} /> TRIGGER EVENT
     </div>
-    <div style={{ color: '#0f172a', fontWeight: 600, fontSize: '0.95rem' }}>{data.label}</div>
-    <Handle type="source" position={Position.Bottom} style={{ background: '#3b82f6', width: '8px', height: '8px' }} />
+    <div style={{ fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>{data.label}</div>
+    <Handle type="source" position={Position.Bottom} style={{ background: '#fff', width: '12px', height: '12px', border: '3px solid #3b82f6', bottom: '-6px' }} />
   </div>
 );
 
 const ApprovalNode = ({ data }: any) => (
-  <div style={{ padding: '12px 20px', borderRadius: '8px', background: '#fff', border: '2px solid #8b5cf6', minWidth: '180px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-    <Handle type="target" position={Position.Top} style={{ background: '#8b5cf6', width: '8px', height: '8px' }} />
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#6d28d9', fontWeight: 700, fontSize: '0.85rem', marginBottom: '4px' }}>
-      <User size={14} /> APPROVAL
+  <div style={{ padding: '16px 24px', borderRadius: '16px', background: '#ffffff', minWidth: '220px', textAlign: 'center', boxShadow: '0 15px 35px -5px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0' }}>
+    <Handle type="target" position={Position.Top} style={{ background: '#fff', width: '12px', height: '12px', border: '3px solid #8b5cf6', top: '-6px' }} />
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#8b5cf6', fontWeight: 800, fontSize: '0.75rem', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <User size={14} /> APPROVAL STEP
     </div>
-    <div style={{ color: '#0f172a', fontWeight: 600, fontSize: '0.95rem' }}>{data.label}</div>
-    <div style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '4px' }}>Assigned to: {data.assignee || 'Unassigned'}</div>
-    <Handle type="source" position={Position.Bottom} style={{ background: '#8b5cf6', width: '8px', height: '8px' }} />
+    <div style={{ color: '#0f172a', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>{data.label}</div>
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f8fafc', padding: '6px 12px', borderRadius: '20px', color: '#475569', fontSize: '0.75rem', marginTop: '12px', fontWeight: 600, border: '1px solid #e2e8f0' }}>
+      <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#8b5cf6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>{data.assignee?.charAt(0) || 'U'}</div>
+      {data.assignee || 'Unassigned'}
+    </div>
+    <Handle type="source" position={Position.Bottom} style={{ background: '#fff', width: '12px', height: '12px', border: '3px solid #8b5cf6', bottom: '-6px' }} />
   </div>
 );
 
 const ConditionNode = ({ data }: any) => (
-  <div style={{ padding: '16px 20px', borderRadius: '8px', background: '#fff', border: '2px solid #f59e0b', minWidth: '180px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-    <Handle type="target" position={Position.Top} style={{ background: '#f59e0b', width: '8px', height: '8px' }} />
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#b45309', fontWeight: 700, fontSize: '0.85rem', marginBottom: '4px' }}>
-      <GitMerge size={14} /> CONDITION
+  <div style={{ padding: '16px 24px', borderRadius: '16px', background: '#ffffff', minWidth: '240px', textAlign: 'center', boxShadow: '0 15px 35px -5px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0' }}>
+    <Handle type="target" position={Position.Top} style={{ background: '#fff', width: '12px', height: '12px', border: '3px solid #f59e0b', top: '-6px' }} />
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#f59e0b', fontWeight: 800, fontSize: '0.75rem', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <GitMerge size={14} /> LOGIC CONDITION
     </div>
-    <div style={{ color: '#0f172a', fontWeight: 600, fontSize: '0.95rem' }}>{data.label}</div>
+    <div style={{ color: '#0f172a', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em', marginBottom: '8px' }}>{data.label}</div>
     
-    <Handle type="source" position={Position.Bottom} id="true" style={{ left: '30%', background: '#10b981', width: '10px', height: '10px' }} />
-    <div style={{ position: 'absolute', bottom: '-20px', left: '20%', fontSize: '10px', color: '#10b981', fontWeight: 'bold' }}>TRUE</div>
+    <Handle type="source" position={Position.Bottom} id="true" style={{ left: '25%', background: '#fff', width: '12px', height: '12px', border: '3px solid #10b981', bottom: '-6px' }} />
+    <div style={{ position: 'absolute', bottom: '-26px', left: '15%', fontSize: '11px', color: '#059669', fontWeight: 800, background: '#ecfdf5', padding: '2px 8px', borderRadius: '10px', border: '1px solid #a7f3d0' }}>TRUE</div>
     
-    <Handle type="source" position={Position.Bottom} id="false" style={{ left: '70%', background: '#ef4444', width: '10px', height: '10px' }} />
-    <div style={{ position: 'absolute', bottom: '-20px', left: '60%', fontSize: '10px', color: '#ef4444', fontWeight: 'bold' }}>FALSE</div>
+    <Handle type="source" position={Position.Bottom} id="false" style={{ left: '75%', background: '#fff', width: '12px', height: '12px', border: '3px solid #ef4444', bottom: '-6px' }} />
+    <div style={{ position: 'absolute', bottom: '-26px', left: '65%', fontSize: '11px', color: '#dc2626', fontWeight: 800, background: '#fef2f2', padding: '2px 8px', borderRadius: '10px', border: '1px solid #fecaca' }}>FALSE</div>
   </div>
 );
 
 const ActionNode = ({ data }: any) => (
-  <div style={{ padding: '12px 20px', borderRadius: '8px', background: '#fff', border: '2px solid #10b981', minWidth: '180px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-    <Handle type="target" position={Position.Top} style={{ background: '#10b981', width: '8px', height: '8px' }} />
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#047857', fontWeight: 700, fontSize: '0.85rem', marginBottom: '4px' }}>
-      <Server size={14} /> ACTION
+  <div style={{ padding: '16px 24px', borderRadius: '16px', background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)', color: '#fff', minWidth: '220px', textAlign: 'center', boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+    <Handle type="target" position={Position.Top} style={{ background: '#10b981', width: '12px', height: '12px', border: '2px solid #fff', top: '-6px' }} />
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#10b981', fontWeight: 800, fontSize: '0.75rem', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <Server size={14} /> AUTOMATED ACTION
     </div>
-    <div style={{ color: '#0f172a', fontWeight: 600, fontSize: '0.95rem' }}>{data.label}</div>
-    <Handle type="source" position={Position.Bottom} style={{ background: '#10b981', width: '8px', height: '8px' }} />
+    <div style={{ fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>{data.label}</div>
+    <Handle type="source" position={Position.Bottom} style={{ background: '#10b981', width: '12px', height: '12px', border: '2px solid #fff', bottom: '-6px' }} />
   </div>
 );
 
@@ -140,82 +143,81 @@ export default function ApprovalsPage() {
 
   if (mode === 'builder') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: '#f8fafc', zIndex: 1000 }}>
-        {/* Builder Header */}
-        <div style={{ height: '70px', background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button onClick={() => setMode('list')} style={{ background: '#f1f5f9', border: 'none', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#475569' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: '#f8fafc', zIndex: 1000, overflow: 'hidden' }}>
+        
+        {/* Full Screen Canva-style Canvas */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            nodeTypes={nodeTypes}
+            fitView
+            defaultEdgeOptions={{ type: 'smoothstep', style: { strokeWidth: 3, stroke: '#cbd5e1' } }}
+          >
+            <Background color="#cbd5e1" gap={24} size={2} />
+            <Controls style={{ background: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', overflow: 'hidden' }} />
+            <MiniMap 
+              style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)', overflow: 'hidden' }}
+              nodeColor={(n) => {
+              if (n.type === 'trigger') return '#3b82f6';
+              if (n.type === 'approval') return '#8b5cf6';
+              if (n.type === 'condition') return '#f59e0b';
+              if (n.type === 'action') return '#10b981';
+              return '#cbd5e1';
+            }} />
+          </ReactFlow>
+        </div>
+
+        {/* Canva-style Floating Header Overlay */}
+        <div style={{ position: 'absolute', top: '24px', left: '24px', right: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
+          
+          {/* Left Side: Name and Back */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(12px)', padding: '10px 20px', borderRadius: '24px', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.08)', border: '1px solid rgba(255,255,255,0.4)' }}>
+            <button onClick={() => setMode('list')} style={{ background: '#f1f5f9', border: 'none', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#0f172a', transition: 'all 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#e2e8f0'} onMouseLeave={e => e.currentTarget.style.background = '#f1f5f9'}>
               <ChevronLeft size={20} />
             </button>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Flow Designer (ServiceNow Style)</span>
-              <input 
-                value={flowName} 
-                onChange={e => setFlowName(e.target.value)} 
-                style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', border: 'none', outline: 'none', background: 'transparent', padding: 0 }}
-              />
-            </div>
+            <div style={{ width: '1px', height: '24px', background: '#e2e8f0' }}></div>
+            <input 
+              value={flowName} 
+              onChange={e => setFlowName(e.target.value)} 
+              style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', border: 'none', outline: 'none', background: 'transparent', padding: '4px 8px', width: '250px' }}
+              placeholder="Name your design..."
+            />
           </div>
+
+          {/* Right Side: Actions */}
           <div style={{ display: 'flex', gap: '12px' }}>
-            <button onClick={handleSaveFlow} style={{ padding: '10px 20px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px -1px rgba(37,99,235,0.2)' }}>
-              <Save size={16} /> Save & Activate Flow
+            <button onClick={handleSaveFlow} style={{ padding: '12px 24px', background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: '#fff', border: 'none', borderRadius: '24px', fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 10px 25px -5px rgba(99, 102, 241, 0.5)', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
+              <Save size={18} /> Save Flow
             </button>
           </div>
         </div>
 
-        {/* Builder Canvas + Sidebar */}
-        <div style={{ display: 'flex', flex: 1, height: '100%', overflow: 'hidden', position: 'relative' }}>
-          {/* Sidebar Tools */}
-          <div style={{ width: '280px', background: '#fff', borderRight: '1px solid #e2e8f0', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', overflowY: 'auto', zIndex: 10 }}>
-            <div>
-              <h3 style={{ margin: '0 0 12px 0', fontSize: '0.85rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Add Nodes</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <button onClick={() => addNode('approval')} style={{ width: '100%', padding: '12px', background: '#faf5ff', border: '1px solid #d8b4fe', borderRadius: '8px', color: '#6d28d9', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', transition: 'all 0.2s' }}>
-                  <User size={18} /> User Approval
-                </button>
-                <button onClick={() => addNode('condition')} style={{ width: '100%', padding: '12px', background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '8px', color: '#b45309', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', transition: 'all 0.2s' }}>
-                  <GitMerge size={18} /> If/Else Condition
-                </button>
-                <button onClick={() => addNode('action')} style={{ width: '100%', padding: '12px', background: '#ecfdf5', border: '1px solid #6ee7b7', borderRadius: '8px', color: '#047857', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', transition: 'all 0.2s' }}>
-                  <Server size={18} /> System Action
-                </button>
-              </div>
-            </div>
+        {/* Canva-style Floating Tool Panel (Left) */}
+        <div style={{ position: 'absolute', top: '90px', left: '24px', width: '80px', display: 'flex', flexDirection: 'column', gap: '16px', zIndex: 10 }}>
+          <div style={{ background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(12px)', padding: '12px', borderRadius: '24px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)', border: '1px solid rgba(255,255,255,0.4)', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
             
-            <div>
-              <h3 style={{ margin: '0 0 12px 0', fontSize: '0.85rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Instructions</h3>
-              <p style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.5 }}>
-                Click a button above to drop a new node onto the canvas. <br/><br/>
-                Drag from the colored dot at the bottom of a node to connect it to the top of the next node. <br/><br/>
-                For Condition nodes, route the <strong>TRUE</strong> and <strong>FALSE</strong> paths to different actions.
-              </p>
-            </div>
-          </div>
+            <button onClick={() => addNode('approval')} style={{ width: '56px', height: '56px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', color: '#8b5cf6', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#8b5cf6'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = '#e2e8f0'; }}>
+              <User size={22} />
+              <span style={{ fontSize: '9px', fontWeight: 700 }}>Approve</span>
+            </button>
 
-          {/* ReactFlow Canvas */}
-          <div style={{ flex: 1, position: 'relative', background: '#f1f5f9' }}>
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              nodeTypes={nodeTypes}
-              fitView
-              defaultEdgeOptions={{ type: 'smoothstep', style: { strokeWidth: 2, stroke: '#94a3b8' } }}
-            >
-              <Background color="#cbd5e1" gap={20} size={1} />
-              <Controls style={{ background: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-              <MiniMap nodeStrokeColor={(n) => {
-                if (n.type === 'trigger') return '#3b82f6';
-                if (n.type === 'approval') return '#8b5cf6';
-                if (n.type === 'condition') return '#f59e0b';
-                if (n.type === 'action') return '#10b981';
-                return '#000';
-              }} nodeColor="#fff" />
-            </ReactFlow>
+            <button onClick={() => addNode('condition')} style={{ width: '56px', height: '56px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', color: '#f59e0b', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#f59e0b'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = '#e2e8f0'; }}>
+              <GitMerge size={22} />
+              <span style={{ fontSize: '9px', fontWeight: 700 }}>Logic</span>
+            </button>
+
+            <button onClick={() => addNode('action')} style={{ width: '56px', height: '56px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', color: '#10b981', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#10b981'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = '#e2e8f0'; }}>
+              <Server size={22} />
+              <span style={{ fontSize: '9px', fontWeight: 700 }}>Action</span>
+            </button>
+
           </div>
         </div>
+
       </div>
     );
   }
