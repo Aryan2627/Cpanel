@@ -231,7 +231,7 @@ function SingleStageCreateContent() {
               evaluatorId: '',
               _source: `PR ${prod._source}`,
               values: {
-                "Item Name": prod.name,
+                "Item Name": prod.name || prod.product || prod.itemName || prod.title || prod.productName || prod.item || prod.description,
                 "Product Code": prod.code,
                 "Quantity": prod.qty?.toString(),
                 "UOM": prod.uom || "EA",
