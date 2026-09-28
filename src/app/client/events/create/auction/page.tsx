@@ -635,16 +635,39 @@ function AuctionCreateContent() {
                                         style={glassInputStyle}
                                       />
                                     ) : f.type === 'date' ? (
-                                      <input 
-                                        type="date" value={creatorData[f.key] || ''} onChange={(e) => setCreatorData({ ...creatorData, [f.key]: e.target.value })}
-                                        style={glassInputStyle} onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'} onBlur={e => e.currentTarget.style.boxShadow = 'none'}
-                                      />
-                                    ) : (
-                                      <input 
-                                        type="text" placeholder={`Enter ${f.name}`} value={creatorData[f.key] || ''} onChange={(e) => setCreatorData({ ...creatorData, [f.key]: e.target.value })}
-                                        style={glassInputStyle} onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'} onBlur={e => e.currentTarget.style.boxShadow = 'none'}
-                                      />
-                                    )}
+                                        <input 
+                                          type="date" value={creatorData[f.key] || ''} onChange={(e) => setCreatorData({ ...creatorData, [f.key]: e.target.value })}
+                                          style={glassInputStyle} onFocus={e => e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)'} onBlur={e => e.currentTarget.style.boxShadow = 'none'}
+                                        />
+                                      ) : (() => {
+                                        const nLower = (f.originalKey || f.name || '').toLowerCase();
+                                        const isQty = nLower.includes('quantity') || nLower === 'qty';
+                                        const isProd = nLower.includes('product') || nLower.includes('item');
+                                        const isReadOnly = fromPR && isProd;
+                                        const maxQtyStr = (fromPR && isQty) ? lineItems.find((i) => i.id === f._sourceItemId)?.values?.['Quantity'] : undefined;
+                                        const maxQty = maxQtyStr ? Number(maxQtyStr) : undefined;
+                                        
+                                        return (
+                                          <input 
+                                            type={isQty ? "number" : "text"} 
+                                            max={maxQty}
+                                            readOnly={isReadOnly}
+                                            placeholder={isReadOnly ? "Auto-filled from PR" : `Enter ${f.name}`} 
+                                            value={creatorData[f.key] || ''} 
+                                            onChange={(e) => {
+                                              if (isReadOnly) return;
+                                              let val = e.target.value;
+                                              if (isQty && maxQty !== undefined && Number(val) > maxQty) {
+                                                val = maxQty.toString();
+                                              }
+                                              setCreatorData({ ...creatorData, [f.key]: val });
+                                            }}
+                                            style={isReadOnly ? { ...glassInputStyle, background: '#f1f5f9', cursor: 'not-allowed', color: '#64748b' } : glassInputStyle} 
+                                            onFocus={e => !isReadOnly && (e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.2)')} 
+                                            onBlur={e => !isReadOnly && (e.currentTarget.style.boxShadow = 'none')}
+                                          />
+                                        );
+                                      })()}
                                   </div>
                                 ))}
                               </div>
