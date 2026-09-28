@@ -21,7 +21,12 @@ const TriggerNode = ({ data }: any) => (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#93c5fd', fontWeight: 800, fontSize: '0.75rem', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
       <Play size={14} /> TRIGGER EVENT
     </div>
-    <div style={{ fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>{data.label}</div>
+    <input 
+      className="nodrag"
+      defaultValue={data.label}
+      onChange={e => data.label = e.target.value}
+      style={{ fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em', background: 'rgba(0,0,0,0.1)', border: '1px dashed rgba(255,255,255,0.3)', color: '#fff', textAlign: 'center', width: '100%', borderRadius: '8px', padding: '4px', outline: 'none' }} 
+    />
     <Handle type="source" position={Position.Bottom} style={{ background: '#fff', width: '12px', height: '12px', border: '3px solid #3b82f6', bottom: '-6px' }} />
   </div>
 );
@@ -32,10 +37,21 @@ const ApprovalNode = ({ data }: any) => (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#8b5cf6', fontWeight: 800, fontSize: '0.75rem', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
       <User size={14} /> APPROVAL STEP
     </div>
-    <div style={{ color: '#0f172a', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>{data.label}</div>
-    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f8fafc', padding: '6px 12px', borderRadius: '20px', color: '#475569', fontSize: '0.75rem', marginTop: '12px', fontWeight: 600, border: '1px solid #e2e8f0' }}>
-      <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#8b5cf6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>{data.assignee?.charAt(0) || 'U'}</div>
-      {data.assignee || 'Unassigned'}
+    <input 
+      className="nodrag"
+      defaultValue={data.label}
+      onChange={e => data.label = e.target.value}
+      style={{ color: '#0f172a', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em', background: 'transparent', border: '1px dashed #cbd5e1', textAlign: 'center', width: '100%', borderRadius: '8px', padding: '4px', outline: 'none', marginBottom: '4px' }} 
+    />
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f8fafc', padding: '4px 12px', borderRadius: '20px', color: '#475569', fontSize: '0.8rem', marginTop: '8px', fontWeight: 600, border: '1px solid #e2e8f0' }}>
+      <User size={12} color="#8b5cf6" />
+      <input 
+        className="nodrag"
+        defaultValue={data.assignee || 'Unassigned'}
+        onChange={e => data.assignee = e.target.value}
+        style={{ background: 'transparent', border: 'none', outline: 'none', width: '90px', color: '#475569', fontWeight: 600 }}
+        placeholder="Assign to..."
+      />
     </div>
     <Handle type="source" position={Position.Bottom} style={{ background: '#fff', width: '12px', height: '12px', border: '3px solid #8b5cf6', bottom: '-6px' }} />
   </div>
@@ -47,7 +63,12 @@ const ConditionNode = ({ data }: any) => (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#f59e0b', fontWeight: 800, fontSize: '0.75rem', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
       <GitMerge size={14} /> LOGIC CONDITION
     </div>
-    <div style={{ color: '#0f172a', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em', marginBottom: '8px' }}>{data.label}</div>
+    <input 
+      className="nodrag"
+      defaultValue={data.label}
+      onChange={e => data.label = e.target.value}
+      style={{ color: '#0f172a', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em', background: 'transparent', border: '1px dashed #cbd5e1', textAlign: 'center', width: '100%', borderRadius: '8px', padding: '4px', outline: 'none', marginBottom: '8px' }} 
+    />
     
     <Handle type="source" position={Position.Bottom} id="true" style={{ left: '25%', background: '#fff', width: '12px', height: '12px', border: '3px solid #10b981', bottom: '-6px' }} />
     <div style={{ position: 'absolute', bottom: '-26px', left: '15%', fontSize: '11px', color: '#059669', fontWeight: 800, background: '#ecfdf5', padding: '2px 8px', borderRadius: '10px', border: '1px solid #a7f3d0' }}>TRUE</div>
@@ -63,12 +84,18 @@ const ActionNode = ({ data }: any) => (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#10b981', fontWeight: 800, fontSize: '0.75rem', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
       <Server size={14} /> AUTOMATED ACTION
     </div>
-    <div style={{ fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>{data.label}</div>
+    <input 
+      className="nodrag"
+      defaultValue={data.label}
+      onChange={e => data.label = e.target.value}
+      style={{ fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em', background: 'rgba(255,255,255,0.1)', border: '1px dashed rgba(255,255,255,0.2)', color: '#fff', textAlign: 'center', width: '100%', borderRadius: '8px', padding: '4px', outline: 'none' }} 
+    />
     <Handle type="source" position={Position.Bottom} style={{ background: '#10b981', width: '12px', height: '12px', border: '2px solid #fff', bottom: '-6px' }} />
   </div>
 );
 
 const nodeTypes = {
+
   trigger: TriggerNode,
   approval: ApprovalNode,
   condition: ConditionNode,
