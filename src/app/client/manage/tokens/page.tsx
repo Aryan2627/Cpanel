@@ -171,68 +171,36 @@ export default function TokensPage() {
         ))}
       </div>
 
-      {/* Token Action Cost Reference */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '28px' }}>
-        <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-          <h3 style={{ margin: '0 0 16px 0', fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>Token Cost Per Action</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {Object.entries({
-              CREATE_EVENT: 10,
-              CREATE_PR: 5,
-              CREATE_PO: 5,
-              AI_ANALYSIS: 25,
-              INVITE_VENDOR: 2,
-              ADD_USER: 5,
-              RUN_WORKFLOW: 10,
-              EXPORT_GDPR: 15,
-            }).map(([action, cost]) => (
-              <div key={action} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '1.1rem' }}>{ACTION_ICONS[action] || '⚡'}</span>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#374151' }}>{action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+
+      {/* Recent Usage Ledger — full width, no token costs shown */}
+      <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', marginBottom: '28px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+        <h3 style={{ margin: '0 0 16px 0', fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>Recent Activity</h3>
+        {ledger.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
+            <Zap size={32} style={{ margin: '0 auto 8px', display: 'block', opacity: 0.4 }} />
+            <div style={{ fontWeight: 600 }}>No activity recorded yet</div>
+            <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>Usage will appear here as your team uses the platform</div>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '8px', maxHeight: '400px', overflowY: 'auto' }}>
+            {ledger.map((entry: any) => (
+              <div key={entry.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>{ACTION_ICONS[entry.action] || '⚡'}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#374151', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {entry.action.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                    <Clock size={10} />
+                    {new Date(entry.createdAt).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' })}
+                  </div>
                 </div>
-                <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0f172a', background: '#fff', padding: '3px 10px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
-                  {cost} tokens
-                </span>
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Recent Token Ledger */}
-        <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-          <h3 style={{ margin: '0 0 16px 0', fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>Recent Usage Ledger</h3>
-          {ledger.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
-              <Zap size={32} style={{ margin: '0 auto 8px', display: 'block', opacity: 0.4 }} />
-              <div style={{ fontWeight: 600 }}>No usage recorded yet</div>
-              <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>Token usage will appear here as your team uses the platform</div>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '380px', overflowY: 'auto' }}>
-              {ledger.map((entry: any) => (
-                <div key={entry.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '1.1rem' }}>{ACTION_ICONS[entry.action] || '⚡'}</span>
-                    <div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#374151' }}>
-                        {entry.action.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                      </div>
-                      <div style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Clock size={10} />
-                        {new Date(entry.createdAt).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' })}
-                      </div>
-                    </div>
-                  </div>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#ef4444' }}>
-                    -{entry.tokensConsumed}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        )}
       </div>
+
 
       {/* Upgrade Modal */}
       {showUpgradeModal && (
