@@ -1,9 +1,13 @@
 import Razorpay from 'razorpay';
 
-export const razorpay = new Razorpay({
-  key_id:     process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+// Lazy getter — only instantiated at runtime, never during build
+// (avoids "key_id is mandatory" crash when env vars aren't set at build time)
+export function getRazorpay() {
+  return new Razorpay({
+    key_id:     process.env.RAZORPAY_KEY_ID!,
+    key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  });
+}
 
 // ─── PRODUCT CATALOG ─────────────────────────────────────────────────────────
 

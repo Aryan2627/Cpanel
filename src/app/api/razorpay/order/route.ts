@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { razorpay, TOKEN_PACKAGES, PLAN_PRICES, LICENSE_RENEWAL } from '../../../../lib/razorpay';
+import { getRazorpay, TOKEN_PACKAGES, PLAN_PRICES, LICENSE_RENEWAL } from '../../../../lib/razorpay';
 import { getTenantId } from '../../../../lib/tenant';
 import { prisma } from '../../../../lib/prisma';
 
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
     }
 
-    const order = await razorpay.orders.create({
+    const order = await getRazorpay().orders.create({
       amount,
       currency: 'INR',
       receipt,
