@@ -184,20 +184,20 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                           href={sub.path}
                           style={{
                             padding: '10px 16px', borderRadius: '8px',
-                            color: (sub.path === '/client/vendors' ? pathname === sub.path : pathname.startsWith(sub.path)) ? '#2563eb' : '#475569',
-                            backgroundColor: (sub.path === '/client/vendors' ? pathname === sub.path : pathname.startsWith(sub.path)) ? '#eff6ff' : 'transparent',
+                            color: pathname === sub.path ? '#2563eb' : '#475569',
+                            backgroundColor: pathname === sub.path ? '#eff6ff' : 'transparent',
                             textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
                             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                             transition: 'all 0.1s'
                           }}
                           onMouseEnter={(e) => {
-                            if (!(sub.path === '/client/vendors' ? pathname === sub.path : pathname.startsWith(sub.path))) {
+                            if (pathname !== sub.path) {
                               (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
                               (e.currentTarget as HTMLElement).style.color = '#0f172a';
                             }
                           }}
                           onMouseLeave={(e) => {
-                            if (!(sub.path === '/client/vendors' ? pathname === sub.path : pathname.startsWith(sub.path))) {
+                            if (pathname !== sub.path) {
                               (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
                               (e.currentTarget as HTMLElement).style.color = '#475569';
                             }
@@ -335,6 +335,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             </SessionContext.Provider>
   );
 }
+
 
 
 
