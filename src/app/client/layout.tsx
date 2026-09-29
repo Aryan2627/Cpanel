@@ -41,7 +41,6 @@ const TOP_MENUS = [
       { name: 'Templates', path: '/client/manage/templates' },
       { name: 'Approval Rules', path: '/client/manage/approvals' },
       { name: '? Tokens and Usage', path: '/client/manage/tokens' },
-      { name: '?? Audit Trail', path: '/client/manage/audit' },
     ]
   },
   {
@@ -336,6 +335,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             </SessionContext.Provider>
   );
 }
+
 
 
 
