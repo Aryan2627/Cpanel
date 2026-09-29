@@ -1,10 +1,15 @@
 "use client";
 import React from 'react';
 import { useSession } from '../../../../context/SessionContext';
-import { Calendar, ShieldCheck, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Calendar, ShieldCheck, Clock, CheckCircle2, AlertCircle, Zap } from 'lucide-react';
 
 export default function LicenseSummaryPage() {
   const { session, loading } = useSession();
+  const [tokenStatus, setTokenStatus] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/tokens').then(r => r.json()).then(d => setTokenStatus(d.status)).catch(() => {});
+  }, []);
 
   if (loading) {
     return <div style={{ padding: '40px', color: '#64748b', textAlign: 'center' }}>Loading license data...</div>;
@@ -97,3 +102,6 @@ export default function LicenseSummaryPage() {
     </div>
   );
 }
+
+
+
