@@ -2,11 +2,15 @@
 import { useState, useEffect } from 'react';
 import { useSession } from '../../../../context/SessionContext';
 import { Calendar, ShieldCheck, Clock, CheckCircle2, AlertCircle, Zap, RotateCcw } from 'lucide-react';
+import Script from 'next/script';
+
+declare global { interface Window { Razorpay: any; } }
 
 export default function LicenseSummaryPage() {
   const { session, loading } = useSession();
   const [tokenStatus, setTokenStatus] = useState<any>(null);
   const [renewing, setRenewing] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/tokens')
@@ -18,13 +22,39 @@ export default function LicenseSummaryPage() {
   const handleRenewLicense = async () => {
     setRenewing(true);
     try {
-      const res = await fetch('/api/stripe/checkout', {
+      const res = await fetch('/api/razorpay/order', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'license' }),
       });
-      const { url, error } = await res.json();
-      if (error) throw new Error(error);
-      window.location.href = url;
+      const order = await res.json();
+      if (order.error) throw new Error(order.error);
+
+      const rzp = new window.Razorpay({
+        key:         order.keyId,
+        amount:      order.amount,
+        currency:    order.currency,
+        name:        order.name,
+        description: order.description,
+        order_id:    order.orderId,
+        theme:       { color: '#0f172a' },
+        modal:       { ondismiss: () => setRenewing(false) },
+        handler: async (response: any) => {
+          const verify = await fetch('/api/razorpay/verify', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...response, notes: order.notes }),
+          });
+          const result = await verify.json();
+          if (result.success) {
+            setToast('✅ License renewed for 1 year!');
+            setTimeout(() => setToast(null), 5000);
+          } else {
+            setToast('❌ Verification failed. Contact support.');
+            setTimeout(() => setToast(null), 5000);
+          }
+          setRenewing(false);
+        },
+      });
+      rzp.open();
     } catch (e: any) {
       alert('Payment error: ' + e.message);
       setRenewing(false);
@@ -54,6 +84,13 @@ export default function LicenseSummaryPage() {
     : 'linear-gradient(90deg,#10b981,#34d399)';
 
   return (
+    <>
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+      {toast && (
+        <div style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 9999, padding: '14px 20px', background: toast.startsWith('✅') ? '#0f172a' : '#ef4444', color: '#fff', borderRadius: '12px', fontWeight: 600, fontSize: '0.9rem', boxShadow: '0 8px 30px rgba(0,0,0,0.2)' }}>
+          {toast}
+        </div>
+      )}
     <div style={{ padding: '40px', backgroundColor: '#f8faff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
 
@@ -188,5 +225,7 @@ export default function LicenseSummaryPage() {
 
       </div>
     </div>
+    </>
   );
 }
+
