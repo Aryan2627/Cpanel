@@ -1,11 +1,12 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useSession } from '../../../../context/SessionContext';
-import { Calendar, ShieldCheck, Clock, CheckCircle2, AlertCircle, Zap } from 'lucide-react';
+import { Calendar, ShieldCheck, Clock, CheckCircle2, AlertCircle, Zap, RotateCcw } from 'lucide-react';
 
 export default function LicenseSummaryPage() {
   const { session, loading } = useSession();
   const [tokenStatus, setTokenStatus] = useState<any>(null);
+  const [renewing, setRenewing] = useState(false);
 
   useEffect(() => {
     fetch('/api/tokens')
@@ -13,6 +14,22 @@ export default function LicenseSummaryPage() {
       .then(d => setTokenStatus(d.status))
       .catch(() => {});
   }, []);
+
+  const handleRenewLicense = async () => {
+    setRenewing(true);
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'license' }),
+      });
+      const { url, error } = await res.json();
+      if (error) throw new Error(error);
+      window.location.href = url;
+    } catch (e: any) {
+      alert('Payment error: ' + e.message);
+      setRenewing(false);
+    }
+  };
 
   if (loading) {
     return <div style={{ padding: '40px', color: '#64748b', textAlign: 'center' }}>Loading license data...</div>;
@@ -42,9 +59,19 @@ export default function LicenseSummaryPage() {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
           <h1 style={{ fontSize: '2rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>ProcGen License Summary</h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: isExpired ? '#fef2f2' : '#ecfdf5', padding: '8px 16px', borderRadius: '20px', border: '1px solid ' + statusColor + '40' }}>
-            {isExpired ? <AlertCircle size={18} color={statusColor} /> : <CheckCircle2 size={18} color={statusColor} />}
-            <span style={{ color: statusColor, fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>{session?.licenseStatus || 'Active'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: isExpired ? '#fef2f2' : '#ecfdf5', padding: '8px 16px', borderRadius: '20px', border: '1px solid ' + statusColor + '40' }}>
+              {isExpired ? <AlertCircle size={18} color={statusColor} /> : <CheckCircle2 size={18} color={statusColor} />}
+              <span style={{ color: statusColor, fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>{session?.licenseStatus || 'Active'}</span>
+            </div>
+            <button
+              onClick={handleRenewLicense}
+              disabled={renewing}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'linear-gradient(135deg, #0f172a, #1e293b)', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: renewing ? 'not-allowed' : 'pointer', fontSize: '0.9rem', opacity: renewing ? 0.7 : 1 }}
+            >
+              {renewing ? <RotateCcw size={16} style={{ animation: 'spin 1s linear infinite' }} /> : '🔄'}
+              {renewing ? 'Redirecting...' : 'Renew License'}
+            </button>
           </div>
         </div>
 
