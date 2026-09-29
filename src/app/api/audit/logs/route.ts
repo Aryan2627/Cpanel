@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '../../../../../lib/prisma';
-import { getTenantId } from '../../../../../lib/tenant';
+import { prisma } from '../../../../lib/prisma';
+import { getTenantId } from '../../../../lib/tenant';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -45,3 +45,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

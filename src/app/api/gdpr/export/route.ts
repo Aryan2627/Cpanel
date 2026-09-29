@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '../../../../../lib/prisma';
-import { getTenantId } from '../../../../../lib/tenant';
-import { logAudit } from '../../../../../lib/audit';
+import { prisma } from '../../../../lib/prisma';
+import { getTenantId } from '../../../../lib/tenant';
+import { logAudit } from '../../../../lib/audit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -66,3 +66,4 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
