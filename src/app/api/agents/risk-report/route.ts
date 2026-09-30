@@ -33,12 +33,13 @@ export async function POST(req: Request) {
     };
 
     const specificKey = process.env.TARK_API_KEY;
-    const fallbackKey = process.env.NVIDIA_API_KEY || process.env.OPENAI_API_KEY;
+    const fallbackKey = process.env.NVIDIA_API_KEY || process.env.OPENAI_API_KEY || "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";
     const llmKey = specificKey || fallbackKey;
 
     if (llmKey) {
-      const baseURL = nvidiaKey ? 'https://integrate.api.nvidia.com/v1' : undefined;
-      const modelName = nvidiaKey ? 'meta/llama-3.2-3b-instruct' : 'gpt-4o';
+      const isNvidia = llmKey && (llmKey.startsWith('nvapi-') || !!process.env.NVIDIA_API_KEY);
+      const baseURL = isNvidia ? 'https://integrate.api.nvidia.com/v1' : undefined;
+      const modelName = isNvidia ? 'meta/llama-3.2-3b-instruct' : 'gpt-4o-mini';
       const openai = new OpenAI({ apiKey: llmKey, baseURL });
 
       const prompt = `You are a Procurement Risk Analyst.
