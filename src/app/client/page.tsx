@@ -24,7 +24,7 @@ export default function ClientDashboard() {
       if (u?.features) {
         try {
           const feats = JSON.parse(u.features);
-          if (feats.agentic_portal === true && feats.main_portal === false) {
+          if (feats.agentic_portal === true) {
             router.push('/client/ai-agents/procurement');
           }
         } catch(e) {}

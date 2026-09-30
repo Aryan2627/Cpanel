@@ -132,7 +132,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const orgFeatures = currentUser?.features ? (() => { try { return JSON.parse(currentUser.features); } catch { return {}; } })() : {};
   const isMainPortal = orgFeatures.main_portal !== false; 
   const isAgenticPortal = orgFeatures.agentic_portal === true;
-  const isAgenticOnly = isAgenticPortal && !isMainPortal;
+  // If Agentic Portal is turned ON, it takes full priority and hides classic menus
+  const isAgenticOnly = isAgenticPortal === true;
 
   const displayMenus = TOP_MENUS.filter(menu => {
     if (isAgenticOnly) return menu.name === 'AI Agents';
