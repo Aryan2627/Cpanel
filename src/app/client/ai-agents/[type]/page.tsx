@@ -350,7 +350,13 @@ export default function FullScreenAgentPage() {
                  </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {displayItems.map((item) => {
+                  {loadingData && (
+              <div style={{ padding: '64px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', color: '#38bdf8' }}>
+                <Loader2 size={32} className="animate-spin" />
+                <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>Syncing Agent Context...</div>
+              </div>
+            )}
+            {!loadingData && displayItems.map((item) => {
                     const isProcessing = processingItems[item.id];
                     const progress = itemProgress[item.id] || item.progress;
                     const isDone = progress === '100%';
