@@ -81,9 +81,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const cached = localStorage.getItem('auth_me_cache');
-    if (cached) { try { setCurrentUser(JSON.parse(cached)); } catch(e){} }
-    fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => { if (d?.name) { setCurrentUser(d); localStorage.setItem('auth_me_cache', JSON.stringify(d)); } }).catch(() => null);
+    fetch('/api/auth/me')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.name) { setCurrentUser(d); } })
+      .catch(() => null);
   }, []);
 
   const handleGeneratePO = async () => {
