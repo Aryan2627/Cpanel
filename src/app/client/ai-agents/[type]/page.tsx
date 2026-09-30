@@ -209,7 +209,7 @@ export default function FullScreenAgentPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ display: 'flex', gap: '24px' }}>
             <div style={{ width: '72px', height: '72px', borderRadius: '16px', backgroundColor: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', fontSize: '36px', overflow: 'hidden' }}>
-              {data.name === 'Anveshan' ? <img src="/anveshan-avatar.png" alt="Anveshan" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : data.name === 'Niti' ? <img src="/niti-avatar.jpg" alt="Niti" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : data.name === 'Tark' ? '⚖️' : data.name === 'Garuda' ? '🦅' : '🤖'}
+              {data.name === 'Anveshan' ? <img src="/anveshan-avatar.png" alt="Anveshan" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : data.name === 'Niti' ? <img src="/niti-avatar.jpg" alt="Niti" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : data.name === 'Tark' ? <img src="/tark-avatar.jpg" alt="Tark" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : data.name === 'Garuda' ? '🦅' : '🤖'}
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
