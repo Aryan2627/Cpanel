@@ -76,16 +76,55 @@ export default function FullScreenAgentPage() {
     }
   };
 
-  const data = {
-    name: 'Anveshan', role: 'The Discoverer', tag: 'STAGE 1 • DISCOVERY',
-    purpose: 'Autonomous semantic discovery. Connects to global endpoints (Alibaba, IndiaMART) to source exact matches.',
-    tasks: [
-      { title: 'Semantic Extraction', desc: 'Parsing requirements into NLP vectors' },
-      { title: 'Global Web Scrape', desc: 'Live cross-referencing on B2B platforms' },
-      { title: 'RFI Generation', desc: 'Drafting structured capability requests' }
-    ],
-    tabs: ['Active Tasks', 'Market Intelligence', 'Risk Reports'],
+  const getAgentData = () => {
+    if (agentName === 'Procurement Agent') {
+      return {
+        name: 'Anveshan', role: 'The Discoverer', tag: 'STAGE 1 • DISCOVERY',
+        purpose: 'Autonomous semantic discovery. Connects to global endpoints (Alibaba, IndiaMART) to source exact matches.',
+        tasks: [
+          { title: 'Semantic Extraction', desc: 'Parsing requirements into NLP vectors' },
+          { title: 'Global Web Scrape', desc: 'Live cross-referencing on B2B platforms' },
+          { title: 'RFI Generation', desc: 'Drafting structured capability requests' }
+        ],
+        tabs: ['Active Tasks', 'Market Intelligence', 'Risk Reports'],
+      };
+    } else if (agentName === 'Sourcing Agent') {
+      return {
+        name: 'Tark', role: 'The Analyst', tag: 'STAGE 2 • ANALYTICAL',
+        purpose: 'Crunches the numbers to find the best total-cost trade-offs and normalizes quotes.',
+        tasks: [
+          { title: 'Extract pricing from PDFs', desc: 'Scan real uploaded vendor bids/quotes' },
+          { title: 'Normalize line items', desc: 'by unit, currency, and MOQ' },
+          { title: 'Rank by total cost', desc: 'including freight and payment terms' }
+        ],
+        tabs: ['Active Tasks', 'Cost Breakdowns', 'Anomalies'],
+      };
+    } else if (agentName === 'Negotiation Agent') {
+      return {
+        name: 'Niti', role: 'The Strategist', tag: 'STAGE 3 • EXECUTION',
+        purpose: 'Pushes back on supplier pricing and secures optimal net-60 payment terms.',
+        tasks: [
+          { title: 'Analyze historical spend', desc: 'Cross-reference active vendor profiles' },
+          { title: 'Generate counter-offers', desc: 'using market benchmarks and leverage' },
+          { title: 'Draft and send emails', desc: 'directly to vendor sales reps' }
+        ],
+        tabs: ['Active Tasks', 'Savings Realized', 'Counter-offers'],
+      };
+    } else {
+      return {
+        name: 'Garuda', role: 'The Tracker', tag: 'STAGE 4 • OPERATIONS',
+        purpose: 'Watches your POs and invoices like a hawk to ensure timely delivery and exact matching.',
+        tasks: [
+          { title: 'Monitor ERP sync', desc: 'Scan active Purchase Orders in the database' },
+          { title: 'Track live delivery status', desc: 'and ping suppliers if delayed' },
+          { title: 'Perform 3-way match', desc: 'between PO, GRN, and Invoice' }
+        ],
+        tabs: ['Active Tasks', 'Invoice Matches', 'Risk Alerts'],
+      };
+    }
   };
+
+  const data = getAgentData();
 
   const handleAnalyzeRisk = async (supplier: any, loc: string, title: string) => {
     setSelectedSupplier(supplier);
