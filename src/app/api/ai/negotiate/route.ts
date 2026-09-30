@@ -4,7 +4,12 @@ import { tavily } from '@tavily/core';
 export async function POST(req: Request) {
   try {
     const { messages, context } = await req.json();
-    const { productName, targetPrice, maxPrice, concessions, vendorInitialOffer } = context;
+    let { productName, targetPrice, maxPrice, concessions, vendorInitialOffer } = context;
+
+    // Fix negative values from test database data
+    vendorInitialOffer = Math.abs(vendorInitialOffer);
+    targetPrice = Math.abs(targetPrice);
+    maxPrice = Math.abs(maxPrice);
 
     // 1. Live Market Pricing Intelligence via Tavily
     const tavilyKey = process.env.TAVILY_API_KEY;
@@ -70,12 +75,15 @@ NEVER reveal your exact maximum budget immediately. Negotiate aggressively but p
       apiKeyToUse = null;
     }
 
-    const fallbackMockReply = `Subject: Counter-Offer for ${productName}\n\nDear Vendor,\n\nThank you for your initial quote of $${vendorInitialOffer.toLocaleString()}. \n\nBefore proceeding, we ran a live web scan for ${productName} across global B2B endpoints (Alibaba, IndiaMART, etc). Our scraping algorithm detected that the lowest current online market rate is closer to $${targetPrice.toLocaleString()}.\n\nTo move forward with you, we require a revised quote that beats the online market rate by at least 10%. If you can meet this competitive pricing, we are authorized to immediately offer: ${concessions.join(', ')}.\n\nPlease let us know if we can proceed.\n\nRegards,\nProcGen Niti Agent`;
+    const mockCompetitorPrice = (vendorInitialOffer * 0.75).toLocaleString();
+    const mockTarget = (vendorInitialOffer * 0.65).toLocaleString();
+    
+    const fallbackMockReply = `Subject: Counter-Offer for ${productName}\n\nDear Vendor,\n\nThank you for your initial quote of $${vendorInitialOffer.toLocaleString()}. \n\nBefore proceeding, we ran a live autonomous web scan for "${productName}" across global B2B endpoints. Our web scraping algorithm identified a direct competitor on IndiaMART offering the exact same specifications for $${mockCompetitorPrice}.\n\nTo move forward with you as our preferred vendor, we require a revised quote that beats the online market rate, bringing your price down to $${mockTarget}. If you can meet this competitive pricing, we are authorized to immediately offer: ${concessions.join(', ')}.\n\nPlease let us know if we can proceed.\n\nRegards,\nProcGen Niti Agent`;
 
     if (!apiKeyToUse) {
       // Mock Fallback Mode so demo doesn't crash when user hasn't supplied NITI_API_KEY
       return NextResponse.json({ 
-        reply: fallbackMockReply + "\n\n*(Note: This is a simulated response. To generate live AI negotiations, please add NITI_API_KEY to your environment variables.)*"
+        reply: fallbackMockReply + "\n\n*(Note: This is a simulated response. Because no NITI_API_KEY is configured in your environment variables, the AI and Web Search engines are bypassed to prevent a crash.)*"
       });
     }
 
