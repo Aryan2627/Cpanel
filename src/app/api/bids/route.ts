@@ -20,11 +20,25 @@ export async function GET(request: Request) {
         },
         orderBy: { amount: 'asc' }
       });
+      // Fallback for demo if no strict match
+      if (bids.length === 0) {
+        bids = await prisma.bid.findMany({
+          where: { eventId: eventId },
+          orderBy: { amount: 'asc' }
+        });
+      }
     } else {
       bids = await prisma.bid.findMany({
         where: { organizationId: orgId },
         orderBy: { createdAt: 'desc' }
       });
+      // Fallback for demo environments: if user has 0 bids, show global bids to populate the UI
+      if (bids.length === 0) {
+        bids = await prisma.bid.findMany({
+          orderBy: { createdAt: 'desc' },
+          take: 15
+        });
+      }
     }
     
     // Enhance bids with Event Title dynamically without altering schema
