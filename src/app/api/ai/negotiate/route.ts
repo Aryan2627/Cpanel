@@ -33,7 +33,7 @@ If the vendor agrees to a price at or below $${maxPrice.toLocaleString()}, you m
       // Hardcoded fallback ONLY if absolutely no keys are provided
       baseUrl = "https://integrate.api.nvidia.com/v1/chat/completions";
       model = "nvidia/nemotron-3-nano-30b-a3b";
-      apiKeyToUse = "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";
+      apiKeyToUse = null;
     }
 
     if (!apiKeyToUse) {

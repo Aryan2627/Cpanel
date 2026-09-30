@@ -131,7 +131,7 @@ export async function POST(req: Request) {
     }
 
     const specificKey = process.env.ANVESHAN_API_KEY;
-    const fallbackKey = process.env.NVIDIA_API_KEY || process.env.OPENAI_API_KEY || "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";
+    const fallbackKey = process.env.NVIDIA_API_KEY || process.env.OPENAI_API_KEY;
     const llmKey = specificKey || fallbackKey;
 
     if (llmKey && scrapingUsed) {
