@@ -80,7 +80,7 @@ export async function POST(request: Request) {
       }
     });
 
-    return NextResponse.json({ success: true, poNumber: po.poNumber });
+    return NextResponse.json({ success: true, poNumber: po.poNumber, poId: po.id });
 
   } catch (error: any) {
     console.error('License Renewal Error:', error);

@@ -11,8 +11,25 @@ export default function ClientDashboard() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    const cachedAuth = localStorage.getItem('auth_me_cache');
+    if (cachedAuth) { try { setUser(JSON.parse(cachedAuth)); } catch(e){} }
+    const cachedStats = localStorage.getItem('dashboard_stats_cache');
+    if (cachedStats) { try { setStats(JSON.parse(cachedStats)); setLoading(false); } catch(e){} }
+
     fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => { if (d) setUser(d); });
-    fetch('/api/dashboard/stats').then(r => r.json()).then(d => { setStats(d); setLoading(false); }).catch(() => setLoading(false));
+    fetch('/api/dashboard/stats').then(r => r.json()).then(d => { setStats(d); localStorage.setItem('dashboard_stats_cache', JSON.stringify(d)); setLoading(false); }).catch(() => setLoading(false));
+    
+    // Agentic redirect logic
+    fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(u => {
+      if (u?.features) {
+        try {
+          const feats = JSON.parse(u.features);
+          if (feats.agentic_portal === true) {
+            router.push('/client/ai-agents/procurement');
+          }
+        } catch(e) {}
+      }
+    });
   }, []);
 
   const kpis = [
@@ -46,14 +63,14 @@ export default function ClientDashboard() {
         <div style={{ position: 'absolute', top: 0, right: 0, width: '400px', height: '100%', background: 'radial-gradient(circle at 70% 50%, rgba(59,130,246,0.15), transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
           <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>Command Center</p>
-          <h1 className="mobile-h1" style={{ color: '#fff', fontSize: '1.8rem', fontWeight: 800, margin: 0, letterSpacing: '-0.5px' }}>
+          <h1 className="mobile-h1" style={{ color: '#0f172a', fontSize: '1.8rem', fontWeight: 800, margin: 0, letterSpacing: '-0.5px' }}>
             Welcome back{user?.name ? ', ' + user.name.split(' ')[0] : ''}! 👋
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.6)', margin: '8px 0 0', fontSize: '0.95rem' }}>Here's your procurement overview for today.</p>
         </div>
       </div>
 
-      <div className="mobile-p-16 mobile-mt-0" style={{ padding: '0 32px 40px', marginTop: '-24px', position: 'relative', zIndex: 10 }}>
+      <div className="mobile-p-16 mobile-mt-0" style={{ padding: '0 32px 40px', marginTop: '0', position: 'relative', zIndex: 10 }}>
         {/* KPI Cards */}
         <div id="tour-kpi-cards" className="dashboard-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '16px', marginBottom: '24px' }}>
           {kpis.map((k, i) => {

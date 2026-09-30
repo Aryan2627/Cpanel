@@ -331,9 +331,9 @@ export default function BuyerEventDetailsPage() {
     csv += templateFields.map((f: any) => f.name).join(',') + '\n';
     bids.forEach(bid => {
       let templateData: any = {};
-      try { templateData = JSON.parse(bid.templateData); } catch(e) {}
+      try { let _tmp = JSON.parse(bid.templateData); if (typeof _tmp === 'string') _tmp = JSON.parse(_tmp); templateData = _tmp || {}; } catch(e) {}
       let row = `"${bid.vendorName}",${bid.score || 0},${bid.amount},${bid.currency || 'INR'},"${bid.esgScore || 'N/A'}",`;
-      const tVals = templateFields.map((f: any) => `"${templateData[f.key] || ''}"`);
+      const tVals = templateFields.map((f: any) => `"${templateData[f.key] || templateData[f.name] || ''}"`);
       row += tVals.join(',') + '\n';
       csv += row;
     });
@@ -415,7 +415,7 @@ export default function BuyerEventDetailsPage() {
   const proceedWithAward = async (bid: any, quantities: Record<string, number>) => {
     try {
       let bidTemplateData: any = {};
-      try { bidTemplateData = JSON.parse(bid.templateData); } catch(e) {}
+      try { let _tmp = JSON.parse(bid.templateData); if (typeof _tmp === 'string') _tmp = JSON.parse(_tmp); bidTemplateData = _tmp || {}; } catch(e) {}
       const poDetails = { templateFields, bidData: bidTemplateData, vendorEmail: bid.vendorId || 'vendor@example.com', awardedPrs: quantities };
       const poRes = await fetch('/api/pos', {
         method: 'POST',
@@ -470,11 +470,11 @@ export default function BuyerEventDetailsPage() {
         
         let splitTotal = 0;
         let bidTemplateData: any = {};
-        try { bidTemplateData = JSON.parse(vendorBid.templateData); } catch(e) {}
+        try { let _tmp = JSON.parse(vendorBid.templateData); if (typeof _tmp === 'string') _tmp = JSON.parse(_tmp); bidTemplateData = _tmp || {}; } catch(e) {}
         
         vendorTemplateFields.forEach((f: any) => {
           if (f.type === 'number') {
-             const val = parseFloat(bidTemplateData[f.key]) || 0;
+             const val = parseFloat(bidTemplateData[f.key] || bidTemplateData[f.name]) || 0;
              splitTotal += val;
           }
         });
@@ -519,8 +519,8 @@ export default function BuyerEventDetailsPage() {
       if (f.weight > 0) {
         const vals = bids.map(b => {
           let data: any = {};
-          try { data = JSON.parse(b.templateData) } catch(e) {}
-          const val = parseFloat(data[f.key]);
+          try { let _tmp = JSON.parse(b.templateData); if (typeof _tmp === 'string') _tmp = JSON.parse(_tmp); data = _tmp || {}; } catch(e) {}
+          const val = parseFloat(data[f.key] || data[f.name]);
           return isNaN(val) ? null : val;
         }).filter(v => v !== null) as number[];
         if (vals.length > 0) minVals[f.key] = Math.min(...vals);
@@ -529,7 +529,7 @@ export default function BuyerEventDetailsPage() {
 
     const processed = bids.map(bid => {
       let data: any = {};
-      try { data = JSON.parse(bid.templateData); } catch(e) {}
+      try { let _tmp = JSON.parse(bid.templateData); if (typeof _tmp === 'string') _tmp = JSON.parse(_tmp); data = _tmp || {}; } catch(e) {}
       
       const currency = bid.currency || 'INR';
       // bid.amount is already converted to baseCurrency by the vendor portal
@@ -539,7 +539,7 @@ export default function BuyerEventDetailsPage() {
       let score = 0;
       templateFields.forEach((f: any) => {
         if (f.weight > 0) {
-          const val = parseFloat(data[f.key]);
+          const val = parseFloat(data[f.key] || data[f.name]);
           if (!isNaN(val) && minVals[f.key]) {
             // Lower is better: (Min / VendorVal) * Weight
             score += (minVals[f.key] / val) * f.weight;
@@ -569,9 +569,14 @@ export default function BuyerEventDetailsPage() {
 
       return { ...bid, baseAmount, score: Math.round(score * 10) / 10, esgScore, parsedData: data, trustScore, riskLevel, financialHealth };
     }).sort((a: any, b: any) => {
-      if (b.score !== a.score) return b.score - a.score;
-      return a.baseAmount - b.baseAmount; // Lowest amount wins if scores tie
-    });
+        if (b.score !== a.score) return b.score - a.score;
+        return a.baseAmount - b.baseAmount; // Lowest amount wins if scores tie
+      });
+      
+      const byPrice = [...processed].sort((a,b) => a.baseAmount - b.baseAmount);
+      processed.forEach(p => {
+        p.priceRank = byPrice.findIndex(x => x.id === p.id) + 1;
+      });
     
     // Add AI Ghost Bid if enabled
     if (showGhostBidding && processed.length > 0) {
@@ -643,7 +648,7 @@ export default function BuyerEventDetailsPage() {
           <div style={{ width: '100%' }}>
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
               <h2 style={{ margin: '0 0 16px 0', fontSize: '1.1rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <FileText size={18} color="#2563eb" /> Event Snapshot <span style={{ fontSize: '0.65rem', backgroundColor: '#3b82f6', color: '#fff', padding: '2px 8px', borderRadius: '12px', marginLeft: '12px' }}>V2 UI Active</span>
+                <FileText size={18} color="#2563eb" /> Event Snapshot <span style={{ fontSize: '0.65rem', backgroundColor: '#f1f5f9', color: '#64748b', padding: '2px 8px', borderRadius: '4px', border: '1px solid #e2e8f0', marginLeft: '12px' }}>V2 UI Active</span>
               </h2>
               <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap', alignItems: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -708,7 +713,7 @@ export default function BuyerEventDetailsPage() {
                   <BarChart3 size={18} color="#2563eb" /> Bidding Summary & Best Value Scoring
                 </h2>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <button onClick={() => setIsCompareModalOpen(true)} style={{ backgroundColor: '#10b981', color: '#fff', padding: '6px 16px', border: 'none', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(16, 185, 129, 0.2)' }}>
+                  <button onClick={() => setIsCompareModalOpen(true)} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', transition: 'background-color 0.2s ease' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f1f5f9'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}>
                     <BarChart3 size={16} /> Compare Matrix
                   </button>
                   <button onClick={() => {
@@ -732,17 +737,17 @@ export default function BuyerEventDetailsPage() {
                       setSplitSelections(initialSelections);
                       setIsSplitAwardOpen(true);
                     }} 
-                    style={{ backgroundColor: '#6366f1', color: '#fff', padding: '6px 16px', border: 'none', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(99, 102, 241, 0.2)' }}
+                    style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', transition: 'background-color 0.2s ease' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f1f5f9'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}
                   >
                     <Layers size={16} /> Split Award
                   </button>
-                  <button onClick={handleAiEvaluation} style={{ backgroundColor: '#0f172a', color: '#38bdf8', padding: '6px 16px', border: '1px solid #38bdf8', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 0 10px rgba(56,189,248,0.2)' }}>
+                  <button onClick={handleAiEvaluation} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', transition: 'background-color 0.2s ease' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f1f5f9'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}>
                       <Brain size={16} /> AI Board Evaluation
                     </button>
-                    <button onClick={() => setIsSurrogateOpen(true)} style={{ backgroundColor: '#f59e0b', color: '#fff', padding: '6px 16px', border: 'none', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(245, 158, 11, 0.2)' }}>
+                    <button onClick={() => setIsSurrogateOpen(true)} style={{ backgroundColor: '#fff', color: '#334155', padding: '6px 16px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', transition: 'background-color 0.2s ease' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f1f5f9'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fff'}>
                     <User size={16} /> Proxy Bid
                   </button>
-                  <div style={{ backgroundColor: '#eff6ff', color: '#1d4ed8', padding: '4px 12px', borderRadius: '16px', fontSize: '0.85rem', fontWeight: 500 }}>
+                  <div style={{ backgroundColor: '#f8fafc', color: '#475569', border: '1px solid #e2e8f0', padding: '4px 12px', borderRadius: '16px', fontSize: '0.85rem', fontWeight: 500 }}>
                     {bids.length} Bids Received
                   </div>
                 </div>
@@ -784,7 +789,7 @@ export default function BuyerEventDetailsPage() {
                     <thead>
                       <tr>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Vendor</th>
-                        {event?.type === 'Rank based' && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Rank</th>}
+                        <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Rank</th>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Score</th>
                         <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Total Amount ({event.baseCurrency || 'INR'})</th>
                         {enableESG && <th style={{ padding: '0 24px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Carbon Footprint</th>}
@@ -797,20 +802,16 @@ export default function BuyerEventDetailsPage() {
                         
                         if (bid.isGhost) {
                           return (
-                            <tr key={bid.id} style={{ backgroundColor: '#faf5ff', backgroundImage: 'linear-gradient(to right, #faf5ff, #f3e8ff)', boxShadow: '0 4px 6px -1px rgba(147, 51, 234, 0.1)', borderRadius: '12px', transition: 'transform 0.2s, box-shadow 0.2s' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(147, 51, 234, 0.15)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(147, 51, 234, 0.1)'; }}>
-                              <td style={{ padding: '20px 24px', fontWeight: 600, color: '#6b21a8', borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px', border: '1px solid #e9d5ff', borderRight: 'none' }}>
+                            <tr key={bid.id} style={{ backgroundColor: '#f8fafc', backgroundImage: 'linear-gradient(to right, #faf5ff, #f3e8ff)', boxShadow: '0 4px 6px -1px rgba(147, 51, 234, 0.1)', borderRadius: '12px', transition: 'transform 0.2s, box-shadow 0.2s' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(147, 51, 234, 0.15)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(147, 51, 234, 0.1)'; }}>
+                              <td style={{ padding: '20px 24px', fontWeight: 600, color: '#6b21a8', borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px', border: '1px solid #e2e8f0', borderRight: 'none' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.05rem' }}>
                                   <BrainCircuit size={18} color="#9333ea" /> {bid.vendorName}
                                 </div>
-                                <div style={{ fontSize: '0.8rem', color: '#9333ea', marginTop: '6px', fontWeight: 500, backgroundColor: '#f3e8ff', padding: '4px 8px', borderRadius: '12px', display: 'inline-block' }}>
+                                <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '6px', fontWeight: 500, backgroundColor: '#f3e8ff', padding: '4px 8px', borderRadius: '12px', display: 'inline-block' }}>
                                   Generative Market Baseline
                                 </div>
                               </td>
-                              {event?.type === 'Rank based' && (
-                                <td style={{ padding: '20px 24px', fontWeight: 800, color: '#9333ea', fontSize: '1.2rem', borderTop: '1px solid #e9d5ff', borderBottom: '1px solid #e9d5ff' }}>
-                                  -
-                                </td>
-                              )}
+                              <td style={{ padding: '20px 24px', fontWeight: 800, color: '#64748b', fontSize: '1.2rem', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>-</td>
                               <td style={{ padding: '20px 24px', borderTop: '1px solid #e9d5ff', borderBottom: '1px solid #e9d5ff' }}>
                                 <span style={{ padding: '6px 12px', borderRadius: '16px', fontSize: '0.85rem', fontWeight: 700, backgroundColor: '#d8b4fe', color: '#581c87', boxShadow: '0 2px 4px rgba(147,51,234,0.2)' }}>
                                   {bid.score > 0 ? `${bid.score}/100` : 'N/A'}
@@ -824,28 +825,28 @@ export default function BuyerEventDetailsPage() {
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Leaf size={16} /> {bid.esgScore}</div>
                                 </td>
                               )}
-                              <td style={{ padding: '20px 24px', textAlign: 'right', borderTopRightRadius: '12px', borderBottomRightRadius: '12px', border: '1px solid #e9d5ff', borderLeft: 'none' }}>
-                                <span style={{ fontSize: '0.85rem', color: '#9333ea', fontStyle: 'italic', fontWeight: 600 }}>AI Expected Value</span>
+                              <td style={{ padding: '20px 24px', textAlign: 'right', borderTopRightRadius: '12px', borderBottomRightRadius: '12px', border: '1px solid #e2e8f0', borderLeft: 'none' }}>
+                                <span style={{ fontSize: '0.85rem', color: '#64748b', fontStyle: 'italic', fontWeight: 600 }}>AI Expected Value</span>
                               </td>
                             </tr>
                           );
                         }
                         
                         return (
-                          <tr key={bid.id} style={{ backgroundColor: isBest ? '#f0fdf4' : '#ffffff', border: isBest ? '2px solid #10b981' : '1px solid #e2e8f0', boxShadow: isBest ? '0 10px 25px -5px rgba(16, 185, 129, 0.2)' : '0 4px 6px -1px rgba(0,0,0,0.05)', borderRadius: '12px', transition: 'all 0.2s ease', position: 'relative' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = isBest ? '0 15px 30px -5px rgba(16, 185, 129, 0.3)' : '0 10px 15px -3px rgba(0,0,0,0.1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = isBest ? '0 10px 25px -5px rgba(16, 185, 129, 0.2)' : '0 4px 6px -1px rgba(0,0,0,0.05)'; }}>
-                            <td style={{ padding: '20px 24px', fontWeight: 600, color: '#0f172a', borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px', border: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderRight: 'none', position: 'relative' }}>
+                          <tr key={bid.id} style={{ backgroundColor: isBest ? '#f8fafc' : '#ffffff', border: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', boxShadow: isBest ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 1px 3px rgba(0,0,0,0.05)', borderRadius: '12px', transition: 'all 0.2s ease', position: 'relative' }} onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = isBest ? '0 15px 30px -5px rgba(16, 185, 129, 0.3)' : '0 10px 15px -3px rgba(0,0,0,0.1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = isBest ? '0 10px 25px -5px rgba(16, 185, 129, 0.2)' : '0 4px 6px -1px rgba(0,0,0,0.05)'; }}>
+                            <td style={{ padding: '20px 24px', fontWeight: 600, color: '#0f172a', borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px', border: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderRight: 'none', position: 'relative' }}>
                               {isBest && (
-                                <div style={{ position: 'absolute', top: '-12px', left: '24px', backgroundColor: '#10b981', color: '#fff', padding: '2px 12px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.5px', boxShadow: '0 2px 4px rgba(16,185,129,0.3)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <div style={{ position: 'absolute', top: '-12px', left: '24px', backgroundColor: '#475569', color: '#fff', padding: '2px 12px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.5px', boxShadow: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                   <Target size={12} /> TOP CHOICE
                                 </div>
                               )}
                               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.05rem', marginTop: isBest ? '8px' : '0' }}>
-                                <User size={18} color={isBest ? '#10b981' : '#64748b'} /> {bid.vendorName || 'Unknown Vendor'}
+                                <User size={18} color={'#64748b'} /> {bid.vendorName || 'Unknown Vendor'}
                                 {bid.riskLevel === 'High Risk' && <span title="High Supply Chain Risk" style={{ display: 'flex' }}><AlertTriangle size={16} color="#ef4444" /></span>}
                                 {bid.riskLevel === 'Moderate Risk' && <span title="Moderate Supply Chain Risk" style={{ display: 'flex' }}><AlertTriangle size={16} color="#f59e0b" /></span>}
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
-                                <div style={{ fontSize: '0.8rem', color: bid.trustScore > 4 ? '#10b981' : bid.trustScore < 3 ? '#ef4444' : '#f59e0b', fontWeight: 700, backgroundColor: bid.trustScore > 4 ? '#ecfdf5' : bid.trustScore < 3 ? '#fef2f2' : '#fffbeb', padding: '4px 8px', borderRadius: '6px', border: `1px solid ${bid.trustScore > 4 ? '#a7f3d0' : bid.trustScore < 3 ? '#fecaca' : '#fde68a'}` }}>
+                                <div style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 700, backgroundColor: '#f8fafc', padding: '4px 8px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
                                    {bid.trustScore} Trust
                                 </div>
                                 {showBankruptcyPredictor && bid.financialHealth === 'Critical' && (
@@ -855,12 +856,13 @@ export default function BuyerEventDetailsPage() {
                                 )}
                               </div>
                             </td>
-                            <td style={{ padding: '20px 24px', borderTop: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderBottom: isBest ? '2px solid #34d399' : '1px solid #e2e8f0' }}>
-                              <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '54px', height: '54px', borderRadius: '50%', backgroundColor: isBest ? '#10b981' : '#f1f5f9', color: isBest ? '#fff' : '#334155', fontWeight: 800, fontSize: '1.1rem', boxShadow: isBest ? '0 4px 10px rgba(16,185,129,0.3)' : 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
+                            <td style={{ padding: '20px 24px', fontWeight: 800, color: '#475569', fontSize: '1.2rem', borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>#{bid.priceRank}</td>
+                              <td style={{ padding: '20px 24px', borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>
+                                <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '54px', height: '54px', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#334155', fontWeight: 700, fontSize: '1rem', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)' }}>
                                 {bid.score > 0 ? bid.score : '-'}
                               </div>
                             </td>
-                            <td style={{ padding: '20px 24px', fontWeight: 700, color: '#0f172a', fontSize: '1.15rem', borderTop: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderBottom: isBest ? '2px solid #34d399' : '1px solid #e2e8f0' }}>
+                            <td style={{ padding: '20px 24px', fontWeight: 700, color: '#0f172a', fontSize: '1.15rem', borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>
                               {bid.baseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {event.baseCurrency || 'INR'}
                               {bid.initialAmount && bid.initialAmount > bid.baseAmount && (
                                 <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '6px' }}>
@@ -871,19 +873,19 @@ export default function BuyerEventDetailsPage() {
                               {bid.currency !== (event.baseCurrency || 'INR') && <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500, marginTop: '4px' }}>Orig: {bid.localAmount || bid.amount} {bid.currency}</div>}
                             </td>
                             {enableESG && (
-                              <td style={{ padding: '20px 24px', color: '#16a34a', fontWeight: 600, borderTop: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderBottom: isBest ? '2px solid #34d399' : '1px solid #e2e8f0' }}>
+                              <td style={{ padding: '20px 24px', color: '#16a34a', fontWeight: 600, borderTop: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderBottom: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0' }}>
                                 <div style={{ alignItems: 'center', gap: '6px', backgroundColor: '#f0fdf4', padding: '6px 12px', borderRadius: '20px', display: 'inline-flex', border: '1px solid #bbf7d0' }}><Leaf size={16} /> {bid.esgScore}</div>
                               </td>
                             )}
-                            <td style={{ padding: '20px 24px', textAlign: 'right', borderTopRightRadius: '12px', borderBottomRightRadius: '12px', border: isBest ? '2px solid #34d399' : '1px solid #e2e8f0', borderLeft: 'none' }}>
+                            <td style={{ padding: '20px 24px', textAlign: 'right', borderTopRightRadius: '12px', borderBottomRightRadius: '12px', border: isBest ? '1px solid #94a3b8' : '1px solid #e2e8f0', borderLeft: 'none' }}>
                               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' }}>
-                                <button onClick={() => openChat(bid)} style={{ padding: '10px 16px', backgroundColor: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#dbeafe'; e.currentTarget.style.transform = 'scale(1.05)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#eff6ff'; e.currentTarget.style.transform = 'scale(1)'; }}>
+                                <button onClick={() => openChat(bid)} style={{ padding: '10px 16px', backgroundColor: '#fff', color: '#334155', border: '1px solid #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#dbeafe'; e.currentTarget.style.transform = 'scale(1.05)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#eff6ff'; e.currentTarget.style.transform = 'scale(1)'; }}>
                                    Negotiate
                                 </button>
                                 {(!showBankruptcyPredictor || bid.financialHealth !== 'Critical') && (
                                   <button onClick={() => handleAward(bid)} style={{ 
                                     padding: '10px 20px', 
-                                    background: isBest ? 'linear-gradient(to right, #10b981, #059669)' : '#fff', 
+                                    background: isBest ? '#0f172a' : '#fff', 
                                     color: isBest ? '#fff' : '#0f172a', 
                                     border: isBest ? 'none' : '1px solid #cbd5e1', 
                                     borderRadius: '8px', 
@@ -893,9 +895,9 @@ export default function BuyerEventDetailsPage() {
                                     display: 'flex', 
                                     alignItems: 'center', 
                                     gap: '6px', 
-                                    boxShadow: isBest ? '0 4px 10px rgba(16,185,129,0.4)' : '0 1px 2px rgba(0,0,0,0.05)', 
+                                    boxShadow: isBest ? '0 1px 2px rgba(0,0,0,0.1)' : '0 1px 2px rgba(0,0,0,0.05)', 
                                     transition: 'all 0.2s' 
-                                  }} onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = isBest ? '0 6px 15px rgba(16,185,129,0.5)' : '0 4px 6px -1px rgba(0,0,0,0.1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = isBest ? '0 4px 10px rgba(16,185,129,0.4)' : '0 1px 2px rgba(0,0,0,0.05)'; }}>
+                                  }} onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = isBest ? '0 2px 4px rgba(0,0,0,0.1)' : '0 4px 6px -1px rgba(0,0,0,0.1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = isBest ? '0 4px 10px rgba(16,185,129,0.4)' : '0 1px 2px rgba(0,0,0,0.05)'; }}>
                                     {isBest ? ' Award Best Bid' : 'Award Vendor'}
                                   </button>
                                 )}
@@ -1033,13 +1035,28 @@ export default function BuyerEventDetailsPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Awarded Qty:</div>
                     <input 
-                      type="number" 
-                      min="0" 
-                      max={intake.quantity} 
-                      value={awardQuantities[intake.refId] || 0}
-                      onChange={(e) => setAwardQuantities({...awardQuantities, [intake.refId]: parseInt(e.target.value) || 0})}
-                      style={{ width: '80px', padding: '8px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', textAlign: 'center' }}
-                    />
+                        type="number" 
+                        min="0" 
+                        max={intake.quantity} 
+                        value={awardQuantities[intake.refId] !== undefined ? awardQuantities[intake.refId] : 0}
+                        onChange={(e) => {
+                          let val = parseInt(e.target.value) || 0;
+                          if (val > (intake.quantity || 0)) {
+                            val = intake.quantity || 0;
+                            e.target.value = val;
+                          }
+                          setAwardQuantities({...awardQuantities, [intake.refId]: val});
+                        }}
+                        onBlur={(e) => {
+                          let val = parseInt(e.target.value) || 0;
+                          if (val > (intake.quantity || 0)) {
+                            val = intake.quantity || 0;
+                            e.target.value = val;
+                            setAwardQuantities({...awardQuantities, [intake.refId]: val});
+                          }
+                        }}
+                        style={{ width: '80px', padding: '8px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', textAlign: 'center' }}
+                      />
                     <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>/ {intake.quantity}</div>
                   </div>
                 </div>
@@ -1269,7 +1286,7 @@ export default function BuyerEventDetailsPage() {
                   {processedBids.map((bid: any) => {
                     if (bid.isGhost) {
                       return (
-                        <tr key={bid.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#faf5ff', backgroundImage: 'linear-gradient(to right, #faf5ff, #f3e8ff)' }}>
+                        <tr key={bid.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', backgroundImage: 'linear-gradient(to right, #faf5ff, #f3e8ff)' }}>
                           <td style={{ padding: '16px', fontWeight: 600, color: '#6b21a8', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <BrainCircuit size={16} /> {bid.vendorName}
                           </td>
@@ -1279,8 +1296,8 @@ export default function BuyerEventDetailsPage() {
                           </td>
                           {enableESG && <td style={{ padding: '16px', color: '#16a34a', fontWeight: 500 }}>{bid.esgScore}</td>}
                           {templateFields.map((f: any) => (
-                            <td key={f.key} style={{ padding: '16px', color: '#9333ea', fontStyle: 'italic' }}>
-                              {bid.parsedData[f.key] || '-'}
+                            <td key={f.key} style={{ padding: '16px', color: '#64748b', fontStyle: 'italic' }}>
+                              {bid.parsedData[f.key] || bid.parsedData[f.name] || '-'}
                             </td>
                           ))}
                         </tr>
@@ -1298,7 +1315,7 @@ export default function BuyerEventDetailsPage() {
                         {enableESG && <td style={{ padding: '16px', color: '#16a34a', fontWeight: 500 }}>{bid.esgScore}</td>}
                         
                         {templateFields.map((f: any) => {
-                          const rawVal = bid.parsedData[f.key];
+                          const rawVal = bid.parsedData[f.key] || bid.parsedData[f.name];
                           const val = parseFloat(rawVal);
                           const isNumeric = !isNaN(val);
                           const target = parseFloat(f.targetPrice);

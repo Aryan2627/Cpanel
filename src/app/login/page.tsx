@@ -1,5 +1,5 @@
 ﻿"use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Login() {
@@ -13,6 +13,21 @@ export default function Login() {
   const [previewUrl, setPreviewUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // CAPTCHA State
+  const [captchaNum1, setCaptchaNum1] = useState(0);
+  const [captchaNum2, setCaptchaNum2] = useState(0);
+  const [captchaInput, setCaptchaInput] = useState('');
+
+  const generateCaptcha = () => {
+    setCaptchaNum1(Math.floor(Math.random() * 10) + 1);
+    setCaptchaNum2(Math.floor(Math.random() * 10) + 1);
+    setCaptchaInput('');
+  };
+
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
 
   
   const handleRequestOTP = async (e: React.FormEvent) => {
@@ -73,6 +88,11 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (parseInt(captchaInput) !== (captchaNum1 + captchaNum2)) {
+      setError('Human verification failed. Please try again.');
+      generateCaptcha();
+      return;
+    }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError('Please enter a valid email address.');
@@ -277,9 +297,28 @@ export default function Login() {
                 />
               </div>
               
-              <button 
+              
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', color: '#334155', marginBottom: '8px' }}>Security Verification</label>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ flex: '0 0 auto', padding: '12px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '1rem', fontWeight: '600', color: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100px' }}>
+                      {captchaNum1} + {captchaNum2}
+                    </div>
+                    <input
+                      type="text"
+                      value={captchaInput}
+                      onChange={(e) => setCaptchaInput(e.target.value.replace(/\D/g, ''))}
+                      required
+                      placeholder="Result"
+                      className="input-field"
+                      style={{ flex: '1' }}
+                    />
+                  </div>
+                </div>
+
+                <button 
                 type="submit" 
-                disabled={loading}
+                disabled={loading || !captchaInput}
                 className="btn-primary"
                 style={{ background: loading ? '#93c5fd' : '', cursor: loading ? 'not-allowed' : 'pointer' }}
               >

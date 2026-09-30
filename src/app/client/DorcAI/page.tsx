@@ -4,7 +4,7 @@ import {
   BrainCircuit, X, Zap, Loader2, Database, Send, Terminal,
   CheckCircle2, AlertTriangle, CheckCircle, FileText, Settings, Eye,
   Plus, Sparkles, Shield, ChevronRight, BarChart3, Bot
-, Sun, Moon, FileUp, Cpu, Search, Monitor, Download } from 'lucide-react';
+, Sun, Moon, FileUp, Cpu, Search, Monitor, Download , Mic, Volume2, VolumeX , MessageCircle, Layers, Award, Calculator, CreditCard, PieChart, ShieldAlert, Banknote, Wrench, GitMerge, ShoppingCart, Mail, Users } from 'lucide-react';
 
 /* ───────────────────────── Utility sub-components ───────────────────────── */
 
@@ -34,7 +34,7 @@ const launchPiP = async () => {
           <div style="width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg, #00c6ff, #0072ff); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 15px rgba(0,114,255,0.4);">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
           </div>
-          Cortex Anywhere
+          Dorc AI Anywhere
         </h3>
         <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 24px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Zero-Install Web Copilot</p>
         
@@ -65,7 +65,7 @@ const launchPiP = async () => {
            chat.innerHTML += `<div class="msg" style="border-color: rgba(0,198,255,0.3); background: rgba(0,198,255,0.05);">
             <strong style="color: #00c6ff; display: block; margin-bottom: 6px;">Context Detected: Microsoft Excel</strong>
             I see you are looking at an Excel spreadsheet containing a <strong>Bill of Materials</strong> for IT Infrastructure.<br/><br/>
-            💡 <strong>Cortex Insights:</strong><br/>
+            💡 <strong>Dorc AI Insights:</strong><br/>
             I have instantly cross-referenced the hardware rows visible on your screen against our internal catalog. I can procure the entire list for <strong>$23,200</strong> through our preferred vendors.<br/><br/>
             <button style="background: #00c6ff; border: none; padding: 8px 12px; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; margin-top: 8px; width: 100%;">Generate PR from Excel Data</button>
             </div>`;
@@ -82,6 +82,31 @@ const launchPiP = async () => {
     console.error(e);
     alert('Failed to launch PiP window.');
   }
+};
+
+const BidAnalyzerForm = ({ onSubmit }: { onSubmit: (eventId: string) => void }) => {
+  const [eventId, setEventId] = useState('');
+  const inp = { width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.07)', color:'#e2e8f0', fontSize:'0.85rem', outline:'none' };
+  return (
+    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(15,23,42,0.9)', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 4px 24px rgba(0,0,0,0.4)' }}>
+      <div style={{ marginBottom:'14px' }}>
+        <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Target Event ID / Name</label>
+        <input 
+          type="text" 
+          placeholder="e.g. EVT-1234 or Laptop Procurement" 
+          value={eventId} 
+          onChange={e=>setEventId(e.target.value)} 
+          style={inp}
+        />
+      </div>
+      <button 
+        onClick={() => { if(eventId.trim()) onSubmit(eventId.trim()); }} 
+        style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#3b82f6,#2563eb)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}
+      >
+        Analyze Bids
+      </button>
+    </div>
+  );
 };
 
 const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => {
@@ -286,16 +311,107 @@ const AgentSwarm = ({ data }: { data: any }) => {
   );
 };
 
-export default function CortexPage() {
+export default function DorcPage() {
   const [input, setInput] = useState('');
+
+  const [isListening, setIsListening] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [voiceGender, setVoiceGender] = useState<'female'|'male'>('female');
+  const voiceEnabledRef = useRef(false);
+  const voiceGenderRef = useRef<'female'|'male'>('female');
+  
+  useEffect(() => { voiceEnabledRef.current = voiceEnabled; }, [voiceEnabled]);
+  useEffect(() => { voiceGenderRef.current = voiceGender; }, [voiceGender]);
+  
+  const speakText = (text: string) => {
+    if (!voiceEnabledRef.current || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text.replace(/[*_#]/g, ''));
+    const voices = window.speechSynthesis.getVoices();
+    const gender = voiceGenderRef.current;
+    let voice = voices.find(v => v.name.toLowerCase().includes(gender));
+    if (!voice) {
+       if (gender === 'female') {
+         voice = voices.find(v => v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Google US English'));
+       } else {
+         voice = voices.find(v => v.name.includes('David') || v.name.includes('Daniel') || v.name.includes('Google UK English Male'));
+       }
+    }
+    if (voice) utterance.voice = voice;
+    window.speechSynthesis.speak(utterance);
+  };
+  
+  const startListening = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return alert('Voice recognition not supported in this browser.');
+    if (isListening) return;
+    
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+    
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript.toLowerCase();
+      setInput(event.results[0][0].transcript);
+      
+      let matchedCmd = null;
+      if (transcript.match(/bom|material|bill of material|guided intake|purchase request/i)) matchedCmd = '/bom';
+      else if (transcript.match(/compare|bids|bid analysis|award/i)) matchedCmd = '/analyze-bids';
+      else if (transcript.match(/risk|due diligence|swarm/i)) matchedCmd = '/analyze-risk';
+      else if (transcript.match(/draft contract|generate contract|generate legal/i)) matchedCmd = '/draft-contract';
+      else if (transcript.match(/contract|legal review/i)) matchedCmd = '/analyze-contract';
+      else if (transcript.match(/clause|policy validation/i)) matchedCmd = '/review-clause';
+      else if (transcript.match(/shipment|track|asn|grn|transit/i)) matchedCmd = '/track-shipments';
+      else if (transcript.match(/stockout|shortage|inventory|demand forecast/i)) matchedCmd = '/predict-stockout';
+      else if (transcript.match(/3way|three way|invoice match|reconcil/i)) matchedCmd = '/3way-match';
+      else if (transcript.match(/esg|sustainability|green/i)) matchedCmd = '/esg-audit';
+      else if (transcript.match(/market intel|commodity|pricing trend|should cost/i)) matchedCmd = '/market-intel';
+      else if (transcript.match(/scorecard|performance grade/i)) matchedCmd = '/vendor-scorecard';
+      else if (transcript.match(/s2p|source to pay|orchestrat|end to end/i)) matchedCmd = '/s2p';
+      else if (transcript.match(/event|auction|sourcing agent/i)) matchedCmd = '/create-event';
+      else if (transcript.match(/onboard|new vendor|new supplier|discovery/i)) matchedCmd = '/create-vendor';
+      else if (transcript.match(/po|purchase order/i)) matchedCmd = '/draft-po';
+      else if (transcript.match(/product|catalog|catalogue|master data/i)) matchedCmd = '/add-product';
+      else if (transcript.match(/scan|ocr|screen|capture/i)) matchedCmd = '/scan';
+      else if (transcript.match(/clear|reset|start over/i)) matchedCmd = '/clear';
+      else if (transcript.match(/discover|find supplier|global supplier/i)) matchedCmd = '/discover-suppliers';
+      else if (transcript.match(/negotiate|counter offer/i)) matchedCmd = '/negotiate';
+      else if (transcript.match(/aggregate|bulk|cross-department/i)) matchedCmd = '/aggregate-demand';
+      else if (transcript.match(/auto award|award winner/i)) matchedCmd = '/auto-award';
+      else if (transcript.match(/should cost|cost model/i)) matchedCmd = '/should-cost';
+      else if (transcript.match(/budget|variance/i)) matchedCmd = '/validate-budget';
+      else if (transcript.match(/spend|tail spend|rogue/i)) matchedCmd = '/spend-analytics';
+      else if (transcript.match(/fraud/i)) matchedCmd = '/detect-fraud';
+      else if (transcript.match(/payment|payout/i)) matchedCmd = '/process-payment';
+      else if (transcript.match(/exception|discrepancy/i)) matchedCmd = '/resolve-exceptions';
+      else if (transcript.match(/approval|route|routing/i)) matchedCmd = '/route-approvals';
+      else if (transcript.match(/communicate|email supplier/i)) matchedCmd = '/communicate';
+      else if (transcript.match(/guided buying|punch out/i)) matchedCmd = '/guided-buying';
+      else if (transcript.match(/supplier ops|relationship/i)) matchedCmd = '/supplier-ops';
+      
+      if (matchedCmd) {
+        execute(matchedCmd);
+        setInput('');
+      } else {
+        execute(transcript);
+        setInput('');
+      }
+    };
+    recognition.start();
+  };
+
   const [userName, setUserName] = useState('Admin');
-  const [messages, setMessages] = useState<Message[]>([
-    { role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }
+  const [messages, setanys] = useState<any[]>([
+    { role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSlash, setShowSlash] = useState(false);
   const [slashCategory, setSlashCategory] = useState('All');
-  const [chats, setChats] = useState<{id: string, title: string, messages: Message[]}[]>([
+  const [chats, setChats] = useState<{id: string, title: string, messages: any[]}[]>([
     { id: 'c1', title: 'Risk Swarm — Vendor Contract Q3', messages: [{ role: 'agent', content: 'Multi-Agent Swarm analysis completed for Vendor Contract Q3.' }] },
     { id: 'c2', title: 'Legal Review — NDA Acme Corp', messages: [{ role: 'agent', content: 'Legal clause review completed for Acme Corp NDA.' }] },
     { id: 'c3', title: 'Procurement Savings Analysis', messages: [{ role: 'agent', content: 'Savings analysis: Found 12% cost reduction opportunities.' }] },
@@ -307,6 +423,8 @@ export default function CortexPage() {
   const [eventForm, setEventForm] = useState({ title:'', budget:'', vendorId:'', duration:'', durationUnit:'days' });
   const [s2pForm, setS2pForm] = useState({ title: '', category: 'IT', department: 'Engineering', budget: '', description: '', quantity: 1, requiredDate: '', address: '' });
   const [vendorForm, setVendorForm] = useState({ name:'', email:'', category:'' });
+  const [opsSearch, setOpsSearch] = useState('');
+  const [opsVendors, setOpsVendors] = useState<any[]>([]);
   const [poForm, setPoForm] = useState({ poNumber:'', amount:'', desc:'' });
   const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'', isGenerating:false });
   const [viewImage, setViewImage] = useState<string | null>(null);
@@ -318,12 +436,12 @@ export default function CortexPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const playGreeting = () => {
-        if (!sessionStorage.getItem('cortex_greeted_v2')) {
+        if (!sessionStorage.getItem('dorc_greeted_v1')) {
           try {
             const audio = new Audio('/greeting.mp3');
             audio.volume = 1.0;
             audio.play().then(() => {
-              sessionStorage.setItem('cortex_greeted_v2', 'true');
+              sessionStorage.setItem('dorc_greeted_v1', 'true');
               document.removeEventListener('click', playGreeting);
               document.removeEventListener('keydown', playGreeting);
             }).catch(e => {
@@ -350,7 +468,7 @@ export default function CortexPage() {
   useEffect(() => {
     setIsClient(true);
     try {
-      const stored = localStorage.getItem('cortex_chats_v2');
+      const stored = localStorage.getItem('dorc_chats_v1');
       if (stored) {
         const { chatsData, timestamp, activeId } = JSON.parse(stored);
         if (Date.now() - timestamp < 2 * 60 * 60 * 1000) {
@@ -359,11 +477,11 @@ export default function CortexPage() {
             setActiveChatId(activeId);
             const activeChat = chatsData.find((c: any) => c.id === activeId);
             if (activeChat && activeChat.messages && activeChat.messages.length > 0) {
-              setMessages(activeChat.messages);
+              setanys(activeChat.messages);
             }
           }
         } else {
-          localStorage.removeItem('cortex_chats_v2');
+          localStorage.removeItem('dorc_chats_v1');
         }
       }
     } catch(e) {}
@@ -371,7 +489,7 @@ export default function CortexPage() {
 
   useEffect(() => {
     if (!isClient) return;
-    localStorage.setItem('cortex_chats_v2', JSON.stringify({
+    localStorage.setItem('dorc_chats_v1', JSON.stringify({
       chatsData: chats,
       activeId: activeChatId,
       timestamp: Date.now()
@@ -397,7 +515,7 @@ export default function CortexPage() {
     if(cmd.startsWith('/analyze-risk')) display = 'Deploy AI swarm to analyze this contract\'s risk profile.';
     if(cmd.startsWith('/analyze-contract')) display = 'Run deep legal clause analysis.';
     if(cmd.startsWith('/execute-bom-upload')) display = 'Processing Bill of Materials...';
-    setMessages(p=>[...p, { role:'user', content:display }]);
+    setanys(p=>[...p, { role:'user', content:display }]);
     const newId = 'c_' + Date.now();
     if(messages.length===1) {
       const title = display.substring(0, 40);
@@ -408,8 +526,9 @@ export default function CortexPage() {
     try {
       const r = await fetch('/api/ai/cortex',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ prompt:cmd, userName, history:messages.slice(-5) }) });
       const d = await r.json();
-      setMessages(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
-    } catch(e) { setMessages(p=>[...p,{ role:'agent', content:'Connection error.' }]); }
+      setanys(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
+        if (d && d.final_response) speakText(d.final_response);
+    } catch(e) { setanys(p=>[...p,{ role:'agent', content:'Connection error.' }]); }
     setIsProcessing(false);
   };
 
@@ -417,7 +536,7 @@ export default function CortexPage() {
   const handleScreenScan = async () => {
     setShowSlash(false);
     const msgId = 'scan-' + Date.now();
-    setMessages(p => [...p, 
+    setanys(p => [...p, 
       { role: 'user', content: 'Scan my current screen and analyze it.' },
       { id: msgId, role: 'agent', content: 'Requesting permission to read screen...', isLoading: true }
     ]);
@@ -425,7 +544,7 @@ export default function CortexPage() {
 
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'window' } });
-      setMessages(p => p.map(m => m.id === msgId ? { ...m, content: 'Analyzing live video frame with Local OCR...' } : m));
+      setanys(p => p.map(m => m.id === msgId ? { ...m, content: 'Analyzing live video frame with Local OCR...' } : m));
 
       // @ts-ignore
       if (!(window as any).Tesseract) {
@@ -453,14 +572,14 @@ export default function CortexPage() {
       const { data: { text } } = await (window as any).Tesseract.recognize(canvas, 'eng');
 
       if (!text || text.trim().length === 0) {
-        setMessages(p => p.map(m => m.id === msgId ? { ...m, content: 'Could not detect clear text on that screen.', isLoading: false } : m));
+        setanys(p => p.map(m => m.id === msgId ? { ...m, content: 'Could not detect clear text on that screen.', isLoading: false } : m));
       } else {
         const cleanText = text.substring(0, 1500) + (text.length > 1500 ? '... [TRUNCATED]' : '');
-        setMessages(p => p.map(m => m.id === msgId ? { ...m, content: `**Screen Analysis Complete.**\n\nI successfully scanned your screen using an advanced in-browser local OCR engine. Here is the raw text extracted directly from the pixels:\n\n\`\`\`text\n${cleanText}\n\`\`\``, isLoading: false } : m));
+        setanys(p => p.map(m => m.id === msgId ? { ...m, content: `**Screen Analysis Complete.**\n\nI successfully scanned your screen using an advanced in-browser local OCR engine. Here is the raw text extracted directly from the pixels:\n\n\`\`\`text\n${cleanText}\n\`\`\``, isLoading: false } : m));
       }
     } catch (err) {
       console.error(err);
-      setMessages(p => p.map(m => m.id === msgId ? { ...m, content: 'Screen capture cancelled or failed.', isLoading: false } : m));
+      setanys(p => p.map(m => m.id === msgId ? { ...m, content: 'Screen capture cancelled or failed.', isLoading: false } : m));
     }
     
     setIsProcessing(false);
@@ -470,7 +589,7 @@ export default function CortexPage() {
     if(e) e.preventDefault();
     if(!input.trim()||isProcessing) return;
     const q = input.trim(); setInput('');
-    setMessages(p=>[...p,{ role:'user', content:q }]);
+    setanys(p=>[...p,{ role:'user', content:q }]);
     const newId2 = 'c_' + Date.now();
     if(messages.length===1) {
       const title2 = q.substring(0, 40);
@@ -481,8 +600,8 @@ export default function CortexPage() {
     try {
       const r = await fetch('/api/ai/cortex',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ prompt:q, userName, history:messages.slice(-5) }) });
       const d = await r.json();
-      setMessages(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
-    } catch(e) { setMessages(p=>[...p,{ role:'agent', content:'Connection to Cortex Core failed.' }]); }
+      setanys(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
+    } catch(e) { setanys(p=>[...p,{ role:'agent', content:'Connection to Dorc AI Core failed.' }]); }
     setIsProcessing(false);
   };
 
@@ -510,10 +629,46 @@ export default function CortexPage() {
       { category:'System', cmd:'/add-product', label:'Add Item to Catalog', icon:<Plus size={14}/>, color:'#a3e635', bg:'rgba(132,204,22,0.12)', auto:false },
       { category:'System', cmd:'/scan', label:'Analyze Current Screen (OCR)', icon:<Monitor size={14}/>, color:'#00c6ff', bg:'rgba(0,198,255,0.12)', auto:true },
       { category:'System', cmd:'/clear', label:'Clear Conversation', icon:<X size={14}/>, color:'#94a3b8', bg:'rgba(148,163,184,0.08)', auto:true },
+        { category:'Sourcing', cmd:'/discover-suppliers', label:'Supplier Discovery Agent', icon:<Search size={14}/>, color:'#38bdf8', bg:'rgba(56,189,248,0.12)', auto:true },
+        { category:'Sourcing', cmd:'/negotiate', label:'Autonomous Negotiation Agent', icon:<MessageCircle size={14}/>, color:'#818cf8', bg:'rgba(129,140,248,0.12)', auto:true },
+        { category:'Sourcing', cmd:'/aggregate-demand', label:'Demand Aggregation Agent', icon:<Layers size={14}/>, color:'#10b981', bg:'rgba(16,185,129,0.12)', auto:true },
+        { category:'Sourcing', cmd:'/auto-award', label:'Auto-Award Agent', icon:<Award size={14}/>, color:'#fbbf24', bg:'rgba(251,191,36,0.12)', auto:true },
+        { category:'Sourcing', cmd:'/should-cost', label:'Should-Cost Modeling Agent', icon:<Calculator size={14}/>, color:'#f43f5e', bg:'rgba(244,63,94,0.12)', auto:true },
+        { category:'Finance', cmd:'/validate-budget', label:'Budget Validation Agent', icon:<CreditCard size={14}/>, color:'#eab308', bg:'rgba(234,179,8,0.12)', auto:true },
+        { category:'Finance', cmd:'/spend-analytics', label:'Spend Compliance Agent', icon:<PieChart size={14}/>, color:'#8b5cf6', bg:'rgba(139,92,246,0.12)', auto:true },
+        { category:'Finance', cmd:'/detect-fraud', label:'Fraud Detection Agent', icon:<ShieldAlert size={14}/>, color:'#ef4444', bg:'rgba(239,68,68,0.12)', auto:true },
+        { category:'Finance', cmd:'/process-payment', label:'Payment Processing Agent', icon:<Banknote size={14}/>, color:'#34d399', bg:'rgba(52,211,153,0.12)', auto:true },
+        { category:'Finance', cmd:'/resolve-exceptions', label:'Exception Resolution Agent', icon:<Wrench size={14}/>, color:'#f97316', bg:'rgba(249,115,22,0.12)', auto:true },
+        { category:'System', cmd:'/route-approvals', label:'Approval Routing Agent', icon:<GitMerge size={14}/>, color:'#0ea5e9', bg:'rgba(14,165,233,0.12)', auto:true },
+        { category:'System', cmd:'/guided-buying', label:'Guided Buying Agent', icon:<ShoppingCart size={14}/>, color:'#c084fc', bg:'rgba(192,132,252,0.12)', auto:true },
+        { category:'Vendors', cmd:'/communicate', label:'Communication Agent', icon:<Mail size={14}/>, color:'#3b82f6', bg:'rgba(59,130,246,0.12)', auto:true },
+        { category:'Vendors', cmd:'/supplier-ops', label:'Supplier Ops Agent', icon:<Users size={14}/>, color:'#14b8a6', bg:'rgba(20,184,166,0.12)', auto:false },
     ];
 
   return (
-    <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', height:'100%', width:'100%', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+    <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', flex: 1, width: '100%', height: 'calc(100vh - 64px)', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+        <style>{`
+          @keyframes voiceRing1 {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(3.5); opacity: 0; }
+          }
+          @keyframes voiceRing2 {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.5); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 0.6; }
+          }
+        `}</style>
+        <style>{`
+          @keyframes voiceRing1 {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(2.5); opacity: 0; }
+          }
+          @keyframes voiceRing2 {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.3); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 0.6; }
+          }
+        `}</style>
       
       {/* Animated Background */}
       <style>{`
@@ -536,7 +691,7 @@ export default function CortexPage() {
         /* Main chat background */
         .cortex-light .cx-main { background: #f0f4f8 !important; }
 
-        /* Message text */
+        /* any text */
         .cortex-light .cortex-msg div[style*="color: msg.role==='agent'?'#e2e8f0"] { color: #1e293b !important; }
 
         /* Slash menu */
@@ -593,7 +748,25 @@ export default function CortexPage() {
         @keyframes pulse2 { 0%,100%{opacity:0.4} 50%{opacity:0.7} }
         @keyframes cortexSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
         @keyframes fadeSlideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+                  @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+          @keyframes branchAnim {
+            0% { transform: translate(6px, 12px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(34px, 4px); opacity: 0; }
+          }
+          @keyframes branchAnim2 {
+            0% { transform: translate(6px, 12px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(34px, 12px); opacity: 0; }
+          }
+          @keyframes branchAnim3 {
+            0% { transform: translate(6px, 12px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(34px, 20px); opacity: 0; }
+          }
         .cortex-msg { animation: fadeSlideIn 0.35s ease forwards; }
         .slash-btn:hover { background: rgba(255,255,255,0.06) !important; }
         .bom-row { transition: all 0.2s; }
@@ -638,13 +811,13 @@ export default function CortexPage() {
               <BrainCircuit size={18} color="#fff"/>
             </div>
             <div>
-              <div style={{ fontSize:'0.9rem', fontWeight:800, color:'#f1f5f9', letterSpacing:'-0.5px' }}>Cortex AI</div>
+              <div style={{ fontSize:'0.9rem', fontWeight:800, color:'#f1f5f9', letterSpacing:'-0.5px' }}>Dorc AI</div>
               <div style={{ fontSize:'0.65rem', color:'#4ade80', fontWeight:600, display:'flex', alignItems:'center', gap:'4px' }}>
                 <span style={{ width:'5px', height:'5px', borderRadius:'50%', background:'#4ade80', display:'inline-block', animation:'pulse2 2s infinite' }}/>Online · RAG Active
               </div>
             </div>
           </div>
-          <button onClick={()=>{ setMessages([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); setActiveChatId(null); setMenuOpenId(null); }} style={{ width:'100%', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#a5b4fc', transition:'all 0.2s' }}>
+          <button onClick={()=>{ setanys([{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); setActiveChatId(null); setMenuOpenId(null); }} style={{ width:'100%', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#a5b4fc', transition:'all 0.2s' }}>
             <Plus size={15}/> New Chat
           </button>
         </div>
@@ -658,7 +831,7 @@ export default function CortexPage() {
             const isEditing = editingId===chat.id;
             return (
               <div key={chat.id} className="hist-item" style={{ padding:'9px 12px', paddingRight:'8px', background: isActive?'rgba(99,102,241,0.12)':'transparent', border: isActive?'1px solid rgba(99,102,241,0.25)':'1px solid transparent', borderRadius:'8px', fontSize:'0.8rem', cursor:'pointer', marginBottom:'3px', transition:'all 0.2s', position:'relative', display:'flex', alignItems:'center', gap:'6px' }}
-                onClick={()=>{ if(!isEditing){ setActiveChatId(chat.id); setMessages(chat.messages.length>0?chat.messages:[{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setMenuOpenId(null); } }}
+                onClick={()=>{ if(!isEditing){ setActiveChatId(chat.id); setanys(chat.messages.length>0?chat.messages:[{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setMenuOpenId(null); } }}
               >
                 {isEditing ? (
                   <input
@@ -683,7 +856,7 @@ export default function CortexPage() {
                     <button onClick={()=>{ setEditTitle(chat.title); setEditingId(chat.id); setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#e2e8f0', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
                       ✏️ Rename
                     </button>
-                    <button onClick={()=>{ setChats(p=>p.filter(c=>c.id!==chat.id)); if(activeChatId===chat.id){ setActiveChatId(null); setMessages([{ role:'agent', content:'Cortex is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); } setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#f87171', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
+                    <button onClick={()=>{ setChats(p=>p.filter(c=>c.id!==chat.id)); if(activeChatId===chat.id){ setActiveChatId(null); setanys([{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); } setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#f87171', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
                       🗑️ Delete
                     </button>
                   </div>
@@ -730,7 +903,7 @@ export default function CortexPage() {
       {/* ── MAIN CHAT ── */}
       <div className="cx-main" style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', minWidth:0 }}>
         
-        {/* Messages */}
+        {/* anys */}
         <div style={{ flex:1, overflowY:'auto', overflowX:'hidden', padding:'32px 0 0', minHeight:0 }}>
           <div className="cx-chat-area" style={{ maxWidth:'780px', margin:'0 auto', display:'flex', flexDirection:'column', gap:'28px', padding:'0 28px 24px' }}>
             {messages.map((msg, idx)=>(
@@ -738,12 +911,12 @@ export default function CortexPage() {
                 
                 {/* Avatar */}
                 <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background: msg.role==='agent'?'linear-gradient(135deg,#6366f1,#8b5cf6)':'rgba(255,255,255,0.07)', border: msg.role==='agent'?'none':'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', boxShadow: msg.role==='agent'?'0 0 16px rgba(99,102,241,0.3)':'none' }}>
-                  {msg.role==='agent' ? <BrainCircuit size={18}/> : <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{userName.charAt(0)}</span>}
+                  {msg.role==='agent' ? <img src="/dorc-logo.png" style={{ width: 22, height: 22, objectFit: "contain", filter: "brightness(0) invert(1)" }} /> : <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{userName.charAt(0)}</span>}
                 </div>
 
                 <div style={{ flex:1, paddingTop:'4px', minWidth:0 }}>
                   <div style={{ fontSize:'0.78rem', fontWeight:700, marginBottom:'8px', color: msg.role==='agent'?'#818cf8': isDark ? '#94a3b8' : '#64748b', textTransform:'uppercase', letterSpacing:'0.5px' }}>
-                    {msg.role==='agent' ? 'Cortex AI' : 'You'}
+                    {msg.role==='agent' ? 'Dorc AI' : 'You'}
                   </div>
                   <div style={{ color: msg.role==='agent'? (isDark ? '#e2e8f0' : '#1e293b') : (isDark ? '#94a3b8' : '#475569'), fontSize:'0.95rem', lineHeight:'1.7' }}>
                     {fmt(msg.content)}
@@ -875,7 +1048,7 @@ export default function CortexPage() {
                       </div>
 
                       <div style={{ padding:'16px 20px', background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', display:'flex', justifyContent:'flex-end' }}>
-                        <button onClick={() => setMessages(p => [...p, { role:'agent', content:'', uiComponent:'pr_success', uiData: { prNumber: 'PR-2026-0842', total: msg.uiData.totalEstimatedCost } }])} style={{ background:'linear-gradient(135deg, #2dd4bf, #0d9488)', border:'none', padding:'12px 24px', borderRadius:'8px', color:'#fff', fontWeight:700, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 4px 15px rgba(13,148,136,0.3)', display:'flex', alignItems:'center', gap:'8px', transition:'transform 0.1s' }}>
+                        <button onClick={() => setanys(p => [...p, { role:'agent', content:'', uiComponent:'pr_success', uiData: { prNumber: 'PR-2026-0842', total: msg.uiData.totalEstimatedCost } }])} style={{ background:'linear-gradient(135deg, #2dd4bf, #0d9488)', border:'none', padding:'12px 24px', borderRadius:'8px', color:'#fff', fontWeight:700, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 4px 15px rgba(13,148,136,0.3)', display:'flex', alignItems:'center', gap:'8px', transition:'transform 0.1s' }}>
                           <CheckCircle2 size={16}/> Generate Purchase Request
                         </button>
                       </div>
@@ -888,7 +1061,13 @@ export default function CortexPage() {
                   )}
 
                   {/* Document Generator Form */}
-                  {msg.uiComponent==='document_generator_form' && (
+                  
+                    {/* Bid Analyzer Form */}
+                    {msg.uiComponent==='bid_analyzer_form' && (
+                      <BidAnalyzerForm onSubmit={e => execute('/analyze bids for ' + e)}/>
+                    )}
+
+{msg.uiComponent==='document_generator_form' && (
                     <DocumentGeneratorForm onSubmit={d=>execute('/execute-draft-document '+JSON.stringify(d))}/>
                   )}
 
@@ -1091,7 +1270,7 @@ export default function CortexPage() {
                                    // High-end fallback if pollinations fails or rate-limits
                                    e.currentTarget.src = `https://loremflickr.com/800/500/${encodeURIComponent(productForm.name)}?lock=${Math.floor(Math.random()*1000)}`; 
                                  }}
-                                 style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', clipPath:'inset(0px 0px 8% 0px)', transition:'opacity 0.5s ease-in' }} 
+                                 style={{ flex: 1, width: '100%', objectFit:'cover', objectPosition:'center', clipPath:'inset(0px 0px 8% 0px)', transition:'opacity 0.5s ease-in' }} 
                                  alt="Product Preview" 
                                />
                                
@@ -1241,7 +1420,40 @@ export default function CortexPage() {
                     )}
 
                     {/* 3Way Match */}
-                    {msg.uiComponent==='three_way_match' && (
+                    
+                    {/* Bid Matrix */}
+                    {msg.uiComponent==='bid_matrix' && msg.uiData && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> Vendor Bid Matrix - {msg.uiData.eventName}</div>
+                        <div style={{ overflowX:'auto' }}>
+                          <table style={{ width:'100%', fontSize:'0.75rem', textAlign:'left', borderCollapse:'collapse' }}>
+                            <thead>
+                              <tr style={{ color: isDark ? '#94a3b8' : '#64748b', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}>
+                                <th style={{padding:'8px'}}>Vendor</th>
+                                <th style={{padding:'8px'}}>Total Price</th>
+                                <th style={{padding:'8px'}}>Quoted Lines</th>
+                                <th style={{padding:'8px'}}>Compliance</th>
+                                <th style={{padding:'8px'}}>Risk</th>
+                                <th style={{padding:'8px'}}>Dorc Score</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {msg.uiData.bids.map((b: any, idx: number) => (
+                                <tr key={idx} style={{ color: isDark ? '#e2e8f0' : '#0f172a', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #f1f5f9' }}>
+                                  <td style={{padding:'8px', fontWeight:600}}>{b.vendor}</td>
+                                  <td style={{padding:'8px', color: idx===0 ? '#10b981' : 'inherit', fontWeight: idx===0 ? 700 : 400}}>${b.price.toLocaleString()}</td>
+                                  <td style={{padding:'8px'}}>{b.timeline}</td>
+                                  <td style={{padding:'8px', color: b.compliance==='Pass'?'#10b981':'#ef4444'}}>{b.compliance}</td>
+                                  <td style={{padding:'8px'}}>{b.risk}</td>
+                                  <td style={{padding:'8px', color:'#3b82f6', fontWeight:600}}>{b.score}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+{msg.uiComponent==='three_way_match' && (
                       <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
                         <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> 3-Way Reconciliation</div>
                         <div style={{ overflowX:'auto' }}>
@@ -1285,22 +1497,96 @@ export default function CortexPage() {
                     )}
 
                     {/* Vendor Scorecard */}
+                                        {msg.uiComponent==='supplier_ops_form' && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(20,184,166,0.3)' : '1px solid #e2e8f0' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Users size={16} color="#14b8a6"/> Select Vendor for Analysis</div>
+                        <div style={{ position: 'relative' }}>
+                          <input 
+                            type="text" 
+                            placeholder="Type to search vendors..." 
+                            value={opsSearch}
+                            onChange={async (e) => {
+                              const val = e.target.value;
+                              setOpsSearch(val);
+                              if (val.length > 1) {
+                                try {
+                                  const r = await fetch('/api/vendors');
+                                  if (r.ok) {
+                                    const data = await r.json();
+                                    setOpsVendors(data.filter((v: any) => v.name && v.name.toLowerCase().includes(val.toLowerCase())).slice(0, 5));
+                                  }
+                                } catch (e) {}
+                              } else {
+                                setOpsVendors([]);
+                              }
+                            }}
+                            style={{ width:'100%', padding:'12px 14px', borderRadius:'8px', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #cbd5e1', background: isDark ? 'rgba(255,255,255,0.05)' : '#fff', color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.85rem', outline:'none' }}
+                          />
+                          {opsVendors.length > 0 && (
+                            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '4px', background: isDark ? '#1e293b' : '#fff', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0', borderRadius: '8px', zIndex: 10, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                              {opsVendors.map(v => (
+                                <button 
+                                  key={v.id}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setOpsSearch('');
+                                    setOpsVendors([]);
+                                    execute('/supplier-ops ' + v.name);
+                                  }}
+                                  style={{ width: '100%', padding: '10px 14px', textAlign: 'left', background: 'transparent', border: 'none', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #f1f5f9', cursor: 'pointer', color: isDark ? '#e2e8f0' : '#0f172a', fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between' }}
+                                  onMouseEnter={(e) => (e.target as any).style.background = isDark ? 'rgba(255,255,255,0.05)' : '#f8fafc'}
+                                  onMouseLeave={(e) => (e.target as any).style.background = 'transparent'}
+                                >
+                                  <span style={{ fontWeight: 600 }}>{v.name}</span>
+                                  <span style={{ color: '#64748b', fontSize: '0.75rem' }}>{v.type || v.status}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     {msg.uiComponent==='vendor_scorecard' && msg.uiData && (
                       <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(59,130,246,0.3)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
                         <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle size={16} color="#2563eb"/> Scorecard: {msg.uiData.vendor}</div>
                         <div style={{ display:'flex', gap:'12px' }}>
-                          <div style={{ width:'70px', height:'70px', background:'#2563eb', borderRadius:'12px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', fontWeight:900, color:'#fff', boxShadow:'0 4px 12px rgba(37,99,235,0.2)' }}>A</div>
+                          <div style={{ width:'70px', height:'70px', background: msg.uiData.gradeColor || '#2563eb', borderRadius:'12px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', fontWeight:900, color:'#fff', boxShadow: 'none' }}>{msg.uiData.grade || 'A'}</div>
                           <div style={{ flex:1, display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px' }}>
-                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>On-Time</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#10b981'}}>98.2%</div></div>
-                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>Defect Rate</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#10b981'}}>0.4%</div></div>
-                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>Responsive</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#eab308'}}>Avg (2d)</div></div>
-                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>Risk Tier</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#10b981'}}>Low</div></div>
+                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>On-Time</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#10b981'}}>{msg.uiData.onTime || '98.2%'}</div></div>
+                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>Defect Rate</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#10b981'}}>{msg.uiData.defectRate || '0.4%'}</div></div>
+                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>Responsive</div><div style={{fontSize:'0.85rem',fontWeight:700,color:'#eab308'}}>{msg.uiData.responsive || 'Avg (2d)'}</div></div>
+                            <div style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', padding:'8px', borderRadius:'6px' }}><div style={{fontSize:'0.65rem',color: isDark ? '#94a3b8' : '#64748b'}}>Risk Tier</div><div style={{fontSize:'0.85rem',fontWeight:700,color:msg.uiData.riskColor || '#10b981'}}>{msg.uiData.riskTier || 'Low'}</div></div>
                           </div>
                         </div>
                       </div>
                     )}
 
-                  {/* AI Generated Image */}
+                  
+                    {/* Vendor Comparison Matrix */}
+                    {msg.uiComponent==='vendor_compare_matrix' && (
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(59,130,246,0.3)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)', overflowX: 'auto' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}>
+                          <Users size={16} color="#2563eb"/> Vendor Comparison Matrix
+                        </div>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
+                          <thead>
+                            <tr style={{ background: isDark ? 'rgba(255,255,255,0.05)' : '#f8faff' }}>
+                              <th style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.2)' }}>Metric</th>
+                              <th style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.2)' }}>Foxconn</th>
+                              <th style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.2)' }}>Pegatron</th>
+                              <th style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.2)' }}>Wistron</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>Avg Unit Cost</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>$890</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>$875</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>$910</td></tr>
+                            <tr><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>SLA Adherence</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>94%</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>89%</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>98%</td></tr>
+                            <tr><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)' }}>ESG Score</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)', color: '#10b981' }}>85 (High)</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)', color: '#eab308' }}>62 (Med)</td><td style={{ padding: '8px', borderBottom: '1px solid rgba(150,150,150,0.1)', color: '#10b981' }}>92 (High)</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+
+                    {/* AI Generated Image */}
                   {msg.uiComponent==='generated_image' && msg.uiData && (
                     <div style={{ marginTop:'14px', borderRadius:'14px', overflow:'hidden', border:'1px solid rgba(99,102,241,0.3)', background:'rgba(15,23,42,0.9)', boxShadow:'0 8px 30px rgba(0,0,0,0.4)' }}>
                       <div style={{ padding:'14px 18px', borderBottom:'1px solid rgba(99,102,241,0.2)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
@@ -1329,12 +1615,36 @@ export default function CortexPage() {
                   <Loader2 size={18} color="#fff" className="animate-spin"/>
                 </div>
                 <div style={{ paddingTop:'8px' }}>
-                  <div style={{ fontSize:'0.78rem', fontWeight:700, color:'#818cf8', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'8px' }}>Cortex AI</div>
+                  <div style={{ fontSize:'0.78rem', fontWeight:700, color:'#818cf8', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'8px' }}>Dorc AI</div>
                   <div style={{ display:'flex', alignItems:'center', gap:'10px', background:'rgba(99,102,241,0.08)', border:'1px solid rgba(99,102,241,0.15)', padding:'10px 16px', borderRadius:'12px' }}>
                     <div style={{ display:'flex', gap:'4px' }}>
-                      {[0,1,2].map(i=><div key={i} style={{ width:'6px', height:'6px', borderRadius:'50%', background:'#6366f1', animation:`pulse2 1.4s ease-in-out ${i*0.2}s infinite` }}/>)}
+                                            <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
+                        <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="6" cy="12" r="3" fill="#6366f1" />
+                          <circle cx="34" cy="4" r="3" fill="#8b5cf6" />
+                          <circle cx="34" cy="12" r="3" fill="#ec4899" />
+                          <circle cx="34" cy="20" r="3" fill="#14b8a6" />
+                          
+                          <path id="path1" d="M 6 12 C 18 12, 22 4, 34 4" stroke="rgba(99,102,241,0.3)" strokeWidth="1.5" fill="none"/>
+                          <path id="path2" d="M 6 12 L 34 12" stroke="rgba(99,102,241,0.3)" strokeWidth="1.5" fill="none"/>
+                          <path id="path3" d="M 6 12 C 18 12, 22 20, 34 20" stroke="rgba(99,102,241,0.3)" strokeWidth="1.5" fill="none"/>
+
+                          <circle r="1.5" fill="#fff">
+                            <animateMotion dur="1.5s" repeatCount="indefinite" path="M 6 12 C 18 12, 22 4, 34 4" />
+                            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="1.5s" repeatCount="indefinite" />
+                          </circle>
+                          <circle r="1.5" fill="#fff">
+                            <animateMotion dur="1.5s" begin="0.3s" repeatCount="indefinite" path="M 6 12 L 34 12" />
+                            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="1.5s" begin="0.3s" repeatCount="indefinite" />
+                          </circle>
+                          <circle r="1.5" fill="#fff">
+                            <animateMotion dur="1.5s" begin="0.6s" repeatCount="indefinite" path="M 6 12 C 18 12, 22 20, 34 20" />
+                            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="1.5s" begin="0.6s" repeatCount="indefinite" />
+                          </circle>
+                        </svg>
+                      </div>
                     </div>
-                    <span style={{ fontSize:'0.83rem', color:'#818cf8', fontWeight:500 }}>Cortex is thinking...</span>
+                    <span style={{ fontSize:'0.83rem', color:'#818cf8', fontWeight:500 }}>Dorc AI is thinking...</span>
                   </div>
                 </div>
               </div>
@@ -1367,7 +1677,7 @@ export default function CortexPage() {
                       .filter(c => c.cmd.toLowerCase().includes(input.toLowerCase()))
                       .map((item: any, i: number)=>(
                       <div key={i} className="slash-btn" style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%', borderBottom:'1px solid rgba(255,255,255,0.03)', transition:'all 0.15s' }}>
-                        <button onClick={()=>{ item.auto ? execute(item.cmd) : setInput(item.cmd); setShowSlash(false); }} style={{ flex: 1, display:'flex', alignItems:'center', gap:'14px', padding:'11px 16px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left' }}>
+                        <button onClick={()=>{ item.auto ? execute(item.cmd) : setInput(item.cmd + ' '); setShowSlash(false); }} style={{ flex: 1, display:'flex', alignItems:'center', gap:'14px', padding:'11px 16px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left' }}>
                           <div style={{ background:item.bg, color:item.color, padding:'7px', borderRadius:'8px', display:'flex', flexShrink:0 }}>{item.icon}</div>
                           <div>
                             <div style={{ fontWeight:600, color:'#e2e8f0', fontSize:'0.85rem' }}>{item.cmd}</div>
@@ -1386,17 +1696,51 @@ export default function CortexPage() {
             )}
 
             {/* Input Box */}
-            <form onSubmit={send} style={{ position:'relative', display:'flex', alignItems:'center' }}>
-              <div style={{ position:'absolute', left:'18px', zIndex:2, display:'flex', alignItems:'center' }}>
-                <Sparkles size={16} color={input?'#0072ff':'#334155'} style={{ transition:'color 0.2s' }}/>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'8px', padding:'0 4px' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'10px', background:'rgba(15,23,42,0.6)', border:'1px solid rgba(255,255,255,0.05)', padding:'4px 10px', borderRadius:'20px', backdropFilter:'blur(10px)', boxShadow:'0 4px 12px rgba(0,0,0,0.1)', width:'fit-content' }}>
+                    <button onClick={() => setVoiceEnabled(!voiceEnabled)} type="button" style={{ background:'none', border:'none', color: voiceEnabled ? '#10b981' : '#64748b', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.7rem', fontWeight:700, padding:'2px 4px', transition:'all 0.2s' }}>
+                      {voiceEnabled ? <Volume2 size={14} className="animate-pulse" /> : <VolumeX size={14}/>} {voiceEnabled ? 'Voice Active' : 'Voice Muted'}
+                    </button>
+                    
+                    {voiceEnabled && (
+                      <>
+                        <div style={{ width:'1px', height:'14px', background:'rgba(255,255,255,0.1)' }} />
+                        <div style={{ display:'flex', alignItems:'center', gap:'4px' }}>
+                          <button 
+                            onClick={() => setVoiceGender('female')}
+                            type="button"
+                            style={{ padding: '4px 10px', borderRadius: '12px', border: 'none', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', background: voiceGender === 'female' ? 'rgba(16,185,129,0.15)' : 'transparent', color: voiceGender === 'female' ? '#10b981' : '#64748b', transition: 'all 0.2s' }}
+                          >Female</button>
+                          <button 
+                            onClick={() => setVoiceGender('male')}
+                            type="button"
+                            style={{ padding: '4px 10px', borderRadius: '12px', border: 'none', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', background: voiceGender === 'male' ? 'rgba(16,185,129,0.15)' : 'transparent', color: voiceGender === 'male' ? '#10b981' : '#64748b', transition: 'all 0.2s' }}
+                          >Male</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
               </div>
+              <form onSubmit={send} style={{ position:'relative', display:'flex', alignItems:'center' }}>
+              <div style={{ position:'absolute', left:'12px', zIndex:2, display:'flex', alignItems:'center', justifyContent:'center', width:'32px', height:'32px' }}>
+                 <button type="button" onClick={startListening} style={{ background: isListening ? 'rgba(0,198,255,0.2)' : 'transparent', border:'none', width:'100%', height:'100%', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', position:'relative', transition:'all 0.3s' }}>
+                     {isListening && (
+                       <>
+                         <div style={{ position:'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius:'50%', border:'2px solid #00c6ff', animation: 'voiceRing1 1.5s infinite ease-out' }} />
+                         <div style={{ position:'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius:'50%', border:'2px solid #00c6ff', animation: 'voiceRing1 1.5s infinite ease-out 0.75s' }} />
+                         <div style={{ position:'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius:'50%', background: 'rgba(0,198,255,0.3)', animation: 'voiceRing2 1.2s infinite ease-in-out' }} />
+                       </>
+                     )}
+                     <Sparkles size={16} color={isListening ? '#00c6ff' : input ? '#0072ff' : '#64748b'} style={{ transition:'all 0.2s', position:'relative', zIndex:3, transform: isListening ? 'scale(1.2)' : 'scale(1)' }}/>
+                   </button>
+                </div>
               <input
                 type="text" value={input}
                 onChange={e=>{ setInput(e.target.value); setShowSlash(e.target.value=='/'); }}
                 onKeyDown={e=>{ if(e.key==='Escape') setShowSlash(false); }}
-                placeholder="Ask Cortex anything, or type / for AI workflows..."
+                placeholder="Ask Dorc AI anything, or type / for AI workflows..."
                 disabled={isProcessing}
-                className="cx-input-field" style={{ width:'100%', padding:'16px 56px 16px 46px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#e2e8f0', fontSize:'16px', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
+                className="cx-input-field" style={{ width:'100%', padding:'16px 100px 16px 50px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#e2e8f0', fontSize:'16px', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
               />
               
               <button 
@@ -1408,12 +1752,15 @@ export default function CortexPage() {
               >
                 <Monitor size={16} color="#00c6ff" />
               </button>
-              <button type="submit" disabled={!input.trim()||isProcessing} style={{ position:'absolute', right:'10px', width:'38px', height:'38px', borderRadius:'12px', background: input.trim()&&!isProcessing?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.05)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor: input.trim()&&!isProcessing?'pointer':'default', transition:'all 0.2s', boxShadow: input.trim()&&!isProcessing?'0 0 16px rgba(99,102,241,0.4)':'none' }}>
+              
+                
+                
+                <button type="submit" disabled={!input.trim()||isProcessing} style={{ position:'absolute', right:'10px', width:'38px', height:'38px', borderRadius:'12px', background: input.trim()&&!isProcessing?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(255,255,255,0.05)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor: input.trim()&&!isProcessing?'pointer':'default', transition:'all 0.2s', boxShadow: input.trim()&&!isProcessing?'0 0 16px rgba(99,102,241,0.4)':'none' }}>
                 <Send size={15} color={input.trim()&&!isProcessing?'#fff':'#334155'}/>
               </button>
             </form>
             <div style={{ textAlign:'center', color:'#1e293b', fontSize:'0.7rem', marginTop:'10px' }}>
-              Cortex · Enterprise RAG · Multi-Agent Swarm · Legal AI · Chain of Thought
+              Dorc AI · Enterprise RAG · Multi-Agent Swarm · Legal AI · Chain of Thought
             </div>
           </div>
         </div>

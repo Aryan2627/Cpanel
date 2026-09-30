@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, X, Loader2, Monitor } from 'lucide-react';
 
-export default function CortexWidget() {
+export default function DorcWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -104,7 +104,7 @@ export default function CortexWidget() {
           }}>
             <div>
               <h3 style={{ margin: '0 0 4px 0', color: '#00c6ff', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '1.1rem' }}>
-                <Sparkles size={18} /> Cortex Anywhere
+                <img src="/dorc-logo.png" style={{ width: 22, height: 22, objectFit: "contain", filter: "brightness(0) invert(1)" }} /> Dorc AI
               </h3>
               <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Live Vision AI (Local OCR)
@@ -169,7 +169,7 @@ export default function CortexWidget() {
         </div>
       )}
 
-      {/* Floating Cortex Ring */}
+      {/* Floating Dorc AI Ring */}
       <div 
         onClick={() => setIsOpen(!isOpen)}
         title="Launch Web Copilot"
@@ -180,9 +180,9 @@ export default function CortexWidget() {
           width: '60px',
           height: '60px',
           borderRadius: '50%',
-          background: 'rgba(15, 23, 42, 0.8)',
+          background: 'linear-gradient(135deg, #f8fafc, #e0f2fe)',
           border: '2px solid #00c6ff',
-          boxShadow: '0 0 20px rgba(0, 198, 255, 0.5), inset 0 0 10px rgba(0, 198, 255, 0.3)',
+          boxShadow: '0 0 20px rgba(0, 198, 255, 0.6)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -192,7 +192,7 @@ export default function CortexWidget() {
           backdropFilter: 'blur(10px)'
         }}
       >
-        {isOpen ? <X size={28} color="#00c6ff" /> : <Sparkles size={28} color="#00c6ff" />}
+        {isOpen ? <X size={28} color="#00c6ff" /> : <img src="/dorc-logo.png" style={{ width: 44, height: 44, objectFit: "contain", filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.2))" }} />}
         <style>{`
           @keyframes pulseRing {
             0% { box-shadow: 0 0 15px rgba(0, 198, 255, 0.4), inset 0 0 10px rgba(0, 198, 255, 0.3); }

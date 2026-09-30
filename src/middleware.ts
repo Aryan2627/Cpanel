@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
@@ -7,6 +7,18 @@ export function middleware(request: NextRequest) {
   const procSession = request.cookies.get('proc-session')?.value;
   const nextAuthSession = request.cookies.get('next-auth.session-token')?.value 
     || request.cookies.get('__Secure-next-auth.session-token')?.value;
+
+  
+  // CSRF Defense-in-Depth: Validate Origin on mutating API requests
+  if (request.method !== 'GET' && request.method !== 'HEAD' && request.method !== 'OPTIONS') {
+    const origin = request.headers.get('origin') || request.headers.get('referer');
+    const host = request.headers.get('host');
+    
+    // Ensure the request originated from our own host
+    if (origin && host && !origin.includes(host) && !origin.includes('localhost')) {
+      return new NextResponse('Forbidden: Invalid Origin (CSRF Protection Active)', { status: 403 });
+    }
+  }
 
   const isProtectedRoute = 
     request.nextUrl.pathname.startsWith('/admin') ||
@@ -18,7 +30,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  return response;
 }
 
 export const config = {

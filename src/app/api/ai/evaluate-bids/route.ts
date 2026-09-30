@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const { eventId } = await req.json();
     if (!eventId) return NextResponse.json({ error: 'Missing eventId' }, { status: 400 });
 
-    const nvidiaKey = process.env.NVIDIA_API_KEY || process.env.GROQ_API_KEY;
+    const nvidiaKey = process.env.GARUDA_API_KEY || process.env.NVIDIA_API_KEY || process.env.GROQ_API_KEY;
 
     if (!nvidiaKey || !nvidiaKey.startsWith('nvapi-')) {
       // Mock data if no key is provided

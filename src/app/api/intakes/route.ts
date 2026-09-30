@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getTenantId } from '../../../lib/tenant';
 import { prisma } from '../../../lib/prisma';
 
@@ -22,6 +22,20 @@ export async function POST(request: Request) {
   try {
     const orgId = await getTenantId();
     if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
+
+    // 🔐 TOKEN GATE: Consume tokens before creating PR
+    try {
+      const { consumeTokens } = await import('../../../lib/tokens');
+      await consumeTokens(orgId, 'CREATE_PR');
+    } catch (tokenErr: any) {
+      if (tokenErr.message?.startsWith('INSUFFICIENT_TOKENS')) {
+        const [, remaining, cost] = tokenErr.message.split(':');
+        const { insufficientTokensResponse } = await import('../../../lib/tokens');
+        return insufficientTokensResponse(parseInt(remaining), parseInt(cost));
+      }
+      throw tokenErr;
+    }
+
     const data = await request.json();
 
     const existing = await prisma.intake.findFirst({

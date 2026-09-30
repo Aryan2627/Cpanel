@@ -16,6 +16,18 @@ model Organization {
   features  String? // JSON string for feature toggles
   industry  String?
   createdAt DateTime @default(now())
+  
+  // Licensing
+  licenseStart  DateTime?
+  licenseEnd    DateTime?
+  licenseStatus String?   @default("Active")
+  licensePlan   String?   @default("Enterprise") // Active, Expired, Suspended
+
+  // Token-Based Plan Metering
+  plan           String   @default("starter")    // starter | growth | enterprise | unlimited
+  tokensTotal    Int      @default(500)
+  tokensUsed     Int      @default(0)
+  tokensResetAt  DateTime @default(now())
 
   // Relations
   users          User[]
@@ -387,4 +399,18 @@ model FormConfiguration {
   updatedAt      DateTime      @updatedAt
 
   @@unique([organizationId, formName, fieldName])
+}
+
+
+model TokenLedger {
+  id             String   @id @default(uuid())
+  organizationId String
+  action         String
+  tokensConsumed Int
+  actorEmail     String?
+  entityRef      String?
+  createdAt      DateTime @default(now())
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([organizationId, action])
 }

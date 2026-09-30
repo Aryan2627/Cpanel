@@ -111,7 +111,7 @@ export default function TourButton() {
         showProgress: true,
         animate: true,
         allowClose: true,
-        overlayClickNext: true,
+        
         steps: steps.map(step => {
           // If the step has an element but it doesn't exist on the DOM, convert it to a center popover so it doesn't break
           if (step.element && !document.querySelector(step.element)) {
@@ -129,44 +129,33 @@ export default function TourButton() {
 
   if (!mounted) return null;
 
-  return (
+    return (
     <button 
       onClick={handleStartTour}
       style={{
-        position: 'fixed',
-        bottom: '24px',
-        right: '24px',
-        width: '56px',
-        height: '56px',
-        borderRadius: '50%',
-        backgroundColor: '#2563eb', // Deeper enterprise blue
-        color: '#fff',
-        border: 'none',
-        boxShadow: '0 4px 15px rgba(37, 99, 235, 0.4)',
+        display: 'flex', alignItems: 'center', gap: '6px',
+        background: 'rgba(37, 99, 235, 0.15)',
+        border: '1px solid rgba(37, 99, 235, 0.3)',
+        borderRadius: '24px',
+        padding: '4px 10px', color: '#93c5fd', fontSize: '0.75rem', fontWeight: 700,
         cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+        transition: 'all 0.2s',
+        marginLeft: '4px'
       }}
       onMouseEnter={(e) => { 
-        e.currentTarget.style.transform = 'scale(1.1) translateY(-4px)'; 
-        e.currentTarget.style.backgroundColor = '#1d4ed8'; 
-        e.currentTarget.style.boxShadow = '0 8px 20px rgba(37, 99, 235, 0.6)';
+        e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.3)'; 
       }}
       onMouseLeave={(e) => { 
-        e.currentTarget.style.transform = 'scale(1) translateY(0)'; 
-        e.currentTarget.style.backgroundColor = '#2563eb'; 
-        e.currentTarget.style.boxShadow = '0 4px 15px rgba(37, 99, 235, 0.4)';
+        e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.15)'; 
       }}
-      title="Start Page Tour"
+      title="Page Guide / Tutorial"
     >
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
         <line x1="12" y1="17" x2="12.01" y2="17"></line>
       </svg>
+      Tour
     </button>
   );
 }

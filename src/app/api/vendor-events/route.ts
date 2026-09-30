@@ -63,6 +63,7 @@ export async function GET(request: Request) {
           in: approvedOrgIds as string[]
         }
       },
+      include: { organization: true },
       orderBy: { createdAt: 'desc' }
     });
     

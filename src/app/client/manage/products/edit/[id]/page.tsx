@@ -1,9 +1,9 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function CreateProductPage() {
+export default function EditProductPage({ params }: { params: any }) {
   const router = useRouter();
   const { id } = React.use(params as any) as any;
 

@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { after } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { sendVendorInvitation } from '../../../lib/email-service';
@@ -35,7 +35,20 @@ export async function POST(request: Request) {
   try {
     const orgId = await getTenantId();
     const data = await request.json();
-    
+
+    // 🔐 TOKEN GATE: Consume tokens before creating event
+    try {
+      const { consumeTokens, insufficientTokensResponse } = await import('../../../lib/tokens');
+      await consumeTokens(orgId, 'CREATE_EVENT');
+    } catch (tokenErr: any) {
+      if (tokenErr.message?.startsWith('INSUFFICIENT_TOKENS')) {
+        const [, remaining, cost] = tokenErr.message.split(':');
+        const { insufficientTokensResponse } = await import('../../../lib/tokens');
+        return insufficientTokensResponse(parseInt(remaining), parseInt(cost));
+      }
+      throw tokenErr;
+    }
+
     // Generate IDs instantly for the frontend response
     const crypto = require('crypto');
     const eventId = crypto.randomUUID();

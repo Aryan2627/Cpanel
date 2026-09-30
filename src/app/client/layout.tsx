@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { IntakeProvider } from '../../context/IntakeContext';
+import { SessionContext } from '../../context/SessionContext';
 import TourButton from './TourButton';
 import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
 import JarvisAssistant from './JarvisAssistant';
-import CortexWidget from './CortexWidget';
-import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles } from 'lucide-react';
+import DorcWidget from './DorcWidget';
+import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles, Command } from 'lucide-react';
 
 const TOP_MENUS = [
   { name: 'Dashboard', path: '/client', icon: LayoutDashboard },
@@ -16,11 +17,11 @@ const TOP_MENUS = [
     name: 'Procurement',
     icon: ShoppingCart,
     sub: [
-      { name: 'Purchase Requests', path: '/client/intake' },
-      { name: 'Requisitions', path: '/client/pr' },
-      { name: 'Tenders & Auctions', path: '/client/events' },
-      { name: 'Purchase Orders', path: '/client/po' },
-      { name: 'Approvals', path: '/client/approvals' },
+      { name: 'Intake Desk', path: '/client/intake' },
+      { name: 'Requisitions (PR)', path: '/client/pr' },
+      { name: 'Sourcing Events (RFx)', path: '/client/events' },
+      { name: 'Purchase Orders (PO)', path: '/client/po' },
+      { name: 'My Approvals', path: '/client/approvals' },
     ]
   },
   {
@@ -39,6 +40,7 @@ const TOP_MENUS = [
       { name: 'Products', path: '/client/manage/products' },
       { name: 'Templates', path: '/client/manage/templates' },
       { name: 'Approval Rules', path: '/client/manage/approvals' },
+      { name: '? Tokens and Usage', path: '/client/manage/tokens' },
     ]
   },
   {
@@ -55,6 +57,16 @@ const TOP_MENUS = [
       { name: 'Payments Due', path: '/client/license/expiry/payments' },
     ]
   },
+  {
+    name: 'AI Agents',
+    icon: Sparkles,
+    sub: [
+      { name: 'Procurement Agent', path: '/client/ai-agents/procurement' },
+      { name: 'Sourcing Agent', path: '/client/ai-agents/sourcing' },
+      { name: 'Negotiation Agent', path: '/client/ai-agents/negotiation' },
+      { name: 'Operations Agent', path: '/client/ai-agents/operations' },
+    ]
+  },
 ];
 
 
@@ -65,10 +77,14 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // Track which dropdown is open
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
+  const [activeAgent, setActiveAgent] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => { if (d?.name) setCurrentUser(d); }).catch(() => null);
+    fetch('/api/auth/me')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.name) { setCurrentUser(d); } })
+      .catch(() => null);
   }, []);
 
   const handleGeneratePO = async () => {
@@ -90,6 +106,63 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
   };
 
+  
+
+  
+
+  const handleLogout = async () => {
+    try { 
+      await fetch('/api/auth/logout', { method: 'POST' }); 
+      const { signOut } = await import('next-auth/react'); 
+      await signOut({ redirect: false }); 
+      localStorage.removeItem('auth_me_cache');
+      window.location.href = '/login'; 
+    } catch(e) { 
+      window.location.href = '/login'; 
+    }
+  };
+
+  
+  const orgFeatures = currentUser?.features ? (() => { try { return JSON.parse(currentUser.features); } catch { return {}; } })() : {};
+  const isMainPortal = orgFeatures.main_portal !== false; 
+  const isAgenticPortal = orgFeatures.agentic_portal === true;
+  // If Agentic Portal is turned ON, it takes full priority and hides classic menus
+  const isAgenticOnly = isAgenticPortal === true || (typeof window !== 'undefined' && window.location.search.includes('agentic=true'));
+    // Global Agentic Mode Redirect
+    useEffect(() => {
+      if (isAgenticOnly && pathname && !pathname.startsWith('/client/ai-agents') && !pathname.startsWith('/client/cortex')) {
+        router.push('/client/ai-agents/procurement');
+      }
+    }, [isAgenticOnly, pathname, router]);
+
+    
+    // Debug log for the user to inspect in browser console
+    useEffect(() => {
+      if (currentUser) {
+        console.log("ProcGen Organization Features (Decrypted Payload):", currentUser.features);
+        if (currentUser.features === "") {
+          // console.warn("removed");
+        }
+      }
+    }, [currentUser]);
+
+  const displayMenus = TOP_MENUS.filter(menu => {
+    if (isAgenticOnly) return menu.name === 'AI Agents';
+    if (!isMainPortal) return menu.name === 'AI Agents';
+    return true; 
+  });
+
+  
+  // STRICT UI LEAK PREVENTION: Wait for user profile to load before rendering the layout
+  if (currentUser === null) {
+    return (
+      <div style={{ height: '100vh', width: '100vw', backgroundColor: '#030712', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '16px' }}>
+         <div className="animate-pulse" style={{ color: '#38bdf8', fontSize: '1.2rem', fontWeight: 600, letterSpacing: '2px' }}>INITIALIZING SYSTEM</div>
+         <div className="animate-spin" style={{ width: '40px', height: '40px', border: '3px solid rgba(56, 189, 248, 0.1)', borderTop: '3px solid #38bdf8', borderRadius: '50%' }}></div>
+      </div>
+    );
+  }
+
   if (currentUser && currentUser.licenseStatus === 'Expired') {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #071330, #0d1f4f)', color: '#fff', flexDirection: 'column', fontFamily: 'system-ui', textAlign: 'center', padding: '24px' }}>
@@ -103,19 +176,22 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  const handleLogout = async () => {
-    try { 
-      await fetch('/api/auth/logout', { method: 'POST' }); 
-      const { signOut } = await import('next-auth/react'); 
-      await signOut({ redirect: true, callbackUrl: '/login' }); 
-    } catch(e) { 
-      window.location.href = '/login'; 
-    }
-  };
-
   return (
-    <IntakeProvider>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
+    <SessionContext.Provider value={{ session: currentUser, loading: currentUser === null }}>
+            <IntakeProvider>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: isAgenticOnly ? '#030712' : '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
+        {isAgenticOnly && (
+          <style dangerouslySetInnerHTML={{__html: `
+            body { 
+              background-color: #030712 !important; 
+              background-image: 
+                radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.04), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(167, 139, 250, 0.04), transparent 25%) !important;
+              background-attachment: fixed !important;
+              color: #f8fafc !important;
+            }
+          `}} />
+        )}
         
         {currentUser?.isImpersonating && (
           <div style={{ background: '#f97316', color: '#fff', padding: '8px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', fontWeight: 700, zIndex: 999999, position: 'relative' }}>
@@ -129,15 +205,40 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
         )}
 
-        <div className="mobile-p-16" style={{ height: '64px', backgroundColor: '#071330', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div className="mobile-p-16" style={{ 
+          height: '64px', 
+          backgroundColor: isAgenticOnly ? 'rgba(9, 9, 11, 0.6)' : '#0f172a', 
+          backdropFilter: isAgenticOnly ? 'blur(16px)' : 'none',
+          WebkitBackdropFilter: isAgenticOnly ? 'blur(16px)' : 'none',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+          padding: '0 24px', 
+          borderBottom: isAgenticOnly ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.05)', 
+          position: 'sticky', top: 0, zIndex: 100 
+        }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
             <Link href="/client" style={{ color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <img src="/logo.png" alt="ProcGen Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
             </Link>
 
-            <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {TOP_MENUS.map((menu) => (
+            <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: isAgenticOnly ? '12px' : '4px' }}>
+              {isAgenticOnly ? (
+                <>
+                  <Link prefetch={true} href="/client/ai-agents/procurement" style={{ padding: '8px 16px', borderRadius: '24px', background: pathname.includes('procurement') ? 'rgba(56, 189, 248, 0.15)' : 'transparent', border: pathname.includes('procurement') ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid transparent', color: pathname.includes('procurement') ? '#38bdf8' : 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+                    Anveshan AI (Sourcing)
+                  </Link>
+                  <Link prefetch={true} href="/client/ai-agents/risk" style={{ padding: '8px 16px', borderRadius: '24px', background: pathname.includes('risk') ? 'rgba(248, 113, 113, 0.15)' : 'transparent', border: pathname.includes('risk') ? '1px solid rgba(248, 113, 113, 0.3)' : '1px solid transparent', color: pathname.includes('risk') ? '#f87171' : 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+                    Tark AI (Risk)
+                  </Link>
+                  <Link prefetch={true} href="/client/ai-agents/contracts" style={{ padding: '8px 16px', borderRadius: '24px', background: pathname.includes('contracts') ? 'rgba(167, 139, 250, 0.15)' : 'transparent', border: pathname.includes('contracts') ? '1px solid rgba(167, 139, 250, 0.3)' : '1px solid transparent', color: pathname.includes('contracts') ? '#a78bfa' : 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+                    Niti AI (Contracts)
+                  </Link>
+                  <Link prefetch={true} href="/client/ai-agents/operations" style={{ padding: '8px 16px', borderRadius: '24px', background: pathname.includes('operations') ? 'rgba(52, 211, 153, 0.15)' : 'transparent', border: pathname.includes('operations') ? '1px solid rgba(52, 211, 153, 0.3)' : '1px solid transparent', color: pathname.includes('operations') ? '#34d399' : 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+                    Garuda AI (Delivery)
+                  </Link>
+                </>
+              ) : (
+                displayMenus.map((menu) => (
                 <div 
                   key={menu.name}
                   onMouseEnter={() => setHoveredMenu(menu.name)}
@@ -174,37 +275,27 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                       display: 'flex', flexDirection: 'column', gap: '4px'
                     }}>
                       {menu.sub.map((sub) => (
-                        <Link
-                          key={sub.name}
-                          href={sub.path}
-                          style={{
-                            padding: '10px 16px', borderRadius: '8px',
-                            color: pathname.startsWith(sub.path) ? '#2563eb' : '#475569',
-                            backgroundColor: pathname.startsWith(sub.path) ? '#eff6ff' : 'transparent',
-                            textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
-                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                            transition: 'all 0.1s'
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!pathname.startsWith(sub.path)) {
-                              (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
-                              (e.currentTarget as HTMLElement).style.color = '#0f172a';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!pathname.startsWith(sub.path)) {
-                              (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-                              (e.currentTarget as HTMLElement).style.color = '#475569';
-                            }
-                          }}
-                        >
-                          {sub.name}
-                        </Link>
+                          <Link
+                            key={sub.name}
+                            href={sub.path}
+                            onClick={() => setHoveredMenu(null)}
+                            style={{ 
+                              padding: '10px 12px', borderRadius: '8px', color: '#334155', 
+                              textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500,
+                              display: 'flex', alignItems: 'center', gap: '8px',
+                              backgroundColor: pathname === sub.path ? '#f1f5f9' : 'transparent',
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: pathname === sub.path ? '#2563eb' : '#cbd5e1' }} />
+                            {sub.name}
+                          </Link>
                       ))}
                     </div>
                   )}
                 </div>
-              ))}
+              ))
+              )}
             </nav>
           </div>
 
@@ -222,6 +313,20 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {/* Atlan-style Search Button to trigger Cmd+K */}
+                <button 
+                  onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px 12px', color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem', cursor: 'pointer', transition: 'all 0.2s ease', marginRight: '8px' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+                >
+                  <Search size={14} />
+                  <span>Search...</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '2px', background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', marginLeft: '12px', fontWeight: 600 }}>
+                    <Command size={10} />K
+                  </div>
+                </button>
+
               
               {(currentUser?.features ? (() => { try { return JSON.parse(currentUser.features).cortex_ai; } catch { return false; } })() : false) && (
 <Link 
@@ -236,7 +341,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   transition: 'transform 0.2s',
                 }}
               >
-                <Sparkles size={14} /> Cortex AI
+                <img src="/dorc-logo.png" style={{ width: 16, height: 16, objectFit: "contain", filter: "brightness(0) invert(1)" }} /> Dorc AI
               </Link>
               )}
 
@@ -268,24 +373,34 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         {mobileMenuOpen && (
           <div style={{ position: 'absolute', top: '64px', left: 0, width: '100%', background: '#0f172a', zIndex: 9999, borderBottom: '1px solid rgba(255,255,255,0.1)', maxHeight: 'calc(100vh - 64px)', overflowY: 'auto' }}>
             <div style={{ display: 'flex', flexDirection: 'column', padding: '16px' }}>
-              {TOP_MENUS.map(menu => (
-                <div key={menu.name} style={{ marginBottom: '8px' }}>
-                  <Link href={menu.path || '#'} onClick={() => { if(!menu.sub) setMobileMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', color: '#fff', textDecoration: 'none', fontWeight: 600, borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }}>
-                    <menu.icon size={18} /> {menu.name}
-                  </Link>
-                  {menu.sub && (
-                    <div style={{ paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
-                      {menu.sub.map(sub => (
-                        <Link key={sub.name} href={sub.path} onClick={() => setMobileMenuOpen(false)} style={{ padding: '10px', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', display: 'block' }}>
-                          {sub.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+              {isAgenticOnly ? (
+                <>
+                  <Link prefetch={true} href="/client/ai-agents/procurement" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px', color: pathname.includes('procurement') ? '#38bdf8' : '#fff', textDecoration: 'none', fontWeight: 600, background: pathname.includes('procurement') ? 'rgba(56, 189, 248, 0.1)' : 'transparent', borderRadius: '8px', marginBottom: '8px' }}>Anveshan AI (Sourcing)</Link>
+                  <Link prefetch={true} href="/client/ai-agents/risk" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px', color: pathname.includes('risk') ? '#f87171' : '#fff', textDecoration: 'none', fontWeight: 600, background: pathname.includes('risk') ? 'rgba(248, 113, 113, 0.1)' : 'transparent', borderRadius: '8px', marginBottom: '8px' }}>Tark AI (Risk)</Link>
+                  <Link prefetch={true} href="/client/ai-agents/contracts" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px', color: pathname.includes('contracts') ? '#a78bfa' : '#fff', textDecoration: 'none', fontWeight: 600, background: pathname.includes('contracts') ? 'rgba(167, 139, 250, 0.1)' : 'transparent', borderRadius: '8px', marginBottom: '8px' }}>Niti AI (Contracts)</Link>
+                  <Link prefetch={true} href="/client/ai-agents/operations" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px', color: pathname.includes('operations') ? '#34d399' : '#fff', textDecoration: 'none', fontWeight: 600, background: pathname.includes('operations') ? 'rgba(52, 211, 153, 0.1)' : 'transparent', borderRadius: '8px', marginBottom: '8px' }}>Garuda AI (Delivery)</Link>
+                </>
+              ) : (
+                displayMenus.map(menu => (
+                  <div key={menu.name} style={{ marginBottom: '8px' }}>
+                    <Link href={menu.path || '#'} onClick={() => { if(!menu.sub) setMobileMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', color: '#fff', textDecoration: 'none', fontWeight: 600, borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }}>
+                      <menu.icon size={20} />
+                      {menu.name}
+                    </Link>
+                    {menu.sub && (
+                      <div style={{ paddingLeft: '44px', display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+                        {menu.sub.map(sub => (
+                          <Link key={sub.name} href={sub.path} onClick={() => setMobileMenuOpen(false)} style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.95rem' }}>
+                            {sub.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+              </div>
             </div>
-          </div>
         )}
 
         {/* The Absolute Backdrop Blur for Cinematic Nav effect */}
@@ -296,21 +411,29 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           }} />
         )}
 
-        <div style={{ flex: 1, position: 'relative', zIndex: 10 }}>
+        <div style={{ flex: 1, position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column' }}>
           {children}
         </div>
       </div>
       
       
-      <CortexWidget />
+      <DorcWidget />
 
       <CartOverlay />
 
-      <TourButton />
+      
       <SpotlightSearch />
       
     </IntakeProvider>
+            </SessionContext.Provider>
   );
 }
+
+
+
+
+
+
+
 
 
