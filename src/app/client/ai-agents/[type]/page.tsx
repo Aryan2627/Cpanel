@@ -232,8 +232,8 @@ export default function FullScreenAgentPage() {
           background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 60%);
           border-radius: 50%; filter: blur(40px); animation: ambient-pulse 5s infinite ease-in-out reverse;
         }
-        .atlan-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.3s; }
-        .atlan-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+        .atlan-card { background: #ffffff; border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 16px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .atlan-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); border-color: #cbd5e1; }
         .scanning-active { border-color: #60a5fa !important; box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15) !important; }
         .log-entry { animation: fade-in-up 0.4s ease-out forwards; }
       `}} />
@@ -289,7 +289,7 @@ export default function FullScreenAgentPage() {
         </div>
 
         {/* Right Main Area */}
-        <div style={{ flex: 1, padding: '32px', backgroundColor: '#fff', overflowY: 'auto' }}>
+        <div style={{ flex: 1, padding: '32px', backgroundColor: '#f1f5f9', backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '24px 24px', overflowY: 'auto' }}>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -311,21 +311,21 @@ export default function FullScreenAgentPage() {
               {/* SEARCH BAR & LOCATION FILTER */}
               <div style={{ marginBottom: '32px', display: 'flex', gap: '16px' }}>
                 <div style={{ flex: 1, position: 'relative' }}>
-                  <Search size={20} color="#94a3b8" style={{ position: 'absolute', left: '16px', top: '16px' }} />
+                  <Search size={20} color="#94a3b8" style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)' }} />
                   <input 
                     type="text" 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search for a product requirement to source..." 
-                    style={{ width: '100%', padding: '16px 16px 16px 48px', borderRadius: '12px', border: '1px solid #cbd5e1', fontSize: '1rem', outline: 'none', backgroundColor: '#f8fafc', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}
+                    style={{ width: '100%', padding: '18px 18px 18px 48px', borderRadius: '100px', border: 'none', fontSize: '1rem', outline: 'none', backgroundColor: '#ffffff', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)' }}
                   />
                 </div>
                 <div style={{ position: 'relative', width: '200px' }}>
-                  <MapPin size={20} color="#64748b" style={{ position: 'absolute', left: '16px', top: '16px' }} />
+                  <MapPin size={20} color="#64748b" style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)' }} />
                   <select 
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    style={{ width: '100%', padding: '16px 16px 16px 48px', borderRadius: '12px', border: '1px solid #cbd5e1', fontSize: '1rem', outline: 'none', backgroundColor: '#fff', cursor: 'pointer', appearance: 'none', fontWeight: 600, color: '#334155' }}
+                    style={{ width: '100%', padding: '18px 18px 18px 48px', borderRadius: '100px', border: 'none', fontSize: '1rem', outline: 'none', backgroundColor: '#ffffff', cursor: 'pointer', appearance: 'none', fontWeight: 700, color: '#0f172a', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)' }}
                   >
                     <option value="Global">Global Search</option>
                     <option value="India">India</option>
@@ -381,7 +381,7 @@ export default function FullScreenAgentPage() {
                               {!isProcessing && !isDone && (
                                 <button 
                                   onClick={() => handleRunTask(item.id)}
-                                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: '#fff', color: '#0f172a', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #cbd5e1', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
+                                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: 'linear-gradient(135deg, #2563eb, #7c3aed)', color: '#fff', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)', transition: 'transform 0.2s', textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}
                                 >
                                   <Play size={14} /> Run Sourcing in {location}
                                 </button>
@@ -433,7 +433,7 @@ export default function FullScreenAgentPage() {
                                           </a>
                                           <button 
                                             onClick={() => handleAnalyzeRisk(web, location, item.title)}
-                                            style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#fff', backgroundColor: '#3b82f6', padding: '6px 12px', borderRadius: '4px', border: 'none', fontWeight: 600, cursor: 'pointer' }}>
+                                            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#fff', background: 'linear-gradient(135deg, #059669, #10b981)', padding: '8px 16px', borderRadius: '6px', border: 'none', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)' }}>
                                             Analyze Risk & Market
                                           </button>
                                         </div>
