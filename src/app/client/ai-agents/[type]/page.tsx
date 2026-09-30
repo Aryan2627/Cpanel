@@ -300,6 +300,11 @@ export default function FullScreenAgentPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                 <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#f8fafc', margin: 0, letterSpacing: '-0.5px', textShadow: '0 2px 10px rgba(255,255,255,0.1)' }}>{data.name}</h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', fontWeight: 800, color: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.2)' }}><Cpu size={12} /> LEVEL 4 AUTONOMY</div>
+                  {type === 'negotiation' && (
+                    <a href="/client/manage/context-studio" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 700, color: '#a78bfa', backgroundColor: 'rgba(167, 139, 250, 0.15)', padding: '4px 12px', borderRadius: '12px', border: '1px solid rgba(167, 139, 250, 0.3)', textDecoration: 'none', marginLeft: '12px' }}>
+                      <Database size={12} /> OPEN CONTEXT STUDIO
+                    </a>
+                  )}
               </div>
               <p style={{ fontSize: '1rem', color: '#94a3b8', margin: 0, fontWeight: 500, maxWidth: '600px', lineHeight: 1.5 }}>{data.purpose}</p>
             </div>
