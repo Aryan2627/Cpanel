@@ -27,7 +27,9 @@ export default function FullScreenAgentPage() {
   const agentNameMap: Record<string, string> = {
     'procurement': 'Procurement Agent',
     'sourcing': 'Sourcing Agent',
+    'risk': 'Sourcing Agent', 
     'negotiation': 'Negotiation Agent',
+    'contracts': 'Negotiation Agent',
     'operations': 'Operations Agent'
   };
   const agentName = agentNameMap[rawType] || 'Procurement Agent';
