@@ -60,8 +60,13 @@ If the vendor agrees to a price at or below $${maxPrice.toLocaleString()}, you m
       apiKeyToUse = null;
     }
 
+    const fallbackMockReply = `Subject: Counter-Offer for ${productName}\n\nDear Vendor,\n\nThank you for your initial quote of $${vendorInitialOffer.toLocaleString()}. Based on our live market analysis across B2B endpoints, the current competitive rate is closer to $${targetPrice.toLocaleString()}.\n\nIf you can meet this market pricing, we are authorized to offer: ${concessions.join(', ')}.\n\nPlease let us know if we can proceed.\n\nRegards,\nProcGen Niti Agent`;
+
     if (!apiKeyToUse) {
-      return NextResponse.json({ error: "No API key configured for Niti Negotiation Agent" }, { status: 500 });
+      // Mock Fallback Mode so demo doesn't crash when user hasn't supplied NITI_API_KEY
+      return NextResponse.json({ 
+        reply: fallbackMockReply + "\n\n*(Note: This is a simulated response. To generate live AI negotiations, please add NITI_API_KEY to your environment variables.)*"
+      });
     }
 
     const payload = {
@@ -84,7 +89,7 @@ If the vendor agrees to a price at or below $${maxPrice.toLocaleString()}, you m
       const err = await response.text();
       console.error("AI NEGOTIATION API ERROR:", err);
       return NextResponse.json({ 
-        reply: `Subject: Counter-Offer for ${productName}\n\nDear Vendor,\n\nThank you for your initial quote of $${vendorInitialOffer.toLocaleString()}. Based on our live market analysis across B2B endpoints, the current competitive rate is closer to $${targetPrice.toLocaleString()}.\n\nIf you can meet this market pricing, we are authorized to offer: ${concessions.join(', ')}.\n\nPlease let us know if we can proceed.\n\nRegards,\nProcGen Niti Agent`
+        reply: fallbackMockReply + "\n\n*(Note: API request failed. This is a simulated fallback response.)*"
       });
     }
 
