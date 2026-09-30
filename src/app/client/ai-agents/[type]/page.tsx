@@ -21,6 +21,8 @@ export default function FullScreenAgentPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [location, setLocation] = useState('Global');
   const [selectedSupplier, setSelectedSupplier] = useState<any>(null);
+  const [loadingRisk, setLoadingRisk] = useState(false);
+  const [riskReports, setRiskReports] = useState<Record<string, any>>({});
 
   const agentNameMap: Record<string, string> = {
     'procurement': 'Procurement Agent',
@@ -83,6 +85,25 @@ export default function FullScreenAgentPage() {
       { title: 'RFI Generation', desc: 'Drafting structured capability requests' }
     ],
     tabs: ['Active Tasks', 'Market Intelligence', 'Risk Reports'],
+  };
+
+  const handleAnalyzeRisk = async (supplier: any, loc: string, title: string) => {
+    setSelectedSupplier(supplier);
+    setActiveTab('Risk Reports');
+    if (riskReports[supplier.name]) return;
+    setLoadingRisk(true);
+    try {
+      const res = await fetch('/api/agents/risk-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ supplierName: supplier.name, location: loc, product: title })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRiskReports(prev => ({ ...prev, [supplier.name]: data.report }));
+      }
+    } catch (e) { console.error(e); } 
+    finally { setLoadingRisk(false); }
   };
 
   const handleRunTask = async (itemId: string) => {
@@ -326,7 +347,7 @@ export default function FullScreenAgentPage() {
                                             Visit Direct Profile <ArrowRight size={12} />
                                           </a>
                                           <button 
-                                            onClick={() => { setSelectedSupplier(web); setActiveTab('Risk Reports'); }}
+                                            onClick={() => handleAnalyzeRisk(web, location, item.title)}
                                             style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#fff', backgroundColor: '#3b82f6', padding: '6px 12px', borderRadius: '4px', border: 'none', fontWeight: 600, cursor: 'pointer' }}>
                                             Analyze Risk & Market
                                           </button>
@@ -358,32 +379,45 @@ export default function FullScreenAgentPage() {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                   
-                  <div style={{ backgroundColor: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', borderTop: '4px solid #ef4444' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-                      <div>
-                        <h2 style={{ margin: '0 0 8px 0', color: '#0f172a' }}>Compliance & Risk Profile</h2>
-                        <p style={{ margin: 0, color: '#64748b' }}>Generated for <strong>{selectedSupplier.name}</strong></p>
-                      </div>
-                      <span style={{ backgroundColor: '#fef2f2', color: '#ef4444', padding: '8px 16px', borderRadius: '24px', fontSize: '0.85rem', fontWeight: 700, border: '1px solid #fee2e2' }}>
-                        Medium Risk (Score: 68/100)
-                      </span>
+                  {loadingRisk || !riskReports[selectedSupplier.name] ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '64px', color: '#3b82f6' }}>
+                      <Loader2 size={48} className="animate-spin" style={{ marginBottom: '16px' }} />
+                      <h3 style={{ margin: '0 0 8px 0', color: '#0f172a' }}>Live AI Risk Analysis...</h3>
+                      <p style={{ margin: 0, color: '#64748b' }}>Scraping global registries and B2B reviews for {selectedSupplier.name}</p>
                     </div>
+                  ) : (
+                    <div style={{ backgroundColor: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', borderTop: `4px solid ${riskReports[selectedSupplier.name].riskScore > 70 ? '#ef4444' : riskReports[selectedSupplier.name].riskScore > 30 ? '#f59e0b' : '#10b981'}` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+                        <div>
+                          <h2 style={{ margin: '0 0 8px 0', color: '#0f172a' }}>Compliance & Risk Profile</h2>
+                          <p style={{ margin: 0, color: '#64748b' }}>Live AI Generation for <strong>{selectedSupplier.name}</strong></p>
+                        </div>
+                        <span style={{ 
+                          backgroundColor: riskReports[selectedSupplier.name].riskScore > 70 ? '#fef2f2' : riskReports[selectedSupplier.name].riskScore > 30 ? '#fef3c7' : '#ecfdf5', 
+                          color: riskReports[selectedSupplier.name].riskScore > 70 ? '#ef4444' : riskReports[selectedSupplier.name].riskScore > 30 ? '#d97706' : '#10b981', 
+                          padding: '8px 16px', borderRadius: '24px', fontSize: '0.85rem', fontWeight: 700, 
+                          border: `1px solid ${riskReports[selectedSupplier.name].riskScore > 70 ? '#fee2e2' : riskReports[selectedSupplier.name].riskScore > 30 ? '#fde68a' : '#a7f3d0'}`
+                        }}>
+                          {riskReports[selectedSupplier.name].riskLevel} (Score: {riskReports[selectedSupplier.name].riskScore}/100)
+                        </span>
+                      </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-                      <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: 600, marginBottom: '8px' }}><Building size={16} color="#3b82f6"/> Entity Verification</div>
-                        <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Business registration verified. 5+ years operational history detected across public directories.</div>
-                      </div>
-                      <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: 600, marginBottom: '8px' }}><Globe size={16} color="#10b981"/> Geo-Political Risk</div>
-                        <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Located in {location}. No current trade embargoes or sanctions match this entity.</div>
-                      </div>
-                      <div style={{ padding: '16px', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fee2e2' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#991b1b', fontWeight: 600, marginBottom: '8px' }}><AlertTriangle size={16} color="#ef4444"/> Financial Risk Alert</div>
-                        <div style={{ fontSize: '0.85rem', color: '#991b1b' }}>Information scraped from B2B reviews indicates occasional delays in bulk order shipments (10-15%).</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                        <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: 600, marginBottom: '8px' }}><Building size={16} color="#3b82f6"/> Entity Verification</div>
+                          <div style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>{riskReports[selectedSupplier.name].entityVerification}</div>
+                        </div>
+                        <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: 600, marginBottom: '8px' }}><Globe size={16} color="#10b981"/> Geo-Political Risk</div>
+                          <div style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>{riskReports[selectedSupplier.name].geoRisk}</div>
+                        </div>
+                        <div style={{ padding: '16px', backgroundColor: riskReports[selectedSupplier.name].riskScore > 50 ? '#fef2f2' : '#f8fafc', borderRadius: '8px', border: `1px solid ${riskReports[selectedSupplier.name].riskScore > 50 ? '#fee2e2' : '#e2e8f0'}` }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: riskReports[selectedSupplier.name].riskScore > 50 ? '#991b1b' : '#0f172a', fontWeight: 600, marginBottom: '8px' }}><AlertTriangle size={16} color={riskReports[selectedSupplier.name].riskScore > 50 ? '#ef4444' : '#f59e0b'}/> Financial & Web Alert</div>
+                          <div style={{ fontSize: '0.85rem', color: riskReports[selectedSupplier.name].riskScore > 50 ? '#991b1b' : '#64748b', lineHeight: 1.5 }}>{riskReports[selectedSupplier.name].financialRisk}</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
             </div>
