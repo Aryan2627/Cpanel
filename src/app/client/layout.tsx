@@ -106,8 +106,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
   };
 
-  if (currentUser && currentUser.licenseStatus === 'Expired') {
-    
+  
   // STRICT UI LEAK PREVENTION: Wait for user profile to load before rendering the layout
   if (currentUser === null) {
     return (
@@ -117,6 +116,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       </div>
     );
   }
+
+  if (currentUser && currentUser.licenseStatus === 'Expired') {
+    
+
 
 return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #071330, #0d1f4f)', color: '#fff', flexDirection: 'column', fontFamily: 'system-ui', textAlign: 'center', padding: '24px' }}>
