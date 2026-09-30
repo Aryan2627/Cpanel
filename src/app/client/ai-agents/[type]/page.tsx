@@ -411,7 +411,17 @@ export default function FullScreenAgentPage() {
                                 <div key={i} style={{ padding: '12px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '8px' }}>
                                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                                     <span style={{ fontWeight: 700, color: '#0f172a' }}>{web.name}</span>
-                                    <span style={{ fontSize: '0.8rem', color: '#3b82f6' }}>{web.url}</span>
+                                    <a
+                                      href={web.url?.startsWith('http') ? web.url : `https://${web.url}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                        fontSize: '0.8rem', color: '#fff', backgroundColor: '#3b82f6',
+                                        padding: '4px 10px', borderRadius: '6px', textDecoration: 'none',
+                                        fontWeight: 600
+                                      }}
+                                    >Visit Site →</a>
                                   </div>
                                   <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{web.reason}</div>
                                 </div>
