@@ -134,6 +134,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const isAgenticPortal = orgFeatures.agentic_portal === true;
   // If Agentic Portal is turned ON, it takes full priority and hides classic menus
   const isAgenticOnly = isAgenticPortal === true || (typeof window !== 'undefined' && window.location.search.includes('agentic=true'));
+    // Global Agentic Mode Redirect
+    useEffect(() => {
+      if (isAgenticOnly && pathname && !pathname.startsWith('/client/ai-agents') && !pathname.startsWith('/client/cortex')) {
+        router.push('/client/ai-agents/procurement');
+      }
+    }, [isAgenticOnly, pathname, router]);
+
     
     // Debug log for the user to inspect in browser console
     useEffect(() => {
@@ -413,11 +420,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
 
 
-    // Global Agentic Mode Redirect
-    useEffect(() => {
-      if (isAgenticOnly && pathname && !pathname.startsWith('/client/ai-agents') && !pathname.startsWith('/client/cortex')) {
-        router.push('/client/ai-agents/procurement');
-      }
-    }, [isAgenticOnly, pathname, router]);
+
 
 
