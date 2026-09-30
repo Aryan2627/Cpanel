@@ -64,6 +64,19 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       }
     }
 
+    if (hasAccess) {
+      const vendorRecord = await prisma.vendor.findFirst({
+        where: {
+          organizationId: event.organizationId,
+          email: { equals: email, mode: 'insensitive' },
+          status: 'Onboarded'
+        }
+      });
+      if (!vendorRecord) {
+        hasAccess = false;
+      }
+    }
+
     if (!hasAccess) {
       return NextResponse.json({ error: 'Forbidden: You do not have access to this event' }, { status: 403, headers: corsHeaders });
     }

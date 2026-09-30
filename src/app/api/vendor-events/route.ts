@@ -41,11 +41,32 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Invalid token payload' }, { status: 400, headers: corsHeaders });
     }
 
+    const approvedVendors = await prisma.vendor.findMany({
+      where: {
+        email: {
+          equals: email,
+          mode: 'insensitive'
+        },
+        status: 'Onboarded'
+      }
+    });
+
+    if (approvedVendors.length === 0) {
+      return NextResponse.json({ error: 'Not onboarded by any client yet.' }, { status: 403, headers: corsHeaders });
+    }
+
+    const approvedOrgIds = approvedVendors.map(v => v.organizationId).filter(Boolean);
+
     const allEvents = await prisma.event.findMany({
+      where: {
+        organizationId: {
+          in: approvedOrgIds as string[]
+        }
+      },
       orderBy: { createdAt: 'desc' }
     });
     
-    console.log(`[vendor-events] Found ${allEvents.length} total events in DB`);
+    console.log(`[vendor-events] Found ${allEvents.length} total events in DB for approved orgs`);
 
     // Filter events where participants JSON contains the vendor's email
     const vendorEvents = allEvents.filter(event => {

@@ -43,10 +43,23 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'eventId is required' }, { status: 400, headers: corsHeaders });
     }
 
+    const event = await prisma.event.findUnique({ where: { refId: eventId } });
+    if (!event) return NextResponse.json({}, { status: 200, headers: corsHeaders });
+
+    const vendorRecord = await prisma.vendor.findFirst({
+      where: {
+        organizationId: event.organizationId,
+        email: { equals: decoded.email, mode: 'insensitive' },
+        status: 'Onboarded'
+      }
+    });
+
+    if (!vendorRecord) return NextResponse.json({}, { status: 200, headers: corsHeaders });
+
     const bid = await prisma.bid.findFirst({
       where: {
         eventId: eventId,
-        vendorId: decoded.id
+        vendorId: vendorRecord.id
       }
     });
 
@@ -83,11 +96,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'eventId and amount are required' }, { status: 400, headers: corsHeaders });
     }
 
+    const event = await prisma.event.findUnique({ where: { refId: eventId } });
+    if (!event) {
+        return NextResponse.json({ error: 'event not found' }, { status: 404, headers: corsHeaders });
+    }
+
+    const vendorRecord = await prisma.vendor.findFirst({
+        where: {
+            organizationId: event.organizationId,
+            email: { equals: decoded.email, mode: 'insensitive' },
+            status: 'Onboarded'
+        }
+    });
+
+    if (!vendorRecord) {
+        return NextResponse.json({ error: 'Vendor not approved for this client' }, { status: 403, headers: corsHeaders });
+    }
+
+    const actualVendorId = vendorRecord.id;
+
     // Check if bid exists
     const existingBid = await prisma.bid.findFirst({
       where: {
         eventId: eventId,
-        vendorId: decoded.id
+        vendorId: actualVendorId
       }
     });
 
@@ -99,7 +131,7 @@ export async function POST(request: Request) {
           amount: parseFloat(amount),
           initialAmount: existingBid.initialAmount || existingBid.amount,
           templateData: templateData ? JSON.stringify(templateData) : null,
-          vendorName: vendorName || decoded.name || 'Vendor',
+          vendorName: vendorName || vendorRecord.name || 'Vendor',
           status: 'Submitted'
         }
       });
@@ -107,8 +139,8 @@ export async function POST(request: Request) {
       bid = await prisma.bid.create({
         data: {
           eventId,
-          vendorId: decoded.id,
-          vendorName: vendorName || decoded.name || 'Vendor',
+          vendorId: actualVendorId,
+          vendorName: vendorName || vendorRecord.name || 'Vendor',
           amount: parseFloat(amount),
           initialAmount: parseFloat(amount),
           templateData: templateData ? JSON.stringify(templateData) : null,
