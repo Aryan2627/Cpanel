@@ -437,7 +437,7 @@ export default function FullScreenAgentPage() {
                   <p style={{ margin: '0 0 24px 0', color: '#64748b' }}>Pricing and capabilities for <strong>{selectedSupplier.name}</strong></p>
                   
                   <div style={{ backgroundColor: '#f8fafc', padding: '24px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>Tavily Extraction Data</h4>
+                    <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>Supplier Context</h4>
                     <p style={{ fontSize: '0.9rem', color: '#475569', lineHeight: 1.6 }}>{selectedSupplier.reason}</p>
                   </div>
 
