@@ -9,7 +9,7 @@ import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
 import JarvisAssistant from './JarvisAssistant';
 import DorcWidget from './DorcWidget';
-import AgentWorkspace from './AgentWorkspace';
+import AgentPanel from './AgentPanel';
 import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles, Command } from 'lucide-react';
 
 const TOP_MENUS = [
@@ -357,7 +357,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       </div>
       
       
-      <AgentWorkspace agentName={activeAgent} onClose={() => setActiveAgent(null)} />
+      <AgentPanel agentName={activeAgent} onClose={() => setActiveAgent(null)} />
       <DorcWidget />
 
       <CartOverlay />
@@ -369,6 +369,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             </SessionContext.Provider>
   );
 }
+
 
 
 
