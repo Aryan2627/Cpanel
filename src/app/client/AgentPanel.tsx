@@ -17,7 +17,7 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
     if (agentName) {
       setIsOpen(true);
       setMessages([
-        { role: 'ai', content: `Hello! I am your ${agentName}. How can I assist you with your procurement tasks today?` }
+        { role: 'ai', content: `Hello! I am your ${agentName} commander. Which of my sub-agents would you like to deploy today?` }
       ]);
     } else {
       setIsOpen(false);
@@ -44,16 +44,29 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
     }
   };
 
-  const getAgentFeatures = () => {
+  const getSubAgents = () => {
     switch (agentName) {
       case 'Procurement Agent':
-        return ['Requirement understanding', 'Supplier discovery', 'Supplier qualification', 'RFQ creation', 'RFQ distribution', 'Supplier follow-ups', 'Database search'];
+        return [
+          { name: 'Anveshan', role: 'The Discoverer', icon: '🔎' },
+          { name: 'Pramaan', role: 'The Validator', icon: '🛡️' }
+        ];
       case 'Sourcing Agent':
-        return ['Quote extraction', 'Quote comparison', 'Price benchmarking', 'Total-cost analysis', 'MOQ comparison', 'Payment-term comparison', 'Delivery comparison', 'Supplier score', 'Historical pricing', 'Recommendation'];
+        return [
+          { name: 'Drishti', role: 'The Lens', icon: '👁️' },
+          { name: 'Tark', role: 'The Analyst', icon: '🧠' }
+        ];
       case 'Negotiation Agent':
-        return ['Negotiation strategy', 'Historical price analysis', 'Market benchmark', 'Target price', 'Counter-offer generation', 'Supplier communication', 'Negotiation tracking', 'Savings calculation'];
+        return [
+          { name: 'Doot', role: 'The Envoy', icon: '📜' },
+          { name: 'Niti', role: 'The Strategist', icon: '♟️' }
+        ];
       case 'Operations Agent':
-        return ['PO generation', 'PO tracking', 'Delivery tracking', 'Supplier reminders', 'Delay detection', 'GRN/invoice matching', 'Contract/SLA monitoring', 'Supplier performance', 'Risk alerts', 'Procurement analytics'];
+        return [
+          { name: 'Garuda', role: 'The Swift Tracker', icon: '🦅' },
+          { name: 'Rakshak', role: 'The Sentinel', icon: '⚔️' },
+          { name: 'Setu', role: 'The Matcher', icon: '🌉' }
+        ];
       default:
         return [];
     }
@@ -65,14 +78,14 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
     setMessages(prev => [...prev, { role: 'user', content: input }]);
     setInput('');
     setTimeout(() => {
-      setMessages(prev => [...prev, { role: 'ai', content: `I have received your request regarding "${input}". I am processing it now...` }]);
+      setMessages(prev => [...prev, { role: 'ai', content: `I have received your request regarding "${input}". Routing to the appropriate sub-agent...` }]);
     }, 800);
   };
 
-  const handleFeatureClick = (feature: string) => {
-    setMessages(prev => [...prev, { role: 'user', content: `Execute task: ${feature}` }]);
+  const handleSubAgentClick = (subAgent: any) => {
+    setMessages(prev => [...prev, { role: 'user', content: `Deploy ${subAgent.name}` }]);
     setTimeout(() => {
-      setMessages(prev => [...prev, { role: 'ai', content: `Initializing ${feature.toLowerCase()} protocol. Processing your request...` }]);
+      setMessages(prev => [...prev, { role: 'ai', content: `${subAgent.icon} ${subAgent.name} (${subAgent.role}) is now online. What would you like ${subAgent.name} to analyze?` }]);
     }, 800);
   };
 
@@ -159,23 +172,26 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
           </form>
           
           <div style={{ marginTop: '16px' }}>
-             <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Agent Capabilities</div>
+             <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Active Sub-Agents</div>
              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', flexWrap: 'nowrap' }}>
-              {getAgentFeatures().map(feature => (
-                <span 
-                  key={feature} 
-                  onClick={() => handleFeatureClick(feature)}
+              {getSubAgents().map(sub => (
+                <div 
+                  key={sub.name} 
+                  onClick={() => handleSubAgentClick(sub)}
                   style={{ 
-                    fontSize: '0.75rem', color: '#475569', padding: '6px 12px', 
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    fontSize: '0.8rem', color: '#475569', padding: '6px 12px', 
                     backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0',
                     borderRadius: '20px', whiteSpace: 'nowrap', cursor: 'pointer',
-                    transition: 'all 0.2s', fontWeight: 500
+                    transition: 'all 0.2s', fontWeight: 600
                   }}
-                  onMouseOver={e => { e.currentTarget.style.backgroundColor = getAgentColor(); e.currentTarget.style.color = '#fff'; }}
-                  onMouseOut={e => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.color = '#475569'; }}
+                  onMouseOver={e => { e.currentTarget.style.backgroundColor = getAgentColor(); e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = getAgentColor(); }}
+                  onMouseOut={e => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.color = '#475569'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
                 >
-                  {feature}
-                </span>
+                  <span style={{ fontSize: '1rem' }}>{sub.icon}</span> 
+                  <span>{sub.name}</span>
+                  <span style={{ fontWeight: 400, opacity: 0.8, fontSize: '0.7rem', marginLeft: '4px' }}>{sub.role}</span>
+                </div>
               ))}
             </div>
           </div>
