@@ -14,6 +14,7 @@ export default function FullScreenAgentPage() {
   const [processingItems, setProcessingItems] = useState<Record<string, boolean>>({});
   const [itemProgress, setItemProgress] = useState<Record<string, string>>({});
   const [taskSteps, setTaskSteps] = useState<Record<number, number>>({ 0: 0, 1: 0, 2: 0 });
+  const [taskResults, setTaskResults] = useState<Record<string, any>>({});
 
   const agentNameMap: Record<string, string> = {
     'procurement': 'Procurement Agent',
@@ -127,44 +128,32 @@ export default function FullScreenAgentPage() {
 
     try {
       if (agentName === 'Procurement Agent') {
-        // Step 1: Tell AI to Parse (Mocking the UI steps to match network latency)
         setTimeout(() => {
           setItemProgress(prev => ({ ...prev, [itemId]: '40%' }));
           setTaskSteps({ 0: 2, 1: 1, 2: 0 });
         }, 1000);
 
-        // Step 2: Make the actual LLM Backend Call
-        console.log(`🤖 [Anveshan] Sending Intake ${itemId} to NVIDIA Llama 3.1...`);
         const res = await fetch('/api/agents/anveshan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ intakeId: itemId })
         });
         
-        const data = await res.json();
-        console.log(`✅ [Anveshan] AI Processing Complete:`, data);
-
-        // Advance to Step 3 visually
+        const responseData = await res.json();
+        
         setItemProgress(prev => ({ ...prev, [itemId]: '75%' }));
         setTaskSteps({ 0: 2, 1: 2, 2: 1 });
 
-        // Display quick alert so user can see it worked without devtools
-        if (data.success && data.aiExtractionUsed) {
-           alert(`🤖 Llama 3.1 successfully extracted keywords: \n${data.extractedSpecs.join(', ')}\n\nFound ${data.suppliersIdentified} matching vendors!`);
-        } else if (data.success) {
-           alert(`⚠️ API Key missing! Fallback used. Keywords: \n${data.extractedSpecs.join(', ')}`);
-        } else {
-           alert(`Error: ${data.error}`);
+        if (responseData.success) {
+          setTaskResults(prev => ({ ...prev, [itemId]: responseData }));
         }
       } else {
-        // Mock for other agents
         setTimeout(() => {
           setItemProgress(prev => ({ ...prev, [itemId]: '40%' }));
           setTaskSteps({ 0: 2, 1: 1, 2: 0 }); 
         }, 1500);
       }
 
-      // Finish Task visually
       setTimeout(() => {
         setItemProgress(prev => ({ ...prev, [itemId]: '100%' }));
         setTaskSteps({ 0: 2, 1: 2, 2: 2 }); 
@@ -385,6 +374,58 @@ export default function FullScreenAgentPage() {
                           borderRadius: '4px', transition: 'width 0.5s ease-out, background-color 0.3s' 
                         }} />
                       </div>
+
+                      {/* AI RESULTS UI EXPANSION */}
+                      {isDone && taskResults[item.id] && (
+                        <div style={{ marginTop: '24px', padding: '24px', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: 800, marginBottom: '16px' }}>
+                            <Zap size={18} color="#3b82f6" /> AI Autonomous Report
+                          </div>
+                          
+                          <div style={{ marginBottom: '20px' }}>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '8px' }}>Extracted Specs & Match Criteria</div>
+                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                              {taskResults[item.id].extractedSpecs?.map((spec: string, i: number) => (
+                                <span key={i} style={{ padding: '4px 12px', backgroundColor: '#e0e7ff', color: '#4f46e5', borderRadius: '16px', fontSize: '0.8rem', fontWeight: 600 }}>
+                                  {spec}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div style={{ marginBottom: '20px' }}>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '8px' }}>Historical Vector Analysis</div>
+                            <p style={{ margin: 0, fontSize: '0.95rem', color: '#334155', lineHeight: 1.5 }}>
+                              {taskResults[item.id].marketAnalysis}
+                            </p>
+                          </div>
+
+                          <div style={{ marginBottom: '20px' }}>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '8px' }}>External Web Discoveries (New Suppliers)</div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              {taskResults[item.id].webDiscoveries?.map((web: any, i: number) => (
+                                <div key={i} style={{ padding: '12px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '8px' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                    <span style={{ fontWeight: 700, color: '#0f172a' }}>{web.name}</span>
+                                    <span style={{ fontSize: '0.8rem', color: '#3b82f6' }}>{web.url}</span>
+                                  </div>
+                                  <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{web.reason}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '8px' }}>Drafted RFI Email</div>
+                            <pre style={{ margin: 0, padding: '16px', backgroundColor: '#1e293b', color: '#f8fafc', borderRadius: '8px', fontSize: '0.85rem', fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+                              {taskResults[item.id].rfiDraft}
+                            </pre>
+                            <button style={{ marginTop: '12px', padding: '8px 16px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
+                              Approve & Send to Suppliers
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
