@@ -36,13 +36,13 @@ export async function POST(req: Request) {
     await prisma.$transaction([
       prisma.organization.update({
         where: { id: orgId },
-        data: { tokensUsed: { increment: 5 } }
+        data: { tokensUsed: { increment: 4 } }
       }),
       prisma.tokenLedger.create({
         data: {
           organizationId: orgId,
           action: 'Anveshan Auto-Sourcing',
-          tokensConsumed: 5,
+          tokensConsumed: 4,
           actorEmail: 'system',
           entityRef: intake.id
         }
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
     }
-    if (org.tokensUsed + 5 > org.tokensTotal) {
+    if (org.tokensUsed + 4 > org.tokensTotal) {
       return NextResponse.json({ error: 'Insufficient AI tokens. Please upgrade your license to run Anveshan.' }, { status: 402 });
     }
 
