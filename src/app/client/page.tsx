@@ -18,6 +18,18 @@ export default function ClientDashboard() {
 
     fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => { if (d) setUser(d); });
     fetch('/api/dashboard/stats').then(r => r.json()).then(d => { setStats(d); localStorage.setItem('dashboard_stats_cache', JSON.stringify(d)); setLoading(false); }).catch(() => setLoading(false));
+    
+    // Agentic redirect logic
+    fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(u => {
+      if (u?.features) {
+        try {
+          const feats = JSON.parse(u.features);
+          if (feats.agentic_portal === true && feats.main_portal === false) {
+            router.push('/client/ai-agents/procurement');
+          }
+        } catch(e) {}
+      }
+    });
   }, []);
 
   const kpis = [

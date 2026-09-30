@@ -153,7 +153,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             </Link>
 
             <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {TOP_MENUS.map((menu) => (
+              {displayMenus.map((menu) => (
                 <div 
                   key={menu.name}
                   onMouseEnter={() => setHoveredMenu(menu.name)}
@@ -308,7 +308,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         {mobileMenuOpen && (
           <div style={{ position: 'absolute', top: '64px', left: 0, width: '100%', background: '#0f172a', zIndex: 9999, borderBottom: '1px solid rgba(255,255,255,0.1)', maxHeight: 'calc(100vh - 64px)', overflowY: 'auto' }}>
             <div style={{ display: 'flex', flexDirection: 'column', padding: '16px' }}>
-              {TOP_MENUS.map(menu => (
+              {displayMenus.map(menu => (
                 <div key={menu.name} style={{ marginBottom: '8px' }}>
                   <Link href={menu.path || '#'} onClick={() => { if(!menu.sub) setMobileMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', color: '#fff', textDecoration: 'none', fontWeight: 600, borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }}>
                     <menu.icon size={18} /> {menu.name}
