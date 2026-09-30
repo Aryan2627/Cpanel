@@ -128,6 +128,18 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
   };
 
+  
+  const orgFeatures = currentUser?.features ? (() => { try { return JSON.parse(currentUser.features); } catch { return {}; } })() : {};
+  const isMainPortal = orgFeatures.main_portal !== false; 
+  const isAgenticPortal = orgFeatures.agentic_portal === true;
+  const isAgenticOnly = isAgenticPortal && !isMainPortal;
+
+  const displayMenus = TOP_MENUS.filter(menu => {
+    if (isAgenticOnly) return menu.name === 'AI Agents';
+    if (!isMainPortal) return menu.name === 'AI Agents';
+    return true; 
+  });
+
   return (
     <SessionContext.Provider value={{ session: currentUser, loading: currentUser === null }}>
             <IntakeProvider>
