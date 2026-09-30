@@ -414,3 +414,18 @@ model TokenLedger {
   @@index([organizationId, createdAt(sort: Desc)])
   @@index([organizationId, action])
 }
+
+model ContextDefinition {
+  id          String   @id @default(uuid())
+  organizationId String?
+  name        String   
+  description String?
+  content     String   
+  version     String   @default("1.0.0")
+  isActive    Boolean  @default(true)
+  consumedBy  String   
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([organizationId, name])
+}

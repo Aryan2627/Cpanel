@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { tavily } from '@tavily/core';
+import { prisma } from '../../../../lib/prisma';
+import { getTenantId } from '../../../../lib/tenant';
 
 export async function POST(req: Request) {
   try {
@@ -31,6 +33,15 @@ export async function POST(req: Request) {
       }
     }
 
+    
+    const orgId = await getTenantId();
+    const activeRules = await prisma.contextDefinition.findMany({
+      where: { organizationId: orgId, isActive: true, consumedBy: 'Niti' },
+      orderBy: { updatedAt: 'desc' }
+    });
+    
+    const dynamicBusinessRules = activeRules.map(r => r.content).join('\n\n');
+
     const marketIntelligenceContext = liveMarketData 
       ? `LIVE INTERNET SEARCH RESULTS: "${liveMarketData}"
       
@@ -50,7 +61,11 @@ export async function POST(req: Request) {
       role: "system",
       content: `You are ProcGen Agent Alpha, an elite autonomous procurement negotiator representing a corporate buyer. 
 Your goal is to buy: ${productName}. 
-The vendor (who you are talking to) initially offered $${vendorInitialOffer.toLocaleString()}. 
+The vendor (who you are talking to) initially offered ${vendorInitialOffer.toLocaleString()}.
+
+CORPORATE NEGOTIATION GUIDELINES (Enforce strictly):
+${dynamicBusinessRules}
+ 
 
 ${marketIntelligenceContext}
 
