@@ -1,7 +1,7 @@
 
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Zap, Play, CheckCircle2, Loader2, Database, Search, ShieldAlert, Cpu, Globe, ArrowRight, Activity, Mail, MapPin, Building, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Zap, Play, CheckCircle2, Loader2, Database, Search, ShieldAlert, Cpu, Globe, ArrowRight, Activity, Mail, MapPin, Building, AlertTriangle, TrendingUp, Bot } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
 export default function FullScreenAgentPage() {
