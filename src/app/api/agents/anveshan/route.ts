@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
     if (apiKey) {
       const baseURL = nvidiaKey ? 'https://integrate.api.nvidia.com/v1' : undefined;
-      const modelName = nvidiaKey ? 'meta/llama-3.2-3b-instruct' : 'gpt-4o';
+      const modelName = nvidiaKey ? 'meta/llama-3.2-90b-vision-instruct' : 'gpt-4o';
       
       const openai = new OpenAI({ apiKey, baseURL });
 
