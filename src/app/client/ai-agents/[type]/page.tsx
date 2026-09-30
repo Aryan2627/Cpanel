@@ -198,29 +198,68 @@ export default function FullScreenAgentPage() {
         @keyframes pulse-ring { 0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); } 100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
         @keyframes scan-line { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
         @keyframes fade-in-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes ray-sweep { 0% { left: -100%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 200%; opacity: 0; } }
+        @keyframes ambient-pulse { 0% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.1); opacity: 0.6; } 100% { transform: scale(1); opacity: 0.4; } }
+        .cyber-header {
+          position: relative;
+          background: linear-gradient(135deg, #09090b 0%, #18181b 100%);
+          border-bottom: 1px solid #27272a;
+          padding: 40px 48px;
+          overflow: hidden;
+        }
+        .light-ray {
+          position: absolute;
+          top: -50%;
+          width: 200px;
+          height: 200%;
+          background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3), rgba(255, 255, 255, 0.8), rgba(56, 189, 248, 0.3), transparent);
+          transform: skewX(-35deg);
+          animation: ray-sweep 4s infinite linear;
+          filter: blur(4px);
+        }
+        .light-ray.delay {
+          animation-delay: 2s;
+          width: 100px;
+          background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), rgba(255, 255, 255, 0.5), rgba(139, 92, 246, 0.2), transparent);
+        }
+        .ambient-glow-1 {
+          position: absolute; top: -50px; right: 10%; width: 400px; height: 400px;
+          background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 60%);
+          border-radius: 50%; filter: blur(40px); animation: ambient-pulse 6s infinite ease-in-out;
+        }
+        .ambient-glow-2 {
+          position: absolute; bottom: -100px; left: 15%; width: 300px; height: 300px;
+          background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 60%);
+          border-radius: 50%; filter: blur(40px); animation: ambient-pulse 5s infinite ease-in-out reverse;
+        }
         .atlan-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.3s; }
         .atlan-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: #cbd5e1; }
         .scanning-active { border-color: #60a5fa !important; box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15) !important; }
         .log-entry { animation: fade-in-up 0.4s ease-out forwards; }
       `}} />
 
-      {/* Header */}
-      <div style={{ backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0', padding: '32px 48px', backgroundImage: 'radial-gradient(circle at 90% 10%, rgba(241, 245, 249, 0.8) 0%, transparent 40%)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      {/* Advanced Cyber Header */}
+      <div className="cyber-header">
+        <div className="ambient-glow-1" />
+        <div className="ambient-glow-2" />
+        <div className="light-ray" />
+        <div className="light-ray delay" />
+        
+        <div style={{ position: 'relative', zIndex: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ display: 'flex', gap: '24px' }}>
-            <div style={{ width: '72px', height: '72px', borderRadius: '16px', backgroundColor: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', fontSize: '36px', overflow: 'hidden' }}>
+            <div style={{ width: '72px', height: '72px', borderRadius: '16px', backgroundColor: '#18181b', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(56, 189, 248, 0.2)', fontSize: '36px', overflow: 'hidden' }}>
               {data.name === 'Anveshan' ? <img src="/anveshan-avatar.png" alt="Anveshan" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : data.name === 'Niti' ? <img src="/niti-avatar.jpg" alt="Niti" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : data.name === 'Tark' ? <img src="/tark-avatar.jpg" alt="Tark" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : data.name === 'Garuda' ? <img src="/garuda-avatar.png" alt="Garuda" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '🤖'}
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.5px' }}>{data.name}</h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', fontWeight: 700, color: '#3b82f6', backgroundColor: '#eff6ff', padding: '4px 10px', borderRadius: '12px', border: '1px solid #bfdbfe' }}><Cpu size={12} /> LEVEL 4 AUTONOMY</div>
+                <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#f8fafc', margin: 0, letterSpacing: '-0.5px', textShadow: '0 2px 10px rgba(255,255,255,0.1)' }}>{data.name}</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', fontWeight: 800, color: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.2)' }}><Cpu size={12} /> LEVEL 4 AUTONOMY</div>
               </div>
-              <p style={{ fontSize: '1rem', color: '#64748b', margin: 0, fontWeight: 500, maxWidth: '600px', lineHeight: 1.5 }}>{data.purpose}</p>
+              <p style={{ fontSize: '1rem', color: '#94a3b8', margin: 0, fontWeight: 500, maxWidth: '600px', lineHeight: 1.5 }}>{data.purpose}</p>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 600, color: '#10b981', backgroundColor: '#ecfdf5', padding: '8px 16px', borderRadius: '20px', border: '1px solid #a7f3d0' }}>
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', animation: 'pulse-ring 2s infinite' }} /> Live Endpoints Active
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 700, color: '#34d399', backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '8px 16px', borderRadius: '20px', border: '1px solid rgba(16, 185, 129, 0.2)', backdropFilter: 'blur(10px)' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#34d399', animation: 'pulse-ring 2s infinite', boxShadow: '0 0 10px #34d399' }} /> Live Endpoints Active
           </div>
         </div>
       </div>
