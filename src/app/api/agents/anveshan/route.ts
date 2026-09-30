@@ -28,6 +28,33 @@ function buildSmartFallback(title: string, type: string, location: string) {
 export async function POST(req: Request) {
   try {
     const orgId = await getTenantId();
+    
+    const org = await prisma.organization.findUnique({ where: { id: orgId } });
+    if (!org) {
+      
+    // Deduct 5 tokens for executing Anveshan
+    await prisma.$transaction([
+      prisma.organization.update({
+        where: { id: orgId },
+        data: { tokensUsed: { increment: 5 } }
+      }),
+      prisma.tokenLedger.create({
+        data: {
+          organizationId: orgId,
+          action: 'Anveshan Auto-Sourcing',
+          tokensConsumed: 5,
+          actorEmail: 'system',
+          entityRef: intake.id
+        }
+      })
+    ]);
+
+    return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+    }
+    if (org.tokensUsed + 5 > org.tokensTotal) {
+      return NextResponse.json({ error: 'Insufficient AI tokens. Please upgrade your license to run Anveshan.' }, { status: 402 });
+    }
+
     const { intakeId, location = 'Global' } = await req.json();
 
     if (!intakeId) {

@@ -167,6 +167,11 @@ export default function FullScreenAgentPage() {
         body: JSON.stringify({ intakeId: itemId, location }) // Passing location to backend!
       });
       
+      if (res.status === 402) {
+        alert("Insufficient AI tokens. Please upgrade your license to run Anveshan.");
+        throw new Error("Insufficient AI tokens");
+      }
+      
       const responseData = await res.json();
       
       setItemProgress(prev => ({ ...prev, [itemId]: '75%' }));
