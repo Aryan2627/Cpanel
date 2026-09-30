@@ -61,7 +61,7 @@ export async function POST(req: Request) {
             "webDiscoveries": [{ "name": "...", "url": "...", "reason": "..." }],
             "rfiDraft": "..."
           }
-          Do not use markdown blocks.
+          CRITICAL: You must output ONLY a raw JSON object. Do not wrap it in backticks, do not write 'json', and do not include any introductory or concluding text. Just the raw { object } starting with an opening brace.
         `;
 
         const completion = await openai.chat.completions.create({
