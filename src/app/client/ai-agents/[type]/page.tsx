@@ -1,38 +1,34 @@
-
 'use client';
 import React, { useState, useEffect } from 'react';
-import { X, Zap, Play, CheckCircle2, Loader2, Database } from 'lucide-react';
+import { Zap, Play, CheckCircle2, Loader2, Database } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
 
-interface AgentPanelProps {
-  agentName: string | null;
-  onClose: () => void;
-}
-
-export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('Active Tasks');
+export default function FullScreenAgentPage() {
+  const params = useParams();
+  const router = useRouter();
+  const rawType = params.type as string; // 'procurement', 'sourcing', 'negotiation', 'operations'
   
-  // Real data state
+  const [activeTab, setActiveTab] = useState('Active Tasks');
   const [realItems, setRealItems] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(false);
-
-  // Processing simulation state
   const [processingItems, setProcessingItems] = useState<Record<string, boolean>>({});
   const [itemProgress, setItemProgress] = useState<Record<string, string>>({});
-  const [taskSteps, setTaskSteps] = useState<Record<number, number>>({ 0: 0, 1: 0, 2: 0 }); 
+  const [taskSteps, setTaskSteps] = useState<Record<number, number>>({ 0: 0, 1: 0, 2: 0 });
+
+  const agentNameMap: Record<string, string> = {
+    'procurement': 'Procurement Agent',
+    'sourcing': 'Sourcing Agent',
+    'negotiation': 'Negotiation Agent',
+    'operations': 'Operations Agent'
+  };
+  const agentName = agentNameMap[rawType] || 'Procurement Agent';
 
   useEffect(() => {
-    if (agentName) {
-      setIsOpen(true);
-      setActiveTab('Active Tasks');
-      setProcessingItems({});
-      setItemProgress({});
-      setTaskSteps({ 0: 0, 1: 0, 2: 0 });
-      fetchRealData(agentName);
-    } else {
-      setIsOpen(false);
-      setRealItems([]);
-    }
+    setActiveTab('Active Tasks');
+    setProcessingItems({});
+    setItemProgress({});
+    setTaskSteps({ 0: 0, 1: 0, 2: 0 });
+    fetchRealData(agentName);
   }, [agentName]);
 
   const fetchRealData = async (agent: string) => {
@@ -56,15 +52,9 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
           else if (agent === 'Negotiation Agent') title = d.name || d.companyName || `Vendor_${d.id.substring(0,6)}`;
           else if (agent === 'Operations Agent') title = d.poNumber ? `PO-${d.poNumber}` : `Order_${d.id.substring(0,6)}`;
 
-          return {
-            id: d.id,
-            title,
-            metric: 'Awaiting Run',
-            progress: '0%'
-          };
+          return { id: d.id, title, metric: 'Awaiting Run', progress: '0%' };
         });
 
-        // Fallback to empty state if no real data exists yet
         if (formatted.length === 0) {
            formatted.push({ id: 'demo-1', title: 'No real records found yet. Run a demo?', metric: 'Awaiting', progress: '0%' });
         }
@@ -160,68 +150,57 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
   };
 
   return (
-    <>
-      <div 
-        onClick={onClose}
-        style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(4px)',
-          opacity: isOpen ? 1 : 0, pointerEvents: isOpen ? 'auto' : 'none',
-          transition: 'all 0.3s ease', zIndex: 99999
-        }}
-      />
-      
+    <div style={{
+      minHeight: 'calc(100vh - 64px)',
+      backgroundColor: '#f8fafc',
+      position: 'relative',
+      display: 'flex',
+      flexDirection: 'column',
+      padding: '40px'
+    }}>
       <div style={{
-        position: 'fixed', top: '5%', left: '50%', transform: isOpen ? 'translate(-50%, 0)' : 'translate(-50%, 40px)',
-        width: '90%', maxWidth: '1100px', height: '90%', 
-        backgroundColor: '#fff', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
-        borderRadius: '16px', border: '1px solid #e2e8f0',
-        opacity: isOpen ? 1 : 0, pointerEvents: isOpen ? 'auto' : 'none',
-        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        zIndex: 100000, display: 'flex', flexDirection: 'column', overflow: 'hidden'
+        position: 'absolute', inset: 0, zIndex: 0, opacity: 0.6, pointerEvents: 'none',
+        backgroundImage: 'linear-gradient(to right, #e2e8f0 1px, transparent 1px), linear-gradient(to bottom, #e2e8f0 1px, transparent 1px)',
+        backgroundSize: '32px 32px'
+      }} />
+
+      <div style={{
+        position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column',
+        backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #cbd5e1',
+        boxShadow: '0 10px 40px -10px rgba(0,0,0,0.08)', overflow: 'hidden'
       }}>
         
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 0, opacity: 0.4, pointerEvents: 'none',
-          backgroundImage: 'linear-gradient(to right, #f1f5f9 1px, transparent 1px), linear-gradient(to bottom, #f1f5f9 1px, transparent 1px)',
-          backgroundSize: '24px 24px'
-        }} />
-
         <div style={{ 
-          padding: '32px 40px', borderBottom: '1px solid #f1f5f9', 
-          backgroundColor: '#fff', position: 'relative', zIndex: 1,
-          display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between'
+          padding: '40px', borderBottom: '1px solid #f1f5f9', 
+          backgroundColor: '#fff', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between'
         }}>
-          <div style={{ display: 'flex', gap: '20px' }}>
+          <div style={{ display: 'flex', gap: '24px' }}>
             <div style={{ 
-              width: '80px', height: '80px', borderRadius: '16px', 
+              width: '88px', height: '88px', borderRadius: '20px', 
               backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)', fontSize: '40px'
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)', fontSize: '44px'
             }}>
               {getEmoji(data.name)}
             </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>{data.name}</h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', fontWeight: 700, color: '#10b981', backgroundColor: '#ecfdf5', padding: '4px 8px', borderRadius: '12px', border: '1px solid #a7f3d0' }}>
-                  <Database size={12} /> LIVE DB LINKED
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
+                <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>{data.name}</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 700, color: '#10b981', backgroundColor: '#ecfdf5', padding: '6px 12px', borderRadius: '16px', border: '1px solid #a7f3d0', textTransform: 'uppercase' }}>
+                  <Database size={14} /> Live DB Linked
                 </div>
               </div>
-              <p style={{ fontSize: '1.05rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
+              <p style={{ fontSize: '1.1rem', color: '#64748b', margin: 0, fontWeight: 500, maxWidth: '600px', lineHeight: 1.5 }}>
                 {data.purpose}
               </p>
             </div>
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
-            <button onClick={onClose} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', color: '#64748b', cursor: 'pointer', padding: '8px', borderRadius: '8px' }}>
-              <X size={20} />
-            </button>
             <div style={{ 
-              padding: '6px 16px', borderRadius: '20px', 
+              padding: '8px 20px', borderRadius: '24px', 
               backgroundColor: '#eff6ff', color: '#3b82f6', 
-              border: '1px solid #bfdbfe', fontSize: '0.75rem', 
+              border: '1px solid #bfdbfe', fontSize: '0.8rem', 
               fontWeight: 700, letterSpacing: '1px', whiteSpace: 'nowrap' 
             }}>
               {data.tag}
@@ -229,48 +208,48 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
           </div>
         </div>
 
-        <div style={{ display: 'flex', flex: 1, position: 'relative', zIndex: 1, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', flex: 1 }}>
           
-          <div style={{ width: '340px', borderRight: '1px solid #f1f5f9', padding: '40px', backgroundColor: '#fff', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f97316', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '16px' }}>
-              <Zap size={14} fill="currentColor" /> PURPOSE
+          <div style={{ width: '400px', borderRight: '1px solid #f1f5f9', padding: '40px', backgroundColor: '#fafafa', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f97316', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '20px' }}>
+              <Zap size={16} fill="currentColor" /> CORE PURPOSE
             </div>
-            <p style={{ fontSize: '1rem', color: '#334155', lineHeight: 1.6, marginBottom: '40px' }}>
+            <p style={{ fontSize: '1.05rem', color: '#334155', lineHeight: 1.6, marginBottom: '48px' }}>
               {data.purpose}
             </p>
 
-            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', letterSpacing: '1.5px', marginBottom: '24px' }}>
+            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#94a3b8', letterSpacing: '1.5px', marginBottom: '32px' }}>
               LIVE TASK PLAN
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '11px', top: '24px', bottom: '24px', width: '2px', backgroundColor: '#f1f5f9' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', position: 'relative' }}>
+              <div style={{ position: 'absolute', left: '13px', top: '32px', bottom: '32px', width: '2px', backgroundColor: '#e2e8f0' }} />
               
               {data.tasks.map((task, idx) => {
                 const status = taskSteps[idx] || 0; 
                 
                 return (
-                  <div key={idx} style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 2 }}>
+                  <div key={idx} style={{ display: 'flex', gap: '20px', position: 'relative', zIndex: 2 }}>
                     <div style={{ 
-                      width: '24px', height: '24px', borderRadius: '50%', 
+                      width: '28px', height: '28px', borderRadius: '50%', 
                       backgroundColor: status === 2 ? '#22c55e' : status === 1 ? '#3b82f6' : '#fff', 
                       border: `2px solid ${status === 2 ? '#22c55e' : status === 1 ? '#3b82f6' : '#cbd5e1'}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: status > 0 ? '#fff' : '#94a3b8', fontSize: '0.6rem', fontWeight: 800, marginTop: '0px',
+                      color: status > 0 ? '#fff' : '#94a3b8', fontSize: '0.75rem', fontWeight: 800,
                       transition: 'all 0.3s'
                     }}>
-                      {status === 2 ? <CheckCircle2 size={14} /> : status === 1 ? <Loader2 size={14} className="animate-spin" /> : (idx + 1)}
+                      {status === 2 ? <CheckCircle2 size={16} /> : status === 1 ? <Loader2 size={16} className="animate-spin" /> : (idx + 1)}
                     </div>
 
                     <div>
                       <div style={{ 
-                        fontSize: '0.95rem', fontWeight: 600, 
+                        fontSize: '1.05rem', fontWeight: 600, 
                         color: status === 1 ? '#3b82f6' : status === 2 ? '#0f172a' : '#64748b', 
-                        marginBottom: '4px', transition: 'color 0.3s'
+                        marginBottom: '6px', transition: 'color 0.3s'
                       }}>
                         {task.title}
                       </div>
-                      <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{task.desc}</div>
+                      <div style={{ fontSize: '0.9rem', color: '#94a3b8', lineHeight: 1.4 }}>{task.desc}</div>
                     </div>
                   </div>
                 );
@@ -278,16 +257,16 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
             </div>
           </div>
 
-          <div style={{ flex: 1, padding: '40px', backgroundColor: 'transparent', overflowY: 'auto' }}>
+          <div style={{ flex: 1, padding: '40px', backgroundColor: '#fff', overflowY: 'auto' }}>
             
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', gap: '16px', marginBottom: '40px' }}>
               {data.tabs.map((tab, i) => (
                 <button 
                   key={i} 
                   onClick={() => setActiveTab(tab)}
                   style={{
-                    padding: '8px 20px', borderRadius: '24px',
-                    fontSize: '0.85rem', fontWeight: i === 0 ? 600 : 500,
+                    padding: '10px 24px', borderRadius: '24px',
+                    fontSize: '0.9rem', fontWeight: i === 0 ? 600 : 500,
                     cursor: 'pointer', transition: 'all 0.2s',
                     backgroundColor: activeTab === tab ? '#eff6ff' : '#fff',
                     color: activeTab === tab ? '#3b82f6' : '#64748b',
@@ -299,23 +278,23 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
               ))}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
               <div>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#94a3b8', letterSpacing: '1px', textTransform: 'uppercase' }}>
                   {activeTab} • QUEUE
                 </div>
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>
+              <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 500 }}>
                 {loadingData ? 'Fetching...' : `${realItems.length} active database records`}
               </div>
             </div>
 
             {loadingData ? (
-               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '24px', color: '#64748b' }}>
-                 <Loader2 className="animate-spin" /> Fetching live data from DB...
+               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '32px', color: '#64748b', fontSize: '1.1rem' }}>
+                 <Loader2 className="animate-spin" size={24} /> Fetching live data from DB...
                </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {realItems.map((item) => {
                   const isProcessing = processingItems[item.id];
                   const progress = itemProgress[item.id] || item.progress;
@@ -324,51 +303,51 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
                   return (
                     <div key={item.id} style={{ 
                       backgroundColor: '#fff', border: isProcessing ? '1px solid #3b82f6' : '1px solid #e2e8f0', 
-                      borderRadius: '12px', padding: '20px 24px', position: 'relative', overflow: 'hidden',
-                      boxShadow: isProcessing ? '0 4px 12px rgba(59, 130, 246, 0.15)' : '0 1px 3px rgba(0,0,0,0.02)',
+                      borderRadius: '16px', padding: '24px 32px', position: 'relative', overflow: 'hidden',
+                      boxShadow: isProcessing ? '0 8px 24px rgba(59, 130, 246, 0.15)' : '0 2px 6px rgba(0,0,0,0.02)',
                       transition: 'all 0.3s'
                     }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                        <div style={{ fontSize: '1rem', fontWeight: 600, color: '#0f172a', fontFamily: 'monospace' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0f172a', fontFamily: 'monospace' }}>
                           {item.title}
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
                           
                           {!isProcessing && !isDone && (
                             <button 
                               onClick={() => handleRunTask(item.id)}
                               style={{ 
-                                display: 'flex', alignItems: 'center', gap: '6px',
-                                padding: '6px 12px', backgroundColor: '#3b82f6', color: '#fff', 
-                                borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700, 
+                                display: 'flex', alignItems: 'center', gap: '8px',
+                                padding: '8px 16px', backgroundColor: '#3b82f6', color: '#fff', 
+                                borderRadius: '10px', fontSize: '0.85rem', fontWeight: 700, 
                                 border: 'none', cursor: 'pointer', transition: 'background 0.2s'
                               }}
                               onMouseOver={e => e.currentTarget.style.backgroundColor = '#2563eb'}
                               onMouseOut={e => e.currentTarget.style.backgroundColor = '#3b82f6'}
                             >
-                              <Play size={12} fill="currentColor" /> Run Agent
+                              <Play size={14} fill="currentColor" /> Run Agent
                             </button>
                           )}
 
                           {(isProcessing || isDone) && (
-                            <span style={{ fontSize: '0.85rem', color: isDone ? '#22c55e' : '#3b82f6', fontWeight: 600 }}>
+                            <span style={{ fontSize: '0.95rem', color: isDone ? '#22c55e' : '#3b82f6', fontWeight: 600 }}>
                               {isDone ? 'Task Complete' : 'Processing...'}
                             </span>
                           )}
 
                           {isDone && (
-                            <span style={{ padding: '4px 12px', backgroundColor: '#dcfce7', color: '#166534', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700, border: '1px solid #bbf7d0' }}>
+                            <span style={{ padding: '6px 16px', backgroundColor: '#dcfce7', color: '#166534', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 700, border: '1px solid #bbf7d0' }}>
                               Verified
                             </span>
                           )}
                         </div>
                       </div>
                       
-                      <div style={{ width: '100%', height: '6px', backgroundColor: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ width: '100%', height: '8px', backgroundColor: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
                         <div style={{ 
                           width: progress, height: '100%', 
                           backgroundColor: isDone ? '#22c55e' : '#3b82f6', 
-                          borderRadius: '3px', transition: 'width 0.5s ease-out, background-color 0.3s' 
+                          borderRadius: '4px', transition: 'width 0.5s ease-out, background-color 0.3s' 
                         }} />
                       </div>
                     </div>
@@ -380,6 +359,6 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -9,7 +9,6 @@ import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
 import JarvisAssistant from './JarvisAssistant';
 import DorcWidget from './DorcWidget';
-import AgentPanel from './AgentPanel';
 import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles, Command } from 'lucide-react';
 
 const TOP_MENUS = [
@@ -62,10 +61,10 @@ const TOP_MENUS = [
     name: 'AI Agents',
     icon: Sparkles,
     sub: [
-      { name: 'Procurement Agent', path: '#' },
-      { name: 'Sourcing Agent', path: '#' },
-      { name: 'Negotiation Agent', path: '#' },
-      { name: 'Operations Agent', path: '#' },
+      { name: 'Procurement Agent', path: '/client/ai-agents/procurement' },
+      { name: 'Sourcing Agent', path: '/client/ai-agents/sourcing' },
+      { name: 'Negotiation Agent', path: '/client/ai-agents/negotiation' },
+      { name: 'Operations Agent', path: '/client/ai-agents/operations' },
     ]
   },
 ];
@@ -192,66 +191,37 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                     }}>
                       {menu.sub.map((sub) => (
                         
-                          <div 
+                          
+                          <Link
                             key={sub.name}
-                            onClick={(e) => {
-                              if (menu.name === 'AI Agents') {
-                                e.preventDefault();
-                                setActiveAgent(sub.name);
-                                setHoveredMenu(null);
+                            href={sub.path}
+                            style={{
+                              padding: '10px 16px', borderRadius: '8px',
+                              color: pathname === sub.path ? '#2563eb' : '#475569',
+                              backgroundColor: pathname === sub.path ? '#eff6ff' : 'transparent',
+                              textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
+                              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                              transition: 'all 0.1s'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (pathname !== sub.path) {
+                                (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
+                                (e.currentTarget as HTMLElement).style.color = '#0f172a';
                               }
                             }}
+                            onMouseLeave={(e) => {
+                              if (pathname !== sub.path) {
+                                (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                                (e.currentTarget as HTMLElement).style.color = '#475569';
+                              }
+                            }}
+                            onClick={() => {
+                              setHoveredMenu(null);
+                            }}
                           >
-                            {menu.name === 'AI Agents' ? (
-                              <div
-                                style={{
-                                  padding: '10px 16px', borderRadius: '8px',
-                                  color: '#475569',
-                                  backgroundColor: 'transparent',
-                                  textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
-                                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                  transition: 'all 0.1s',
-                                  cursor: 'pointer'
-                                }}
-                                onMouseEnter={(e) => {
-                                  (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
-                                  (e.currentTarget as HTMLElement).style.color = '#0f172a';
-                                }}
-                                onMouseLeave={(e) => {
-                                  (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-                                  (e.currentTarget as HTMLElement).style.color = '#475569';
-                                }}
-                              >
-                                {sub.name}
-                              </div>
-                            ) : (
-                              <Link
-                                href={sub.path}
-                                style={{
-                                  padding: '10px 16px', borderRadius: '8px',
-                                  color: pathname === sub.path ? '#2563eb' : '#475569',
-                                  backgroundColor: pathname === sub.path ? '#eff6ff' : 'transparent',
-                                  textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
-                                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                  transition: 'all 0.1s'
-                                }}
-                                onMouseEnter={(e) => {
-                                  if (pathname !== sub.path) {
-                                    (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
-                                    (e.currentTarget as HTMLElement).style.color = '#0f172a';
-                                  }
-                                }}
-                                onMouseLeave={(e) => {
-                                  if (pathname !== sub.path) {
-                                    (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-                                    (e.currentTarget as HTMLElement).style.color = '#475569';
-                                  }
-                                }}
-                              >
-                                {sub.name}
-                              </Link>
-                            )}
-                          </div>
+                            {sub.name}
+                          </Link>
+
 
                       ))}
                     </div>
@@ -393,7 +363,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       </div>
       
       
-      <AgentPanel agentName={activeAgent} onClose={() => setActiveAgent(null)} />
       <DorcWidget />
 
       <CartOverlay />
