@@ -115,7 +115,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <IntakeProvider>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
         
         {currentUser?.isImpersonating && (
           <div style={{ background: '#f97316', color: '#fff', padding: '8px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', fontWeight: 700, zIndex: 999999, position: 'relative' }}>
@@ -129,7 +129,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
         )}
 
-        <div className="mobile-p-16" style={{ height: '64px', backgroundColor: '#071330', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'relative', zIndex: 100 }}>
+        <div className="mobile-p-16" style={{ height: '64px', backgroundColor: '#071330', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'sticky', top: 0, zIndex: 100 }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
             <Link href="/client" style={{ color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -296,7 +296,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           }} />
         )}
 
-        <div style={{ flex: 1, overflow: 'auto', position: 'relative', zIndex: 10 }}>
+        <div style={{ flex: 1, position: 'relative', zIndex: 10 }}>
           {children}
         </div>
       </div>
@@ -312,3 +312,5 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     </IntakeProvider>
   );
 }
+
+
