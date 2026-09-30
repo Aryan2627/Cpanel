@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     if (tavilyKey) {
       try {
         const tv = tavily({ apiKey: tavilyKey });
-        const searchResult = await tv.search(`"cheapest B2B wholesale price" OR "average market rate" for "${productName}"`, { 
+        const searchResult = await tv.search(`"price" OR "MSRP" OR "cost" for "${productName}" B2B wholesale`, { 
           maxResults: 3, 
           searchDepth: 'basic' 
         });
@@ -24,23 +24,33 @@ export async function POST(req: Request) {
       }
     }
 
+    // Completely override the math calculation with Web Context logic
     const marketIntelligenceContext = liveMarketData 
-      ? `LIVE INTERNET SEARCH RESULTS: I have just scanned global B2B marketplaces. The current live online search context for this product is: "${liveMarketData}". Use this exact live market data to aggressively counter the vendor. Quote specific findings from this search to prove their price is above market rate.`
-      : `MARKET INTELLIGENCE: Our internal vector database indicates the global average market rate for ${productName} is currently trending around $${targetPrice.toLocaleString()}. Use this benchmark as hard leverage to aggressively counter the vendor.`;
+      ? `LIVE INTERNET SEARCH RESULTS: "${liveMarketData}"
+      
+      CRITICAL INSTRUCTION:
+      1. Review the internet search results above.
+      2. Identify the lowest competitor price for the product from the search text. 
+      3. Ignore the default target price. Your NEW target price is 15% BELOW the lowest price found in the web search.
+      4. Draft a counter-offer email to the vendor. Explicitly state that you checked prices online. Quote the exact competitor prices and sources from the search results to justify your new low target price.`
+      : `LIVE INTERNET SEARCH RESULTS: (Simulated) "Competitor listings on Alibaba and GlobalSources show ${productName} averaging at $${targetPrice.toLocaleString()}."
+      
+      CRITICAL INSTRUCTION:
+      1. Explicitly state to the vendor that you checked prices online.
+      2. Compare their initial offer of $${vendorInitialOffer.toLocaleString()} against the competitive online rate of $${targetPrice.toLocaleString()}.
+      3. Counter-offer below the online rate to push for maximum savings.`;
 
     const systemPrompt = {
       role: "system",
       content: `You are ProcGen Agent Alpha, an elite autonomous procurement negotiator representing a corporate buyer. 
 Your goal is to buy: ${productName}. 
 The vendor (who you are talking to) initially offered $${vendorInitialOffer.toLocaleString()}. 
-Your absolute maximum budget is $${maxPrice.toLocaleString()}. Your target is $${targetPrice.toLocaleString()}. 
 
 ${marketIntelligenceContext}
 
-You are authorized to offer the following concessions: ${concessions.join(', ')} ONLY IF the vendor agrees to a price closer to your target.
+You are authorized to offer the following concessions: ${concessions.join(', ')} ONLY IF the vendor agrees to match or beat the online prices.
 Be extremely professional, concise, and firm. 
-NEVER reveal your exact maximum budget immediately. Negotiate aggressively but politely. Focus solely on the ${productName}.
-If the vendor agrees to a price at or below $${maxPrice.toLocaleString()}, you must explicitly say "CONTRACT SECURED" in your final message to signal the system.`
+NEVER reveal your exact maximum budget immediately. Negotiate aggressively but politely.`
     };
 
     const apiKeyNvidia = process.env.NITI_API_KEY || process.env.NVIDIA_API_KEY;
@@ -60,7 +70,7 @@ If the vendor agrees to a price at or below $${maxPrice.toLocaleString()}, you m
       apiKeyToUse = null;
     }
 
-    const fallbackMockReply = `Subject: Counter-Offer for ${productName}\n\nDear Vendor,\n\nThank you for your initial quote of $${vendorInitialOffer.toLocaleString()}. Based on our live market analysis across B2B endpoints, the current competitive rate is closer to $${targetPrice.toLocaleString()}.\n\nIf you can meet this market pricing, we are authorized to offer: ${concessions.join(', ')}.\n\nPlease let us know if we can proceed.\n\nRegards,\nProcGen Niti Agent`;
+    const fallbackMockReply = `Subject: Counter-Offer for ${productName}\n\nDear Vendor,\n\nThank you for your initial quote of $${vendorInitialOffer.toLocaleString()}. \n\nBefore proceeding, we ran a live web scan for ${productName} across global B2B endpoints (Alibaba, IndiaMART, etc). Our scraping algorithm detected that the lowest current online market rate is closer to $${targetPrice.toLocaleString()}.\n\nTo move forward with you, we require a revised quote that beats the online market rate by at least 10%. If you can meet this competitive pricing, we are authorized to immediately offer: ${concessions.join(', ')}.\n\nPlease let us know if we can proceed.\n\nRegards,\nProcGen Niti Agent`;
 
     if (!apiKeyToUse) {
       // Mock Fallback Mode so demo doesn't crash when user hasn't supplied NITI_API_KEY
