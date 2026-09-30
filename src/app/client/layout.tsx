@@ -106,7 +106,18 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   };
 
   if (currentUser && currentUser.licenseStatus === 'Expired') {
+    
+  // STRICT UI LEAK PREVENTION: Wait for user profile to load before rendering the layout
+  if (currentUser === null) {
     return (
+      <div style={{ height: '100vh', width: '100vw', backgroundColor: '#030712', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '16px' }}>
+         <div className="animate-pulse" style={{ color: '#38bdf8', fontSize: '1.2rem', fontWeight: 600, letterSpacing: '2px' }}>INITIALIZING SYSTEM</div>
+         <div className="animate-spin" style={{ width: '40px', height: '40px', border: '3px solid rgba(56, 189, 248, 0.1)', borderTop: '3px solid #38bdf8', borderRadius: '50%' }}></div>
+      </div>
+    );
+  }
+
+return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #071330, #0d1f4f)', color: '#fff', flexDirection: 'column', fontFamily: 'system-ui', textAlign: 'center', padding: '24px' }}>
         <Shield size={64} color="#fca5a5" style={{ marginBottom: '24px' }} />
         <h1 style={{ fontSize: '2rem', marginBottom: '12px', fontWeight: 700 }}>License Expired</h1>
