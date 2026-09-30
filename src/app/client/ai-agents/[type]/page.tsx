@@ -1,7 +1,7 @@
 
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Zap, Play, CheckCircle2, Loader2, Database, Search, ShieldAlert, Cpu, Globe, ArrowRight, Activity, Mail, MapPin, Building, AlertTriangle, TrendingUp, Bot } from 'lucide-react';
+import { Zap, Play, CheckCircle2, Loader2, Database, Search, ShieldAlert, Cpu, Globe, ArrowRight, Activity, Mail, MapPin, Building, AlertTriangle, TrendingUp, Bot, ExternalLink } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
 export default function FullScreenAgentPage() {
@@ -189,7 +189,7 @@ export default function FullScreenAgentPage() {
         setTaskSteps({ 0: 2, 1: 2, 2: 2 });
         setScanLogs(prev => ({ ...prev, [itemId]: [...(prev[itemId]||[]), 'Niti has formulated the optimal negotiation strategy.'] }));
         
-        setTaskResults(prev => ({ ...prev, [itemId]: { isNiti: true, reply: data.reply || data.error } }));
+        setTaskResults(prev => ({ ...prev, [itemId]: { isNiti: true, reply: data.reply || data.error, referenceUrl: data.referenceUrl } }));
       } catch (e) {
         console.error(e);
       } finally {
@@ -467,8 +467,13 @@ export default function FullScreenAgentPage() {
                               <div style={{ backgroundColor: '#0f172a', padding: '20px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', fontFamily: 'monospace', fontSize: '0.9rem', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
                                 {taskResults[item.id].reply}
                               </div>
-                              <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-                                <button style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>
+                              <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                {taskResults[item.id].referenceUrl && (
+                                  <a href={taskResults[item.id].referenceUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#a78bfa', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, backgroundColor: 'rgba(167, 139, 250, 0.1)', padding: '8px 16px', borderRadius: '6px' }}>
+                                    <ExternalLink size={14} /> View Reference Market Pricing
+                                  </a>
+                                )}
+                                <button style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', marginLeft: 'auto' }}>
                                   <Play size={16} /> Execute Auto-Email
                                 </button>
                               </div>

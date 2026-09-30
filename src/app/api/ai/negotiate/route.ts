@@ -6,14 +6,13 @@ export async function POST(req: Request) {
     const { messages, context } = await req.json();
     let { productName, targetPrice, maxPrice, concessions, vendorInitialOffer } = context;
 
-    // Fix negative values from test database data
     vendorInitialOffer = Math.abs(vendorInitialOffer);
     targetPrice = Math.abs(targetPrice);
     maxPrice = Math.abs(maxPrice);
 
-    // 1. Live Market Pricing Intelligence via Tavily
     const tavilyKey = process.env.TAVILY_API_KEY;
     let liveMarketData = '';
+    let referenceUrl = `https://dir.indiamart.com/search.mp?ss=${encodeURIComponent(productName)}`;
 
     if (tavilyKey) {
       try {
@@ -24,12 +23,14 @@ export async function POST(req: Request) {
         });
         
         liveMarketData = searchResult.results.map(r => r.content).join(' ');
+        if (searchResult.results.length > 0) {
+          referenceUrl = searchResult.results[0].url;
+        }
       } catch (err) {
         console.error("Tavily search failed:", err);
       }
     }
 
-    // Completely override the math calculation with Web Context logic
     const marketIntelligenceContext = liveMarketData 
       ? `LIVE INTERNET SEARCH RESULTS: "${liveMarketData}"
       
@@ -81,9 +82,9 @@ NEVER reveal your exact maximum budget immediately. Negotiate aggressively but p
     const fallbackMockReply = `Subject: Counter-Offer for ${productName}\n\nDear Vendor,\n\nThank you for your initial quote of $${vendorInitialOffer.toLocaleString()}. \n\nBefore proceeding, we ran a live autonomous web scan for "${productName}" across global B2B endpoints. Our web scraping algorithm identified a direct competitor on IndiaMART offering the exact same specifications for $${mockCompetitorPrice}.\n\nTo move forward with you as our preferred vendor, we require a revised quote that beats the online market rate, bringing your price down to $${mockTarget}. If you can meet this competitive pricing, we are authorized to immediately offer: ${concessions.join(', ')}.\n\nPlease let us know if we can proceed.\n\nRegards,\nProcGen Niti Agent`;
 
     if (!apiKeyToUse) {
-      // Mock Fallback Mode so demo doesn't crash when user hasn't supplied NITI_API_KEY
       return NextResponse.json({ 
-        reply: fallbackMockReply + "\n\n*(Note: This is a simulated response. Because no NITI_API_KEY is configured in your environment variables, the AI and Web Search engines are bypassed to prevent a crash.)*"
+        reply: fallbackMockReply + "\n\n*(Note: This is a simulated response. Because no NITI_API_KEY is configured in your environment variables, the AI and Web Search engines are bypassed to prevent a crash.)*",
+        referenceUrl: referenceUrl
       });
     }
 
@@ -107,13 +108,15 @@ NEVER reveal your exact maximum budget immediately. Negotiate aggressively but p
       const err = await response.text();
       console.error("AI NEGOTIATION API ERROR:", err);
       return NextResponse.json({ 
-        reply: fallbackMockReply + "\n\n*(Note: API request failed. This is a simulated fallback response.)*"
+        reply: fallbackMockReply + "\n\n*(Note: API request failed. This is a simulated fallback response.)*",
+        referenceUrl: referenceUrl
       });
     }
 
     const data = await response.json();
     return NextResponse.json({ 
-      reply: data.choices[0].message.content 
+      reply: data.choices[0].message.content,
+      referenceUrl: referenceUrl
     });
 
   } catch (error) {
