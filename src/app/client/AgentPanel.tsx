@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState, useEffect } from 'react';
 import { X, Search, Activity, Handshake, Shield, Bot, Send, ArrowRight } from 'lucide-react';
@@ -43,6 +44,21 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
     }
   };
 
+  const getAgentFeatures = () => {
+    switch (agentName) {
+      case 'Procurement Agent':
+        return ['Requirement understanding', 'Supplier discovery', 'Supplier qualification', 'RFQ creation', 'RFQ distribution', 'Supplier follow-ups', 'Database search'];
+      case 'Sourcing Agent':
+        return ['Quote extraction', 'Quote comparison', 'Price benchmarking', 'Total-cost analysis', 'MOQ comparison', 'Payment-term comparison', 'Delivery comparison', 'Supplier score', 'Historical pricing', 'Recommendation'];
+      case 'Negotiation Agent':
+        return ['Negotiation strategy', 'Historical price analysis', 'Market benchmark', 'Target price', 'Counter-offer generation', 'Supplier communication', 'Negotiation tracking', 'Savings calculation'];
+      case 'Operations Agent':
+        return ['PO generation', 'PO tracking', 'Delivery tracking', 'Supplier reminders', 'Delay detection', 'GRN/invoice matching', 'Contract/SLA monitoring', 'Supplier performance', 'Risk alerts', 'Procurement analytics'];
+      default:
+        return [];
+    }
+  };
+
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -50,6 +66,13 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
     setInput('');
     setTimeout(() => {
       setMessages(prev => [...prev, { role: 'ai', content: `I have received your request regarding "${input}". I am processing it now...` }]);
+    }, 800);
+  };
+
+  const handleFeatureClick = (feature: string) => {
+    setMessages(prev => [...prev, { role: 'user', content: `Execute task: ${feature}` }]);
+    setTimeout(() => {
+      setMessages(prev => [...prev, { role: 'ai', content: `Initializing ${feature.toLowerCase()} protocol. Processing your request...` }]);
     }, 800);
   };
 
@@ -134,9 +157,27 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
               <Send size={20} />
             </button>
           </form>
-          <div style={{ display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
-            <span style={{ fontSize: '0.75rem', color: '#64748b', padding: '6px 12px', backgroundColor: '#f1f5f9', borderRadius: '20px', whiteSpace: 'nowrap', cursor: 'pointer' }}>Generate savings report</span>
-            <span style={{ fontSize: '0.75rem', color: '#64748b', padding: '6px 12px', backgroundColor: '#f1f5f9', borderRadius: '20px', whiteSpace: 'nowrap', cursor: 'pointer' }}>Suggest counter-offer</span>
+          
+          <div style={{ marginTop: '16px' }}>
+             <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Agent Capabilities</div>
+             <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', flexWrap: 'nowrap' }}>
+              {getAgentFeatures().map(feature => (
+                <span 
+                  key={feature} 
+                  onClick={() => handleFeatureClick(feature)}
+                  style={{ 
+                    fontSize: '0.75rem', color: '#475569', padding: '6px 12px', 
+                    backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0',
+                    borderRadius: '20px', whiteSpace: 'nowrap', cursor: 'pointer',
+                    transition: 'all 0.2s', fontWeight: 500
+                  }}
+                  onMouseOver={e => { e.currentTarget.style.backgroundColor = getAgentColor(); e.currentTarget.style.color = '#fff'; }}
+                  onMouseOut={e => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.color = '#475569'; }}
+                >
+                  {feature}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </div>
