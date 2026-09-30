@@ -473,7 +473,7 @@ export default function FullScreenAgentPage() {
                                     <ExternalLink size={14} /> View Reference Market Pricing
                                   </a>
                                 )}
-                                <button style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', marginLeft: 'auto' }}>
+                                <button onClick={() => handleExecuteAutoEmail(item)} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', marginLeft: 'auto' }}>
                                   <Play size={16} /> Execute Auto-Email
                                 </button>
                               </div>
