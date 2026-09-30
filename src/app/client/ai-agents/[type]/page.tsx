@@ -391,7 +391,7 @@ export default function FullScreenAgentPage() {
                                   onClick={() => handleRunTask(item.id)}
                                   style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: 'linear-gradient(135deg, #2563eb, #7c3aed)', color: '#fff', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)', transition: 'transform 0.2s', textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}
                                 >
-                                  <Play size={14} /> Run Sourcing in {location}
+                                  <Play size={14} /> {agentName === 'Negotiation Agent' ? 'Generate Negotiation Strategy' : `Run Sourcing in ${location}`}
                                 </button>
                               )}
                               {isProcessing && !isDone && <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#3b82f6', fontSize: '0.85rem', fontWeight: 600 }}><Loader2 size={16} className="animate-spin" /> Scanning {location}...</div>}
