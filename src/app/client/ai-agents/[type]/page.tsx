@@ -64,9 +64,12 @@ export default function FullScreenAgentPage() {
           else if (agent === 'Operations Agent') title = d.poNumber ? `PO-${d.poNumber}` : `Order_${d.id.substring(0,6)}`;
 
           return { 
-            id: d.id, title, metric: 'Awaiting Run', progress: '0%', type: d.type || 'STANDARD',
-            date: new Date(d.createdAt || Date.now()).toLocaleDateString()
-          };
+              id: d.id, title, metric: 'Awaiting Run', progress: '0%', type: d.type || 'STANDARD',
+              date: new Date(d.createdAt || Date.now()).toLocaleDateString(),
+              amount: d.amount,
+              eventTitle: d.eventTitle,
+              vendorName: d.vendorName
+            };
         });
         if (formatted.length === 0) formatted.push({ id: 'demo-1', title: 'demo laptop', type: 'URGENT', date: new Date().toLocaleDateString() });
         setRealItems(formatted);
@@ -152,8 +155,50 @@ export default function FullScreenAgentPage() {
     setProcessingItems(prev => ({ ...prev, [itemId]: true }));
     setItemProgress(prev => ({ ...prev, [itemId]: '10%' }));
     setTaskSteps({ 0: 1, 1: 0, 2: 0 }); 
-    setScanLogs(prev => ({ ...prev, [itemId]: ['Initializing Anveshan cognitive engine...'] }));
 
+    if (agentName === 'Negotiation Agent') {
+      setScanLogs(prev => ({ ...prev, [itemId]: ['Initializing Niti negotiation engine...'] }));
+      try {
+        setTimeout(() => setScanLogs(prev => ({ ...prev, [itemId]: [...(prev[itemId]||[]), 'Analyzing supplier history and previous quotes...'] })), 400);
+        setTimeout(() => {
+          setItemProgress(prev => ({ ...prev, [itemId]: '40%' }));
+          setTaskSteps({ 0: 2, 1: 1, 2: 0 });
+          setScanLogs(prev => ({ ...prev, [itemId]: [...(prev[itemId]||[]), 'Cross-referencing global pricing benchmarks...'] }));
+        }, 1000);
+        setTimeout(() => setScanLogs(prev => ({ ...prev, [itemId]: [...(prev[itemId]||[]), 'Drafting strategic counter-offer...'] })), 2500);
+
+        const item = realItems.find(i => i.id === itemId);
+        const res = await fetch('/api/ai/negotiate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [{ role: 'user', content: `Draft a strict counter-offer email to ${item?.vendorName || 'this vendor'} pushing back on their price.` }],
+            context: {
+              productName: item?.eventTitle || 'Enterprise Hardware',
+              targetPrice: item?.amount ? item.amount * 0.80 : 85000,
+              maxPrice: item?.amount ? item.amount * 0.90 : 95000,
+              concessions: ["Net 60 Payment Terms", "Volume Commitment"],
+              vendorInitialOffer: item?.amount || 115000
+            }
+          })
+        });
+
+        const data = await res.json();
+
+        setItemProgress(prev => ({ ...prev, [itemId]: '100%' }));
+        setTaskSteps({ 0: 2, 1: 2, 2: 2 });
+        setScanLogs(prev => ({ ...prev, [itemId]: [...(prev[itemId]||[]), 'Niti has formulated the optimal negotiation strategy.'] }));
+        
+        setTaskResults(prev => ({ ...prev, [itemId]: { isNiti: true, reply: data.reply || data.error } }));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setProcessingItems(prev => ({ ...prev, [itemId]: false }));
+      }
+      return;
+    }
+
+    setScanLogs(prev => ({ ...prev, [itemId]: ['Initializing Anveshan cognitive engine...'] }));
     try {
       setTimeout(() => setScanLogs(prev => ({ ...prev, [itemId]: [...(prev[itemId]||[]), 'Parsing NLP intent from intake title...'] })), 400);
       setTimeout(() => {
@@ -166,9 +211,8 @@ export default function FullScreenAgentPage() {
       const res = await fetch('/api/agents/anveshan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ intakeId: itemId, location }) // Passing location to backend!
+        body: JSON.stringify({ intakeId: itemId, location })
       });
-      
       if (res.status === 402) {
         alert("Insufficient AI tokens. Please upgrade your license to run Anveshan.");
         throw new Error("Insufficient AI tokens");
@@ -408,7 +452,31 @@ export default function FullScreenAgentPage() {
                         </div>
 
                         {/* AI RESULTS */}
-                        {isDone && taskResults[item.id] && (
+                          {isDone && taskResults[item.id] && taskResults[item.id].isNiti && (
+                          <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '24px' }}>
+                            <div style={{ backgroundColor: 'rgba(167, 139, 250, 0.05)', border: '1px solid rgba(167, 139, 250, 0.2)', borderRadius: '12px', padding: '24px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                                <div style={{ backgroundColor: 'rgba(167, 139, 250, 0.2)', padding: '8px', borderRadius: '50%', color: '#a78bfa' }}>
+                                  <Bot size={24} />
+                                </div>
+                                <div>
+                                  <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#f8fafc' }}>Niti Generated Counter-Offer</div>
+                                  <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Targeted for {item.title}</div>
+                                </div>
+                              </div>
+                              <div style={{ backgroundColor: '#0f172a', padding: '20px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', fontFamily: 'monospace', fontSize: '0.9rem', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                                {taskResults[item.id].reply}
+                              </div>
+                              <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+                                <button style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>
+                                  <Play size={16} /> Execute Auto-Email
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {isDone && taskResults[item.id] && !taskResults[item.id].isNiti && (
                           <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '24px' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
                               
