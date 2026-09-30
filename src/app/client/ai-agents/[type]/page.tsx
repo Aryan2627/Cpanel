@@ -208,7 +208,9 @@ export default function FullScreenAgentPage() {
       <div style={{ backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0', padding: '32px 48px', backgroundImage: 'radial-gradient(circle at 90% 10%, rgba(241, 245, 249, 0.8) 0%, transparent 40%)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ display: 'flex', gap: '24px' }}>
-            <div style={{ width: '72px', height: '72px', borderRadius: '16px', backgroundColor: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', fontSize: '36px' }}>🔎</div>
+            <div style={{ width: '72px', height: '72px', borderRadius: '16px', backgroundColor: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', fontSize: '36px', overflow: 'hidden' }}>
+              {data.name === 'Anveshan' ? <img src="/anveshan-avatar.png" alt="Anveshan" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : data.name === 'Tark' ? '⚖️' : data.name === 'Niti' ? '🤝' : data.name === 'Garuda' ? '🦅' : '🤖'}
+            </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                 <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.5px' }}>{data.name}</h1>
