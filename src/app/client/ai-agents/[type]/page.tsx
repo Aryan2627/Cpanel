@@ -162,7 +162,11 @@ export default function FullScreenAgentPage() {
 
     } catch (err) {
       console.error("Task failed", err);
+      // PREVENT GETTING STUCK: Reset visual state if API completely fails/times out
+      setItemProgress(prev => ({ ...prev, [itemId]: '0%' }));
+      setTaskSteps({ 0: 0, 1: 0, 2: 0 }); 
       setProcessingItems(prev => ({ ...prev, [itemId]: false }));
+      alert("Error: The AI took too long to respond (Vercel Timeout) or the connection failed. Check your console for details.");
     }
   };
 
