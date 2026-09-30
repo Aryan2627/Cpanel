@@ -49,10 +49,10 @@ export async function POST(req: Request) {
           The buyer submitted this Intake Request: "${intake.title || 'General Equipment'}" (Type: ${intake.type}).
 
           Perform the following advanced tasks:
-          1. Extract 3-5 core search keywords.
-          2. Act as a Historical Vector Database: Write a 2-sentence "marketAnalysis" warning about historical lead times or risks for this specific category.
-          3. Act as a Web Scraper: Invent 2 realistic "webDiscoveries" (new global vendors not in our DB) that could fulfill this. Give them a name, url, and reason.
-          4. Draft a short, highly professional RFI (Request for Information) email to send to these vendors.
+          1. Extract 3-5 core search keywords representing the product/service needed.
+          2. Act as a Historical Vector Database: Write a 2-sentence "marketAnalysis" warning about historical lead times or risks for this specific product category.
+          3. Global Sourcing Expert: Using your vast knowledge of real-world global supply chains, identify 2 ACTUAL, REAL-WORLD global suppliers or manufacturers that specialize in providing exactly what the buyer is asking for. Do NOT invent these. Provide their actual company names and their actual real-world website URLs. (e.g., if they ask for enterprise laptops, return real companies like Dell, Lenovo, or CDW).
+          4. Draft a short, highly professional RFI (Request for Information) email to send to these global vendors.
 
           Return ONLY a valid JSON object matching this exact schema:
           {
