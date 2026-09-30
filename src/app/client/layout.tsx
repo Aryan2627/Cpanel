@@ -154,7 +154,19 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   return (
     <SessionContext.Provider value={{ session: currentUser, loading: currentUser === null }}>
             <IntakeProvider>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: isAgenticOnly ? '#030712' : '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
+        {isAgenticOnly && (
+          <style dangerouslySetInnerHTML={{__html: `
+            body { 
+              background-color: #030712 !important; 
+              background-image: 
+                radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.04), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(167, 139, 250, 0.04), transparent 25%) !important;
+              background-attachment: fixed !important;
+              color: #f8fafc !important;
+            }
+          `}} />
+        )}
         
         {currentUser?.isImpersonating && (
           <div style={{ background: '#f97316', color: '#fff', padding: '8px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', fontWeight: 700, zIndex: 999999, position: 'relative' }}>
@@ -168,7 +180,16 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
         )}
 
-        <div className="mobile-p-16" style={{ height: '64px', backgroundColor: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div className="mobile-p-16" style={{ 
+          height: '64px', 
+          backgroundColor: isAgenticOnly ? 'rgba(9, 9, 11, 0.6)' : '#0f172a', 
+          backdropFilter: isAgenticOnly ? 'blur(16px)' : 'none',
+          WebkitBackdropFilter: isAgenticOnly ? 'blur(16px)' : 'none',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+          padding: '0 24px', 
+          borderBottom: isAgenticOnly ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.05)', 
+          position: 'sticky', top: 0, zIndex: 100 
+        }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
             <Link href="/client" style={{ color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -331,45 +352,34 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         {mobileMenuOpen && (
           <div style={{ position: 'absolute', top: '64px', left: 0, width: '100%', background: '#0f172a', zIndex: 9999, borderBottom: '1px solid rgba(255,255,255,0.1)', maxHeight: 'calc(100vh - 64px)', overflowY: 'auto' }}>
             <div style={{ display: 'flex', flexDirection: 'column', padding: '16px' }}>
-              {displayMenus.map(menu => (
-                <div key={menu.name} style={{ marginBottom: '8px' }}>
-                  <Link href={menu.path || '#'} onClick={() => { if(!menu.sub) setMobileMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', color: '#fff', textDecoration: 'none', fontWeight: 600, borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }}>
-                    <menu.icon size={18} /> {menu.name}
-                  </Link>
-                  {menu.sub && (
-                    <div style={{ paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
-                      {menu.sub.map(sub => (
-                        
-                        <div 
-                          key={sub.name}
-                          onClick={(e) => {
-                            if (menu.name === 'AI Agents') {
-                              e.preventDefault();
-                              setActiveAgent(sub.name);
-                              setHoveredMenu(null);
-                            } else {
-                              setMobileMenuOpen(false);
-                            }
-                          }}
-                        >
-                          {menu.name === 'AI Agents' ? (
-                            <div style={{ padding: '10px', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', display: 'block', cursor: 'pointer' }}>
-                              {sub.name}
-                            </div>
-                          ) : (
-                            <Link href={sub.path} style={{ padding: '10px', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', display: 'block' }}>
-                              {sub.name}
-                            </Link>
-                          )}
-                        </div>
-
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+              {isAgenticOnly ? (
+                <>
+                  <Link href="/client/ai-agents/procurement" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px', color: pathname.includes('procurement') ? '#38bdf8' : '#fff', textDecoration: 'none', fontWeight: 600, background: pathname.includes('procurement') ? 'rgba(56, 189, 248, 0.1)' : 'transparent', borderRadius: '8px', marginBottom: '8px' }}>Anveshan AI (Sourcing)</Link>
+                  <Link href="/client/ai-agents/risk" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px', color: pathname.includes('risk') ? '#f87171' : '#fff', textDecoration: 'none', fontWeight: 600, background: pathname.includes('risk') ? 'rgba(248, 113, 113, 0.1)' : 'transparent', borderRadius: '8px', marginBottom: '8px' }}>Tark AI (Risk)</Link>
+                  <Link href="/client/ai-agents/contracts" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px', color: pathname.includes('contracts') ? '#a78bfa' : '#fff', textDecoration: 'none', fontWeight: 600, background: pathname.includes('contracts') ? 'rgba(167, 139, 250, 0.1)' : 'transparent', borderRadius: '8px', marginBottom: '8px' }}>Niti AI (Contracts)</Link>
+                  <Link href="/client/ai-agents/operations" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px', color: pathname.includes('operations') ? '#34d399' : '#fff', textDecoration: 'none', fontWeight: 600, background: pathname.includes('operations') ? 'rgba(52, 211, 153, 0.1)' : 'transparent', borderRadius: '8px', marginBottom: '8px' }}>Garuda AI (Delivery)</Link>
+                </>
+              ) : (
+                displayMenus.map(menu => (
+                  <div key={menu.name} style={{ marginBottom: '8px' }}>
+                    <Link href={menu.path || '#'} onClick={() => { if(!menu.sub) setMobileMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', color: '#fff', textDecoration: 'none', fontWeight: 600, borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }}>
+                      <menu.icon size={20} />
+                      {menu.name}
+                    </Link>
+                    {menu.sub && (
+                      <div style={{ paddingLeft: '44px', display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+                        {menu.sub.map(sub => (
+                          <Link key={sub.name} href={sub.path} onClick={() => setMobileMenuOpen(false)} style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.95rem' }}>
+                            {sub.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+              </div>
             </div>
-          </div>
         )}
 
         {/* The Absolute Backdrop Blur for Cinematic Nav effect */}
@@ -401,5 +411,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
 
 
+
+
+    // Global Agentic Mode Redirect
+    useEffect(() => {
+      if (isAgenticOnly && pathname && !pathname.startsWith('/client/ai-agents') && !pathname.startsWith('/client/cortex')) {
+        router.push('/client/ai-agents/procurement');
+      }
+    }, [isAgenticOnly, pathname, router]);
 
 
