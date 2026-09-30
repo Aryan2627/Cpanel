@@ -191,32 +191,68 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                       display: 'flex', flexDirection: 'column', gap: '4px'
                     }}>
                       {menu.sub.map((sub) => (
-                        <Link
-                          key={sub.name}
-                          href={sub.path}
-                          style={{
-                            padding: '10px 16px', borderRadius: '8px',
-                            color: pathname === sub.path ? '#2563eb' : '#475569',
-                            backgroundColor: pathname === sub.path ? '#eff6ff' : 'transparent',
-                            textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
-                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                            transition: 'all 0.1s'
-                          }}
-                          onMouseEnter={(e) => {
-                            if (pathname !== sub.path) {
-                              (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
-                              (e.currentTarget as HTMLElement).style.color = '#0f172a';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (pathname !== sub.path) {
-                              (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-                              (e.currentTarget as HTMLElement).style.color = '#475569';
-                            }
-                          }}
-                        >
-                          {sub.name}
-                        </Link>
+                        
+                          <div 
+                            key={sub.name}
+                            onClick={(e) => {
+                              if (menu.name === 'AI Agents') {
+                                e.preventDefault();
+                                setActiveAgent(sub.name);
+                                setHoveredMenu(null);
+                              }
+                            }}
+                          >
+                            {menu.name === 'AI Agents' ? (
+                              <div
+                                style={{
+                                  padding: '10px 16px', borderRadius: '8px',
+                                  color: '#475569',
+                                  backgroundColor: 'transparent',
+                                  textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
+                                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                  transition: 'all 0.1s',
+                                  cursor: 'pointer'
+                                }}
+                                onMouseEnter={(e) => {
+                                  (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
+                                  (e.currentTarget as HTMLElement).style.color = '#0f172a';
+                                }}
+                                onMouseLeave={(e) => {
+                                  (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                                  (e.currentTarget as HTMLElement).style.color = '#475569';
+                                }}
+                              >
+                                {sub.name}
+                              </div>
+                            ) : (
+                              <Link
+                                href={sub.path}
+                                style={{
+                                  padding: '10px 16px', borderRadius: '8px',
+                                  color: pathname === sub.path ? '#2563eb' : '#475569',
+                                  backgroundColor: pathname === sub.path ? '#eff6ff' : 'transparent',
+                                  textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
+                                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                  transition: 'all 0.1s'
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (pathname !== sub.path) {
+                                    (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
+                                    (e.currentTarget as HTMLElement).style.color = '#0f172a';
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (pathname !== sub.path) {
+                                    (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                                    (e.currentTarget as HTMLElement).style.color = '#475569';
+                                  }
+                                }}
+                              >
+                                {sub.name}
+                              </Link>
+                            )}
+                          </div>
+
                       ))}
                     </div>
                   )}
