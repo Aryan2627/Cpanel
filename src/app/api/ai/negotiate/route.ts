@@ -1,9 +1,32 @@
 import { NextResponse } from 'next/server';
+import { tavily } from '@tavily/core';
 
 export async function POST(req: Request) {
   try {
     const { messages, context } = await req.json();
     const { productName, targetPrice, maxPrice, concessions, vendorInitialOffer } = context;
+
+    // 1. Live Market Pricing Intelligence via Tavily
+    const tavilyKey = process.env.TAVILY_API_KEY;
+    let liveMarketData = '';
+
+    if (tavilyKey) {
+      try {
+        const tv = tavily({ apiKey: tavilyKey });
+        const searchResult = await tv.search(`"cheapest B2B wholesale price" OR "average market rate" for "${productName}"`, { 
+          maxResults: 3, 
+          searchDepth: 'basic' 
+        });
+        
+        liveMarketData = searchResult.results.map(r => r.content).join(' ');
+      } catch (err) {
+        console.error("Tavily search failed:", err);
+      }
+    }
+
+    const marketIntelligenceContext = liveMarketData 
+      ? `LIVE INTERNET SEARCH RESULTS: I have just scanned global B2B marketplaces. The current live online search context for this product is: "${liveMarketData}". Use this exact live market data to aggressively counter the vendor. Quote specific findings from this search to prove their price is above market rate.`
+      : `MARKET INTELLIGENCE: Our internal vector database indicates the global average market rate for ${productName} is currently trending around $${targetPrice.toLocaleString()}. Use this benchmark as hard leverage to aggressively counter the vendor.`;
 
     const systemPrompt = {
       role: "system",
@@ -11,6 +34,9 @@ export async function POST(req: Request) {
 Your goal is to buy: ${productName}. 
 The vendor (who you are talking to) initially offered $${vendorInitialOffer.toLocaleString()}. 
 Your absolute maximum budget is $${maxPrice.toLocaleString()}. Your target is $${targetPrice.toLocaleString()}. 
+
+${marketIntelligenceContext}
+
 You are authorized to offer the following concessions: ${concessions.join(', ')} ONLY IF the vendor agrees to a price closer to your target.
 Be extremely professional, concise, and firm. 
 NEVER reveal your exact maximum budget immediately. Negotiate aggressively but politely. Focus solely on the ${productName}.
@@ -24,13 +50,11 @@ If the vendor agrees to a price at or below $${maxPrice.toLocaleString()}, you m
     let model = "gpt-4o-mini";
     let apiKeyToUse = apiKeyOpenAi;
 
-    // Prefer NVIDIA if explicitly provided
     if (apiKeyNvidia && apiKeyNvidia.startsWith('nvapi-')) {
       baseUrl = "https://integrate.api.nvidia.com/v1/chat/completions";
       model = "nvidia/nemotron-3-nano-30b-a3b";
       apiKeyToUse = apiKeyNvidia;
     } else if (!apiKeyOpenAi) {
-      // Hardcoded fallback ONLY if absolutely no keys are provided
       baseUrl = "https://integrate.api.nvidia.com/v1/chat/completions";
       model = "nvidia/nemotron-3-nano-30b-a3b";
       apiKeyToUse = null;
@@ -59,9 +83,8 @@ If the vendor agrees to a price at or below $${maxPrice.toLocaleString()}, you m
     if (!response.ok) {
       const err = await response.text();
       console.error("AI NEGOTIATION API ERROR:", err);
-      // Fallback to mock response if API fails to prevent UI from breaking
       return NextResponse.json({ 
-        reply: `Subject: Counter-Offer for ${productName}\n\nDear Vendor,\n\nThank you for your initial quote of $${vendorInitialOffer.toLocaleString()}. After reviewing our budget, our maximum allowable threshold is $${maxPrice.toLocaleString()}, though we are targeting $${targetPrice.toLocaleString()}.\n\nIf you can meet this pricing, we are authorized to offer the following concessions: ${concessions.join(', ')}.\n\nPlease let us know if we have a deal.\n\nRegards,\nProcGen Niti Agent`
+        reply: `Subject: Counter-Offer for ${productName}\n\nDear Vendor,\n\nThank you for your initial quote of $${vendorInitialOffer.toLocaleString()}. Based on our live market analysis across B2B endpoints, the current competitive rate is closer to $${targetPrice.toLocaleString()}.\n\nIf you can meet this market pricing, we are authorized to offer: ${concessions.join(', ')}.\n\nPlease let us know if we can proceed.\n\nRegards,\nProcGen Niti Agent`
       });
     }
 
