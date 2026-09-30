@@ -133,7 +133,9 @@ return (
     try { 
       await fetch('/api/auth/logout', { method: 'POST' }); 
       const { signOut } = await import('next-auth/react'); 
-      await signOut({ redirect: true, callbackUrl: '/login' }); 
+      await signOut({ redirect: false }); 
+      localStorage.removeItem('auth_me_cache');
+      window.location.href = '/login'; 
     } catch(e) { 
       window.location.href = '/login'; 
     }
