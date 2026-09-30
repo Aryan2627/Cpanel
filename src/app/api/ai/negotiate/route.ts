@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const NVIDIA_API_KEY = "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";
+const NVIDIA_API_KEY = process.env.NITI_API_KEY || process.env.NVIDIA_API_KEY || process.env.OPENAI_API_KEY || "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";
 const BASE_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
 
 export async function POST(req: Request) {

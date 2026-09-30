@@ -130,9 +130,9 @@ export async function POST(req: Request) {
       }
     }
 
-    const nvidiaKey = process.env.NVIDIA_API_KEY;
-    const openaiKey = process.env.OPENAI_API_KEY;
-    const llmKey = nvidiaKey || openaiKey;
+    const specificKey = process.env.ANVESHAN_API_KEY;
+    const fallbackKey = process.env.NVIDIA_API_KEY || process.env.OPENAI_API_KEY;
+    const llmKey = specificKey || fallbackKey;
 
     if (llmKey && scrapingUsed) {
       const baseURL = nvidiaKey ? 'https://integrate.api.nvidia.com/v1' : undefined;

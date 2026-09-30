@@ -32,9 +32,9 @@ export async function POST(req: Request) {
       financialRisk: `Information scraped from reviews indicates standard operational flow.`
     };
 
-    const nvidiaKey = process.env.NVIDIA_API_KEY;
-    const openaiKey = process.env.OPENAI_API_KEY;
-    const llmKey = nvidiaKey || openaiKey;
+    const specificKey = process.env.TARK_API_KEY;
+    const fallbackKey = process.env.NVIDIA_API_KEY || process.env.OPENAI_API_KEY;
+    const llmKey = specificKey || fallbackKey;
 
     if (llmKey) {
       const baseURL = nvidiaKey ? 'https://integrate.api.nvidia.com/v1' : undefined;
