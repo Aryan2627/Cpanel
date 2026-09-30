@@ -456,8 +456,8 @@ export default function FullScreenAgentPage() {
                           <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '24px' }}>
                             <div style={{ backgroundColor: 'rgba(167, 139, 250, 0.05)', border: '1px solid rgba(167, 139, 250, 0.2)', borderRadius: '12px', padding: '24px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                                <div style={{ backgroundColor: 'rgba(167, 139, 250, 0.2)', padding: '8px', borderRadius: '50%', color: '#a78bfa' }}>
-                                  <Bot size={24} />
+                                <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', border: '2px solid rgba(167, 139, 250, 0.5)', flexShrink: 0, boxShadow: '0 0 15px rgba(167, 139, 250, 0.3)' }}>
+                                  <img src="/niti-avatar.jpg" alt="Niti" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
                                 <div>
                                   <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#f8fafc' }}>Niti Generated Counter-Offer</div>
