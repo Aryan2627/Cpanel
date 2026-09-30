@@ -9,6 +9,7 @@ import SpotlightSearch from './SpotlightSearch';
 import CartOverlay from './CartOverlay';
 import JarvisAssistant from './JarvisAssistant';
 import DorcWidget from './DorcWidget';
+import AgentWorkspace from './AgentWorkspace';
 import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles, Command } from 'lucide-react';
 
 const TOP_MENUS = [
@@ -57,6 +58,16 @@ const TOP_MENUS = [
       { name: 'Payments Due', path: '/client/license/expiry/payments' },
     ]
   },
+  {
+    name: 'AI Agents',
+    icon: Sparkles,
+    sub: [
+      { name: 'Procurement Agent', path: '#' },
+      { name: 'Sourcing Agent', path: '#' },
+      { name: 'Negotiation Agent', path: '#' },
+      { name: 'Operations Agent', path: '#' },
+    ]
+  },
 ];
 
 
@@ -67,6 +78,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // Track which dropdown is open
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
+  const [activeAgent, setActiveAgent] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -298,9 +310,30 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   {menu.sub && (
                     <div style={{ paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
                       {menu.sub.map(sub => (
-                        <Link key={sub.name} href={sub.path} onClick={() => setMobileMenuOpen(false)} style={{ padding: '10px', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', display: 'block' }}>
-                          {sub.name}
-                        </Link>
+                        
+                        <div 
+                          key={sub.name}
+                          onClick={(e) => {
+                            if (menu.name === 'AI Agents') {
+                              e.preventDefault();
+                              setActiveAgent(sub.name);
+                              setHoveredMenu(null);
+                            } else {
+                              setMobileMenuOpen(false);
+                            }
+                          }}
+                        >
+                          {menu.name === 'AI Agents' ? (
+                            <div style={{ padding: '10px', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', display: 'block', cursor: 'pointer' }}>
+                              {sub.name}
+                            </div>
+                          ) : (
+                            <Link href={sub.path} style={{ padding: '10px', color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', display: 'block' }}>
+                              {sub.name}
+                            </Link>
+                          )}
+                        </div>
+
                       ))}
                     </div>
                   )}
@@ -324,6 +357,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       </div>
       
       
+      <AgentWorkspace agentName={activeAgent} onClose={() => setActiveAgent(null)} />
       <DorcWidget />
 
       <CartOverlay />
