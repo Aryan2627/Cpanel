@@ -203,8 +203,24 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               <img src="/logo.png" alt="ProcGen Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
             </Link>
 
-            <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {displayMenus.map((menu) => (
+            <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: isAgenticOnly ? '12px' : '4px' }}>
+              {isAgenticOnly ? (
+                <>
+                  <Link href="/client/ai-agents/procurement" style={{ padding: '8px 16px', borderRadius: '24px', background: pathname.includes('procurement') ? 'rgba(56, 189, 248, 0.15)' : 'transparent', border: pathname.includes('procurement') ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid transparent', color: pathname.includes('procurement') ? '#38bdf8' : 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+                    Anveshan AI (Sourcing)
+                  </Link>
+                  <Link href="/client/ai-agents/risk" style={{ padding: '8px 16px', borderRadius: '24px', background: pathname.includes('risk') ? 'rgba(248, 113, 113, 0.15)' : 'transparent', border: pathname.includes('risk') ? '1px solid rgba(248, 113, 113, 0.3)' : '1px solid transparent', color: pathname.includes('risk') ? '#f87171' : 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+                    Tark AI (Risk)
+                  </Link>
+                  <Link href="/client/ai-agents/contracts" style={{ padding: '8px 16px', borderRadius: '24px', background: pathname.includes('contracts') ? 'rgba(167, 139, 250, 0.15)' : 'transparent', border: pathname.includes('contracts') ? '1px solid rgba(167, 139, 250, 0.3)' : '1px solid transparent', color: pathname.includes('contracts') ? '#a78bfa' : 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+                    Niti AI (Contracts)
+                  </Link>
+                  <Link href="/client/ai-agents/operations" style={{ padding: '8px 16px', borderRadius: '24px', background: pathname.includes('operations') ? 'rgba(52, 211, 153, 0.15)' : 'transparent', border: pathname.includes('operations') ? '1px solid rgba(52, 211, 153, 0.3)' : '1px solid transparent', color: pathname.includes('operations') ? '#34d399' : 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+                    Garuda AI (Delivery)
+                  </Link>
+                </>
+              ) : (
+                displayMenus.map((menu) => (
                 <div 
                   key={menu.name}
                   onMouseEnter={() => setHoveredMenu(menu.name)}
@@ -241,47 +257,27 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                       display: 'flex', flexDirection: 'column', gap: '4px'
                     }}>
                       {menu.sub.map((sub) => (
-                        
-                          
                           <Link
                             key={sub.name}
                             href={sub.path}
-                            style={{
-                              padding: '10px 16px', borderRadius: '8px',
-                              color: pathname === sub.path ? '#2563eb' : '#475569',
-                              backgroundColor: pathname === sub.path ? '#eff6ff' : 'transparent',
-                              textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600,
-                              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                              transition: 'all 0.1s'
-                            }}
-                            onMouseEnter={(e) => {
-                              if (pathname !== sub.path) {
-                                (e.currentTarget as HTMLElement).style.backgroundColor = '#f8fafc';
-                                (e.currentTarget as HTMLElement).style.color = '#0f172a';
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (pathname !== sub.path) {
-                                (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-                                (e.currentTarget as HTMLElement).style.color = '#475569';
-                              }
-                            }}
-                            onClick={() => {
-                              setHoveredMenu(null);
+                            onClick={() => setHoveredMenu(null)}
+                            style={{ 
+                              padding: '10px 12px', borderRadius: '8px', color: '#334155', 
+                              textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500,
+                              display: 'flex', alignItems: 'center', gap: '8px',
+                              backgroundColor: pathname === sub.path ? '#f1f5f9' : 'transparent',
+                              transition: 'all 0.2s'
                             }}
                           >
+                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: pathname === sub.path ? '#2563eb' : '#cbd5e1' }} />
                             {sub.name}
                           </Link>
-
-
                       ))}
                     </div>
                   )}
                 </div>
-              ))}
-              
-              <TourButton />
-              
+              ))
+              )}
             </nav>
           </div>
 
