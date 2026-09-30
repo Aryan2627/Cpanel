@@ -1,7 +1,6 @@
-
 'use client';
 import React, { useState, useEffect } from 'react';
-import { X, Search, Activity, Handshake, Shield, Bot, Send, ArrowRight } from 'lucide-react';
+import { X, Zap } from 'lucide-react';
 
 interface AgentPanelProps {
   agentName: string | null;
@@ -10,84 +9,97 @@ interface AgentPanelProps {
 
 export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<{role: string, content: string}[]>([]);
-  const [input, setInput] = useState('');
+  const [activeTab, setActiveTab] = useState('Active Tasks');
 
   useEffect(() => {
     if (agentName) {
       setIsOpen(true);
-      setMessages([
-        { role: 'ai', content: `Hello! I am your ${agentName} commander. Which of my sub-agents would you like to deploy today?` }
-      ]);
+      setActiveTab('Active Tasks');
     } else {
       setIsOpen(false);
     }
   }, [agentName]);
 
-  const getAgentColor = () => {
-    switch (agentName) {
-      case 'Procurement Agent': return '#3b82f6';
-      case 'Sourcing Agent': return '#6366f1';
-      case 'Negotiation Agent': return '#10b981';
-      case 'Operations Agent': return '#f59e0b';
-      default: return '#334155';
+  // Mock Data based on the agent
+  const getAgentData = () => {
+    if (agentName === 'Procurement Agent') {
+      return {
+        name: 'Anveshan',
+        role: 'The Discoverer',
+        tag: 'STAGE 1 • DISCOVERY',
+        purpose: 'Scours global databases to find exactly what you need based on unstructured requirements.',
+        tasks: [
+          { title: 'Parse incoming requisitions', desc: 'across all departments and cost centers' },
+          { title: 'Identify capable suppliers', desc: 'by category, compliance score, and region' },
+          { title: 'Rank by qualification score', desc: 'and assign outreach priority' }
+        ],
+        tabs: ['Active Tasks', 'Market Intelligence', 'Risk Reports'],
+        items: [
+          { title: 'Acme Corp Profile', metric: '94% Match', pill: 'Gold Tier ↑', progress: '85%' },
+          { title: 'Globex Industrial', metric: '88% Match', progress: '69%' },
+          { title: 'Stark Manufacturing', metric: '82% Match', progress: '54%' },
+          { title: 'Wayne Enterprises', metric: '76% Match', progress: '41%' }
+        ]
+      };
+    } else if (agentName === 'Sourcing Agent') {
+      return {
+        name: 'Tark',
+        role: 'The Analyst',
+        tag: 'STAGE 2 • ANALYTICAL',
+        purpose: 'Crunches the numbers to find the best total-cost trade-offs and normalizes quotes.',
+        tasks: [
+          { title: 'Extract pricing from PDFs', desc: 'across all incoming vendor quotes' },
+          { title: 'Normalize line items', desc: 'by unit, currency, and MOQ' },
+          { title: 'Rank by total cost', desc: 'including freight and payment terms' }
+        ],
+        tabs: ['Active Tasks', 'Cost Breakdowns', 'Anomalies'],
+        items: [
+          { title: 'quote_acme_v2.pdf', metric: '100% Extracted', pill: 'Verified', progress: '100%' },
+          { title: 'globex_pricing_2026.xlsx', metric: '98% Extracted', progress: '98%' },
+          { title: 'stark_initial_bid.pdf', metric: '92% Extracted', progress: '92%' },
+          { title: 'email_wayne_offer.msg', metric: '85% Extracted', progress: '85%' }
+        ]
+      };
+    } else if (agentName === 'Negotiation Agent') {
+      return {
+        name: 'Niti',
+        role: 'The Strategist',
+        tag: 'STAGE 3 • EXECUTION',
+        purpose: 'Pushes back on supplier pricing and secures optimal net-60 payment terms.',
+        tasks: [
+          { title: 'Analyze historical spend', desc: 'to establish baseline target pricing' },
+          { title: 'Generate counter-offers', desc: 'using market benchmarks and leverage' },
+          { title: 'Draft and send emails', desc: 'directly to vendor sales reps' }
+        ],
+        tabs: ['Active Tasks', 'Savings Realized', 'Counter-offers'],
+        items: [
+          { title: 'Acme Corp Renewal', metric: '₹1.2M Saved', pill: 'Closed Won', progress: '100%' },
+          { title: 'Globex Bulk Order', metric: '₹450K Pending', progress: '70%' },
+          { title: 'Stark Logistics SLA', metric: 'In Review', progress: '50%' }
+        ]
+      };
+    } else {
+      return {
+        name: 'Garuda',
+        role: 'The Tracker',
+        tag: 'STAGE 4 • OPERATIONS',
+        purpose: 'Watches your POs and invoices like a hawk to ensure timely delivery and exact matching.',
+        tasks: [
+          { title: 'Monitor ERP sync', desc: 'for all approved Purchase Orders' },
+          { title: 'Track live delivery status', desc: 'and ping suppliers if delayed' },
+          { title: 'Perform 3-way match', desc: 'between PO, GRN, and Invoice' }
+        ],
+        tabs: ['Active Tasks', 'Invoice Matches', 'Risk Alerts'],
+        items: [
+          { title: 'PO-9921 (Acme)', metric: 'On Time', pill: 'Matched', progress: '100%' },
+          { title: 'PO-9922 (Globex)', metric: 'Delayed 2 Days', progress: '60%' },
+          { title: 'PO-9925 (Stark)', metric: 'Invoice Mismatch', progress: '30%' }
+        ]
+      };
     }
   };
 
-  const getAgentIcon = () => {
-    switch (agentName) {
-      case 'Procurement Agent': return <Search size={20} />;
-      case 'Sourcing Agent': return <Activity size={20} />;
-      case 'Negotiation Agent': return <Handshake size={20} />;
-      case 'Operations Agent': return <Shield size={20} />;
-      default: return <Bot size={20} />;
-    }
-  };
-
-  const getSubAgents = () => {
-    switch (agentName) {
-      case 'Procurement Agent':
-        return [
-          { name: 'Anveshan', role: 'The Discoverer', icon: '🔎' },
-          { name: 'Pramaan', role: 'The Validator', icon: '🛡️' }
-        ];
-      case 'Sourcing Agent':
-        return [
-          { name: 'Drishti', role: 'The Lens', icon: '👁️' },
-          { name: 'Tark', role: 'The Analyst', icon: '🧠' }
-        ];
-      case 'Negotiation Agent':
-        return [
-          { name: 'Doot', role: 'The Envoy', icon: '📜' },
-          { name: 'Niti', role: 'The Strategist', icon: '♟️' }
-        ];
-      case 'Operations Agent':
-        return [
-          { name: 'Garuda', role: 'The Swift Tracker', icon: '🦅' },
-          { name: 'Rakshak', role: 'The Sentinel', icon: '⚔️' },
-          { name: 'Setu', role: 'The Matcher', icon: '🌉' }
-        ];
-      default:
-        return [];
-    }
-  };
-
-  const handleSend = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-    setMessages(prev => [...prev, { role: 'user', content: input }]);
-    setInput('');
-    setTimeout(() => {
-      setMessages(prev => [...prev, { role: 'ai', content: `I have received your request regarding "${input}". Routing to the appropriate sub-agent...` }]);
-    }, 800);
-  };
-
-  const handleSubAgentClick = (subAgent: any) => {
-    setMessages(prev => [...prev, { role: 'user', content: `Deploy ${subAgent.name}` }]);
-    setTimeout(() => {
-      setMessages(prev => [...prev, { role: 'ai', content: `${subAgent.icon} ${subAgent.name} (${subAgent.role}) is now online. What would you like ${subAgent.name} to analyze?` }]);
-    }, 800);
-  };
+  const data = getAgentData();
 
   return (
     <>
@@ -100,100 +112,167 @@ export default function AgentPanel({ agentName, onClose }: AgentPanelProps) {
           transition: 'all 0.3s ease', zIndex: 99999
         }}
       />
+      
+      {/* Massive Centered Modal instead of Side Panel */}
       <div style={{
-        position: 'fixed', top: 0, right: 0, bottom: 0, width: '500px', maxWidth: '100vw',
-        backgroundColor: '#fff', boxShadow: '-10px 0 40px rgba(0,0,0,0.1)',
-        transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-        transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-        zIndex: 100000, display: 'flex', flexDirection: 'column'
+        position: 'fixed', top: '5%', left: '50%', transform: isOpen ? 'translate(-50%, 0)' : 'translate(-50%, 40px)',
+        width: '90%', maxWidth: '1100px', height: '90%', 
+        backgroundColor: '#fff', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+        borderRadius: '16px', border: '1px solid #e2e8f0',
+        opacity: isOpen ? 1 : 0, pointerEvents: isOpen ? 'auto' : 'none',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        zIndex: 100000, display: 'flex', flexDirection: 'column', overflow: 'hidden'
       }}>
+        
+        {/* Subtle grid background applied to whole modal */}
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 0, opacity: 0.4, pointerEvents: 'none',
+          backgroundImage: 'linear-gradient(to right, #f1f5f9 1px, transparent 1px), linear-gradient(to bottom, #f1f5f9 1px, transparent 1px)',
+          backgroundSize: '24px 24px'
+        }} />
+
+        {/* Header */}
         <div style={{ 
-          padding: '24px', borderBottom: '1px solid #e2e8f0', 
-          backgroundColor: getAgentColor(), color: '#fff',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+          padding: '32px 40px', borderBottom: '1px solid #f1f5f9', 
+          backgroundColor: '#fff', position: 'relative', zIndex: 1,
+          display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {getAgentIcon()}
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <div style={{ 
+              width: '80px', height: '80px', borderRadius: '16px', 
+              backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)', fontSize: '40px'
+            }}>
+              {data.name === 'Anveshan' ? '🔎' : data.name === 'Tark' ? '🧠' : data.name === 'Niti' ? '♟️' : '🦅'}
             </div>
             <div>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>{agentName}</h2>
-              <div style={{ fontSize: '0.85rem', opacity: 0.8, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#4ade80' }}></span> Online & Ready
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
+                <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>{data.name}</h1>
               </div>
+              <p style={{ fontSize: '1.05rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
+                {data.purpose}
+              </p>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px', borderRadius: '8px', display: 'flex' }} onMouseOver={e => e.currentTarget.style.backgroundColor='rgba(255,255,255,0.1)'} onMouseOut={e => e.currentTarget.style.backgroundColor='transparent'}>
-            <X size={24} />
-          </button>
-        </div>
-        {agentName === 'Negotiation Agent' && isOpen && (
-          <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Active Context</div>
-            <div style={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.9rem' }}>Vendor: Acme Corp (PO-9921)</div>
-                <div style={{ color: '#64748b', fontSize: '0.8rem' }}>Current Quote: $45,000</div>
-              </div>
-              <button style={{ background: '#e0e7ff', color: '#4f46e5', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>View Contract</button>
-            </div>
-          </div>
-        )}
-        <div style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '24px', backgroundColor: '#f8fafc' }}>
-          {messages.map((m, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
-              <div style={{ 
-                maxWidth: '85%', padding: '16px', borderRadius: '16px',
-                backgroundColor: m.role === 'user' ? getAgentColor() : '#fff',
-                color: m.role === 'user' ? '#fff' : '#334155',
-                border: m.role === 'user' ? 'none' : '1px solid #e2e8f0',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-                borderTopRightRadius: m.role === 'user' ? '4px' : '16px',
-                borderTopLeftRadius: m.role === 'user' ? '16px' : '4px',
-                lineHeight: '1.5', fontSize: '0.95rem'
-              }}>
-                {m.content}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div style={{ padding: '20px', backgroundColor: '#fff', borderTop: '1px solid #e2e8f0' }}>
-          <form onSubmit={handleSend} style={{ display: 'flex', gap: '12px' }}>
-            <input 
-              type="text" 
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              placeholder="Ask your agent..." 
-              style={{ flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.95rem', backgroundColor: '#f8fafc' }} 
-            />
-            <button type="submit" style={{ width: '52px', height: '52px', borderRadius: '12px', backgroundColor: getAgentColor(), color: '#fff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
-              <Send size={20} />
-            </button>
-          </form>
           
-          <div style={{ marginTop: '16px' }}>
-             <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Active Sub-Agents</div>
-             <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', flexWrap: 'nowrap' }}>
-              {getSubAgents().map(sub => (
-                <div 
-                  key={sub.name} 
-                  onClick={() => handleSubAgentClick(sub)}
-                  style={{ 
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    fontSize: '0.8rem', color: '#475569', padding: '6px 12px', 
-                    backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0',
-                    borderRadius: '20px', whiteSpace: 'nowrap', cursor: 'pointer',
-                    transition: 'all 0.2s', fontWeight: 600
-                  }}
-                  onMouseOver={e => { e.currentTarget.style.backgroundColor = getAgentColor(); e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = getAgentColor(); }}
-                  onMouseOut={e => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.color = '#475569'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
-                >
-                  <span style={{ fontSize: '1rem' }}>{sub.icon}</span> 
-                  <span>{sub.name}</span>
-                  <span style={{ fontWeight: 400, opacity: 0.8, fontSize: '0.7rem', marginLeft: '4px' }}>{sub.role}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
+            <button onClick={onClose} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', color: '#64748b', cursor: 'pointer', padding: '8px', borderRadius: '8px' }}>
+              <X size={20} />
+            </button>
+            <div style={{ 
+              padding: '6px 16px', borderRadius: '20px', 
+              backgroundColor: '#eff6ff', color: '#3b82f6', 
+              border: '1px solid #bfdbfe', fontSize: '0.75rem', 
+              fontWeight: 700, letterSpacing: '1px', whiteSpace: 'nowrap' 
+            }}>
+              {data.tag}
+            </div>
+          </div>
+        </div>
+
+        {/* Body Split */}
+        <div style={{ display: 'flex', flex: 1, position: 'relative', zIndex: 1, overflow: 'hidden' }}>
+          
+          {/* Left Panel */}
+          <div style={{ width: '340px', borderRight: '1px solid #f1f5f9', padding: '40px', backgroundColor: '#fff', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f97316', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '16px' }}>
+              <Zap size={14} fill="currentColor" /> PURPOSE
+            </div>
+            <p style={{ fontSize: '1rem', color: '#334155', lineHeight: 1.6, marginBottom: '40px' }}>
+              {data.purpose}
+            </p>
+
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', letterSpacing: '1.5px', marginBottom: '24px' }}>
+              TASK PLAN
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', position: 'relative' }}>
+              <div style={{ position: 'absolute', left: '8px', top: '24px', bottom: '24px', width: '2px', backgroundColor: '#f1f5f9' }} />
+              
+              {data.tasks.map((task, idx) => (
+                <div key={idx} style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 2 }}>
+                  <div style={{ 
+                    width: '18px', height: '18px', borderRadius: '50%', 
+                    backgroundColor: '#fff', border: '2px solid #3b82f6',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#3b82f6', fontSize: '0.6rem', fontWeight: 800, marginTop: '2px'
+                  }}>
+                    {idx + 1}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#0f172a', marginBottom: '4px' }}>{task.title}</div>
+                    <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{task.desc}</div>
+                  </div>
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Right Panel */}
+          <div style={{ flex: 1, padding: '40px', backgroundColor: 'transparent', overflowY: 'auto' }}>
+            
+            {/* Nav Pills */}
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '32px' }}>
+              {data.tabs.map((tab, i) => (
+                <button 
+                  key={i} 
+                  onClick={() => setActiveTab(tab)}
+                  style={{
+                    padding: '8px 20px', borderRadius: '24px',
+                    fontSize: '0.85rem', fontWeight: i === 0 ? 600 : 500,
+                    cursor: 'pointer', transition: 'all 0.2s',
+                    backgroundColor: activeTab === tab ? '#eff6ff' : '#fff',
+                    color: activeTab === tab ? '#3b82f6' : '#64748b',
+                    border: activeTab === tab ? '1px solid #bfdbfe' : '1px solid #e2e8f0'
+                  }}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                  {activeTab} • QUEUE
+                </div>
+              </div>
+              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>
+                {data.items.length} assets
+              </div>
+            </div>
+
+            {/* List Cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {data.items.map((item, i) => (
+                <div key={i} style={{ 
+                  backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px',
+                  padding: '20px 24px', position: 'relative', overflow: 'hidden',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <div style={{ fontSize: '1rem', fontWeight: 600, color: '#0f172a', fontFamily: 'monospace' }}>
+                      {item.title}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 500 }}>{item.metric}</span>
+                      {item.pill && (
+                        <span style={{ padding: '4px 12px', backgroundColor: '#fef3c7', color: '#d97706', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700, border: '1px solid #fde68a' }}>
+                          {item.pill}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div style={{ width: '100%', height: '4px', backgroundColor: '#f1f5f9', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: item.progress, height: '100%', backgroundColor: '#3b82f6', borderRadius: '2px' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            
           </div>
         </div>
       </div>
