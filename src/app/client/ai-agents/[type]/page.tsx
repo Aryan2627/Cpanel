@@ -48,7 +48,7 @@ export default function FullScreenAgentPage() {
       let endpoint = '';
       if (agent === 'Procurement Agent') endpoint = '/api/intakes';
       else if (agent === 'Sourcing Agent') endpoint = '/api/bids';
-      else if (agent === 'Negotiation Agent') endpoint = '/api/vendors';
+      else if (agent === 'Negotiation Agent') endpoint = '/api/bids';
       else if (agent === 'Operations Agent') endpoint = '/api/pos';
 
       if (!endpoint) return;
@@ -60,7 +60,7 @@ export default function FullScreenAgentPage() {
           let title = '';
           if (agent === 'Procurement Agent') title = d.title || `Intake Request #${d.id.substring(0,6)}`;
           else if (agent === 'Sourcing Agent') title = d.supplierName ? `Quote_${d.supplierName}.pdf` : `Bid_${d.id.substring(0,6)}.pdf`;
-          else if (agent === 'Negotiation Agent') title = d.name || d.companyName || `Vendor_${d.id.substring(0,6)}`;
+          else if (agent === 'Negotiation Agent') title = `Bid: ${d.vendorName} for ${d.eventTitle || 'Event'}`;
           else if (agent === 'Operations Agent') title = d.poNumber ? `PO-${d.poNumber}` : `Order_${d.id.substring(0,6)}`;
 
           return { 
