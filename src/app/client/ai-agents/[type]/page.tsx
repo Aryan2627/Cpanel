@@ -118,28 +118,63 @@ export default function FullScreenAgentPage() {
 
   const data = getAgentData();
 
-  const handleRunTask = (itemId: string) => {
+  const handleRunTask = async (itemId: string) => {
     if (processingItems[itemId]) return;
     
     setProcessingItems(prev => ({ ...prev, [itemId]: true }));
     setItemProgress(prev => ({ ...prev, [itemId]: '10%' }));
     setTaskSteps({ 0: 1, 1: 0, 2: 0 }); 
 
-    setTimeout(() => {
-      setItemProgress(prev => ({ ...prev, [itemId]: '40%' }));
-      setTaskSteps({ 0: 2, 1: 1, 2: 0 }); 
-      
-      setTimeout(() => {
-        setItemProgress(prev => ({ ...prev, [itemId]: '75%' }));
-        setTaskSteps({ 0: 2, 1: 2, 2: 1 }); 
-        
+    try {
+      if (agentName === 'Procurement Agent') {
+        // Step 1: Tell AI to Parse (Mocking the UI steps to match network latency)
         setTimeout(() => {
-          setItemProgress(prev => ({ ...prev, [itemId]: '100%' }));
-          setTaskSteps({ 0: 2, 1: 2, 2: 2 }); 
-          setProcessingItems(prev => ({ ...prev, [itemId]: false }));
+          setItemProgress(prev => ({ ...prev, [itemId]: '40%' }));
+          setTaskSteps({ 0: 2, 1: 1, 2: 0 });
+        }, 1000);
+
+        // Step 2: Make the actual LLM Backend Call
+        console.log(`🤖 [Anveshan] Sending Intake ${itemId} to NVIDIA Llama 3.1...`);
+        const res = await fetch('/api/agents/anveshan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ intakeId: itemId })
+        });
+        
+        const data = await res.json();
+        console.log(`✅ [Anveshan] AI Processing Complete:`, data);
+
+        // Advance to Step 3 visually
+        setItemProgress(prev => ({ ...prev, [itemId]: '75%' }));
+        setTaskSteps({ 0: 2, 1: 2, 2: 1 });
+
+        // Display quick alert so user can see it worked without devtools
+        if (data.success && data.aiExtractionUsed) {
+           alert(`🤖 Llama 3.1 successfully extracted keywords: \n${data.extractedSpecs.join(', ')}\n\nFound ${data.suppliersIdentified} matching vendors!`);
+        } else if (data.success) {
+           alert(`⚠️ API Key missing! Fallback used. Keywords: \n${data.extractedSpecs.join(', ')}`);
+        } else {
+           alert(`Error: ${data.error}`);
+        }
+      } else {
+        // Mock for other agents
+        setTimeout(() => {
+          setItemProgress(prev => ({ ...prev, [itemId]: '40%' }));
+          setTaskSteps({ 0: 2, 1: 1, 2: 0 }); 
         }, 1500);
-      }, 1500);
-    }, 1500);
+      }
+
+      // Finish Task visually
+      setTimeout(() => {
+        setItemProgress(prev => ({ ...prev, [itemId]: '100%' }));
+        setTaskSteps({ 0: 2, 1: 2, 2: 2 }); 
+        setProcessingItems(prev => ({ ...prev, [itemId]: false }));
+      }, agentName === 'Procurement Agent' ? 500 : 3000);
+
+    } catch (err) {
+      console.error("Task failed", err);
+      setProcessingItems(prev => ({ ...prev, [itemId]: false }));
+    }
   };
 
   const getEmoji = (name: string) => {
