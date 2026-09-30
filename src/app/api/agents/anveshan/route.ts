@@ -54,6 +54,7 @@ export async function POST(req: Request) {
           3. Global Sourcing Expert: Using your vast knowledge of real-world global supply chains, identify 2 ACTUAL, REAL-WORLD global suppliers or manufacturers that specialize in providing exactly what the buyer is asking for. Do NOT invent these. Provide their actual company names and their actual real-world website URLs. (e.g., if they ask for enterprise laptops, return real companies like Dell, Lenovo, or CDW).
           4. Draft a short, highly professional RFI (Request for Information) email to send to these global vendors.
 
+          CRITICAL: You must output ONLY a raw JSON object. Do not wrap it in backticks, do not write 'json', and do not include any introductory or concluding text. Just the raw { object } starting with an opening brace.
           Return ONLY a valid JSON object matching this exact schema:
           {
             "keywords": ["..."],
@@ -61,24 +62,41 @@ export async function POST(req: Request) {
             "webDiscoveries": [{ "name": "...", "url": "...", "reason": "..." }],
             "rfiDraft": "..."
           }
-          CRITICAL: You must output ONLY a raw JSON object. Do not wrap it in backticks, do not write 'json', and do not include any introductory or concluding text. Just the raw { object } starting with an opening brace.
         `;
 
         const completion = await openai.chat.completions.create({
           model: modelName,
           messages: [{ role: 'user', content: promptText }],
-          temperature: 0.3,
+          temperature: 0.2,
+          max_tokens: 1500
         });
 
         const rawJson = completion.choices[0]?.message?.content?.trim() || '';
-        const cleanedJson = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
-        const parsed = JSON.parse(cleanedJson);
         
-        if (parsed.keywords) aiResult = parsed;
+        const startIdx = rawJson.indexOf('{');
+        const endIdx = rawJson.lastIndexOf('}');
+        
+        if (startIdx !== -1 && endIdx !== -1) {
+          const jsonOnly = rawJson.substring(startIdx, endIdx + 1);
+          const parsed = JSON.parse(jsonOnly);
+          
+          if (parsed.keywords && Array.isArray(parsed.keywords)) {
+             aiResult.keywords = parsed.keywords;
+          }
+          if (parsed.marketAnalysis) aiResult.marketAnalysis = parsed.marketAnalysis;
+          if (parsed.webDiscoveries && Array.isArray(parsed.webDiscoveries)) {
+             aiResult.webDiscoveries = parsed.webDiscoveries;
+          }
+          if (parsed.rfiDraft) aiResult.rfiDraft = parsed.rfiDraft;
+        } else {
+          aiResult.marketAnalysis = "⚠️ AI FAILED TO RETURN JSON. Raw Output was: " + rawJson;
+        }
 
-      } catch (aiError) {
-        console.error("AI advanced processing failed:", aiError);
+      } catch (aiError: any) {
+        aiResult.marketAnalysis = "⚠️ NVIDIA API CRASHED: " + (aiError.message || String(aiError));
       }
+    } else {
+      aiResult.marketAnalysis = "⚠️ NO API KEY FOUND IN VERCEL. Please check your Vercel Environment Variables.";
     }
     
     // Internal Supplier Search
