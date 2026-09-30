@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { prisma } from '../../../../lib/prisma';
 import { verifyToken } from '../../../../lib/session';
+import { decrypt } from '../../../../lib/encryption';
 
 export const runtime = 'nodejs';
 
@@ -44,7 +45,7 @@ export async function GET() {
         licensePlan: user.organization?.licensePlan || 'Enterprise',
         licenseStart: user.organization?.licenseStart || null,
         licenseEnd: user.organization?.licenseEnd || null,
-        features: user.organization?.features || null,
+        features: (user.organization?.features && user.organization.features.includes(':')) ? decrypt(user.organization.features) : (user.organization?.features || null),
         permissions: user.permissions || {},
         isImpersonating: !!payload.impersonatorId,
         impersonatorId: payload.impersonatorId || null
