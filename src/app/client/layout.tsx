@@ -133,7 +133,17 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const isMainPortal = orgFeatures.main_portal !== false; 
   const isAgenticPortal = orgFeatures.agentic_portal === true;
   // If Agentic Portal is turned ON, it takes full priority and hides classic menus
-  const isAgenticOnly = isAgenticPortal === true;
+  const isAgenticOnly = isAgenticPortal === true || (typeof window !== 'undefined' && window.location.search.includes('agentic=true'));
+    
+    // Debug log for the user to inspect in browser console
+    useEffect(() => {
+      if (currentUser) {
+        console.log("ProcGen Organization Features (Decrypted Payload):", currentUser.features);
+        if (currentUser.features === "") {
+          // console.warn("removed");
+        }
+      }
+    }, [currentUser]);
 
   const displayMenus = TOP_MENUS.filter(menu => {
     if (isAgenticOnly) return menu.name === 'AI Agents';
