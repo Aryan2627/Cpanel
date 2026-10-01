@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Folder, FileText, Plus, X, Play, RefreshCw, ChevronRight } from 'lucide-react';
+import { Folder, FileText, Plus, X, Play, RefreshCw, ChevronRight, BookText } from 'lucide-react';
 
 export default function ContextStudioPage() {
   const [rules, setRules] = useState<any[]>([]);
@@ -255,6 +255,13 @@ export default function ContextStudioPage() {
                   {activeRule.name}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <a 
+                    href="/downloads/Context-Studio-User-Guide.md" 
+                    download="ProcGen_Context_Studio_Guide.md"
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none', padding: '4px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'all 0.2s' }}
+                  >
+                    <BookText size={14} /> Guide
+                  </a>
                   <div style={{ backgroundColor: '#f1f5f9', color: '#3b82f6', fontSize: '0.75rem', padding: '4px 12px', borderRadius: '16px', fontWeight: 500 }}>
                     v{activeRule.version || '1.0.0'} · AI + human
                   </div>
