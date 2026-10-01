@@ -40,6 +40,19 @@ export default function ContextStudioPage() {
     setLoading(false);
   };
 
+    const highlightYAML = (text: string) => {
+    if (!text) return '';
+    let html = text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/^( *)(-[ ]+)?([a-zA-Z0-9_]+)(:)/gm, '$1$2<span style="color: #0451a5; font-weight: 500;">$3</span>$4')
+      .replace(/(:[ ]+)(true|false|null)\b/g, '$1<span style="color: #0000ff;">$2</span>')
+      .replace(/(:[ ]+)(\d+)\b/g, '$1<span style="color: #098658;">$2</span>')
+      .replace(/("(?:\\"|[^"])*")/g, '<span style="color: #a31515;">$1</span>')
+      .replace(/(#.*)$/gm, '<span style="color: #008000;">$1</span>');
+    
+    return html;
+  };
+
   const activeRule = rules.find(r => r.id === activeRuleId);
 
   const handleSave = async () => {
@@ -256,14 +269,30 @@ export default function ContextStudioPage() {
                 <div style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '16px', fontFamily: 'Consolas, Monaco, monospace' }}>
                   # {activeRule.consumedBy.toLowerCase()} · {activeRule.consumedBy}/{activeRule.name}
                 </div>
-                <textarea 
-                  value={content}
-                  onChange={e => setContent(e.target.value)}
-                  style={{ 
-                    flex: 1, backgroundColor: 'transparent', border: 'none', 
-                    color: '#0f172a', fontFamily: 'Consolas, Monaco, monospace', fontSize: '0.9rem', lineHeight: 1.8, resize: 'none', outline: 'none'
-                  }}
-                />
+                <div style={{ position: 'relative', flex: 1, overflow: 'auto' }}>
+                  <textarea 
+                    value={content}
+                    onChange={e => setContent(e.target.value)}
+                    spellCheck={false}
+                    style={{ 
+                      position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                      backgroundColor: 'transparent', border: 'none', 
+                      color: 'transparent', caretColor: '#000', 
+                      fontFamily: 'Consolas, Monaco, monospace', fontSize: '0.9rem', lineHeight: 1.8, 
+                      resize: 'none', outline: 'none', zIndex: 2, margin: 0, padding: 0
+                    }}
+                  />
+                  <div 
+                    aria-hidden="true"
+                    dangerouslySetInnerHTML={{ __html: highlightYAML(content) + '<br/>' }}
+                    style={{
+                      position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                      fontFamily: 'Consolas, Monaco, monospace', fontSize: '0.9rem', lineHeight: 1.8,
+                      pointerEvents: 'none', zIndex: 1, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                      color: '#000', margin: 0, padding: 0
+                    }}
+                  />
+                </div>
               </div>
             </>
           ) : (
