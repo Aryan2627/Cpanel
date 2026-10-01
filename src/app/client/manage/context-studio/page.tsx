@@ -103,7 +103,7 @@ export default function ContextStudioPage() {
   }, {} as Record<string, any[]>);
 
   return (
-    <div style={{ display: 'flex', height: '100%', backgroundColor: '#0f172a', fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)', backgroundColor: '#0f172a', fontFamily: 'system-ui, sans-serif' }}>
       
       {/* Sidebar / Context Repo */}
       <div style={{ width: '300px', backgroundColor: '#1e293b', borderRight: '1px solid #334155', display: 'flex', flexDirection: 'column' }}>
