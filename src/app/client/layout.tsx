@@ -154,12 +154,34 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   });
 
   
-  // STRICT UI LEAK PREVENTION: Wait for user profile to load before rendering the layout
+    // STRICT UI LEAK PREVENTION: Wait for user profile to load before rendering the layout
   if (currentUser === null) {
     return (
-      <div style={{ height: '100vh', width: '100vw', backgroundColor: '#030712', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '16px' }}>
-         <div className="animate-pulse" style={{ color: '#38bdf8', fontSize: '1.2rem', fontWeight: 600, letterSpacing: '2px' }}>INITIALIZING SYSTEM</div>
-         <div className="animate-spin" style={{ width: '40px', height: '40px', border: '3px solid rgba(56, 189, 248, 0.1)', borderTop: '3px solid #38bdf8', borderRadius: '50%' }}></div>
+      <div style={{ height: '100vh', width: '100vw', backgroundColor: '#030712', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '32px' }}>
+         <style>{`
+           @keyframes splitLeft { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-25px); filter: drop-shadow(-10px 0 15px rgba(56, 189, 248, 0.6)); } }
+           @keyframes splitRight { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(25px); filter: drop-shadow(10px 0 15px rgba(56, 189, 248, 0.6)); } }
+           @keyframes glowJoin { 0%, 5%, 95%, 100% { filter: drop-shadow(0 0 30px rgba(56, 189, 248, 1)); } 50% { filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.2)); } }
+         `}</style>
+         
+         <div style={{ position: 'relative', width: '250px', height: '80px', animation: 'glowJoin 2.5s infinite ease-in-out' }}>
+           {/* Left Half */}
+           <img 
+             src="/logo.png" 
+             alt="ProcGen" 
+             style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '100%', objectFit: 'contain', clipPath: 'inset(0 50% 0 0)', animation: 'splitLeft 2.5s infinite cubic-bezier(0.68, -0.55, 0.265, 1.55)' }} 
+           />
+           {/* Right Half */}
+           <img 
+             src="/logo.png" 
+             alt="ProcGen" 
+             style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '100%', objectFit: 'contain', clipPath: 'inset(0 0 0 50%)', animation: 'splitRight 2.5s infinite cubic-bezier(0.68, -0.55, 0.265, 1.55)' }} 
+           />
+         </div>
+         
+         <div className="animate-pulse" style={{ color: '#38bdf8', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '6px', textTransform: 'uppercase' }}>
+           Initializing
+         </div>
       </div>
     );
   }
