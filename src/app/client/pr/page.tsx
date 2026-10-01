@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useIntake } from '../../../context/IntakeContext';
 import {
-  RefreshCcw, Plus, ChevronDown, ChevronRight, CheckCircle2,
+  RefreshCcw, Plus, ChevronDown, ChevronRight, CheckCircle2, Zap, Cpu, Check, Lock,
   FileText, X, ArrowRight, Search, ClipboardList, AlertTriangle,
   Clock, Layers, ArrowUpDown, ShieldCheck
 } from 'lucide-react';
@@ -22,6 +22,8 @@ export default function PRPage() {
   const [techStage, setTechStage] = useState(false);
   const [rfq, setRfq] = useState(false);
   const [auction, setAuction] = useState(false);
+  const [tarkModalPr, setTarkModalPr] = useState<any>(null);
+  const [tarkStep, setTarkStep] = useState(0);
 
   const prData = useMemo(() => {
     return intakes.map((row, i) => {
@@ -176,7 +178,7 @@ export default function PRPage() {
                   <input type="checkbox" checked={selectedRows.size === filteredData.length && filteredData.length > 0} onChange={handleSelectAll} style={{ accentColor: '#0f172a', cursor: 'pointer' }} />
                 </th>
                 <th style={{ padding: '13px 8px', width: '36px' }}></th>
-                {[['refId', 'PR No (Ref ID)'], ['title', 'Title / Material'], ['quantity', 'Quantity'], ['reqName', 'Requester'], ['priority', 'Priority'], ['storageLocation', 'Location']].map(([key, label]) => (
+                {[['refId', 'PR No (Ref ID)'], ['title', 'Title / Material'], ['quantity', 'Quantity'], ['reqName', 'Requester'], ['budget', 'Budget'], ['priority', 'Priority'], ['storageLocation', 'Location'], ['action', 'Agent Action']].map(([key, label]) => (
                   <th key={key} style={{ padding: '13px 16px', textAlign: 'left', color: '#475569', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', whiteSpace: 'nowrap' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>{label} <ArrowUpDown size={10} color="#cbd5e1" /></span>
                   </th>
@@ -206,8 +208,11 @@ export default function PRPage() {
                       </td>
                       <td style={{ padding: '13px 16px', fontWeight: 700, color: '#0f172a', fontSize: '0.875rem' }}>{item.title || '—'}</td>
                       <td style={{ padding: '13px 16px', fontWeight: 600, color: '#0f172a', fontSize: '0.875rem' }}>
-                        <span style={{ background: '#eff6ff', padding: '3px 10px', borderRadius: '6px', fontSize: '0.82rem' }}>{item.quantity || 1} <span style={{ color: '#94a3b8', fontWeight: 400 }}>EA</span></span>
-                      </td>
+                          <span style={{ background: '#eff6ff', padding: '3px 10px', borderRadius: '6px', fontSize: '0.82rem' }}>{item.quantity || 1} <span style={{ color: '#94a3b8', fontWeight: 400 }}>EA</span></span>
+                        </td>
+                        <td style={{ padding: '13px 16px', fontWeight: 700, color: '#059669', fontSize: '0.875rem' }}>
+                          {item.budget ? `${Number(item.budget).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '-'}
+                        </td>
                       <td style={{ padding: '13px 16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#e5edff', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.65rem', flexShrink: 0 }}>
@@ -369,6 +374,69 @@ export default function PRPage() {
       )}
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-    </div>
+    
+      {tarkModalPr && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: '#fff', width: '600px', borderRadius: '24px', padding: '32px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', border: '1px solid #e2e8f0', position: 'relative' }}>
+            <button onClick={() => setTarkModalPr(null)} style={{ position: 'absolute', top: '24px', right: '24px', background: '#f1f5f9', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}>
+              <X size={16} />
+            </button>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #bfdbfe' }}>
+                <Cpu size={28} color="#2563eb" />
+              </div>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>TARK Execution Engine</h2>
+                <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '0.9rem', fontWeight: 500 }}>Processing PR {tarkModalPr.refId} • {tarkModalPr.title}</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Step 1 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', background: tarkStep >= 1 ? '#f0fdf4' : '#f8fafc', border: tarkStep >= 1 ? '1px solid #bbf7d0' : '1px solid #e2e8f0', borderRadius: '12px', transition: 'all 0.3s' }}>
+                {tarkStep >= 1 ? <CheckCircle2 size={24} color="#16a34a" /> : <Search size={24} color="#94a3b8" />}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, color: tarkStep >= 1 ? '#166534' : '#64748b', fontSize: '0.95rem' }}>Budget Verification</div>
+                  {tarkStep >= 1 && <div style={{ fontSize: '0.8rem', color: '#15803d', marginTop: '4px' }}>Confirmed $\{Number(tarkModalPr.budget || 0).toLocaleString()} aligns with Dept allocation.</div>}
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', background: tarkStep >= 2 ? '#f0fdf4' : '#f8fafc', border: tarkStep >= 2 ? '1px solid #bbf7d0' : '1px solid #e2e8f0', borderRadius: '12px', transition: 'all 0.3s' }}>
+                {tarkStep >= 2 ? <CheckCircle2 size={24} color="#16a34a" /> : <FileText size={24} color="#94a3b8" />}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, color: tarkStep >= 2 ? '#166534' : '#64748b', fontSize: '0.95rem' }}>3-Way Semantic Match</div>
+                  {tarkStep >= 2 && <div style={{ fontSize: '0.8rem', color: '#15803d', marginTop: '4px' }}>Contract logic and item quantities verified.</div>}
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', background: tarkStep >= 3 ? '#eff6ff' : '#f8fafc', border: tarkStep >= 3 ? '1px solid #bfdbfe' : '1px solid #e2e8f0', borderRadius: '12px', transition: 'all 0.3s' }}>
+                {tarkStep >= 3 ? <Zap size={24} color="#2563eb" /> : <Clock size={24} color="#94a3b8" />}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, color: tarkStep >= 3 ? '#1e3a8a' : '#64748b', fontSize: '0.95rem' }}>Drafting Purchase Order</div>
+                  {tarkStep >= 3 && <div style={{ fontSize: '0.8rem', color: '#1e40af', marginTop: '4px' }}>PO-99201 generated via ERP API.</div>}
+                </div>
+              </div>
+
+              {/* Step 4 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', background: tarkStep >= 4 ? '#fffbeb' : '#f8fafc', border: tarkStep >= 4 ? '1px solid #fde68a' : '1px solid #e2e8f0', borderRadius: '12px', transition: 'all 0.3s' }}>
+                {tarkStep >= 4 ? <ShieldCheck size={24} color="#d97706" /> : <Lock size={24} color="#94a3b8" />}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, color: tarkStep >= 4 ? '#92400e' : '#64748b', fontSize: '0.95rem' }}>Human-in-the-Loop Routing</div>
+                  {tarkStep >= 4 && <div style={{ fontSize: '0.8rem', color: '#b45309', marginTop: '4px' }}>Routed to VP Finance for cryptographic sign-off.</div>}
+                </div>
+                {tarkStep >= 4 && (
+                  <button onClick={() => setTarkModalPr(null)} style={{ background: '#d97706', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }}>
+                    View Route
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+</div>
   );
 }

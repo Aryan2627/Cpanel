@@ -12,6 +12,7 @@ type Intake = {
   reqAt: string;
   updAt: string;
   quantity?: number;
+  budget?: number;
 };
 
 type IntakeContextType = {

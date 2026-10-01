@@ -11,6 +11,7 @@ export default function PurchaseIntake() {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [quantity, setQuantity] = useState<number | string>('');
+  const [budget, setBudget] = useState<number | string>('');
   const [customData, setCustomData] = useState<any>({});
   const [categories, setCategories] = useState<string[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
@@ -59,6 +60,7 @@ export default function PurchaseIntake() {
         reqAt: formattedDate,
         updAt: formattedDate,
         quantity: Number(quantity) || 1,
+        budget: Number(budget) || 0,
       });
 
       setSubmitted(true);
