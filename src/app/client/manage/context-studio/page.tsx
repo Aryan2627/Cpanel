@@ -42,15 +42,19 @@ export default function ContextStudioPage() {
 
     const highlightYAML = (text: string) => {
     if (!text) return '';
-    let html = text
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/^( *)(-[ ]+)?([a-zA-Z0-9_]+)(:)/gm, '$1$2<span style="color: #0451a5; font-weight: 500;">$3</span>$4')
-      .replace(/(:[ ]+)(true|false|null)\b/g, '$1<span style="color: #0000ff;">$2</span>')
-      .replace(/(:[ ]+)(\d+)\b/g, '$1<span style="color: #098658;">$2</span>')
-      .replace(/("(?:\\"|[^"])*")/g, '<span style="color: #a31515;">$1</span>')
-      .replace(/(#.*)$/gm, '<span style="color: #008000;">$1</span>');
+    const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     
-    return html;
+    // Single-pass regex to prevent HTML tag collisions
+    const regex = /(#.*$)|("(?:\\"|[^"])*")|^(\s*(?:-\s+)?)([a-zA-Z0-9_]+)(:)|(:[ ]+)(true|false|null)\b|(:[ ]+)(\d+(?:\.\d+)?)\b/gm;
+    
+    return escaped.replace(regex, (match, pComment, pString, pKeySpace, pKey, pColon, pBoolSpace, pBool, pNumSpace, pNum) => {
+      if (pComment) return `<span style="color: #008000;">${pComment}</span>`;
+      if (pString) return `<span style="color: #a31515;">${pString}</span>`;
+      if (pKey) return `${pKeySpace}<span style="color: #0451a5; font-weight: 500;">${pKey}</span>${pColon}`;
+      if (pBool) return `${pBoolSpace}<span style="color: #0000ff;">${pBool}</span>`;
+      if (pNum) return `${pNumSpace}<span style="color: #098658;">${pNum}</span>`;
+      return match;
+    });
   };
 
   const activeRule = rules.find(r => r.id === activeRuleId);
