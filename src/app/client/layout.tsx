@@ -1,14 +1,15 @@
 'use client';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { IntakeProvider } from '../../context/IntakeContext';
 import { SessionContext } from '../../context/SessionContext';
 import TourButton from './TourButton';
-import SpotlightSearch from './SpotlightSearch';
-import CartOverlay from './CartOverlay';
-import JarvisAssistant from './JarvisAssistant';
-import DorcWidget from './DorcWidget';
+const SpotlightSearch = dynamic(() => import('./SpotlightSearch'), { ssr: false });
+const CartOverlay = dynamic(() => import('./CartOverlay'), { ssr: false });
+const JarvisAssistant = dynamic(() => import('./JarvisAssistant'), { ssr: false });
+const DorcWidget = dynamic(() => import('./DorcWidget'), { ssr: false });
 import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles, Command } from 'lucide-react';
 
 const TOP_MENUS = [
@@ -240,7 +241,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
-            <Link href="/client" style={{ color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Link prefetch={false} href="/client" style={{ color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <img src="/logo.png" alt="ProcGen Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
             </Link>
 
@@ -268,8 +269,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                   onMouseLeave={() => setHoveredMenu(null)}
                   style={{ position: 'relative' }}
                 >
-                  <Link 
-                    href={menu.path || '#'}
+                  <Link prefetch={false} href={menu.path || '#'}
                     style={{ 
                       padding: '8px 16px', 
                       borderRadius: '8px',
@@ -352,8 +352,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
               
               {(currentUser?.features ? (() => { try { return JSON.parse(currentUser.features).cortex_ai; } catch { return false; } })() : false) && (
-<Link 
-                href="/client/cortex"
+<Link prefetch={false} href="/client/cortex"
                 style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
                   background: 'linear-gradient(135deg, #00c6ff, #0072ff)',
@@ -373,7 +372,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', border: '2px solid #071330' }} />
               </div>
               
-              <Link href="/client/settings" style={{ textDecoration: 'none' }}>
+              <Link prefetch={false} href="/client/settings" style={{ textDecoration: 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '16px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
                   <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e293b, #334155)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>
                     {(currentUser?.name || 'A')[0]}
@@ -406,7 +405,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               ) : (
                 displayMenus.map(menu => (
                   <div key={menu.name} style={{ marginBottom: '8px' }}>
-                    <Link href={menu.path || '#'} onClick={() => { if(!menu.sub) setMobileMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', color: '#fff', textDecoration: 'none', fontWeight: 600, borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }}>
+                    <Link prefetch={false} href={menu.path || '#'} onClick={() => { if(!menu.sub) setMobileMenuOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', color: '#fff', textDecoration: 'none', fontWeight: 600, borderRadius: '8px', background: 'rgba(255,255,255,0.05)' }}>
                       <menu.icon size={20} />
                       {menu.name}
                     </Link>
