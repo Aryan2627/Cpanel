@@ -145,13 +145,13 @@ export default function ContextStudioPage() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #e5e7eb', backgroundColor: '#fff', padding: '0 32px', height: '70px', overflowX: 'auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: '800px' }}>
-          <Step num={1} title="Bootstrap" sub="Build context repos" active={currentStep === 1} past={currentStep > 1} />
+          <Step num={1} title="Configure" sub="Define agent rules" active={currentStep === 1} past={currentStep > 1} />
           <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
-          <Step num={2} title="Simulate" sub="Run evaluations" active={currentStep === 2} past={currentStep > 2} />
+          <Step num={2} title="Simulate" sub="Test scenarios" active={currentStep === 2} past={currentStep > 2} />
           <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
-          <Step num={3} title="Deploy" sub="Push to agents" active={currentStep === 3} past={currentStep > 3} />
+          <Step num={3} title="Activate" sub="Deploy to swarm" active={currentStep === 3} past={currentStep > 3} />
           <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
-          <Step num={4} title="Observe" sub="Traces & drift" active={currentStep === 4} past={currentStep > 4} />
+          <Step num={4} title="Monitor" sub="Audit operations" active={currentStep === 4} past={currentStep > 4} />
         </div>
       </div>
     );
