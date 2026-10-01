@@ -256,8 +256,8 @@ export default function ContextStudioPage() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   <a 
-                    href="/downloads/Context-Studio-User-Guide.md" 
-                    download="ProcGen_Context_Studio_Guide.md"
+                    href="/downloads/Context-Studio-User-Guide.pdf" 
+                    download="ProcGen_Context_Studio_Guide.pdf"
                     style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none', padding: '4px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#fff', transition: 'all 0.2s' }}
                   >
                     <BookText size={14} /> Guide
