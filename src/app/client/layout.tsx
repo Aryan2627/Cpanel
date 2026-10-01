@@ -8,7 +8,6 @@ import { SessionContext } from '../../context/SessionContext';
 import TourButton from './TourButton';
 const SpotlightSearch = dynamic(() => import('./SpotlightSearch'), { ssr: false });
 const CartOverlay = dynamic(() => import('./CartOverlay'), { ssr: false });
-const JarvisAssistant = dynamic(() => import('./JarvisAssistant'), { ssr: false });
 const DorcWidget = dynamic(() => import('./DorcWidget'), { ssr: false });
 import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles, Command } from 'lucide-react';
 
