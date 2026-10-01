@@ -8,44 +8,30 @@ const AGENTS = [
     id: 'niti',
     name: 'NITI',
     role: 'Negotiation Agent',
-    description: 'Fights for the best price, demands favorable payment terms, and prevents long-term vendor lock-in. Powered by advanced context rules.',
-    seed: 'Niti',
+    description: 'Fights for the best price, demands favorable payment terms, and prevents long-term vendor lock-in.',
+    image: '/niti-avatar.jpg',
   },
   {
     id: 'anveshan',
     name: 'ANVESHAN',
     role: 'Sourcing Agent',
     description: 'Performs deep web scanning to discover sustainable, SOC-2 compliant, and cost-effective global suppliers.',
-    seed: 'Anveshan',
+    image: '/anveshan-avatar.png',
   },
   {
     id: 'tark',
     name: 'TARK',
     role: 'Operations Agent',
     description: 'Automates purchase order creation, routes complex approvals, and enforces strict contract logic flawlessly.',
-    seed: 'Tark',
+    image: '/tark-avatar.jpg',
   },
   {
     id: 'garuda',
     name: 'GARUDA',
     role: 'Risk Agent',
     description: 'Monitors real-time supply chain disruptions, geopolitical events, and ESG compliance across your vendor base.',
-    seed: 'Garuda',
-  },
-  {
-    id: 'jarvis',
-    name: 'JARVIS',
-    role: 'Global Co-pilot',
-    description: 'Your conversational AI assistant that navigates the entire procurement platform and answers data queries.',
-    seed: 'Jarvis',
-  },
-  {
-    id: 'lexis',
-    name: 'LEXIS',
-    role: 'Glossary Builder',
-    description: 'Automatically builds and maintains your enterprise procurement glossary from raw database column patterns.',
-    seed: 'Lexis',
-  },
+    image: '/garuda-avatar.png',
+  }
 ];
 
 export default function AutonomousAgentsPage() {
@@ -138,11 +124,7 @@ export default function AutonomousAgentsPage() {
             }}>
               {/* Decorative radial glow */}
               <div style={{ position: 'absolute', width: '100%', height: '100%', borderRadius: '24px', boxShadow: 'inset 0 0 20px rgba(37,99,235,0.1)' }} />
-              <img 
-                src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${activeAgent.seed}`} 
-                alt={activeAgent.name} 
-                style={{ width: '100px', height: '100px', zIndex: 1 }} 
-              />
+              <img src={activeAgent.image} alt={activeAgent.name} style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '16px', zIndex: 1 }} />
             </div>
             
             <h2 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 12px 0', letterSpacing: '-0.5px' }}>
@@ -167,7 +149,7 @@ export default function AutonomousAgentsPage() {
             
             <div style={{ 
               display: 'grid', 
-              gridTemplateColumns: 'repeat(3, 1fr)', 
+              gridTemplateColumns: 'repeat(2, 1fr)', 
               gap: '16px',
               flex: 1
             }}>
@@ -191,11 +173,7 @@ export default function AutonomousAgentsPage() {
                       boxShadow: isActive ? '0 4px 12px rgba(37,99,235,0.1)' : 'none'
                     }}
                   >
-                    <img 
-                      src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${agent.seed}`} 
-                      alt={agent.name} 
-                      style={{ width: '48px', height: '48px', marginBottom: '12px' }} 
-                    />
+                    <img src={agent.image} alt={agent.name} style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '10px', marginBottom: '12px' }} />
                     <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>
                       {agent.name}
                     </div>
