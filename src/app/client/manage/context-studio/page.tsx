@@ -9,6 +9,7 @@ export default function ContextStudioPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [content, setContent] = useState('');
+  const [currentStep, setCurrentStep] = useState(1);
   
   // Creation state
   const [isCreating, setIsCreating] = useState(false);
@@ -59,8 +60,14 @@ export default function ContextStudioPage() {
 
   const activeRule = rules.find(r => r.id === activeRuleId);
 
-  const handleSave = async () => {
+    const handleSave = async () => {
     setSaving(true);
+    setCurrentStep(2); // Simulate
+    
+    // Fake simulation delay
+    await new Promise(r => setTimeout(r, 800));
+    
+    setCurrentStep(3); // Deploy
     try {
       const res = await fetch('/api/context-studio', {
         method: 'PUT',
@@ -70,10 +77,14 @@ export default function ContextStudioPage() {
       if (res.ok) {
         const updated = await res.json();
         setRules(rules.map(r => r.id === updated.id ? updated : r));
+        
+        // Move to observe
+        setCurrentStep(4);
         alert('Deployed to ' + activeRule.consumedBy + ' successfully!');
       }
     } catch (e) {
       console.error(e);
+      setCurrentStep(1);
     }
     setSaving(false);
   };
@@ -113,52 +124,38 @@ export default function ContextStudioPage() {
   }, {} as Record<string, any[]>);
 
   // Lifecycle Steps Header Component
-  const LifecycleHeader = () => (
-    <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #e5e7eb', backgroundColor: '#fff', padding: '0 32px', height: '70px', overflowX: 'auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: '800px' }}>
-        
-        {/* Step 1 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '2px solid #2563eb', paddingBottom: '16px', marginTop: '16px' }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>1</div>
+  const LifecycleHeader = () => {
+    const Step = ({ num, title, sub, active, past }: { num: number, title: string, sub: string, active: boolean, past: boolean }) => {
+      const color = active ? '#2563eb' : (past ? '#10b981' : '#64748b');
+      const bgColor = active ? '#2563eb' : (past ? '#10b981' : '#f1f5f9');
+      const textColor = active ? '#fff' : (past ? '#fff' : '#64748b');
+      const titleColor = active || past ? '#0f172a' : '#64748b';
+      
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: active ? '2px solid #2563eb' : '2px solid transparent', paddingBottom: '16px', marginTop: '16px', transition: 'all 0.3s' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: bgColor, color: textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, transition: 'all 0.3s' }}>{num}</div>
           <div>
-            <div style={{ color: '#2563eb', fontWeight: 600, fontSize: '0.9rem' }}>Bootstrap</div>
-            <div style={{ color: '#93c5fd', fontSize: '0.75rem' }}>Build context repos</div>
+            <div style={{ color: titleColor, fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.3s' }}>{title}</div>
+            <div style={{ color: active ? '#93c5fd' : '#94a3b8', fontSize: '0.75rem', transition: 'all 0.3s' }}>{sub}</div>
           </div>
         </div>
-        <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
+      );
+    };
 
-        {/* Step 2 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>2</div>
-          <div>
-            <div style={{ color: '#334155', fontWeight: 600, fontSize: '0.9rem' }}>Simulate</div>
-            <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Run evaluations</div>
-          </div>
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #e5e7eb', backgroundColor: '#fff', padding: '0 32px', height: '70px', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: '800px' }}>
+          <Step num={1} title="Bootstrap" sub="Build context repos" active={currentStep === 1} past={currentStep > 1} />
+          <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
+          <Step num={2} title="Simulate" sub="Run evaluations" active={currentStep === 2} past={currentStep > 2} />
+          <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
+          <Step num={3} title="Deploy" sub="Push to agents" active={currentStep === 3} past={currentStep > 3} />
+          <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
+          <Step num={4} title="Observe" sub="Traces & drift" active={currentStep === 4} past={currentStep > 4} />
         </div>
-        <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
-
-        {/* Step 3 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>3</div>
-          <div>
-            <div style={{ color: '#334155', fontWeight: 600, fontSize: '0.9rem' }}>Deploy</div>
-            <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Push to agents</div>
-          </div>
-        </div>
-        <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
-
-        {/* Step 4 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>4</div>
-          <div>
-            <div style={{ color: '#334155', fontWeight: 600, fontSize: '0.9rem' }}>Observe</div>
-            <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Traces & drift</div>
-          </div>
-        </div>
-
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', backgroundColor: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
@@ -192,7 +189,7 @@ export default function ContextStudioPage() {
                       {groupedRules[agentName].map((rule: any) => (
                         <div 
                           key={rule.id}
-                          onClick={() => { setActiveRuleId(rule.id); setContent(rule.content); setIsCreating(false); }}
+                          onClick={() => { setActiveRuleId(rule.id); setContent(rule.content); setIsCreating(false); setCurrentStep(1); }}
                           style={{ 
                             padding: '6px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem',
                             backgroundColor: activeRuleId === rule.id && !isCreating ? '#eff6ff' : 'transparent',
@@ -283,7 +280,7 @@ export default function ContextStudioPage() {
                 <div style={{ position: 'relative', flex: 1, overflow: 'auto' }}>
                   <textarea 
                     value={content}
-                    onChange={e => setContent(e.target.value)}
+                    onChange={e => { setContent(e.target.value); setCurrentStep(1); }}
                     spellCheck={false}
                     style={{ 
                       position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
