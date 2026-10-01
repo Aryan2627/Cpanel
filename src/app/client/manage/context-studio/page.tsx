@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Database, FileCode, CheckCircle2, Save, Plus, Folder, RefreshCw, Cpu, X } from 'lucide-react';
+import { Folder, FileText, Plus, X, Play, RefreshCw, ChevronRight } from 'lucide-react';
 
 export default function ContextStudioPage() {
   const [rules, setRules] = useState<any[]>([]);
@@ -16,13 +16,7 @@ export default function ContextStudioPage() {
   const [newAgent, setNewAgent] = useState('Niti');
   const [newDesc, setNewDesc] = useState('');
 
-  const AGENTS = [
-    'Niti',
-    'Anveshan',
-    'Tark',
-    'Garuda',
-    'Jarvis'
-  ];
+  const AGENTS = ['Niti', 'Anveshan', 'Tark', 'Garuda', 'Jarvis'];
 
   useEffect(() => {
     fetchRules();
@@ -59,7 +53,7 @@ export default function ContextStudioPage() {
       if (res.ok) {
         const updated = await res.json();
         setRules(rules.map(r => r.id === updated.id ? updated : r));
-        alert('Context rule updated and deployed to ' + activeRule.consumedBy + ' successfully!');
+        alert('Deployed to ' + activeRule.consumedBy + ' successfully!');
       }
     } catch (e) {
       console.error(e);
@@ -95,136 +89,189 @@ export default function ContextStudioPage() {
     setSaving(false);
   };
 
-  // Group rules by agent
   const groupedRules = rules.reduce((acc, rule) => {
     if (!acc[rule.consumedBy]) acc[rule.consumedBy] = [];
     acc[rule.consumedBy].push(rule);
     return acc;
   }, {} as Record<string, any[]>);
 
+  // Lifecycle Steps Header Component
+  const LifecycleHeader = () => (
+    <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #e5e7eb', backgroundColor: '#fff', padding: '0 32px', height: '70px', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: '800px' }}>
+        
+        {/* Step 1 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '2px solid #2563eb', paddingBottom: '16px', marginTop: '16px' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>1</div>
+          <div>
+            <div style={{ color: '#2563eb', fontWeight: 600, fontSize: '0.9rem' }}>Bootstrap</div>
+            <div style={{ color: '#93c5fd', fontSize: '0.75rem' }}>Build context repos</div>
+          </div>
+        </div>
+        <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
+
+        {/* Step 2 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>2</div>
+          <div>
+            <div style={{ color: '#334155', fontWeight: 600, fontSize: '0.9rem' }}>Simulate</div>
+            <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Run evaluations</div>
+          </div>
+        </div>
+        <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
+
+        {/* Step 3 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>3</div>
+          <div>
+            <div style={{ color: '#334155', fontWeight: 600, fontSize: '0.9rem' }}>Deploy</div>
+            <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Push to agents</div>
+          </div>
+        </div>
+        <ChevronRight size={16} color="#cbd5e1" style={{ margin: '0 16px' }} />
+
+        {/* Step 4 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>4</div>
+          <div>
+            <div style={{ color: '#334155', fontWeight: 600, fontSize: '0.9rem' }}>Observe</div>
+            <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Traces & drift</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+
   return (
-    <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)', backgroundColor: '#0f172a', fontFamily: 'system-ui, sans-serif' }}>
-      
-      {/* Sidebar / Context Repo */}
-      <div style={{ width: '300px', backgroundColor: '#1e293b', borderRight: '1px solid #334155', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '24px 20px', borderBottom: '1px solid #334155' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', fontWeight: 700, fontSize: '1.2rem' }}>
-              <Database size={20} color="#a78bfa" />
-              Context Studio
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', backgroundColor: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+      <LifecycleHeader />
+
+      <div style={{ display: 'flex', flex: 1 }}>
+        {/* Sidebar */}
+        <div style={{ width: '320px', borderRight: '1px solid #e5e7eb', backgroundColor: '#fff', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ padding: '16px 24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em' }}>CONTEXT REPO</div>
+            <div style={{ backgroundColor: '#eff6ff', color: '#3b82f6', fontSize: '0.7rem', fontWeight: 600, padding: '4px 10px', borderRadius: '12px' }}>
+              procurement-rules
             </div>
-            <button onClick={() => setIsCreating(true)} style={{ background: 'rgba(167, 139, 250, 0.15)', border: '1px solid rgba(167, 139, 250, 0.3)', color: '#a78bfa', borderRadius: '6px', padding: '4px', cursor: 'pointer' }}>
+            <button onClick={() => setIsCreating(true)} style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
               <Plus size={16} />
             </button>
           </div>
-          <p style={{ color: '#94a3b8', fontSize: '0.8rem', margin: 0 }}>Omni-Agent Logic Controller</p>
+
+          <div style={{ padding: '24px', flex: 1, overflowY: 'auto' }}>
+            {loading ? (
+              <div style={{ color: '#64748b', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}><RefreshCw size={14} className="animate-spin" /> Loading...</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {Object.keys(groupedRules).map(agentName => (
+                  <div key={agentName}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1e293b', fontSize: '0.9rem', fontWeight: 600, marginBottom: '12px' }}>
+                      <Folder size={16} fill="#fbbf24" color="#d97706" /> {agentName}/
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '12px' }}>
+                      {groupedRules[agentName].map((rule: any) => (
+                        <div 
+                          key={rule.id}
+                          onClick={() => { setActiveRuleId(rule.id); setContent(rule.content); setIsCreating(false); }}
+                          style={{ 
+                            padding: '6px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem',
+                            backgroundColor: activeRuleId === rule.id && !isCreating ? '#eff6ff' : 'transparent',
+                            color: activeRuleId === rule.id && !isCreating ? '#2563eb' : '#475569',
+                            borderRadius: '4px'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ width: '4px', height: '4px', backgroundColor: activeRuleId === rule.id && !isCreating ? '#2563eb' : '#94a3b8', transform: 'rotate(45deg)' }} />
+                            {rule.name}
+                          </div>
+                          <div style={{ color: '#94a3b8', fontSize: '0.75rem', fontFamily: 'monospace' }}>
+                            v{rule.version || '1.0.0'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div style={{ padding: '20px', flex: 1, overflowY: 'auto' }}>
-          {loading ? (
-            <div style={{ color: '#94a3b8', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}><RefreshCw size={14} className="animate-spin" /> Loading Agents...</div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {Object.keys(groupedRules).map(agentName => (
-                <div key={agentName}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '0.75rem', fontWeight: 700, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    <Cpu size={14} color="#38bdf8" /> {agentName}
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '8px', borderLeft: '1px solid #334155', marginLeft: '6px' }}>
-                    {groupedRules[agentName].map((rule: any) => (
-                      <div 
-                        key={rule.id}
-                        onClick={() => { setActiveRuleId(rule.id); setContent(rule.content); setIsCreating(false); }}
-                        style={{ 
-                          padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem',
-                          backgroundColor: activeRuleId === rule.id && !isCreating ? 'rgba(167, 139, 250, 0.15)' : 'transparent',
-                          color: activeRuleId === rule.id && !isCreating ? '#a78bfa' : '#cbd5e1'
-                        }}
-                      >
-                        <FileCode size={14} />
-                        {rule.name}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Main Editor Pane */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#0f172a', position: 'relative' }}>
-        {isCreating ? (
-          <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto', width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 style={{ color: '#fff', margin: 0 }}>Create Context Definition</h2>
-              <button onClick={() => setIsCreating(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={24} /></button>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={{ display: 'block', color: '#cbd5e1', fontSize: '0.85rem', marginBottom: '6px' }}>Target Agent</label>
-                <select value={newAgent} onChange={e => setNewAgent(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', background: '#1e293b', border: '1px solid #334155', color: '#fff' }}>
-                  {AGENTS.map(a => <option key={a} value={a}>{a}</option>)}
-                </select>
-              </div>
-              <div>
-                <label style={{ display: 'block', color: '#cbd5e1', fontSize: '0.85rem', marginBottom: '6px' }}>Definition Filename</label>
-                <input value={newName} onChange={e => setNewName(e.target.value)} placeholder="e.g. strict_slas.yml" style={{ width: '100%', padding: '10px', borderRadius: '8px', background: '#1e293b', border: '1px solid #334155', color: '#fff' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', color: '#cbd5e1', fontSize: '0.85rem', marginBottom: '6px' }}>Short Description</label>
-                <input value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="What does this boundary enforce?" style={{ width: '100%', padding: '10px', borderRadius: '8px', background: '#1e293b', border: '1px solid #334155', color: '#fff' }} />
+        {/* Main Editor Pane */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
+          {isCreating ? (
+            <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto', width: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                <h2 style={{ color: '#0f172a', margin: 0, fontWeight: 600 }}>Create Context Definition</h2>
+                <button onClick={() => setIsCreating(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={24} /></button>
               </div>
               
-              <button onClick={handleCreate} disabled={!newName || saving} style={{ marginTop: '16px', background: '#8b5cf6', color: '#fff', padding: '12px', borderRadius: '8px', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
-                {saving ? 'Creating...' : 'Initialize Context'}
-              </button>
-            </div>
-          </div>
-        ) : activeRule ? (
-          <>
-            <div style={{ padding: '24px 32px', borderBottom: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h1 style={{ color: '#fff', fontSize: '1.4rem', margin: '0 0 6px 0', fontWeight: 600 }}>{activeRule.name}</h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', color: '#94a3b8', fontSize: '0.85rem' }}>
-                  <span>Consumed by: <strong style={{ color: '#cbd5e1' }}>{activeRule.consumedBy}</strong></span>
-                  <span>Version: <strong style={{ color: '#cbd5e1' }}>{activeRule.version}</strong></span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#10b981' }}><CheckCircle2 size={14} /> Active</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div>
+                  <label style={{ display: 'block', color: '#475569', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 500 }}>Target Agent</label>
+                  <select value={newAgent} onChange={e => setNewAgent(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '6px', background: '#fff', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}>
+                    {AGENTS.map(a => <option key={a} value={a}>{a}</option>)}
+                  </select>
                 </div>
-              </div>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button 
-                  onClick={handleSave}
-                  disabled={saving || content === activeRule.content}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: (saving || content === activeRule.content) ? '#334155' : '#8b5cf6', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 600, cursor: (saving || content === activeRule.content) ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}
-                >
-                  <Save size={16} /> {saving ? 'Deploying...' : 'Deploy Context'}
+                <div>
+                  <label style={{ display: 'block', color: '#475569', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 500 }}>Definition Filename</label>
+                  <input value={newName} onChange={e => setNewName(e.target.value)} placeholder="e.g. strict_slas.yml" style={{ width: '100%', padding: '12px', borderRadius: '6px', background: '#fff', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', color: '#475569', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 500 }}>Short Description</label>
+                  <input value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="What does this boundary enforce?" style={{ width: '100%', padding: '12px', borderRadius: '6px', background: '#fff', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }} />
+                </div>
+                
+                <button onClick={handleCreate} disabled={!newName || saving} style={{ marginTop: '12px', background: '#2563eb', color: '#fff', padding: '12px', borderRadius: '6px', fontWeight: 500, border: 'none', cursor: 'pointer' }}>
+                  {saving ? 'Creating...' : 'Initialize Context'}
                 </button>
               </div>
             </div>
-
-            <div style={{ flex: 1, padding: '32px', display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto' }}>
-              <div style={{ color: '#94a3b8', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                # You are editing the global context for {activeRule.consumedBy}. YAML/JSON formatting is supported.
+          ) : activeRule ? (
+            <>
+              {/* Editor Header */}
+              <div style={{ padding: '16px 32px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  {activeRule.name}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ backgroundColor: '#f1f5f9', color: '#3b82f6', fontSize: '0.75rem', padding: '4px 12px', borderRadius: '16px', fontWeight: 500 }}>
+                    v{activeRule.version || '1.0.0'} · AI + human
+                  </div>
+                  <button 
+                    onClick={handleSave}
+                    disabled={saving || content === activeRule.content}
+                    style={{ background: 'none', border: 'none', color: (saving || content === activeRule.content) ? '#94a3b8' : '#2563eb', fontWeight: 600, fontSize: '0.85rem', cursor: (saving || content === activeRule.content) ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <Play size={14} fill={(saving || content === activeRule.content) ? '#94a3b8' : '#2563eb'} /> {saving ? 'Deploying...' : 'Deploy'}
+                  </button>
+                </div>
               </div>
-              <textarea 
-                value={content}
-                onChange={e => setContent(e.target.value)}
-                style={{ 
-                  flex: 1, backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '24px', 
-                  color: '#e2e8f0', fontFamily: 'Consolas, Monaco, monospace', fontSize: '0.95rem', lineHeight: 1.6, resize: 'none', outline: 'none',
-                  boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.2)'
-                }}
-              />
+
+              {/* Editor Area (Light Theme Code Look) */}
+              <div style={{ flex: 1, padding: '32px', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '16px', fontFamily: 'Consolas, Monaco, monospace' }}>
+                  # {activeRule.consumedBy.toLowerCase()} · {activeRule.consumedBy}/{activeRule.name}
+                </div>
+                <textarea 
+                  value={content}
+                  onChange={e => setContent(e.target.value)}
+                  style={{ 
+                    flex: 1, backgroundColor: 'transparent', border: 'none', 
+                    color: '#0f172a', fontFamily: 'Consolas, Monaco, monospace', fontSize: '0.9rem', lineHeight: 1.8, resize: 'none', outline: 'none'
+                  }}
+                />
+              </div>
+            </>
+          ) : (
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+              Select a rule from the context repo
             </div>
-          </>
-        ) : (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
-            Select or create a context definition
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
