@@ -49,7 +49,7 @@ export default function FullScreenAgentPage() {
       if (agent === 'Procurement Agent') endpoint = '/api/intakes';
       else if (agent === 'Sourcing Agent') endpoint = '/api/bids';
       else if (agent === 'Negotiation Agent') endpoint = '/api/bids';
-      else if (agent === 'Operations Agent') endpoint = '/api/pos';
+      else if (agent === 'Operations Agent') endpoint = '/api/intakes';
 
       if (!endpoint) return;
 
@@ -61,7 +61,7 @@ export default function FullScreenAgentPage() {
           if (agent === 'Procurement Agent') title = d.title || `Intake Request #${d.id.substring(0,6)}`;
           else if (agent === 'Sourcing Agent') title = d.supplierName ? `Quote_${d.supplierName}.pdf` : `Bid_${d.id.substring(0,6)}.pdf`;
           else if (agent === 'Negotiation Agent') title = `Bid: ${d.vendorName} for ${d.eventTitle || 'Event'}`;
-          else if (agent === 'Operations Agent') title = d.poNumber ? `PO-${d.poNumber}` : `Order_${d.id.substring(0,6)}`;
+          else if (agent === 'Operations Agent') title = d.title ? `PR: ${d.title}` : `PR-${d.refId || d.id.substring(0,6)}`;
 
           return { 
               id: d.id, title, metric: 'Awaiting Run', progress: '0%', type: d.type || 'STANDARD',
@@ -367,7 +367,7 @@ export default function FullScreenAgentPage() {
                     type="text" 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search for a product requirement to source..." 
+                    placeholder="Search for a PR name or ID..." 
                     style={{ width: '100%', padding: '18px 18px 18px 48px', borderRadius: '100px', border: 'none', fontSize: '1rem', outline: 'none', backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.5)' }}
                   />
                 </div>
@@ -391,7 +391,7 @@ export default function FullScreenAgentPage() {
                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', backgroundColor: '#f8fafc', borderRadius: '16px', border: '2px dashed #e2e8f0', color: '#94a3b8' }}>
                    <Search size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
                    <h3 style={{ margin: '0 0 8px 0', color: '#475569' }}>Search your database</h3>
-                   <p style={{ margin: 0, fontSize: '0.9rem' }}>Type a product name (e.g. "Laptop", "Furniture") to locate the intake record.</p>
+                   <p style={{ margin: 0, fontSize: '0.9rem' }}>Type a PR name or ID to locate the record.</p>
                  </div>
               ) : displayItems.length === 0 ? (
                  <div style={{ padding: '32px', textAlign: 'center', color: '#94a3b8', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
