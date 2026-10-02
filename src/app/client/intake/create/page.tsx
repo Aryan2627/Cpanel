@@ -60,7 +60,7 @@ export default function PurchaseIntake() {
         reqAt: formattedDate,
         updAt: formattedDate,
         quantity: Number(quantity) || 1,
-        budget: Number(budget) || 0,
+        budget: typeof budget === 'string' ? Number(budget.replace(/[^0-9.]/g, '')) || 0 : Number(budget) || 0,
       });
 
       setSubmitted(true);

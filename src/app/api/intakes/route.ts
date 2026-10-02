@@ -71,10 +71,10 @@ export async function POST(request: Request) {
         reqAt: data.reqAt || new Date().toISOString().split('T')[0],
         updAt: data.updAt || new Date().toISOString().split('T')[0],
         quantity: data.quantity || 1,
-        customData: data.budget ? { budget: parseFloat(data.budget) } : undefined,
+        customData: (data.budget !== undefined && data.budget !== null) ? { budget: Number(data.budget) } : undefined,
       }
     });
-    return NextResponse.json(newIntake, { status: 201 });
+    return NextResponse.json({ ...newIntake, budget: newIntake.customData ? newIntake.customData.budget : undefined }, { status: 201 });
   } catch (error: any) {
     console.error('API Error creating intake:', error);
     return NextResponse.json({ error: error.message || 'Failed to create intake' }, { status: 500 });
