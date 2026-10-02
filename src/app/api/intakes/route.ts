@@ -12,7 +12,17 @@ export async function GET() {
       where: { organizationId: orgId },
       orderBy: { createdAt: 'desc' }
     });
-    return NextResponse.json(intakes);
+    
+    // Map customData back to root for the frontend PR table
+    const formatted = intakes.map(i => {
+      let budget = undefined;
+      if (i.customData && typeof i.customData === 'object' && !Array.isArray(i.customData)) {
+        budget = (i.customData as any).budget;
+      }
+      return { ...i, budget };
+    });
+    
+    return NextResponse.json(formatted);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch intakes' }, { status: 500 });
   }
@@ -23,7 +33,7 @@ export async function POST(request: Request) {
     const orgId = await getTenantId();
     if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
 
-    // 🔐 TOKEN GATE: Consume tokens before creating PR
+    // TOKEN GATE: Consume tokens before creating PR
     try {
       const { consumeTokens } = await import('../../../lib/tokens');
       await consumeTokens(orgId, 'CREATE_PR');
@@ -61,6 +71,7 @@ export async function POST(request: Request) {
         reqAt: data.reqAt || new Date().toISOString().split('T')[0],
         updAt: data.updAt || new Date().toISOString().split('T')[0],
         quantity: data.quantity || 1,
+        customData: data.budget ? { budget: parseFloat(data.budget) } : undefined,
       }
     });
     return NextResponse.json(newIntake, { status: 201 });
@@ -69,6 +80,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message || 'Failed to create intake' }, { status: 500 });
   }
 }
+
 export async function PUT(request: Request) {
   try {
     const data = await request.json();
@@ -87,4 +99,3 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: error.message || 'Failed to update intake' }, { status: 500 });
   }
 }
-
