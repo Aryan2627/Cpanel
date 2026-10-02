@@ -36,7 +36,7 @@ export function IntakeProvider({ children }: { children: ReactNode }) {
         }
       })
       .catch(err => console.error('Failed to fetch intakes:', err));
-  }, [pathname]);
+  }, []);
 
   const addIntake = async (intake: Intake) => {
     try {

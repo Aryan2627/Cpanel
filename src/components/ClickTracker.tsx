@@ -25,7 +25,7 @@ export default function ClickTracker() {
       clickBuffer.current.push(clickData);
 
       // Flush if buffer gets large
-      if (clickBuffer.current.length >= 5) {
+      if (clickBuffer.current.length >= 25) {
         flushClicks();
       }
     };
