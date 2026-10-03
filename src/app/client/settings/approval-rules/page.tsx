@@ -8,7 +8,7 @@ export default function ApprovalRulesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [newRule, setNewRule] = useState({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: '', hierarchyLevel: 50 });
+  const [newRule, setNewRule] = useState({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: '' });
   
   // Searchable Dropdown State
   const [searchTerm, setSearchTerm] = useState('');
@@ -51,15 +51,24 @@ export default function ApprovalRulesPage() {
     if (!newRule.name || !newRule.value || !newRule.approverRole) return;
     setIsSaving(true);
     try {
+      // Auto-assign the next hierarchy step based on the number of existing rules
+      const nextStep = rules.length + 1;
+      
       const res = await fetch('/api/approval-rules', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newRule)
+        body: JSON.stringify({
+          ...newRule,
+          hierarchyLevel: nextStep
+        })
       });
       const savedRule = await res.json();
-      setRules([...rules, savedRule].sort((a, b) => (a.hierarchyLevel || 50) - (b.hierarchyLevel || 50)));
+      
+      const updatedRules = [...rules, savedRule].sort((a, b) => (a.hierarchyLevel || 0) - (b.hierarchyLevel || 0));
+      setRules(updatedRules);
+      
       setIsAdding(false);
-      setNewRule({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: '', hierarchyLevel: 50 });
+      setNewRule({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: '' });
       setSearchTerm('');
     } catch (error) {
       console.error("Error saving rule:", error);
@@ -97,7 +106,7 @@ export default function ApprovalRulesPage() {
     );
   };
 
-  const sortedRules = [...rules].sort((a, b) => (a.hierarchyLevel || 50) - (b.hierarchyLevel || 50));
+  const sortedRules = [...rules].sort((a, b) => (a.hierarchyLevel || 0) - (b.hierarchyLevel || 0));
   const filteredUsers = dbUsers.filter(u => (u.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (u.email || '').toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
@@ -148,7 +157,7 @@ export default function ApprovalRulesPage() {
                 <div key={rule.id} style={{ padding: '24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                      <span className="badge badge-gray" style={{ fontSize: '0.7rem' }}>LEVEL {rule.hierarchyLevel || 50}</span>
+                      <span className="badge badge-gray" style={{ fontSize: '0.7rem' }}>STEP {index + 1}</span>
                       <h3 style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text)', margin: 0 }}>{rule.name}</h3>
                     </div>
                     
@@ -231,85 +240,65 @@ export default function ApprovalRulesPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '0' }}>
+              {/* SEARCHABLE USER DROPDOWN (FULL WIDTH, NO HIERARCHY SELECTOR) */}
+              <div className="form-group" style={{ marginBottom: 0 }} ref={dropdownRef}>
+                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <ArrowRight size={14} color="var(--text-muted)" /> Then Assign To
+                </label>
                 
-                {/* SEARCHABLE USER DROPDOWN */}
-                <div className="form-group" style={{ marginBottom: 0 }} ref={dropdownRef}>
-                  <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <ArrowRight size={14} color="var(--text-muted)" /> Then Assign To
-                  </label>
-                  
-                  <div style={{ position: 'relative' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
-                      <Search size={16} />
-                    </div>
-                    <input 
-                      type="text" 
-                      className="form-input" 
-                      style={{ paddingLeft: '36px', fontWeight: 700 }}
-                      placeholder="Search users..."
-                      value={searchTerm}
-                      onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        setShowDropdown(true);
-                        // If they clear the text, clear the selection
-                        if (e.target.value === '') {
-                          setNewRule({...newRule, approverRole: ''});
-                        }
-                      }}
-                      onFocus={() => setShowDropdown(true)}
-                    />
-                    
-                    {showDropdown && (
-                      <div style={{ 
-                        position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, 
-                        background: '#fff', border: '1px solid var(--border)', borderRadius: '8px', 
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 9999, 
-                        maxHeight: '220px', overflowY: 'auto' 
-                      }}>
-                        {filteredUsers.length === 0 ? (
-                          <div style={{ padding: '12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>No users found</div>
-                        ) : (
-                          filteredUsers.map(user => (
-                            <div 
-                              key={user.id}
-                              style={{ padding: '10px 14px', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', transition: 'background 0.15s' }}
-                              onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
-                              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                              onClick={() => {
-                                setNewRule({...newRule, approverRole: user.name || user.email});
-                                setSearchTerm(user.name || user.email);
-                                setShowDropdown(false);
-                              }}
-                            >
-                              <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text)' }}>{user.name || 'Unnamed'}</div>
-                              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{user.email} • {user.role || 'Member'}</div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )}
+                <div style={{ position: 'relative' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
+                    <Search size={16} />
                   </div>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-                    *Search specific users from database
-                  </p>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    style={{ paddingLeft: '36px', fontWeight: 700 }}
+                    placeholder="Search users..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setShowDropdown(true);
+                      if (e.target.value === '') {
+                        setNewRule({...newRule, approverRole: ''});
+                      }
+                    }}
+                    onFocus={() => setShowDropdown(true)}
+                  />
+                  
+                  {showDropdown && (
+                    <div style={{ 
+                      position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, 
+                      background: '#fff', border: '1px solid var(--border)', borderRadius: '8px', 
+                      boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 9999, 
+                      maxHeight: '220px', overflowY: 'auto' 
+                    }}>
+                      {filteredUsers.length === 0 ? (
+                        <div style={{ padding: '12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>No users found</div>
+                      ) : (
+                        filteredUsers.map(user => (
+                          <div 
+                            key={user.id}
+                            style={{ padding: '10px 14px', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', transition: 'background 0.15s' }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                            onClick={() => {
+                              setNewRule({...newRule, approverRole: user.name || user.email});
+                              setSearchTerm(user.name || user.email);
+                              setShowDropdown(false);
+                            }}
+                          >
+                            <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text)' }}>{user.name || 'Unnamed'}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{user.email} • {user.role || 'Member'}</div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Hierarchy Level</label>
-                  <select 
-                    className="form-select"
-                    value={newRule.hierarchyLevel}
-                    onChange={e => setNewRule({...newRule, hierarchyLevel: parseInt(e.target.value)})}
-                  >
-                    <option value="20">Level 20 (Department Head)</option>
-                    <option value="50">Level 50 (SME / Security / Legal)</option>
-                    <option value="90">Level 90 (Finance / Executive)</option>
-                  </select>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-                    Determines approval order
-                  </p>
-                </div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+                  *Search specific users from database
+                </p>
               </div>
 
             </div>
