@@ -19,11 +19,11 @@ export default function ApprovalRulesPage() {
     value1: '',
     value2: '',
     department: '',
-    approver1: '',
-    approver2: '',
-    approver3: '',
-    approver4: '',
-    approver5: ''
+    approver1: [] as string[],
+    approver2: [] as string[],
+    approver3: [] as string[],
+    approver4: [] as string[],
+    approver5: [] as string[]
   });
 
   useEffect(() => {
@@ -60,10 +60,13 @@ export default function ApprovalRulesPage() {
     if (!newRule.value1 || !newRule.department) return;
     setIsSaving(true);
     
-    // Extract non-empty approvers in order
     const approvers = [
-      newRule.approver1, newRule.approver2, newRule.approver3, newRule.approver4, newRule.approver5
-    ].filter(a => a.trim() !== '');
+      newRule.approver1.join(','), 
+      newRule.approver2.join(','), 
+      newRule.approver3.join(','), 
+      newRule.approver4.join(','), 
+      newRule.approver5.join(',')
+    ].filter(a => a !== '');
 
     if (approvers.length === 0) {
       alert("Please select at least one approver.");
@@ -92,7 +95,7 @@ export default function ApprovalRulesPage() {
       setIsAdding(false);
       setNewRule({
         approvalType: 'Quote Selection', type: 'TPA', logic: 'More than', value1: '', value2: '', department: '',
-        approver1: '', approver2: '', approver3: '', approver4: '', approver5: ''
+        approver1: [], approver2: [], approver3: [], approver4: [], approver5: []
       });
     } catch (error) {
       console.error("Error saving rule:", error);
@@ -110,20 +113,47 @@ export default function ApprovalRulesPage() {
     }
   };
 
-  // Helper component for Searchable User Dropdown (mini version for table cells)
-  const UserSelect = ({ value, onChange, placeholder = "Select..." }: any) => {
+  const MultiUserSelect = ({ value, onChange, placeholder = "Select..." }: any) => {
+    const [isOpen, setIsOpen] = useState(false);
+    
+    const toggleUser = (userStr: string) => {
+      if (value.includes(userStr)) {
+        onChange(value.filter((v: string) => v !== userStr));
+      } else {
+        onChange([...value, userStr]);
+      }
+    };
+    
     return (
-      <select 
-        className="form-select" 
-        style={{ padding: '6px', fontSize: '0.8rem', height: '32px', minWidth: '120px' }}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">{placeholder}</option>
-        {dbUsers.map(u => (
-          <option key={u.id} value={u.name || u.email}>{u.name || u.email}</option>
-        ))}
-      </select>
+      <div style={{ position: 'relative', width: '130px' }}>
+        <div 
+          onClick={() => setIsOpen(!isOpen)}
+          className="form-input"
+          style={{ minHeight: '32px', padding: '4px', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', flexWrap: 'wrap', gap: '4px', background: '#fff', border: '1px solid #ccc', borderRadius: '4px' }}
+        >
+          {value.length === 0 ? <span style={{color: '#999'}}>{placeholder}</span> : null}
+          {value.map((v: string) => (
+            <span key={v} style={{ background: '#e2e8f0', padding: '2px 4px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center' }}>
+              {v.substring(0,10)}{v.length > 10 ? '...' : ''}
+              <span onClick={(e) => { e.stopPropagation(); toggleUser(v); }} style={{marginLeft: '4px', cursor: 'pointer', color: '#666'}}>&times;</span>
+            </span>
+          ))}
+        </div>
+        {isOpen && (
+          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #ddd', zIndex: 10, maxHeight: '150px', overflowY: 'auto', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+            <div style={{ padding: '4px', borderBottom: '1px solid #ddd', fontSize: '0.75rem', color: 'var(--primary)', cursor: 'pointer', textAlign: 'center' }} onClick={() => setIsOpen(false)}>Done</div>
+            {dbUsers.map(u => {
+               const uName = u.name || u.email;
+               return (
+                 <div key={u.id} style={{ padding: '6px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }} onClick={() => toggleUser(uName)}>
+                   <input type="checkbox" checked={value.includes(uName)} readOnly style={{ margin: 0 }} />
+                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{uName}</span>
+                 </div>
+               );
+            })}
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -202,7 +232,11 @@ export default function ApprovalRulesPage() {
                   {[0,1,2,3,4].map(idx => (
                     <td key={idx} style={{ padding: '12px' }}>
                       {parsedApprovers[idx] ? (
-                        <span className="badge badge-gray" style={{ fontSize: '0.75rem' }}>{parsedApprovers[idx]}</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          {parsedApprovers[idx].split(',').map((u: string, i: number) => (
+                             <span key={i} className="badge badge-gray" style={{ fontSize: '0.7rem' }}>{u}</span>
+                          ))}
+                        </div>
                       ) : (
                         <span style={{ color: 'var(--border)', fontSize: '0.8rem' }}>-</span>
                       )}
@@ -306,19 +340,19 @@ export default function ApprovalRulesPage() {
                 
                 {/* 5 User Selects */}
                 <td style={{ padding: '8px' }}>
-                  <UserSelect value={newRule.approver1} onChange={(v: string) => setNewRule({...newRule, approver1: v})} />
+                  <MultiUserSelect value={newRule.approver1} onChange={(v: string[]) => setNewRule({...newRule, approver1: v})} />
                 </td>
                 <td style={{ padding: '8px' }}>
-                  <UserSelect value={newRule.approver2} onChange={(v: string) => setNewRule({...newRule, approver2: v})} />
+                  <MultiUserSelect value={newRule.approver2} onChange={(v: string[]) => setNewRule({...newRule, approver2: v})} />
                 </td>
                 <td style={{ padding: '8px' }}>
-                  <UserSelect value={newRule.approver3} onChange={(v: string) => setNewRule({...newRule, approver3: v})} />
+                  <MultiUserSelect value={newRule.approver3} onChange={(v: string[]) => setNewRule({...newRule, approver3: v})} />
                 </td>
                 <td style={{ padding: '8px' }}>
-                  <UserSelect value={newRule.approver4} onChange={(v: string) => setNewRule({...newRule, approver4: v})} />
+                  <MultiUserSelect value={newRule.approver4} onChange={(v: string[]) => setNewRule({...newRule, approver4: v})} />
                 </td>
                 <td style={{ padding: '8px' }}>
-                  <UserSelect value={newRule.approver5} onChange={(v: string) => setNewRule({...newRule, approver5: v})} />
+                  <MultiUserSelect value={newRule.approver5} onChange={(v: string[]) => setNewRule({...newRule, approver5: v})} />
                 </td>
                 
                 <td style={{ padding: '12px', textAlign: 'right', whiteSpace: 'nowrap' }}>
