@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, ShieldAlert, Loader2, ArrowRight, DollarSign, Tag, Building2, Zap, X, ShieldCheck, Check } from 'lucide-react';
+import { Plus, Trash2, Settings, ShieldAlert, Loader2, ArrowRight, DollarSign, Tag, Building2, Zap, X, ShieldCheck, Check } from 'lucide-react';
 
 export default function ApprovalRulesPage() {
   const [rules, setRules] = useState<any[]>([]);
