@@ -4,41 +4,25 @@ import { Plus, Trash2, ShieldAlert, Loader2, ArrowRight, DollarSign, Tag, Buildi
 
 export default function ApprovalRulesPage() {
   const [rules, setRules] = useState<any[]>([]);
-  const [dbRoles, setDbRoles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [newRule, setNewRule] = useState({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: '', hierarchyLevel: 50 });
+  const [newRule, setNewRule] = useState({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: 'Manager' });
+
+  // Fixed roles list as requested
+  const PLATFORM_ROLES = ['Manager', 'Member', 'Admin'];
 
   useEffect(() => {
-    fetchData();
+    fetchRules();
   }, []);
 
-  const fetchData = async () => {
+  const fetchRules = async () => {
     try {
-      const [rulesRes, usersRes] = await Promise.all([
-        fetch('/api/approval-rules'),
-        fetch('/api/users')
-      ]);
-      
-      const rulesData = await rulesRes.json();
-      const usersData = await usersRes.json();
-      
-      // Extract unique roles from actual DB users
-      const uniqueRoles = Array.from(new Set((usersData as any[]).map(u => u.role).filter(Boolean))) as string[];
-      if (uniqueRoles.length > 0) {
-        setDbRoles(uniqueRoles);
-        // Default the new rule to the first available role if not set
-        setNewRule(prev => ({ ...prev, approverRole: uniqueRoles[0] }));
-      } else {
-        // Fallback if they have no users set up yet
-        setDbRoles(['CFO', 'IT Security', 'Legal Counsel', 'Department VP']);
-        setNewRule(prev => ({ ...prev, approverRole: 'CFO' }));
-      }
-      
-      setRules(rulesData);
+      const res = await fetch('/api/approval-rules');
+      const data = await res.json();
+      setRules(data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching rules:", error);
     } finally {
       setIsLoading(false);
     }
@@ -54,9 +38,9 @@ export default function ApprovalRulesPage() {
         body: JSON.stringify(newRule)
       });
       const savedRule = await res.json();
-      setRules([...rules, savedRule].sort((a, b) => a.hierarchyLevel - b.hierarchyLevel)); // Sort in UI
+      setRules([...rules, savedRule]);
       setIsAdding(false);
-      setNewRule({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: dbRoles[0] || '', hierarchyLevel: 50 });
+      setNewRule({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: 'Manager' });
     } catch (error) {
       console.error("Error saving rule:", error);
     } finally {
@@ -92,9 +76,6 @@ export default function ApprovalRulesPage() {
       </div>
     );
   };
-
-  // Sort rules for display by their hierarchy level
-  const sortedRules = [...rules].sort((a, b) => (a.hierarchyLevel || 50) - (b.hierarchyLevel || 50));
 
   return (
     <div className="page-content" style={{ padding: '32px' }}>
@@ -140,11 +121,11 @@ export default function ApprovalRulesPage() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {sortedRules.map((rule, index) => (
+              {rules.map((rule, index) => (
                 <div key={rule.id} style={{ padding: '24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                      <span className="badge badge-gray" style={{ fontSize: '0.7rem' }}>LEVEL {rule.hierarchyLevel || 50}</span>
+                      <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>RULE {index + 1}</span>
                       <h3 style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text)', margin: 0 }}>{rule.name}</h3>
                     </div>
                     
@@ -227,41 +208,20 @@ export default function ApprovalRulesPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '0' }}>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <ArrowRight size={14} color="var(--text-muted)" /> Then Assign To
-                  </label>
-                  <select 
-                    className="form-select" 
-                    style={{ fontWeight: 700, color: 'var(--accent)' }}
-                    value={newRule.approverRole} 
-                    onChange={e => setNewRule({...newRule, approverRole: e.target.value})}
-                  >
-                    {dbRoles.map(role => (
-                      <option key={role} value={role}>{role}</option>
-                    ))}
-                  </select>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-                    *Roles fetched from active Users
-                  </p>
-                </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Hierarchy Level</label>
-                  <select 
-                    className="form-select"
-                    value={newRule.hierarchyLevel}
-                    onChange={e => setNewRule({...newRule, hierarchyLevel: parseInt(e.target.value)})}
-                  >
-                    <option value="20">Level 20 (Department Head)</option>
-                    <option value="50">Level 50 (SME / Security / Legal)</option>
-                    <option value="90">Level 90 (Finance / Executive)</option>
-                  </select>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-                    Determines approval order
-                  </p>
-                </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <ArrowRight size={14} color="var(--text-muted)" /> Then Assign To
+                </label>
+                <select 
+                  className="form-select" 
+                  style={{ fontWeight: 700, color: 'var(--accent)' }}
+                  value={newRule.approverRole} 
+                  onChange={e => setNewRule({...newRule, approverRole: e.target.value})}
+                >
+                  {PLATFORM_ROLES.map(role => (
+                    <option key={role} value={role}>{role}</option>
+                  ))}
+                </select>
               </div>
 
             </div>
