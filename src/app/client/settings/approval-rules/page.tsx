@@ -13,6 +13,7 @@ export default function ApprovalRulesPage() {
   // State for new row
   const [isAdding, setIsAdding] = useState(false);
   const [newRule, setNewRule] = useState({
+    approvalType: 'Quote Selection',
     type: 'TPA',
     logic: 'More than',
     value1: '',
@@ -75,6 +76,7 @@ export default function ApprovalRulesPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          approvalType: newRule.approvalType,
           type: newRule.type,
           logic: newRule.logic,
           value1: newRule.value1,
@@ -89,7 +91,7 @@ export default function ApprovalRulesPage() {
       // Reset
       setIsAdding(false);
       setNewRule({
-        type: 'TPA', logic: 'More than', value1: '', value2: '', department: '',
+        approvalType: 'Quote Selection', type: 'TPA', logic: 'More than', value1: '', value2: '', department: '',
         approver1: '', approver2: '', approver3: '', approver4: '', approver5: ''
       });
     } catch (error) {
@@ -149,6 +151,7 @@ export default function ApprovalRulesPage() {
         <table className="table" style={{ width: '100%', minWidth: '1000px', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#f8fafc', borderBottom: '2px solid var(--border)' }}>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '180px' }}>Approval Type</th>
               <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '120px' }}>Type</th>
               <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '220px' }}>Condition</th>
               <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '150px' }}>Department</th>
@@ -169,6 +172,9 @@ export default function ApprovalRulesPage() {
               
               return (
                 <tr key={rule.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                  <td style={{ padding: '12px' }}>
+                    <span style={{ fontWeight: 600, color: 'var(--text)' }}>{rule.approvalType || 'Quote Selection'}</span>
+                  </td>
                   <td style={{ padding: '12px' }}>
                     <span style={{ fontWeight: 600, color: 'var(--accent)' }}>{rule.type}</span>
                   </td>
@@ -215,6 +221,22 @@ export default function ApprovalRulesPage() {
             {/* ADD NEW ROW FORM */}
             {isAdding && (
               <tr style={{ background: '#f0fdf4', borderBottom: '2px solid #bbf7d0' }}>
+                <td style={{ padding: '12px' }}>
+                  <select 
+                    className="form-select" 
+                    style={{ padding: '6px', fontSize: '0.85rem', height: '32px' }}
+                    value={newRule.approvalType}
+                    onChange={(e) => setNewRule({...newRule, approvalType: e.target.value})}
+                  >
+                    <option value="Quote Selection">Quote Selection</option>
+                    <option value="Event Creation">Event Creation</option>
+                    <option value="Surrogate Bid Creation">Surrogate Bid Creation</option>
+                    <option value="Create Product">Create Product</option>
+                    <option value="Reorder Proposal">Reorder Proposal</option>
+                    <option value="Create User">Create User</option>
+                    <option value="Intake Request">Intake Request</option>
+                  </select>
+                </td>
                 <td style={{ padding: '12px' }}>
                   <select 
                     className="form-select" 

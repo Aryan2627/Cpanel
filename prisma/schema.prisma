@@ -434,6 +434,7 @@ model ApprovalRule {
   id             String        @id @default(uuid())
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
+  approvalType   String        @default("Quote Selection")
   type           String
   value1         String
   logic          String

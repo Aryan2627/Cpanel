@@ -36,6 +36,8 @@ export async function POST(request: Request) {
     
     // Evaluate the matrix rules against the PO Amount (TPA)
     for (const rule of rules) {
+      if (rule.approvalType && rule.approvalType !== 'Quote Selection') continue;
+      
       if (rule.type === 'TPA' || rule.type === 'estimatedValue' || rule.type === 'PO Value' || rule.type === 'Total Proposal Value') {
         const ruleValue1 = parseFloat(rule.value1);
         const ruleValue2 = rule.value2 ? parseFloat(rule.value2) : 0;
