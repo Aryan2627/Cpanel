@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma'; // Make sure this path to prisma is correct
+import { prisma } from '@/lib/prisma';
+import { getTenantId } from '@/lib/tenant';
 
 // GET all approval rules
 export async function GET() {
   try {
+    const orgId = await getTenantId();
     const rules = await prisma.approvalRule.findMany({
+      where: { organizationId: orgId },
       orderBy: { createdAt: 'asc' },
     });
     return NextResponse.json(rules);
@@ -14,22 +17,22 @@ export async function GET() {
   }
 }
 
-// POST a new approval rule
+// POST a new approval matrix rule
 export async function POST(request: Request) {
   try {
+    const orgId = await getTenantId();
     const body = await request.json();
-    const { name, field, operator, value, approverRole, hierarchyLevel } = body;
-
-    const parsedLevel = hierarchyLevel ? parseInt(hierarchyLevel) : 50;
+    const { type, value1, logic, value2, department, approvers } = body;
 
     const newRule = await prisma.approvalRule.create({
       data: {
-        name,
-        field,
-        operator,
-        value,
-        approverRole,
-        hierarchyLevel: parsedLevel,
+        organizationId: orgId,
+        type,
+        value1,
+        logic,
+        value2: value2 || null,
+        department,
+        approvers: JSON.stringify(approvers), // Save the array as JSON string
       },
     });
 

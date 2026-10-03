@@ -434,14 +434,12 @@ model ApprovalRule {
   id             String        @id @default(uuid())
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
-  name           String
-  field          String
-  operator       String
-  value          String
-  approverRole   String
-  isActive       Boolean       @default(true)
+  type           String
+  value1         String
+  logic          String
+  value2         String?
+  department     String
+  approvers      String
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-
-  @@index([organizationId])
 }

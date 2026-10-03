@@ -1,45 +1,53 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Trash2, ShieldAlert, Loader2, ArrowRight, DollarSign, Tag, Building2, Zap, X, ShieldCheck, Check, Layers, Search, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Trash2, Zap, Save, Search } from 'lucide-react';
 
 export default function ApprovalRulesPage() {
   const [rules, setRules] = useState<any[]>([]);
   const [dbUsers, setDbUsers] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAdding, setIsAdding] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [newRule, setNewRule] = useState({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: '' });
+  const [departments, setDepartments] = useState<any[]>([]);
   
-  // Searchable Dropdown State
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // State for new row
+  const [isAdding, setIsAdding] = useState(false);
+  const [newRule, setNewRule] = useState({
+    type: 'TPA',
+    logic: 'More than',
+    value1: '',
+    value2: '',
+    department: '',
+    approver1: '',
+    approver2: '',
+    approver3: '',
+    approver4: '',
+    approver5: ''
+  });
 
   useEffect(() => {
     fetchData();
-    
-    // Close dropdown on outside click
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const fetchData = async () => {
     try {
-      const [rulesRes, usersRes] = await Promise.all([
+      const [rulesRes, usersRes, deptsRes] = await Promise.all([
         fetch('/api/approval-rules'),
-        fetch('/api/users')
+        fetch('/api/users'),
+        fetch('/api/departments').catch(() => ({ json: () => [] })) // Fallback
       ]);
       
       const rulesData = await rulesRes.json();
       const usersData = await usersRes.json();
+      const deptsData = await deptsRes.json();
       
       setRules(rulesData);
       setDbUsers(usersData);
+      setDepartments(deptsData || [
+        { id: '1', name: 'Information Technology' },
+        { id: '2', name: 'Finance' },
+        { id: '3', name: 'Operations' }
+      ]);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -48,28 +56,42 @@ export default function ApprovalRulesPage() {
   };
 
   const handleSaveRule = async () => {
-    if (!newRule.name || !newRule.value || !newRule.approverRole) return;
+    if (!newRule.value1 || !newRule.department) return;
     setIsSaving(true);
+    
+    // Extract non-empty approvers in order
+    const approvers = [
+      newRule.approver1, newRule.approver2, newRule.approver3, newRule.approver4, newRule.approver5
+    ].filter(a => a.trim() !== '');
+
+    if (approvers.length === 0) {
+      alert("Please select at least one approver.");
+      setIsSaving(false);
+      return;
+    }
+
     try {
-      // Auto-assign the next hierarchy step based on the number of existing rules
-      const nextStep = rules.length + 1;
-      
       const res = await fetch('/api/approval-rules', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...newRule,
-          hierarchyLevel: nextStep
+          type: newRule.type,
+          logic: newRule.logic,
+          value1: newRule.value1,
+          value2: newRule.logic === 'Between' ? newRule.value2 : null,
+          department: newRule.department,
+          approvers: approvers
         })
       });
       const savedRule = await res.json();
+      setRules([...rules, savedRule]);
       
-      const updatedRules = [...rules, savedRule].sort((a, b) => (a.hierarchyLevel || 0) - (b.hierarchyLevel || 0));
-      setRules(updatedRules);
-      
+      // Reset
       setIsAdding(false);
-      setNewRule({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: '' });
-      setSearchTerm('');
+      setNewRule({
+        type: 'TPA', logic: 'More than', value1: '', value2: '', department: '',
+        approver1: '', approver2: '', approver3: '', approver4: '', approver5: ''
+      });
     } catch (error) {
       console.error("Error saving rule:", error);
     } finally {
@@ -86,240 +108,216 @@ export default function ApprovalRulesPage() {
     }
   };
 
-  const renderCondition = (rule: any) => {
-    const isAmount = rule.field === 'estimatedValue';
-    const isCategory = rule.field === 'category';
-    
+  // Helper component for Searchable User Dropdown (mini version for table cells)
+  const UserSelect = ({ value, onChange, placeholder = "Select..." }: any) => {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
-        <span className={isAmount ? "badge badge-green" : isCategory ? "badge badge-blue" : "badge badge-purple"}>
-          {isAmount ? <DollarSign size={12} /> : isCategory ? <Tag size={12} /> : <Building2 size={12} />}
-          {isAmount ? 'Spend Amount' : isCategory ? 'Category' : 'Department'}
-        </span>
-        <span style={{ color: 'var(--text-muted)', fontFamily: 'monospace', fontWeight: 'bold' }}>
-          {rule.operator === '>=' ? '≥' : rule.operator}
-        </span>
-        <span style={{ padding: '2px 8px', background: '#fff', border: '1px solid var(--border)', borderRadius: '4px', fontWeight: 700 }}>
-          {isAmount && '$'}{rule.value}
-        </span>
-      </div>
+      <select 
+        className="form-select" 
+        style={{ padding: '6px', fontSize: '0.8rem', height: '32px', minWidth: '120px' }}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">{placeholder}</option>
+        {dbUsers.map(u => (
+          <option key={u.id} value={u.name || u.email}>{u.name || u.email}</option>
+        ))}
+      </select>
     );
   };
 
-  const sortedRules = [...rules].sort((a, b) => (a.hierarchyLevel || 0) - (b.hierarchyLevel || 0));
-  const filteredUsers = dbUsers.filter(u => (u.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (u.email || '').toLowerCase().includes(searchTerm.toLowerCase()));
-
   return (
     <div className="page-content" style={{ padding: '32px' }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        
-        {/* HEADER SECTION */}
-        <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
-          <div>
-            <div className="badge badge-blue" style={{ marginBottom: '12px' }}>
-              <Zap size={12} /> Workflow Engine
-            </div>
-            <h1 className="page-title" style={{ color: 'var(--text)', marginBottom: '8px' }}>
-              Routing & Rules
-            </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', maxWidth: '600px', lineHeight: 1.5 }}>
-              Automate your procurement compliance. Define dynamic conditions to automatically route Purchase Requests to the right approvers based on spend, category, or department.
-            </p>
+      
+      {/* HEADER SECTION */}
+      <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
+        <div>
+          <div className="badge badge-blue" style={{ marginBottom: '12px' }}>
+            <Zap size={12} /> Matrix Workflow Engine
           </div>
-          <button onClick={() => setIsAdding(true)} className="btn btn-primary">
-            <Plus size={16} /> Create Rule
-          </button>
+          <h1 className="page-title" style={{ color: 'var(--text)', marginBottom: '8px' }}>
+            Approval Routing Matrix
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', maxWidth: '800px', lineHeight: 1.5 }}>
+            Configure the exact horizontal approval chain based on the document type, condition, and department. 
+            Approvers will be notified sequentially from User 1 to User 5.
+          </p>
         </div>
-
-        {/* RULES LIST */}
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          {isLoading ? (
-            <div style={{ padding: '60px', textAlign: 'center' }}>
-              <Loader2 className="spin-anim" size={32} color="var(--accent)" style={{ margin: '0 auto 16px' }} />
-              <p style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Loading your workflow rules...</p>
-            </div>
-          ) : rules.length === 0 ? (
-            <div style={{ padding: '60px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: '64px', height: '64px', background: '#eff6ff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-                <ShieldAlert size={32} color="#2563eb" />
-              </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text)', marginBottom: '8px' }}>No Rules Configured</h3>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', maxWidth: '400px', lineHeight: 1.5 }}>
-                You haven't set up any dynamic routing rules yet. By default, all requests will only go to the Direct Manager.
-              </p>
-              <button onClick={() => setIsAdding(true)} className="btn btn-secondary">
-                <Plus size={16} /> Create your first rule
-              </button>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {sortedRules.map((rule, index) => (
-                <div key={rule.id} style={{ padding: '24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                      <span className="badge badge-gray" style={{ fontSize: '0.7rem' }}>STEP {index + 1}</span>
-                      <h3 style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text)', margin: 0 }}>{rule.name}</h3>
-                    </div>
-                    
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '16px', background: '#f8fafc', border: '1px solid var(--border)', padding: '10px 16px', borderRadius: '10px' }}>
-                      {renderCondition(rule)}
-                      <ArrowRight size={16} color="var(--text-muted)" />
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>Route to</span>
-                        <span className="badge badge-green" style={{ padding: '4px 10px', fontSize: '0.85rem' }}>
-                          <User size={14} /> {rule.approverRole}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <button 
-                    onClick={() => handleDelete(rule.id)} 
-                    className="btn btn-danger"
-                    style={{ padding: '8px', borderRadius: '50%' }}
-                    title="Delete Rule"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
       </div>
 
-      {/* MODAL: ADD RULE */}
-      {isAdding && (
-        <div className="modal-backdrop">
-          <div className="modal" style={{ width: '100%', maxWidth: '540px', overflow: 'visible' }}>
+      {/* MATRIX TABLE */}
+      <div className="card" style={{ padding: '20px', overflowX: 'auto' }}>
+        <table className="table" style={{ width: '100%', minWidth: '1000px', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ background: '#f8fafc', borderBottom: '2px solid var(--border)' }}>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '120px' }}>Type</th>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '220px' }}>Condition</th>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '150px' }}>Department</th>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700 }}>User 1</th>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700 }}>User 2</th>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700 }}>User 3</th>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700 }}>User 4</th>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700 }}>User 5</th>
+              <th style={{ padding: '12px', width: '50px' }}></th>
+            </tr>
+          </thead>
+          <tbody>
             
-            <div className="modal-header" style={{ background: '#f8fafc' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Layers size={20} color="var(--accent)" /> Create Routing Rule
-              </h2>
-              <button onClick={() => setIsAdding(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
-                <X size={24} />
-              </button>
-            </div>
-
-            <div style={{ padding: '24px' }}>
-              <div className="form-group">
-                <label className="form-label">Rule Name</label>
-                <input type="text" placeholder="e.g. Legal Review for High Spend" className="form-input" 
-                  value={newRule.name} onChange={e => setNewRule({...newRule, name: e.target.value})} />
-              </div>
-
-              <div style={{ background: '#f8fafc', border: '1px solid var(--border)', borderRadius: '10px', padding: '20px', marginBottom: '24px' }}>
-                <h3 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px' }}>
-                  If Condition is Met
-                </h3>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                  <div>
-                    <label className="form-label">Trigger Field</label>
-                    <select className="form-select" value={newRule.field} onChange={e => setNewRule({...newRule, field: e.target.value})}>
-                      <option value="estimatedValue">Spend Amount ($)</option>
-                      <option value="category">PR Category</option>
-                      <option value="department">Department</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="form-label">Logic</label>
-                    <select className="form-select" value={newRule.operator} onChange={e => setNewRule({...newRule, operator: e.target.value})}>
-                      <option value=">=">Is Greater Than (≥)</option>
-                      <option value="==">Exactly Equals (==)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="form-label">Trigger Value</label>
-                  <input type="text" placeholder={newRule.field === 'estimatedValue' ? "e.g. 50000" : "e.g. Software"} className="form-input" 
-                    value={newRule.value} onChange={e => setNewRule({...newRule, value: e.target.value})} />
-                </div>
-              </div>
-
-              {/* SEARCHABLE USER DROPDOWN (FULL WIDTH, NO HIERARCHY SELECTOR) */}
-              <div className="form-group" style={{ marginBottom: 0 }} ref={dropdownRef}>
-                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <ArrowRight size={14} color="var(--text-muted)" /> Then Assign To
-                </label>
-                
-                <div style={{ position: 'relative' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
-                    <Search size={16} />
-                  </div>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    style={{ paddingLeft: '36px', fontWeight: 700 }}
-                    placeholder="Search users..."
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                      setShowDropdown(true);
-                      if (e.target.value === '') {
-                        setNewRule({...newRule, approverRole: ''});
-                      }
-                    }}
-                    onFocus={() => setShowDropdown(true)}
-                  />
-                  
-                  {showDropdown && (
-                    <div style={{ 
-                      position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, 
-                      background: '#fff', border: '1px solid var(--border)', borderRadius: '8px', 
-                      boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 9999, 
-                      maxHeight: '220px', overflowY: 'auto' 
-                    }}>
-                      {filteredUsers.length === 0 ? (
-                        <div style={{ padding: '12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>No users found</div>
+            {/* EXISTING RULES */}
+            {rules.map((rule) => {
+              let parsedApprovers = [];
+              try { parsedApprovers = JSON.parse(rule.approvers || '[]'); } catch(e) {}
+              
+              return (
+                <tr key={rule.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                  <td style={{ padding: '12px' }}>
+                    <span style={{ fontWeight: 600, color: 'var(--accent)' }}>{rule.type}</span>
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                      {rule.logic === 'Between' ? (
+                        <>
+                          <span style={{ padding: '2px 6px', background: '#e2e8f0', borderRadius: '4px', fontWeight: 600 }}>${rule.value1}</span>
+                          <span style={{ color: 'var(--text-muted)' }}>&le; {rule.type} &le;</span>
+                          <span style={{ padding: '2px 6px', background: '#e2e8f0', borderRadius: '4px', fontWeight: 600 }}>${rule.value2}</span>
+                        </>
                       ) : (
-                        filteredUsers.map(user => (
-                          <div 
-                            key={user.id}
-                            style={{ padding: '10px 14px', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', transition: 'background 0.15s' }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                            onClick={() => {
-                              setNewRule({...newRule, approverRole: user.name || user.email});
-                              setSearchTerm(user.name || user.email);
-                              setShowDropdown(false);
-                            }}
-                          >
-                            <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text)' }}>{user.name || 'Unnamed'}</div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{user.email} • {user.role || 'Member'}</div>
-                          </div>
-                        ))
+                        <>
+                          <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>{rule.logic}</span>
+                          <span style={{ padding: '2px 6px', background: '#e2e8f0', borderRadius: '4px', fontWeight: 600 }}>${rule.value1}</span>
+                        </>
                       )}
                     </div>
-                  )}
-                </div>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-                  *Search specific users from database
-                </p>
-              </div>
+                  </td>
+                  <td style={{ padding: '12px', fontSize: '0.9rem', color: 'var(--text)' }}>
+                    {rule.department}
+                  </td>
+                  
+                  {/* Approvers 1 to 5 */}
+                  {[0,1,2,3,4].map(idx => (
+                    <td key={idx} style={{ padding: '12px' }}>
+                      {parsedApprovers[idx] ? (
+                        <span className="badge badge-gray" style={{ fontSize: '0.75rem' }}>{parsedApprovers[idx]}</span>
+                      ) : (
+                        <span style={{ color: 'var(--border)', fontSize: '0.8rem' }}>-</span>
+                      )}
+                    </td>
+                  ))}
+                  
+                  <td style={{ padding: '12px', textAlign: 'right' }}>
+                    <button onClick={() => handleDelete(rule.id)} style={{ color: 'var(--danger)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
 
-            </div>
-
-            <div style={{ padding: '16px 24px', background: '#f8fafc', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-              <button onClick={() => setIsAdding(false)} className="btn btn-secondary">
-                Cancel
-              </button>
-              <button 
-                onClick={handleSaveRule} 
-                disabled={isSaving || !newRule.name || !newRule.value || !newRule.approverRole} 
-                className="btn btn-primary"
-              >
-                {isSaving ? <Loader2 size={16} className="spin-anim" /> : <Check size={16} />} 
-                {isSaving ? 'Saving...' : 'Save Rule'}
-              </button>
-            </div>
-
+            {/* ADD NEW ROW FORM */}
+            {isAdding && (
+              <tr style={{ background: '#f0fdf4', borderBottom: '2px solid #bbf7d0' }}>
+                <td style={{ padding: '12px' }}>
+                  <select 
+                    className="form-select" 
+                    style={{ padding: '6px', fontSize: '0.85rem', height: '32px' }}
+                    value={newRule.type}
+                    onChange={(e) => setNewRule({...newRule, type: e.target.value})}
+                  >
+                    <option value="TPA">TPA</option>
+                    <option value="NetLandedRate">Net Landed Rate</option>
+                  </select>
+                </td>
+                
+                <td style={{ padding: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <select 
+                      className="form-select" 
+                      style={{ padding: '6px', fontSize: '0.8rem', height: '30px' }}
+                      value={newRule.logic}
+                      onChange={(e) => setNewRule({...newRule, logic: e.target.value})}
+                    >
+                      <option value="More than">More than (&gt;)</option>
+                      <option value="Less than">Less than (&lt;)</option>
+                      <option value="Between">Between</option>
+                    </select>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <input 
+                        type="number" 
+                        placeholder="Value 1" 
+                        className="form-input" 
+                        style={{ padding: '4px 6px', fontSize: '0.8rem', height: '28px', width: '100%' }}
+                        value={newRule.value1}
+                        onChange={(e) => setNewRule({...newRule, value1: e.target.value})}
+                      />
+                      {newRule.logic === 'Between' && (
+                        <input 
+                          type="number" 
+                          placeholder="Value 2" 
+                          className="form-input" 
+                          style={{ padding: '4px 6px', fontSize: '0.8rem', height: '28px', width: '100%' }}
+                          value={newRule.value2}
+                          onChange={(e) => setNewRule({...newRule, value2: e.target.value})}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </td>
+                
+                <td style={{ padding: '12px' }}>
+                  <select 
+                    className="form-select" 
+                    style={{ padding: '6px', fontSize: '0.85rem', height: '32px' }}
+                    value={newRule.department}
+                    onChange={(e) => setNewRule({...newRule, department: e.target.value})}
+                  >
+                    <option value="">Select...</option>
+                    {departments.map(d => (
+                      <option key={d.id} value={d.name}>{d.name}</option>
+                    ))}
+                  </select>
+                </td>
+                
+                {/* 5 User Selects */}
+                <td style={{ padding: '8px' }}>
+                  <UserSelect value={newRule.approver1} onChange={(v: string) => setNewRule({...newRule, approver1: v})} />
+                </td>
+                <td style={{ padding: '8px' }}>
+                  <UserSelect value={newRule.approver2} onChange={(v: string) => setNewRule({...newRule, approver2: v})} />
+                </td>
+                <td style={{ padding: '8px' }}>
+                  <UserSelect value={newRule.approver3} onChange={(v: string) => setNewRule({...newRule, approver3: v})} />
+                </td>
+                <td style={{ padding: '8px' }}>
+                  <UserSelect value={newRule.approver4} onChange={(v: string) => setNewRule({...newRule, approver4: v})} />
+                </td>
+                <td style={{ padding: '8px' }}>
+                  <UserSelect value={newRule.approver5} onChange={(v: string) => setNewRule({...newRule, approver5: v})} />
+                </td>
+                
+                <td style={{ padding: '12px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  <button 
+                    onClick={handleSaveRule} 
+                    disabled={isSaving || !newRule.value1 || !newRule.department}
+                    className="btn btn-primary" 
+                    style={{ padding: '6px 10px', height: '32px', fontSize: '0.8rem' }}
+                  >
+                    {isSaving ? '...' : <Save size={14} />}
+                  </button>
+                </td>
+              </tr>
+            )}
+            
+          </tbody>
+        </table>
+        
+        {!isAdding && (
+          <div style={{ marginTop: '16px' }}>
+            <button onClick={() => setIsAdding(true)} className="btn btn-secondary" style={{ fontSize: '0.85rem', padding: '6px 12px' }}>
+              <Plus size={14} /> Add Matrix Row
+            </button>
           </div>
-        </div>
-      )}
+        )}
+        
+      </div>
     </div>
   );
 }

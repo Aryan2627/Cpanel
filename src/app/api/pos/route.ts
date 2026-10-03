@@ -24,30 +24,42 @@ export async function POST(request: Request) {
     if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
     const data = await request.json();
     
-    // --- DYNAMIC APPROVAL RULES ENGINE ---
+    // --- DYNAMIC APPROVAL RULES ENGINE (MATRIX) ---
     const totalAmount = parseFloat(data.total || 0);
     
-    // Fetch all rules from the Routing Engine, sorted by hierarchy (step order)
     const rules = await prisma.approvalRule.findMany({
-      orderBy: { hierarchyLevel: 'asc' }
+      where: { organizationId: orgId },
+      orderBy: { createdAt: 'asc' }
     });
     
     let triggeredApprovers: string[] = [];
     
-    // Evaluate the rules against the PO Amount (TPA)
+    // Evaluate the matrix rules against the PO Amount (TPA)
     for (const rule of rules) {
-      if (rule.field === 'estimatedValue') {
-        const ruleValue = parseFloat(rule.value);
-        if (rule.operator === '>=' && totalAmount >= ruleValue) {
-          triggeredApprovers.push(rule.approverRole);
-        } else if (rule.operator === '==' && totalAmount === ruleValue) {
-          triggeredApprovers.push(rule.approverRole);
+      if (rule.type === 'TPA' || rule.type === 'estimatedValue') {
+        const ruleValue1 = parseFloat(rule.value1);
+        const ruleValue2 = rule.value2 ? parseFloat(rule.value2) : 0;
+        
+        let matches = false;
+        if (rule.logic === 'More than' && totalAmount > ruleValue1) matches = true;
+        else if (rule.logic === 'Less than' && totalAmount < ruleValue1) matches = true;
+        else if (rule.logic === '>=' && totalAmount >= ruleValue1) matches = true;
+        else if (rule.logic === '<=' && totalAmount <= ruleValue1) matches = true;
+        else if (rule.logic === 'Between' && totalAmount >= ruleValue1 && totalAmount <= ruleValue2) matches = true;
+        
+        if (matches) {
+          try {
+            const ruleApprovers = JSON.parse(rule.approvers);
+            if (Array.isArray(ruleApprovers)) {
+               triggeredApprovers.push(...ruleApprovers);
+            }
+          } catch(e) {}
         }
       }
     }
     
-    // Deduplicate approvers while maintaining their sorted hierarchy order
-    triggeredApprovers = [...new Set(triggeredApprovers)];
+    // Deduplicate approvers while maintaining their sequence order
+    triggeredApprovers = [...new Set(triggeredApprovers)].filter(Boolean);
     
     const requiresApproval = triggeredApprovers.length > 0;
     
@@ -68,7 +80,6 @@ export async function POST(request: Request) {
       }
     });
 
-    // Update Intakes based on awarded quantities
     if (data.details) {
       try {
         const detailsObj = JSON.parse(data.details);
@@ -80,13 +91,11 @@ export async function POST(request: Request) {
             
             if (intake && awardedQty > 0) {
               if (awardedQty >= intake.quantity) {
-                // Fully awarded -> mark as Approved (Completed)
                 await prisma.intake.update({
                   where: { id: intake.id },
                   data: { status: 'Approved' }
                 });
               } else {
-                // Partially awarded -> split the PR
                 const remaining = intake.quantity - awardedQty;
                 
                 await prisma.intake.update({
@@ -120,10 +129,9 @@ export async function POST(request: Request) {
     }
 
     if (requiresApproval) {
-      // Create a unique dynamic workflow just for this PO
       const workflow = await prisma.workflow.create({
         data: {
-          name: `Dynamic Approval - ${po.poNumber}`,
+          name: `Matrix Approval - ${po.poNumber}`,
           category: 'Finance PO Approval',
           approvers: JSON.stringify(triggeredApprovers),
           isActive: true
@@ -139,7 +147,7 @@ export async function POST(request: Request) {
           currentStep: 0,
           history: JSON.stringify([{ 
             action: 'Created', 
-            by: 'System (Routing Engine)', 
+            by: 'System (Matrix Engine)', 
             date: new Date().toISOString(),
             poId: po.id, 
             type: 'PO_APPROVAL'
@@ -150,13 +158,11 @@ export async function POST(request: Request) {
       return NextResponse.json(po, { status: 201 });
     }
 
-    // If no rules triggered, auto-push to ERP Sync Service (Microservice)
     fetch('http://localhost:3001/pos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(po)
-    })
-      .then(async (res) => {
+    }).then(async (res) => {
         if (res.ok) {
           const syncData = await res.json();
           await prisma.purchaseOrder.update({
@@ -164,10 +170,9 @@ export async function POST(request: Request) {
             data: { erpStatus: 'Synced', erpId: syncData.erpPoId || po.poNumber, source: 'ERP Sync Service' }
           });
         }
-      })
-      .catch(err => {
-        console.error('Failed to push PO to ERP Microservice:', err.message);
-      });
+    }).catch(err => {
+      console.error('Failed to push PO to ERP Microservice:', err.message);
+    });
 
     return NextResponse.json(po, { status: 201 });
   } catch (error: any) {
