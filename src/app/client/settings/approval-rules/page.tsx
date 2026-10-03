@@ -1,25 +1,44 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Settings, ShieldAlert, Loader2, ArrowRight, DollarSign, Tag, Building2, Zap, X, ShieldCheck, Check } from 'lucide-react';
+import { Plus, Trash2, ShieldAlert, Loader2, ArrowRight, DollarSign, Tag, Building2, Zap, X, ShieldCheck, Check, Layers } from 'lucide-react';
 
 export default function ApprovalRulesPage() {
   const [rules, setRules] = useState<any[]>([]);
+  const [dbRoles, setDbRoles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [newRule, setNewRule] = useState({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: '' });
+  const [newRule, setNewRule] = useState({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: '', hierarchyLevel: 50 });
 
   useEffect(() => {
-    fetchRules();
+    fetchData();
   }, []);
 
-  const fetchRules = async () => {
+  const fetchData = async () => {
     try {
-      const res = await fetch('/api/approval-rules');
-      const data = await res.json();
-      setRules(data);
+      const [rulesRes, usersRes] = await Promise.all([
+        fetch('/api/approval-rules'),
+        fetch('/api/users')
+      ]);
+      
+      const rulesData = await rulesRes.json();
+      const usersData = await usersRes.json();
+      
+      // Extract unique roles from actual DB users
+      const uniqueRoles = Array.from(new Set((usersData as any[]).map(u => u.role).filter(Boolean))) as string[];
+      if (uniqueRoles.length > 0) {
+        setDbRoles(uniqueRoles);
+        // Default the new rule to the first available role if not set
+        setNewRule(prev => ({ ...prev, approverRole: uniqueRoles[0] }));
+      } else {
+        // Fallback if they have no users set up yet
+        setDbRoles(['CFO', 'IT Security', 'Legal Counsel', 'Department VP']);
+        setNewRule(prev => ({ ...prev, approverRole: 'CFO' }));
+      }
+      
+      setRules(rulesData);
     } catch (error) {
-      console.error("Error fetching rules:", error);
+      console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -35,9 +54,9 @@ export default function ApprovalRulesPage() {
         body: JSON.stringify(newRule)
       });
       const savedRule = await res.json();
-      setRules([...rules, savedRule]);
+      setRules([...rules, savedRule].sort((a, b) => a.hierarchyLevel - b.hierarchyLevel)); // Sort in UI
       setIsAdding(false);
-      setNewRule({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: '' });
+      setNewRule({ name: '', field: 'estimatedValue', operator: '>=', value: '', approverRole: dbRoles[0] || '', hierarchyLevel: 50 });
     } catch (error) {
       console.error("Error saving rule:", error);
     } finally {
@@ -73,6 +92,9 @@ export default function ApprovalRulesPage() {
       </div>
     );
   };
+
+  // Sort rules for display by their hierarchy level
+  const sortedRules = [...rules].sort((a, b) => (a.hierarchyLevel || 50) - (b.hierarchyLevel || 50));
 
   return (
     <div className="page-content" style={{ padding: '32px' }}>
@@ -118,11 +140,11 @@ export default function ApprovalRulesPage() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {rules.map((rule, index) => (
+              {sortedRules.map((rule, index) => (
                 <div key={rule.id} style={{ padding: '24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>RULE {index + 1}</span>
+                      <span className="badge badge-gray" style={{ fontSize: '0.7rem' }}>LEVEL {rule.hierarchyLevel || 50}</span>
                       <h3 style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text)', margin: 0 }}>{rule.name}</h3>
                     </div>
                     
@@ -161,7 +183,7 @@ export default function ApprovalRulesPage() {
             
             <div className="modal-header" style={{ background: '#f8fafc' }}>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Settings size={20} color="var(--accent)" /> Create Routing Rule
+                <Layers size={20} color="var(--accent)" /> Create Routing Rule
               </h2>
               <button onClick={() => setIsAdding(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
                 <X size={24} />
@@ -205,13 +227,43 @@ export default function ApprovalRulesPage() {
                 </div>
               </div>
 
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <ArrowRight size={14} color="var(--text-muted)" /> Then Assign To
-                </label>
-                <input type="text" placeholder="e.g. CFO, IT Security, Legal Counsel" className="form-input" style={{ fontWeight: 700 }}
-                  value={newRule.approverRole} onChange={e => setNewRule({...newRule, approverRole: e.target.value})} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '0' }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <ArrowRight size={14} color="var(--text-muted)" /> Then Assign To
+                  </label>
+                  <select 
+                    className="form-select" 
+                    style={{ fontWeight: 700, color: 'var(--accent)' }}
+                    value={newRule.approverRole} 
+                    onChange={e => setNewRule({...newRule, approverRole: e.target.value})}
+                  >
+                    {dbRoles.map(role => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+                    *Roles fetched from active Users
+                  </p>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label">Hierarchy Level</label>
+                  <select 
+                    className="form-select"
+                    value={newRule.hierarchyLevel}
+                    onChange={e => setNewRule({...newRule, hierarchyLevel: parseInt(e.target.value)})}
+                  >
+                    <option value="20">Level 20 (Department Head)</option>
+                    <option value="50">Level 50 (SME / Security / Legal)</option>
+                    <option value="90">Level 90 (Finance / Executive)</option>
+                  </select>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+                    Determines approval order
+                  </p>
+                </div>
               </div>
+
             </div>
 
             <div style={{ padding: '16px 24px', background: '#f8fafc', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>

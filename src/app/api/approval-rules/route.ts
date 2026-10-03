@@ -18,7 +18,9 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, field, operator, value, approverRole } = body;
+    const { name, field, operator, value, approverRole, hierarchyLevel } = body;
+
+    const parsedLevel = hierarchyLevel ? parseInt(hierarchyLevel) : 50;
 
     const newRule = await prisma.approvalRule.create({
       data: {
@@ -27,6 +29,7 @@ export async function POST(request: Request) {
         operator,
         value,
         approverRole,
+        hierarchyLevel: parsedLevel,
       },
     });
 
