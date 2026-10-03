@@ -3,6 +3,7 @@ import { after } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { sendVendorInvitation } from '../../../lib/email-service';
 import { getTenantId } from '../../../lib/tenant';
+import { evaluateApprovalMatrix, createPendingApproval } from '../../../lib/approvalEngine';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
     const orgId = await getTenantId();
     const data = await request.json();
 
-    // 🔐 TOKEN GATE: Consume tokens before creating event
+    // TOKEN GATE
     try {
       const { consumeTokens, insufficientTokensResponse } = await import('../../../lib/tokens');
       await consumeTokens(orgId, 'CREATE_EVENT');
@@ -58,33 +59,16 @@ export async function POST(request: Request) {
     after(async () => {
       try {
         let eventStatus = 'Active';
-        let pendingWorkflow = null;
-        let workflowApprovers = [];
+        
+        // --- DYNAMIC APPROVAL RULES ENGINE ---
+        const { requiresApproval, approvers, workflowName } = await evaluateApprovalMatrix(
+          orgId,
+          'Event Creation',
+          data
+        );
 
-        // Handle explicit workflowId if provided, else fallback to category
-        if (data.workflowId) {
-          const selectedWf = await prisma.workflow.findUnique({
-            where: { id: data.workflowId }
-          });
-          if (selectedWf && selectedWf.organizationId === orgId) {
-            pendingWorkflow = selectedWf;
-          }
-        } else {
-          const workflows = await prisma.workflow.findMany({ 
-            where: { isActive: true, category: data.type, organizationId: orgId } 
-          });
-          if (workflows.length > 0) {
-            pendingWorkflow = workflows[0];
-          }
-        }
-
-        if (pendingWorkflow) {
-          try {
-            workflowApprovers = JSON.parse(pendingWorkflow.approvers);
-            if (workflowApprovers.length > 0) {
-              eventStatus = 'Pending Approval';
-            }
-          } catch(e) {}
+        if (requiresApproval) {
+          eventStatus = 'Pending Approval';
         }
 
         const event = await prisma.event.create({
@@ -106,16 +90,15 @@ export async function POST(request: Request) {
           }
         });
 
-        if (eventStatus === 'Pending Approval' && pendingWorkflow) {
-          await prisma.approvalRequest.create({
-            data: {
-              organizationId: orgId,
-              eventId: event.id,
-              workflowId: pendingWorkflow.id,
-              status: 'Pending',
-              currentStep: 0,
-            }
-          });
+        if (requiresApproval) {
+           await createPendingApproval(
+             orgId,
+             event.id,
+             `${workflowName} - ${event.refId}`,
+             approvers,
+             undefined,
+             'EVENT_APPROVAL'
+           );
         }
 
         // Add to Jarvis Memory (20 days expiration)
@@ -147,7 +130,7 @@ export async function POST(request: Request) {
       }
     });
 
-    // Send immediate response so the UI is extremely fast (takes < 20ms)
+    // Send immediate response so the UI is extremely fast
     return NextResponse.json({ id: eventId, refId: generatedRefId, status: 'Active' }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { getTenantId } from '../../../lib/tenant';
+import { evaluateApprovalMatrix, createPendingApproval } from '../../../lib/approvalEngine';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,46 +25,12 @@ export async function POST(request: Request) {
     if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
     const data = await request.json();
     
-    // --- DYNAMIC APPROVAL RULES ENGINE (MATRIX) ---
-    const totalAmount = parseFloat(data.total || 0);
-    
-    const rules = await prisma.approvalRule.findMany({
-      where: { organizationId: orgId },
-      orderBy: { createdAt: 'asc' }
-    });
-    
-    let triggeredApprovers: string[] = [];
-    
-    // Evaluate the matrix rules against the PO Amount (TPA)
-    for (const rule of rules) {
-      if (rule.approvalType && rule.approvalType !== 'Quote Selection') continue;
-      
-      if (rule.type === 'TPA' || rule.type === 'estimatedValue' || rule.type === 'PO Value' || rule.type === 'Total Proposal Value') {
-        const ruleValue1 = parseFloat(rule.value1);
-        const ruleValue2 = rule.value2 ? parseFloat(rule.value2) : 0;
-        
-        let matches = false;
-        if (rule.logic === 'More than' && totalAmount > ruleValue1) matches = true;
-        else if (rule.logic === 'Less than' && totalAmount < ruleValue1) matches = true;
-        else if (rule.logic === '>=' && totalAmount >= ruleValue1) matches = true;
-        else if (rule.logic === '<=' && totalAmount <= ruleValue1) matches = true;
-        else if (rule.logic === 'Between' && totalAmount >= ruleValue1 && totalAmount <= ruleValue2) matches = true;
-        
-        if (matches) {
-          try {
-            const ruleApprovers = JSON.parse(rule.approvers);
-            if (Array.isArray(ruleApprovers)) {
-               triggeredApprovers.push(...ruleApprovers);
-            }
-          } catch(e) {}
-        }
-      }
-    }
-    
-    // Deduplicate approvers while maintaining their sequence order
-    triggeredApprovers = [...new Set(triggeredApprovers)].filter(Boolean);
-    
-    const requiresApproval = triggeredApprovers.length > 0;
+    // Evaluate the Matrix Engine
+    const { requiresApproval, approvers, workflowName } = await evaluateApprovalMatrix(
+      orgId, 
+      'Quote Selection', 
+      data
+    );
     
     const finalStatus = requiresApproval ? 'Pending Approval' : (data.status || 'Pending Vendor');
     const finalErpStatus = requiresApproval ? 'Blocked - Pending Finance Approval' : 'Pending Sync';
@@ -76,7 +43,7 @@ export async function POST(request: Request) {
         status: finalStatus,
         vendorId: data.vendorId,
         eventId: data.eventId,
-        total: totalAmount,
+        total: parseFloat(data.total || 0),
         details: data.details || null,
         erpStatus: finalErpStatus
       }
@@ -99,12 +66,10 @@ export async function POST(request: Request) {
                 });
               } else {
                 const remaining = intake.quantity - awardedQty;
-                
                 await prisma.intake.update({
                   where: { id: intake.id },
                   data: { status: 'Approved', quantity: awardedQty }
                 });
-                
                 await prisma.intake.create({
                   data: {
                     organizationId: intake.organizationId,
@@ -131,32 +96,14 @@ export async function POST(request: Request) {
     }
 
     if (requiresApproval) {
-      const workflow = await prisma.workflow.create({
-        data: {
-          name: `Matrix Approval - ${po.poNumber}`,
-          category: 'Finance PO Approval',
-          approvers: JSON.stringify(triggeredApprovers),
-          isActive: true
-        }
-      });
-
-      await prisma.approvalRequest.create({
-        data: {
-          organizationId: orgId,
-          eventId: po.eventId, 
-          workflowId: workflow.id,
-          status: 'Pending',
-          currentStep: 0,
-          history: JSON.stringify([{ 
-            action: 'Created', 
-            by: 'System (Matrix Engine)', 
-            date: new Date().toISOString(),
-            poId: po.id, 
-            type: 'PO_APPROVAL'
-          }])
-        }
-      });
-
+      await createPendingApproval(
+        orgId,
+        po.eventId,
+        `${workflowName} - ${po.poNumber}`,
+        approvers,
+        po.id,
+        'PO_APPROVAL'
+      );
       return NextResponse.json(po, { status: 201 });
     }
 

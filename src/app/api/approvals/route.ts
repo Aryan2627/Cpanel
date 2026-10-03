@@ -1,5 +1,6 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
+import { getTenantId } from '../../../lib/tenant';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,15 +13,9 @@ export async function GET() {
       orderBy: { createdAt: 'desc' }
     });
     
-    const eventIds = approvals.map(a => a.eventId);
-    const events = await prisma.event.findMany({
-      where: { id: { in: eventIds } }
-    });
-    
-    const workflows = await prisma.workflow.findMany();
+    const workflows = await prisma.workflow.findMany({ where: { organizationId: orgId } });
 
     const richApprovals = approvals.map(approval => {
-      const event = events.find(e => e.id === approval.eventId);
       const workflow = workflows.find(w => w.id === approval.workflowId);
       
       let approvers = [];
@@ -29,18 +24,25 @@ export async function GET() {
       let history = [];
       try { if (approval.history) history = JSON.parse(approval.history); } catch (e) {}
       
-      const isPoApproval = history.length > 0 && history[0].type === 'PO_APPROVAL';
-      const poId = isPoApproval ? history[0].poId : null;
+      const type = history.length > 0 ? history[0].type : 'GENERIC_APPROVAL';
+      const poId = history.length > 0 ? history[0].poId : null; // we overloaded poId for general reference ID
+
+      let title = workflow?.name || 'Approval Request';
+      if (type === 'PO_APPROVAL') title = `Purchase Order Approval`;
+      if (type === 'INTAKE_APPROVAL') title = `Intake/PR Approval`;
+      if (type === 'EVENT_APPROVAL') title = `Event Creation Approval`;
+      if (type === 'PRODUCT_APPROVAL') title = `Product Approval`;
+      if (type === 'USER_APPROVAL') title = `User Approval`;
 
       return {
         ...approval,
-        eventTitle: isPoApproval ? `Purchase Order for: ${event?.title || 'Unknown'}` : (event?.title || 'Unknown Event'),
-        eventRef: event?.refId || '-',
+        eventTitle: title,
+        eventRef: poId || approval.eventId || '-',
         category: workflow?.category || '-',
         currentApproverEmail: approvers[approval.currentStep] || 'Unknown',
         totalSteps: approvers.length,
-        isPoApproval,
-        poId
+        type,
+        refId: poId // ID of the underlying entity
       };
     });
 
@@ -75,8 +77,8 @@ export async function POST(request: Request) {
     let history: any[] = [];
     try { if (approval.history) history = JSON.parse(approval.history); } catch (e) {}
     
-    const isPoApproval = history.length > 0 && history[0].type === 'PO_APPROVAL';
-    const poId = isPoApproval ? history[0].poId : null;
+    const type = history.length > 0 ? history[0].type : 'GENERIC_APPROVAL';
+    const refId = history.length > 0 ? history[0].poId : null; // overloaded poId
 
     history.push({
       action,
@@ -91,17 +93,18 @@ export async function POST(request: Request) {
         data: { status: 'Rejected', history: JSON.stringify(history) }
       });
       
-      if (isPoApproval && poId) {
-         await prisma.purchaseOrder.update({
-            where: { id: poId },
-            data: { status: 'Rejected', erpStatus: 'Voided' }
-         });
-      } else {
-         await prisma.event.update({
-           where: { id: approval.eventId },
-           data: { status: 'Rejected' }
-         });
+      if (type === 'PO_APPROVAL' && refId) {
+         await prisma.purchaseOrder.update({ where: { id: refId }, data: { status: 'Rejected', erpStatus: 'Voided' } });
+      } else if (type === 'INTAKE_APPROVAL' && refId) {
+         await prisma.intake.update({ where: { id: refId }, data: { status: 'Rejected' } });
+      } else if (type === 'EVENT_APPROVAL' && approval.eventId && approval.eventId !== 'GLOBAL') {
+         await prisma.event.update({ where: { id: approval.eventId }, data: { status: 'Rejected' } });
+      } else if (type === 'PRODUCT_APPROVAL' && refId) {
+         await prisma.product.update({ where: { id: refId }, data: { status: 'Rejected' } });
+      } else if (type === 'USER_APPROVAL' && refId) {
+         await prisma.user.update({ where: { id: refId }, data: { status: 'Rejected' } });
       }
+
       return NextResponse.json({ success: true, status: 'Rejected' });
     } 
     
@@ -109,24 +112,23 @@ export async function POST(request: Request) {
       const nextStep = approval.currentStep + 1;
       
       if (nextStep >= approvers.length) {
-        // Fully approved
+        // Fully approved!
         await prisma.approvalRequest.update({
           where: { id: approvalId },
           data: { status: 'Approved', currentStep: nextStep, history: JSON.stringify(history) }
         });
         
-        if (isPoApproval && poId) {
-           await prisma.purchaseOrder.update({
-              where: { id: poId },
-              data: { status: 'Pending Vendor', erpStatus: 'Pending Sync' } // Unblocks ERP sync and Vendor release
-           });
-           
-           // Theoretically we could trigger the ERP fetch here, but async is fine for demo
-        } else {
-           await prisma.event.update({
-             where: { id: approval.eventId },
-             data: { status: 'Active' }
-           });
+        // Unblock the underlying entity
+        if (type === 'PO_APPROVAL' && refId) {
+           await prisma.purchaseOrder.update({ where: { id: refId }, data: { status: 'Pending Vendor', erpStatus: 'Pending Sync' } });
+        } else if (type === 'INTAKE_APPROVAL' && refId) {
+           await prisma.intake.update({ where: { id: refId }, data: { status: 'Draft' } });
+        } else if (type === 'EVENT_APPROVAL' && approval.eventId && approval.eventId !== 'GLOBAL') {
+           await prisma.event.update({ where: { id: approval.eventId }, data: { status: 'Active' } });
+        } else if (type === 'PRODUCT_APPROVAL' && refId) {
+           await prisma.product.update({ where: { id: refId }, data: { status: 'Active' } });
+        } else if (type === 'USER_APPROVAL' && refId) {
+           await prisma.user.update({ where: { id: refId }, data: { status: 'Active' } });
         }
         
         return NextResponse.json({ success: true, status: 'Approved' });

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getTenantId } from '../../../lib/tenant';
 import { prisma } from '../../../lib/prisma';
+import { evaluateApprovalMatrix, createPendingApproval } from '../../../lib/approvalEngine';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,6 +41,15 @@ export async function POST(request: Request) {
     }
     const productCode = data.code || ('PRD-' + String(nextNum).padStart(4, '0'));
 
+    // --- DYNAMIC APPROVAL RULES ENGINE ---
+    const { requiresApproval, approvers, workflowName } = await evaluateApprovalMatrix(
+      orgId, 
+      'Create Product', 
+      data
+    );
+
+    const initialStatus = requiresApproval ? 'Pending Approval' : (data.status || 'Active');
+
     const product = await prisma.product.create({
       data: {
         code: productCode,
@@ -54,9 +64,21 @@ export async function POST(request: Request) {
         hsnCode: data.hsnCode,
         imageUrl: data.imageUrl,
         phone: data.phone,
-        status: data.status || 'Active',
+        status: initialStatus,
       }
     });
+
+    if (requiresApproval) {
+      await createPendingApproval(
+        orgId,
+        null, // No event ID
+        `${workflowName} - ${productCode}`,
+        approvers,
+        product.id, // Using poId as a generic reference ID in approvalRequest
+        'PRODUCT_APPROVAL'
+      );
+    }
+
     return NextResponse.json(product);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

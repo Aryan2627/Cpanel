@@ -1,6 +1,7 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { getTenantId } from '../../../lib/tenant';
+import { evaluateApprovalMatrix, createPendingApproval } from '../../../lib/approvalEngine';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,6 +41,15 @@ export async function POST(request: Request) {
       }
     }
 
+    // --- DYNAMIC APPROVAL RULES ENGINE ---
+    const { requiresApproval, approvers, workflowName } = await evaluateApprovalMatrix(
+      orgId, 
+      'Create User', 
+      data
+    );
+
+    const initialStatus = requiresApproval ? 'Pending Approval' : (data.status || 'Active');
+
     const user = await prisma.user.create({
       data: {
         organizationId: orgId,
@@ -48,9 +58,21 @@ export async function POST(request: Request) {
         phone: data.phone,
         role: data.role,
         erpId: data.erpId,
-        status: data.status || 'Active',
+        status: initialStatus,
       }
     });
+
+    if (requiresApproval) {
+      await createPendingApproval(
+        orgId,
+        null,
+        `${workflowName} - ${user.name || user.email}`,
+        approvers,
+        user.id,
+        'USER_APPROVAL'
+      );
+    }
+
     return NextResponse.json(user, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -58,6 +80,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  // Existing logic for PUT...
   try {
     const orgId = await getTenantId();
     const data = await request.json();
@@ -107,6 +130,7 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  // Existing logic for DELETE...
   try {
     const orgId = await getTenantId();
     const { searchParams } = new URL(request.url);
