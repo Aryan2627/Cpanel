@@ -41,6 +41,7 @@ const TOP_MENUS = [
       { name: 'Templates', path: '/client/manage/templates' },
       { name: 'Approval Rules', path: '/client/manage/approvals' },
       { name: 'Context Studio (AI)', path: '/client/manage/context-studio' },
+      { name: 'Routing Engine (New)', path: '/client/settings/approval-rules' },
       { name: '? Tokens and Usage', path: '/client/manage/tokens' },
     ]
   },
