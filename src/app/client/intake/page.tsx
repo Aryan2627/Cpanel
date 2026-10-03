@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useRef, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -224,7 +224,7 @@ export default function IntakeTablePage() {
                     onChange={e => setSelectedIds(e.target.checked ? new Set(paginated.map(i => i.refId)) : new Set())}
                     style={{ accentColor: '#0f172a', cursor: 'pointer' }} />
                 </th>
-                {[['refId', 'Ref ID'], ['title', 'Title'], ['reqName', 'Requester'], ['status', 'Status'], ['quantity', 'Qty'], ['reqAt', 'Requested At']].map(([key, label]) => (
+                {[['refId', 'Ref ID'], ['title', 'Title'], ['reqName', 'Requester'], ['status', 'Status'], ['quantity', 'Qty'], ['budget', 'Budget'], ['reqAt', 'Requested At']].map(([key, label]) => (
                   <th key={key} onClick={() => toggleSort(key)} style={{ padding: '13px 16px', textAlign: 'left', color: '#475569', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                       {label} <ArrowUpDown size={11} color="#94a3b8" />
@@ -270,6 +270,7 @@ export default function IntakeTablePage() {
                       <span style={{ padding: '4px 10px', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, ...statusStyle(item.status) }}>{item.status || 'Draft'}</span>
                     </td>
                     <td style={{ padding: '13px 16px', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>{item.quantity || 1}</td>
+                    <td style={{ padding: '13px 16px', color: '#0f172a', fontWeight: 600, fontSize: '0.875rem' }}>{item.budget ? '$' + item.budget.toLocaleString() : '-'}</td>
                     <td style={{ padding: '13px 16px', color: '#94a3b8', fontSize: '0.8rem' }}>{item.reqAt}</td>
                     <td style={{ padding: '13px 16px', textAlign: 'center', position: 'relative' }}>
                       <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
@@ -290,7 +291,7 @@ export default function IntakeTablePage() {
                 );
               }) : (
                 <tr>
-                  <td colSpan={8} style={{ padding: '64px', textAlign: 'center' }}>
+                  <td colSpan={9} style={{ padding: '64px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Inbox size={28} color="#cbd5e1" />
