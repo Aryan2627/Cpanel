@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Zap, Save, Check } from 'lucide-react';
+import { Plus, Minus, Trash2, Zap, Save, Check } from 'lucide-react';
 
 export default function ApprovalRulesPage() {
   const [rules, setRules] = useState<any[]>([]);
@@ -200,13 +200,24 @@ export default function ApprovalRulesPage() {
                 <th key={idx} style={{ padding: '12px', textAlign: 'left', fontWeight: 700, whiteSpace: 'nowrap' }}>
                   User {idx + 1}
                   {idx === hierarchyCount - 1 && (
-                    <button 
-                      onClick={() => setHierarchyCount(hierarchyCount + 1)}
-                      style={{ marginLeft: '8px', background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '50%', width: '18px', height: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', verticalAlign: 'middle' }}
-                      title="Add another level"
-                    >
-                      <Plus size={12} />
-                    </button>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginLeft: '8px', verticalAlign: 'middle' }}>
+                      {hierarchyCount > 1 && (
+                        <button 
+                          onClick={() => setHierarchyCount(hierarchyCount - 1)}
+                          style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                          title="Remove last level"
+                        >
+                          <Minus size={12} />
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => setHierarchyCount(hierarchyCount + 1)}
+                        style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                        title="Add another level"
+                      >
+                        <Plus size={12} />
+                      </button>
+                    </div>
                   )}
                 </th>
               ))}
