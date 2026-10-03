@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { getTenantId } from '../../../lib/tenant';
 
@@ -24,8 +24,32 @@ export async function POST(request: Request) {
     if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
     const data = await request.json();
     
-    // SoD (Segregation of Duties) Check - If PO > 500,000 INR
-    const requiresApproval = parseFloat(data.total || 0) > 500000;
+    // --- DYNAMIC APPROVAL RULES ENGINE ---
+    const totalAmount = parseFloat(data.total || 0);
+    
+    // Fetch all rules from the Routing Engine, sorted by hierarchy (step order)
+    const rules = await prisma.approvalRule.findMany({
+      orderBy: { hierarchyLevel: 'asc' }
+    });
+    
+    let triggeredApprovers: string[] = [];
+    
+    // Evaluate the rules against the PO Amount (TPA)
+    for (const rule of rules) {
+      if (rule.field === 'estimatedValue') {
+        const ruleValue = parseFloat(rule.value);
+        if (rule.operator === '>=' && totalAmount >= ruleValue) {
+          triggeredApprovers.push(rule.approverRole);
+        } else if (rule.operator === '==' && totalAmount === ruleValue) {
+          triggeredApprovers.push(rule.approverRole);
+        }
+      }
+    }
+    
+    // Deduplicate approvers while maintaining their sorted hierarchy order
+    triggeredApprovers = [...new Set(triggeredApprovers)];
+    
+    const requiresApproval = triggeredApprovers.length > 0;
     
     const finalStatus = requiresApproval ? 'Pending Approval' : (data.status || 'Pending Vendor');
     const finalErpStatus = requiresApproval ? 'Blocked - Pending Finance Approval' : 'Pending Sync';
@@ -38,7 +62,7 @@ export async function POST(request: Request) {
         status: finalStatus,
         vendorId: data.vendorId,
         eventId: data.eventId,
-        total: parseFloat(data.total || 0),
+        total: totalAmount,
         details: data.details || null,
         erpStatus: finalErpStatus
       }
@@ -65,25 +89,18 @@ export async function POST(request: Request) {
                 // Partially awarded -> split the PR
                 const remaining = intake.quantity - awardedQty;
                 
-                // 1. Mark original PR as Approved with the awarded quantity
                 await prisma.intake.update({
                   where: { id: intake.id },
-                  data: { 
-                    status: 'Approved',
-                    quantity: awardedQty
-                  }
+                  data: { status: 'Approved', quantity: awardedQty }
                 });
                 
-                // 2. Create a new PR for the remaining open quantity
-                // We generate a new refId by appending a split identifier, or just use a new random one, 
-                // but let's append "-A" or a timestamp to keep it linked.
                 await prisma.intake.create({
                   data: {
                     organizationId: intake.organizationId,
-                    refId: intake.refId + '-REM' + Math.floor(Math.random() * 1000), // Remaining
+                    refId: intake.refId + '-REM' + Math.floor(Math.random() * 1000), 
                     title: intake.title,
                     reqName: intake.reqName,
-                    status: 'Open', // Keep it open
+                    status: 'Open', 
                     type: intake.type,
                     buyer: intake.buyer,
                     reqAt: intake.reqAt,
@@ -103,29 +120,28 @@ export async function POST(request: Request) {
     }
 
     if (requiresApproval) {
-      let workflow = await prisma.workflow.findFirst({ where: { category: 'Finance PO Approval' }});
-      if (!workflow) {
-        workflow = await prisma.workflow.create({
-          data: {
-            name: 'High Value PO Approval',
-            category: 'Finance PO Approval',
-            approvers: JSON.stringify(['finance_director@company.com']),
-            isActive: true
-          }
-        });
-      }
+      // Create a unique dynamic workflow just for this PO
+      const workflow = await prisma.workflow.create({
+        data: {
+          name: `Dynamic Approval - ${po.poNumber}`,
+          category: 'Finance PO Approval',
+          approvers: JSON.stringify(triggeredApprovers),
+          isActive: true
+        }
+      });
 
       await prisma.approvalRequest.create({
         data: {
-          eventId: po.eventId, // Link to the same event
+          organizationId: orgId,
+          eventId: po.eventId, 
           workflowId: workflow.id,
           status: 'Pending',
           currentStep: 0,
           history: JSON.stringify([{ 
             action: 'Created', 
-            by: 'System (SoD Policy)', 
+            by: 'System (Routing Engine)', 
             date: new Date().toISOString(),
-            poId: po.id, // Embedding PO ID here so the approval engine knows it's a PO approval
+            poId: po.id, 
             type: 'PO_APPROVAL'
           }])
         }
@@ -134,7 +150,7 @@ export async function POST(request: Request) {
       return NextResponse.json(po, { status: 201 });
     }
 
-    // Asynchronously push to ERP Sync Service (Microservice)
+    // If no rules triggered, auto-push to ERP Sync Service (Microservice)
     fetch('http://localhost:3001/pos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
