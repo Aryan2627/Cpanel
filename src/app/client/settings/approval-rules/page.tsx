@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Zap, Save, Search } from 'lucide-react';
+import { Plus, Trash2, Zap, Save, Check } from 'lucide-react';
 
 export default function ApprovalRulesPage() {
   const [rules, setRules] = useState<any[]>([]);
   const [dbUsers, setDbUsers] = useState<any[]>([]);
   const [departments, setDepartments] = useState<any[]>([]);
   
+  const [hierarchyCount, setHierarchyCount] = useState(5);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   
@@ -19,11 +20,7 @@ export default function ApprovalRulesPage() {
     value1: '',
     value2: '',
     department: '',
-    approver1: [] as string[],
-    approver2: [] as string[],
-    approver3: [] as string[],
-    approver4: [] as string[],
-    approver5: [] as string[]
+    approverList: Array.from({ length: 20 }, () => [] as string[])
   });
 
   useEffect(() => {
@@ -35,7 +32,7 @@ export default function ApprovalRulesPage() {
       const [rulesRes, usersRes, deptsRes] = await Promise.all([
         fetch('/api/approval-rules'),
         fetch('/api/users'),
-        fetch('/api/departments').catch(() => ({ json: () => [] })) // Fallback
+        fetch('/api/departments').catch(() => ({ json: () => [] }))
       ]);
       
       const rulesData = await rulesRes.json();
@@ -49,6 +46,17 @@ export default function ApprovalRulesPage() {
         { id: '2', name: 'Finance' },
         { id: '3', name: 'Operations' }
       ]);
+
+      // Calculate max hierarchy columns needed based on existing rules
+      let maxH = 5;
+      rulesData.forEach((r: any) => {
+        try {
+          const arr = JSON.parse(r.approvers || '[]');
+          if (arr.length > maxH) maxH = arr.length;
+        } catch(e) {}
+      });
+      setHierarchyCount(maxH);
+
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -56,49 +64,50 @@ export default function ApprovalRulesPage() {
     }
   };
 
-  const handleSaveRule = async () => {
-    if (!newRule.value1 || !newRule.department) return;
+  const handleSaveFlow = async () => {
     setIsSaving(true);
-    
-    const approvers = [
-      newRule.approver1.join(','), 
-      newRule.approver2.join(','), 
-      newRule.approver3.join(','), 
-      newRule.approver4.join(','), 
-      newRule.approver5.join(',')
-    ].filter(a => a !== '');
-
-    if (approvers.length === 0) {
-      alert("Please select at least one approver.");
-      setIsSaving(false);
-      return;
-    }
-
     try {
-      const res = await fetch('/api/approval-rules', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          approvalType: newRule.approvalType,
-          type: newRule.type,
-          logic: newRule.logic,
-          value1: newRule.value1,
-          value2: newRule.logic === 'Between' ? newRule.value2 : null,
-          department: newRule.department,
-          approvers: approvers
-        })
-      });
-      const savedRule = await res.json();
-      setRules([...rules, savedRule]);
+      // If a new row is being actively added, save it to the DB first
+      if (isAdding && newRule.value1 && newRule.department) {
+        const approvers = newRule.approverList
+          .slice(0, hierarchyCount)
+          .map(arr => arr.join(','))
+          .filter(str => str !== '');
+
+        if (approvers.length === 0) {
+          alert("Please select at least one approver for the new rule.");
+          setIsSaving(false);
+          return;
+        }
+
+        const res = await fetch('/api/approval-rules', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            approvalType: newRule.approvalType,
+            type: newRule.type,
+            logic: newRule.logic,
+            value1: newRule.value1,
+            value2: newRule.logic === 'Between' ? newRule.value2 : null,
+            department: newRule.department,
+            approvers: approvers
+          })
+        });
+        const savedRule = await res.json();
+        setRules([...rules, savedRule]);
+        
+        // Reset row adding state
+        setIsAdding(false);
+        setNewRule({
+          approvalType: 'Quote Selection', type: 'TPA', logic: 'More than', value1: '', value2: '', department: '',
+          approverList: Array.from({ length: 20 }, () => [] as string[])
+        });
+      }
       
-      // Reset
-      setIsAdding(false);
-      setNewRule({
-        approvalType: 'Quote Selection', type: 'TPA', logic: 'More than', value1: '', value2: '', department: '',
-        approver1: [], approver2: [], approver3: [], approver4: [], approver5: []
-      });
+      // Global Save Success Toast/Alert
+      alert("Approval Flow configuration saved successfully!");
     } catch (error) {
-      console.error("Error saving rule:", error);
+      console.error("Error saving flow:", error);
     } finally {
       setIsSaving(false);
     }
@@ -158,7 +167,7 @@ export default function ApprovalRulesPage() {
   };
 
   return (
-    <div className="page-content" style={{ padding: '32px' }}>
+    <div className="page-content" style={{ padding: '32px', paddingBottom: '100px' }}>
       
       {/* HEADER SECTION */}
       <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
@@ -171,25 +180,36 @@ export default function ApprovalRulesPage() {
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', maxWidth: '800px', lineHeight: 1.5 }}>
             Configure the exact horizontal approval chain based on the document type, condition, and department. 
-            Approvers will be notified sequentially from User 1 to User 5.
+            Approvers will be notified sequentially from User 1 to User {hierarchyCount}.
           </p>
         </div>
       </div>
 
       {/* MATRIX TABLE */}
-      <div className="card" style={{ padding: '20px', overflowX: 'auto' }}>
+      <div className="card" style={{ padding: '20px', overflowX: 'auto', marginBottom: '40px' }}>
         <table className="table" style={{ width: '100%', minWidth: '1000px', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#f8fafc', borderBottom: '2px solid var(--border)' }}>
-              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '180px' }}>Approval Type</th>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '160px' }}>Approval Type</th>
               <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '120px' }}>Type</th>
               <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '220px' }}>Condition</th>
               <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700, width: '150px' }}>Department</th>
-              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700 }}>User 1</th>
-              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700 }}>User 2</th>
-              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700 }}>User 3</th>
-              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700 }}>User 4</th>
-              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 700 }}>User 5</th>
+              
+              {/* Dynamic Hierarchy Columns */}
+              {Array.from({ length: hierarchyCount }).map((_, idx) => (
+                <th key={idx} style={{ padding: '12px', textAlign: 'left', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                  User {idx + 1}
+                  {idx === hierarchyCount - 1 && (
+                    <button 
+                      onClick={() => setHierarchyCount(hierarchyCount + 1)}
+                      style={{ marginLeft: '8px', background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '50%', width: '18px', height: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', verticalAlign: 'middle' }}
+                      title="Add another level"
+                    >
+                      <Plus size={12} />
+                    </button>
+                  )}
+                </th>
+              ))}
               <th style={{ padding: '12px', width: '50px' }}></th>
             </tr>
           </thead>
@@ -228,9 +248,9 @@ export default function ApprovalRulesPage() {
                     {rule.department}
                   </td>
                   
-                  {/* Approvers 1 to 5 */}
-                  {[0,1,2,3,4].map(idx => (
-                    <td key={idx} style={{ padding: '12px' }}>
+                  {/* Dynamic Approvers rendering */}
+                  {Array.from({ length: hierarchyCount }).map((_, idx) => (
+                    <td key={idx} style={{ padding: '12px', verticalAlign: 'top' }}>
                       {parsedApprovers[idx] ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           {parsedApprovers[idx].split(',').map((u: string, i: number) => (
@@ -243,7 +263,7 @@ export default function ApprovalRulesPage() {
                     </td>
                   ))}
                   
-                  <td style={{ padding: '12px', textAlign: 'right' }}>
+                  <td style={{ padding: '12px', textAlign: 'right', verticalAlign: 'middle' }}>
                     <button onClick={() => handleDelete(rule.id)} style={{ color: 'var(--danger)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
                       <Trash2 size={16} />
                     </button>
@@ -338,31 +358,23 @@ export default function ApprovalRulesPage() {
                   </select>
                 </td>
                 
-                {/* 5 User Selects */}
-                <td style={{ padding: '8px' }}>
-                  <MultiUserSelect value={newRule.approver1} onChange={(v: string[]) => setNewRule({...newRule, approver1: v})} />
-                </td>
-                <td style={{ padding: '8px' }}>
-                  <MultiUserSelect value={newRule.approver2} onChange={(v: string[]) => setNewRule({...newRule, approver2: v})} />
-                </td>
-                <td style={{ padding: '8px' }}>
-                  <MultiUserSelect value={newRule.approver3} onChange={(v: string[]) => setNewRule({...newRule, approver3: v})} />
-                </td>
-                <td style={{ padding: '8px' }}>
-                  <MultiUserSelect value={newRule.approver4} onChange={(v: string[]) => setNewRule({...newRule, approver4: v})} />
-                </td>
-                <td style={{ padding: '8px' }}>
-                  <MultiUserSelect value={newRule.approver5} onChange={(v: string[]) => setNewRule({...newRule, approver5: v})} />
-                </td>
+                {/* Dynamic User Selects for New Row */}
+                {Array.from({ length: hierarchyCount }).map((_, idx) => (
+                  <td key={idx} style={{ padding: '8px', verticalAlign: 'top' }}>
+                    <MultiUserSelect 
+                      value={newRule.approverList[idx]} 
+                      onChange={(v: string[]) => {
+                        const updated = [...newRule.approverList];
+                        updated[idx] = v;
+                        setNewRule({...newRule, approverList: updated});
+                      }} 
+                    />
+                  </td>
+                ))}
                 
-                <td style={{ padding: '12px', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                  <button 
-                    onClick={handleSaveRule} 
-                    disabled={isSaving || !newRule.value1 || !newRule.department}
-                    className="btn btn-primary" 
-                    style={{ padding: '6px 10px', height: '32px', fontSize: '0.8rem' }}
-                  >
-                    {isSaving ? '...' : <Save size={14} />}
+                <td style={{ padding: '12px', textAlign: 'right', verticalAlign: 'middle' }}>
+                  <button onClick={() => setIsAdding(false)} style={{ color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                    <Trash2 size={16} />
                   </button>
                 </td>
               </tr>
@@ -378,8 +390,42 @@ export default function ApprovalRulesPage() {
             </button>
           </div>
         )}
-        
       </div>
+
+      {/* FIXED FOOTER FOR SAVING FLOW */}
+      <div style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 250, // Assuming sidebar width is 250px
+        right: 0,
+        background: '#fff',
+        borderTop: '1px solid #e2e8f0',
+        padding: '16px 32px',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        boxShadow: '0 -4px 6px -1px rgba(0,0,0,0.05)',
+        zIndex: 50
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Configure your entire Approval Routing Matrix, then save to apply it globally.
+          </span>
+          <button 
+            onClick={handleSaveFlow} 
+            disabled={isSaving || (isAdding && (!newRule.value1 || !newRule.department))}
+            className="btn btn-primary" 
+            style={{ padding: '10px 20px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}
+          >
+            {isSaving ? 'Saving...' : (
+              <>
+                <Check size={16} /> Save Matrix Flow
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 }
