@@ -224,6 +224,12 @@ export default function ApprovalRulesPage() {
                   >
                     <option value="TPA">TPA</option>
                     <option value="NetLandedRate">Net Landed Rate</option>
+                    <option value="PO Value">PO Value</option>
+                    <option value="TNA score count">TNA score count</option>
+                    <option value="Auction Rank">Auction Rank</option>
+                    <option value="Total Proposal Value">Total Proposal Value</option>
+                    <option value="Intake Request Condition Type">Intake Request Condition Type</option>
+                    <option value="PR Price">PR Price</option>
                   </select>
                 </td>
                 
