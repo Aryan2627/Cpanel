@@ -22,11 +22,13 @@ export async function POST(request: Request) {
   try {
     const orgId = await getTenantId();
     const body = await request.json();
-    const { type, value1, logic, value2, department, approvers } = body;
+    const { flowName, approvalType, type, value1, logic, value2, department, approvers } = body;
 
     const newRule = await prisma.approvalRule.create({
       data: {
         organizationId: orgId,
+        flowName: flowName || "Default Flow",
+        approvalType: approvalType || "Quote Selection",
         type,
         value1,
         logic,
