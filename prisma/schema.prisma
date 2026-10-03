@@ -16,7 +16,7 @@ model Organization {
   features  String? // JSON string for feature toggles
   industry  String?
   createdAt DateTime @default(now())
-  
+
   // Licensing
   licenseStart  DateTime?
   licenseEnd    DateTime?
@@ -24,28 +24,29 @@ model Organization {
   licensePlan   String?   @default("Enterprise") // Active, Expired, Suspended
 
   // Token-Based Plan Metering
-  plan           String   @default("starter")    // starter | growth | enterprise | unlimited
-  tokensTotal    Int      @default(500)
-  tokensUsed     Int      @default(0)
-  tokensResetAt  DateTime @default(now())
+  plan          String   @default("starter") // starter | growth | enterprise | unlimited
+  tokensTotal   Int      @default(500)
+  tokensUsed    Int      @default(0)
+  tokensResetAt DateTime @default(now())
 
   // Relations
-  users          User[]
+  users              User[]
   formConfigurations FormConfiguration[]
-  teams          Team[]
-  locations      Location[]
-  categories     Category[]
-  products       Product[]
-  intakes        Intake[]
-  events         Event[]
-  vendors        Vendor[]
-  purchaseOrders PurchaseOrder[]
-  bids           Bid[]
-  contracts      Contract[]
-  templates      Template[]
-  jarvisMemories JarvisMemory[]
-  workflows      Workflow[]
-  approvalReqs   ApprovalRequest[]
+  teams              Team[]
+  locations          Location[]
+  categories         Category[]
+  products           Product[]
+  intakes            Intake[]
+  events             Event[]
+  vendors            Vendor[]
+  purchaseOrders     PurchaseOrder[]
+  bids               Bid[]
+  contracts          Contract[]
+  templates          Template[]
+  jarvisMemories     JarvisMemory[]
+  workflows          Workflow[]
+  approvalReqs       ApprovalRequest[]
+  ApprovalRule       ApprovalRule[]
 }
 
 model User {
@@ -386,21 +387,20 @@ model Invoice {
 }
 
 model FormConfiguration {
-  id             String        @id @default(uuid())
+  id             String       @id @default(uuid())
   organizationId String
-  organization   Organization  @relation(fields: [organizationId], references: [id])
-  formName       String        // e.g. "Intake", "Product", "Category"
-  fieldName      String        // e.g. "custom_field_1"
-  fieldLabel     String        // The display label
-  fieldType      String        @default("dropdown") // "dropdown", "text", "number"
-  options        String?       // JSON array of options if dropdown
-  isActive       Boolean       @default(true)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  formName       String // e.g. "Intake", "Product", "Category"
+  fieldName      String // e.g. "custom_field_1"
+  fieldLabel     String // The display label
+  fieldType      String       @default("dropdown") // "dropdown", "text", "number"
+  options        String? // JSON array of options if dropdown
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   @@unique([organizationId, formName, fieldName])
 }
-
 
 model TokenLedger {
   id             String   @id @default(uuid())
@@ -416,16 +416,32 @@ model TokenLedger {
 }
 
 model ContextDefinition {
-  id          String   @id @default(uuid())
+  id             String   @id @default(uuid())
   organizationId String?
-  name        String   
-  description String?
-  content     String   
-  version     String   @default("1.0.0")
-  isActive    Boolean  @default(true)
-  consumedBy  String   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  name           String
+  description    String?
+  content        String
+  version        String   @default("1.0.0")
+  isActive       Boolean  @default(true)
+  consumedBy     String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@index([organizationId, name])
+}
+
+model ApprovalRule {
+  id             String        @id @default(uuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  name           String
+  field          String
+  operator       String
+  value          String
+  approverRole   String
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([organizationId])
 }
