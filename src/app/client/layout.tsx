@@ -22,6 +22,7 @@ const TOP_MENUS = [
       { name: 'Sourcing Events (RFx)', path: '/client/events' },
       { name: 'Purchase Orders (PO)', path: '/client/po' },
       { name: 'My Approvals', path: '/client/approvals' },
+        { name: 'Hire', path: '/client/hire' },
     ]
   },
   {

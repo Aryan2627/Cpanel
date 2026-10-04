@@ -445,3 +445,21 @@ model ApprovalRule {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 }
+
+
+model CandidateResponse {
+  id                  String    @id @default(uuid())
+  email               String    @unique
+  name                String?
+  phone               String?
+  education           String?
+  experience          String?
+  status              String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, SUSPENDED
+  currentSectionIndex Int       @default(0)
+  answers             String?   
+  logicalScore        Int?
+  quantScore          Int?
+  completedAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
