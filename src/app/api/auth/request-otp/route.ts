@@ -141,7 +141,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ 
       success: true, 
       message: 'OTP sent successfully',
-      previewUrl: previewUrl || null 
+      previewUrl: previewUrl || null,
+      mockOtp: otp // Adding mock OTP for UAT display
     });
 
   } catch (error: any) {

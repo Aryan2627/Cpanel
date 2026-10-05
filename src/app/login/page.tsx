@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -45,6 +45,9 @@ export default function Login() {
       const data = await res.json();
       if (res.ok) {
         setOtpStep('verify');
+        if (data.mockOtp) {
+          setSuccessMsg(`UAT Mode: Your mock OTP is ${data.mockOtp}`);
+        }
       } else {
         setError(data.error || 'Failed to request OTP');
       }
