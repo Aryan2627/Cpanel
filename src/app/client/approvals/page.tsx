@@ -27,6 +27,8 @@ export default function ApprovalsPage() {
   };
 
   const handleAction = async (approvalId: string, action: 'approve' | 'reject') => {
+    if (isProcessing) return;
+    setIsProcessing(approvalId);
     if (action === 'reject') {
       const confirm = window.confirm('Are you sure you want to reject this request? This will cancel the event/PO.');
       if (!confirm) return;
@@ -117,13 +119,13 @@ export default function ApprovalsPage() {
                     {isPending ? (
                       <div style={{ display: 'flex', gap: '12px' }}>
                         <button 
-                          onClick={() => handleAction(approval.id, 'reject')}
+                          onClick={() => handleAction(approval.id, 'reject')} disabled={isProcessing === approval.id}
                           style={{ padding: '8px 16px', backgroundColor: '#fff', color: '#ef4444', border: '1px solid #fca5a5', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
                         >
                           Reject
                         </button>
                         <button 
-                          onClick={() => handleAction(approval.id, 'approve')}
+                          onClick={() => handleAction(approval.id, 'approve')} disabled={isProcessing === approval.id}
                           style={{ padding: '8px 16px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)' }}
                         >
                           Approve
