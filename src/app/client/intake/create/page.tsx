@@ -141,7 +141,7 @@ export default function PurchaseIntake() {
               <div style={{ flex: 1 }}>
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500, color: '#334155' }}>Budget (Estimated) <span style={{ color: '#ef4444' }}>*</span></label>
                 <input 
-                  type="number" onWheel={(e) => (e.target as HTMLInputElement).blur()} 
+                  value={budget} onChange={(e) => setBudget(e.target.value)} type="number" onWheel={(e) => (e.target as HTMLInputElement).blur()} 
                   min="0" step="0.01" required 
                   style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem', boxSizing: 'border-box' }}
                 />

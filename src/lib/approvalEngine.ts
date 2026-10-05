@@ -29,7 +29,7 @@ export async function evaluateApprovalMatrix(
     let targetValue: any = 0;
     
     if (['TPA', 'PO Value', 'Total Proposal Value', 'estimatedValue'].includes(rule.type)) {
-      targetValue = parseFloat(dataPayload.total || dataPayload.estimatedValue || 0);
+      targetValue = parseFloat(dataPayload.total || dataPayload.estimatedValue || dataPayload.budget || 0);
     } else if (rule.type === 'Intake Request Condition Type' || rule.type === 'Category') {
       targetValue = dataPayload.type || dataPayload.category || '';
     } else if (rule.type === 'Auction Rank' || rule.type === 'TNA score count') {
