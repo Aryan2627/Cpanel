@@ -23,6 +23,9 @@ export default function FullScreenAgentPage() {
   const [selectedSupplier, setSelectedSupplier] = useState<any>(null);
   const [loadingRisk, setLoadingRisk] = useState(false);
   const [riskReports, setRiskReports] = useState<Record<string, any>>({});
+  const [garudaInput, setGarudaInput] = useState('');
+  const [garudaScanning, setGarudaScanning] = useState(false);
+  const [garudaReport, setGarudaReport] = useState<any>(null);
 
   const agentNameMap: Record<string, string> = {
     'procurement': 'Procurement Agent',
@@ -124,13 +127,33 @@ export default function FullScreenAgentPage() {
           { title: 'Track live delivery status', desc: 'and ping suppliers if delayed' },
           { title: 'Perform 3-way match', desc: 'between PO, GRN, and Invoice' }
         ],
-        tabs: ['Active Tasks', 'Invoice Matches', 'Risk Alerts'],
+        tabs: ['Active Tasks', 'Compliance Scans'],
       };
     }
   };
 
   const data = getAgentData();
 
+  
+  const handleGarudaScan = async () => {
+    if (!garudaInput.trim()) return;
+    setGarudaScanning(true);
+    setGarudaReport(null);
+    try {
+      const res = await fetch('/api/agents/garuda', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetType: 'CONTRACT', targetContent: garudaInput })
+      });
+      const data = await res.json();
+      if (data.report) setGarudaReport(data.report);
+      else alert(data.error || 'Scan failed');
+    } catch(e) {
+      alert('Network error');
+    }
+    setGarudaScanning(false);
+  };
+  
   const handleAnalyzeRisk = async (supplier: any, loc: string, title: string) => {
     setSelectedSupplier(supplier);
     setActiveTab('Risk Reports');
