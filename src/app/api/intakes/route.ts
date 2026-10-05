@@ -49,22 +49,22 @@ export async function POST(request: Request) {
 
     const data = await request.json();
 
-    const existing = await prisma.intake.findFirst({
-      where: {
-        organizationId: orgId,
-        title: data.title
-      }
-    });
+    // ⚡ PERFORMANCE OPTIMIZATION: Run the existence check and the matrix evaluation concurrently
+    const [existing, matrixResult] = await Promise.all([
+      prisma.intake.findFirst({
+        where: {
+          organizationId: orgId,
+          title: data.title
+        }
+      }),
+      evaluateApprovalMatrix(orgId, 'Intake Request', data)
+    ]);
+
     if (existing) {
       return NextResponse.json({ error: 'An intake with this title already exists.' }, { status: 400 });
     }
 
-    // --- DYNAMIC APPROVAL RULES ENGINE ---
-    const { requiresApproval, approvers, workflowName } = await evaluateApprovalMatrix(
-      orgId, 
-      'Intake Request', 
-      data
-    );
+    const { requiresApproval, approvers, workflowName } = matrixResult;
 
     const initialStatus = requiresApproval ? 'Pending Approval' : (data.status || 'Draft');
 

@@ -135,8 +135,8 @@ export async function consumeTokens(
     }),
   ]);
 
-  // Audit log
-  await logAudit({
+  // Audit log - DO NOT await to reduce network latency
+  logAudit({
     actorEmail: actorEmail ?? 'system',
     action: `TOKEN_CONSUMED:${action}`,
     entityType: 'TokenLedger',
