@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { tavily } from '@tavily/core';
+import { getContextRulesForAgent } from '../../../../lib/contextStudio';
+import { getTenantId } from '../../../../lib/tenant';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -41,6 +43,8 @@ export async function POST(req: Request) {
       const baseURL = isNvidia ? 'https://integrate.api.nvidia.com/v1' : undefined;
       const modelName = isNvidia ? 'meta/llama-3.2-3b-instruct' : 'gpt-4o-mini';
       const openai = new OpenAI({ apiKey: llmKey, baseURL });
+      const orgId = await getTenantId();
+      const contextRules = await getContextRulesForAgent(orgId, 'Tark'); // Risk report is typically Tark/Anveshan
 
       const prompt = `You are a Procurement Risk Analyst.
 Analyze this live search data for supplier "${supplierName}":
@@ -54,7 +58,8 @@ Generate a Risk Report JSON object with EXACTLY these keys:
   "geoRisk": (string: 1-2 sentences about geopolitical risk),
   "financialRisk": (string: 1-2 sentences summarizing complaints or financial alerts)
 }
-Output ONLY valid JSON.`;
+Output ONLY valid JSON.
+${contextRules}`;
 
       const llmPromise = openai.chat.completions.create({
         model: modelName,

@@ -4,6 +4,7 @@ import { prisma } from '../../../../lib/prisma';
 import { getTenantId } from '../../../../lib/tenant';
 import OpenAI from 'openai';
 import { tavily } from '@tavily/core';
+import { getContextRulesForAgent } from '../../../../lib/contextStudio';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -141,10 +142,12 @@ export async function POST(req: Request) {
       const openai = new OpenAI({ apiKey: llmKey, baseURL });
 
       const supplierNames = aiResult.webDiscoveries.map(d => d.name).join(', ');
+      const contextRules = await getContextRulesForAgent(orgId, 'Anveshan');
 
       const llmPromise = openai.chat.completions.create({
         model: modelName,
-        messages: [{ role: 'user', content: `Draft a professional B2B procurement RFI email for purchasing "${title}" in ${location}. Addressed to: ${supplierNames}. Include sections for: specs, quantity, GST pricing, MOQ, delivery timeline to ${location}, and payment terms. Under 150 words. Return only the email text.` }],
+        messages: [{ role: 'user', content: `Draft a professional B2B procurement RFI email for purchasing "${title}" in ${location}. Addressed to: ${supplierNames}. Include sections for: specs, quantity, GST pricing, MOQ, delivery timeline to ${location}, and payment terms. Under 150 words. Return only the email text.
+${contextRules}` }],
         temperature: 0.3,
         max_tokens: 300
       });
