@@ -52,7 +52,7 @@ model Organization {
 model User {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String?
   email          String?       @unique
   phone          String?
@@ -69,7 +69,7 @@ model User {
 model Team {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String?
   type           String?
   users          String? // JSON string
@@ -81,7 +81,7 @@ model Team {
 model Location {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String?
   city           String?
   type           String?
@@ -95,7 +95,7 @@ model Category {
   customData     Json?
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String?
   type           String?
   code           String?
@@ -110,7 +110,7 @@ model Product {
   customData     Json?
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   code           String        @unique @default(uuid())
   name           String?
   uom            String?
@@ -133,7 +133,7 @@ model Intake {
   customData     Json?
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   refId          String        @unique
   title          String?
   reqName        String?
@@ -154,7 +154,7 @@ model Intake {
 model Event {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   refId          String        @unique
   title          String?
   type           String?
@@ -176,7 +176,7 @@ model Event {
 model Vendor {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String?
   email          String?
   phone          String?
@@ -202,7 +202,7 @@ model PurchaseOrder {
   invoices       Invoice[]
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   poNumber       String        @unique
   title          String?
   status         String        @default("Draft")
@@ -222,7 +222,7 @@ model PurchaseOrder {
 model Bid {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   eventId        String
   vendorId       String
   vendorName     String?
@@ -243,7 +243,7 @@ model Bid {
 model Contract {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   title          String?
   status         String        @default("Draft")
   vendorId       String?
@@ -262,7 +262,7 @@ model Contract {
 model Template {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String
   type           String        @default("RFQ")
   fields         String // JSON string of fields
@@ -272,7 +272,7 @@ model Template {
 model JarvisMemory {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   entityType     String // e.g., "Event"
   entityRef      String // e.g., "EVT-123"
   context        String // e.g., "New Sourcing Event Created"
@@ -283,7 +283,7 @@ model JarvisMemory {
 model Workflow {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String
   category       String // e.g. "IT Hardware"
   approvers      String // JSON array of approver emails
@@ -294,7 +294,7 @@ model Workflow {
 model ApprovalRequest {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   eventId        String
   workflowId     String
   status         String        @default("Pending") // Pending, Approved, Rejected
@@ -389,7 +389,7 @@ model Invoice {
 model FormConfiguration {
   id             String       @id @default(uuid())
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   formName       String // e.g. "Intake", "Product", "Category"
   fieldName      String // e.g. "custom_field_1"
   fieldLabel     String // The display label
@@ -433,7 +433,7 @@ model ContextDefinition {
 model ApprovalRule {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   flowName       String        @default("Default Flow")
   approvalType   String        @default("Quote Selection")
   type           String

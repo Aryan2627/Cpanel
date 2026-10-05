@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useIntake } from '../../../context/IntakeContext';
@@ -171,7 +171,8 @@ export default function PRPage() {
           </div>
 
           {/* Table */}
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', borderRadius: '12px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#f8faff', borderBottom: '1px solid #e5edff' }}>
                 <th style={{ padding: '13px 16px', width: '44px' }}>
@@ -279,6 +280,7 @@ export default function PRPage() {
               )}
             </tbody>
           </table>
+          </div>
 
           {/* Footer */}
           {filteredData.length > 0 && (

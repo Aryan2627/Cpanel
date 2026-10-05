@@ -8,6 +8,13 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   try {
     const orgId = await getTenantId();
+    
+    // Deduct 1 token per bid submission (Tark analysis)
+    prisma.$transaction([
+      prisma.organization.update({ where: { id: orgId }, data: { tokensUsed: { increment: 1 } } }),
+      prisma.tokenLedger.create({ data: { organizationId: orgId, action: 'Tark Bid Analysis', tokensConsumed: 1, actorEmail: 'system' } })
+    ]).catch(console.error);
+
     const { searchParams } = new URL(request.url);
     const eventId = searchParams.get('eventId');
 
