@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { safeParseJsonFromLLM } from '../../../../lib/safeJsonParse';
 import { tavily } from '@tavily/core';
 import { getContextRulesForAgent } from '../../../../lib/contextStudio';
 import { getTenantId } from '../../../../lib/tenant';

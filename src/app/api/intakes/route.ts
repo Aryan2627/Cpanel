@@ -6,13 +6,22 @@ import { evaluateApprovalMatrix, createPendingApproval } from '../../../lib/appr
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) { // PAGINATION_ADDED
   try {
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.min(200, Math.max(1, parseInt(searchParams.get('limit') || '50')));
+    const skip = (page - 1) * limit;
     const orgId = await getTenantId();
-    const intakes = await prisma.intake.findMany({
+    const [intakes, total] = await Promise.all([
+      prisma.intake.findMany({
+      take: limit,
+      skip,
       where: { organizationId: orgId },
       orderBy: { createdAt: 'desc' }
-    });
+    }),
+      prisma.intake.count({ where: { organizationId: orgId } })
+    ]);
     
     // Map customData back to root for the frontend PR table
     const formatted = intakes.map(i => {
@@ -23,7 +32,7 @@ export async function GET() {
       return { ...i, budget };
     });
     
-    return NextResponse.json(formatted);
+    return NextResponse.json({ data: formatted, total, page, limit });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch intakes' }, { status: 500 });
   }
@@ -77,8 +86,8 @@ export async function POST(request: Request) {
         status: initialStatus,
         type: data.type || 'Standalone NFA',
         buyer: data.buyer || '-',
-        reqAt: data.reqAt || new Date().toISOString().split('T')[0],
-        updAt: data.updAt || new Date().toISOString().split('T')[0],
+        reqAt: data.reqAt || new Date().toISOString(),
+        updAt: data.updAt || new Date().toISOString(),
         quantity: data.quantity || 1,
         customData: (data.budget !== undefined && data.budget !== null) ? { budget: Number(data.budget) } : undefined,
       }
@@ -116,7 +125,7 @@ export async function PUT(request: Request) {
       data: {
         status: data.status,
         quantity: data.quantity,
-        updAt: new Date().toISOString().split('T')[0],
+        updAt: new Date().toISOString(),
       }
     });
     return NextResponse.json(updatedIntake, { status: 200 });

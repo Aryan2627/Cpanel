@@ -6,8 +6,14 @@ import { prisma } from '../../../lib/prisma';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+export async function GET(request: Request) { // PAGINATION_ADDED
+
   try {
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.min(200, Math.max(1, parseInt(searchParams.get('limit') || '50')));
+    const skip = (page - 1) * limit;
+
     const orgId = await getTenantId();
     await purgeExpiredVendors();
     if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
@@ -41,6 +47,8 @@ export async function GET(request: Request) {
     }
 
     const vendors = await prisma.vendor.findMany({
+      take: limit,
+      skip,
       where: whereClause,
       orderBy: { createdAt: 'desc' }
     });

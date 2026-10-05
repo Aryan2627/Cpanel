@@ -3,6 +3,7 @@ import { prisma } from '../../../../lib/prisma';
 import { getTenantId } from '../../../../lib/tenant';
 import { getContextRulesForAgent } from '../../../../lib/contextStudio';
 import OpenAI from 'openai';
+import { safeParseJsonFromLLM } from '../../../../lib/safeJsonParse';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -59,39 +60,17 @@ Output ONLY a raw JSON object with this structure:
 For example, if they ask to see vendors, payload can be "/client/vendors". If they ask to see an event EVT-123, payload can be "/client/events/EVT-123".
 Output valid JSON only without markdown formatting.`;
 
-    const llmPromise = openai.chat.completions.create({
-      model: modelName,
-      messages: [
+    // safeParseJsonFromLLM handles the actual call below
+    const parsed = await safeParseJsonFromLLM<{ reply: string; action?: { type: string; payload: string } }>(
+      openai, modelName,
+      [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: message }
       ],
-      temperature: 0.2,
-      max_tokens: 300
-    });
-
-    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 10000));
-    const result: any = await Promise.race([llmPromise, timeoutPromise]);
-
-    if (result && result.choices && result.choices[0]) {
-      let rawContent = result.choices[0].message.content.trim();
-      
-      // Cleanup markdown if present
-      const startIdx = rawContent.indexOf('{');
-      const endIdx = rawContent.lastIndexOf('}');
-      if (startIdx !== -1 && endIdx !== -1) {
-        rawContent = rawContent.substring(startIdx, endIdx + 1);
-      }
-
-      try {
-        const parsed = JSON.parse(rawContent);
-        return NextResponse.json(parsed);
-      } catch (e) {
-        console.error("Jarvis JSON parse error:", rawContent);
-        return NextResponse.json({ reply: rawContent });
-      }
-    }
-
-    return NextResponse.json({ reply: "I'm sorry, my neural net timed out while processing that." });
+      { temperature: 0.2, max_tokens: 300, timeoutMs: 10000 }
+    );
+    if (parsed) return NextResponse.json(parsed);
+    return NextResponse.json({ reply: "I'm sorry, I couldn't process that right now. Please try again." });
   } catch (error: any) {
     console.error('Jarvis API Error:', error);
     return NextResponse.json({ reply: 'I encountered an error processing your request.' }, { status: 500 });
