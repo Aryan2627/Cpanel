@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       financialRisk: `Information scraped from reviews indicates standard operational flow.`
     };
 
-    const specificKey = process.env.TARK_API_KEY;
+    const specificKey = process.env.ANVESHAN_API_KEY || process.env.TARK_API_KEY;
     const fallbackKey = process.env.NVIDIA_API_KEY || process.env.OPENAI_API_KEY;
     const llmKey = specificKey || fallbackKey;
 
@@ -63,7 +63,7 @@ Output ONLY valid JSON.`;
         max_tokens: 300
       });
 
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000));
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 12000));
       try {
         const result: any = await Promise.race([llmPromise, timeoutPromise]);
         if (result && result.choices && result.choices[0]) {
