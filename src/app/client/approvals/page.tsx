@@ -7,8 +7,12 @@ export default function ApprovalsPage() {
   const router = useRouter();
   const [approvals, setApprovals] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUserEmail, setCurrentUserEmail] = useState('admin@company.com');
+  useEffect(() => {
+    fetch('/api/auth/me').then(r => r.json()).then(d => { if(d?.email) setCurrentUserEmail(d.email); }).catch(()=>{});
+  }, []);
   
-  const currentUserEmail = 'admin@company.com';
+  const { session } = require('../layout'); // Wait, they use context or local storage? Let's use local storage or the context.
 
   useEffect(() => {
     fetchApprovals();
