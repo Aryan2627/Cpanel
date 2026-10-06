@@ -765,6 +765,23 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
     }
 
     if (text.startsWith('/execute-bom-upload')) {
+      let tokensDeducted = false;
+      const effectiveOrgId = orgId || 'demo-org';
+
+      // Atomic Pre-Deduction of AI tokens before LLM request to eliminate race conditions
+      try {
+        const { consumeTokens } = await import('../../../../lib/tokens');
+        await consumeTokens(effectiveOrgId, 'AI_ANALYSIS', userName, 'BOM_UPLOAD');
+        tokensDeducted = true;
+      } catch (tokenErr: any) {
+        if (tokenErr.message?.startsWith('INSUFFICIENT_TOKENS')) {
+          return NextResponse.json({
+            final_response: "⚠️ **Token Limit Exceeded.** Your organization has run out of AI tokens for this billing cycle. Please upgrade your plan in settings.",
+            ui_component: 'text'
+          }, { status: 402 });
+        }
+      }
+
       let extractedText = "No file data received.";
       
       let targetUrl = fileUrl || '';
@@ -816,20 +833,35 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
       }
 
       const apiKey = process.env.CORTEX_API_KEY || process.env.NVIDIA_API_KEY || process.env.OPENAI_API_KEY;
-      if (!apiKey) return NextResponse.json({ final_response: "API Key missing. Cannot parse file." });
-      
-      const isNvidia = apiKey.startsWith('nvapi-') || !!process.env.NVIDIA_API_KEY;
-      const openai = new OpenAI({ apiKey, baseURL: isNvidia ? 'https://integrate.api.nvidia.com/v1' : undefined });
-      const modelName = isNvidia ? 'meta/llama-3.1-8b-instruct' : 'gpt-4o-mini';
+      if (!apiKey) {
+        if (tokensDeducted) {
+          const { refundTokens } = await import('../../../../lib/tokens');
+          await refundTokens(effectiveOrgId, 'AI_ANALYSIS', userName, 'BOM_UPLOAD_REFUND');
+        }
+        return NextResponse.json({ final_response: "API Key missing. Cannot parse file. Token refunded." });
+      }
 
-      const parsedBOM = await safeParseJsonFromLLM<{ items: Array<{ id: number; part: string; desc: string; qty: number; status: string; vendor: string; unitCost: number; matchConfidence: string }> }>(
-        openai, modelName,
-        [
-          { role: 'system', content: 'You are an AI that extracts Bill of Materials (BOM) data from raw Excel/CSV JSON data. Output exactly this JSON structure: { "items": [ { "id": number, "part": "part number", "desc": "description", "qty": number, "status": "IN CATALOG" or "NEEDS SOURCING", "vendor": "supplier name", "unitCost": number, "matchConfidence": "95%" } ] }.' },
-          { role: 'user', content: `Raw File Data:\n${extractedText}` }
-        ],
-        { temperature: 0.1, max_tokens: 1500, timeoutMs: 25000 }
-      );
+      let parsedBOM;
+      try {
+        const isNvidia = apiKey.startsWith('nvapi-') || !!process.env.NVIDIA_API_KEY;
+        const openai = new OpenAI({ apiKey, baseURL: isNvidia ? 'https://integrate.api.nvidia.com/v1' : undefined });
+        const modelName = isNvidia ? 'meta/llama-3.1-8b-instruct' : 'gpt-4o-mini';
+
+        parsedBOM = await safeParseJsonFromLLM<{ items: Array<{ id: number; part: string; desc: string; qty: number; status: string; vendor: string; unitCost: number; matchConfidence: string }> }>(
+          openai, modelName,
+          [
+            { role: 'system', content: 'You are an AI that extracts Bill of Materials (BOM) data from raw Excel/CSV JSON data. Output exactly this JSON structure: { "items": [ { "id": number, "part": "part number", "desc": "description", "qty": number, "status": "IN CATALOG" or "NEEDS SOURCING", "vendor": "supplier name", "unitCost": number, "matchConfidence": "95%" } ] }.' },
+            { role: 'user', content: `Raw File Data:\n${extractedText}` }
+          ],
+          { temperature: 0.1, max_tokens: 1500, timeoutMs: 25000 }
+        );
+      } catch (llmErr) {
+        if (tokensDeducted) {
+          const { refundTokens } = await import('../../../../lib/tokens');
+          await refundTokens(effectiveOrgId, 'AI_ANALYSIS', userName, 'BOM_UPLOAD_REFUND');
+        }
+        return NextResponse.json({ final_response: "AI processing error occurred. Token has been automatically refunded." });
+      }
 
       let totalEst = 0;
       if (parsedBOM && parsedBOM.items) {

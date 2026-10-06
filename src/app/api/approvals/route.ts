@@ -88,10 +88,14 @@ export async function POST(request: Request) {
     });
 
     if (action === 'reject') {
-      await prisma.approvalRequest.update({
-        where: { id: approvalId },
+      const result = await prisma.approvalRequest.updateMany({
+        where: { id: approvalId, status: 'Pending' },
         data: { status: 'Rejected', history: JSON.stringify(history) }
       });
+
+      if (result.count === 0) {
+        return NextResponse.json({ error: 'Conflict: Approval request has already been processed by another user or session.' }, { status: 409 });
+      }
       
       if (type === 'PO_APPROVAL' && refId) {
          await prisma.purchaseOrder.update({ where: { id: refId }, data: { status: 'Rejected', erpStatus: 'Voided' } });
@@ -112,11 +116,15 @@ export async function POST(request: Request) {
       const nextStep = approval.currentStep + 1;
       
       if (nextStep >= approvers.length) {
-        // Fully approved!
-        await prisma.approvalRequest.update({
-          where: { id: approvalId },
+        // Fully approved - Optimistic Concurrency check
+        const result = await prisma.approvalRequest.updateMany({
+          where: { id: approvalId, status: 'Pending' },
           data: { status: 'Approved', currentStep: nextStep, history: JSON.stringify(history) }
         });
+
+        if (result.count === 0) {
+          return NextResponse.json({ error: 'Conflict: Approval request has already been processed by another user or session.' }, { status: 409 });
+        }
         
         // Unblock the underlying entity
         if (type === 'PO_APPROVAL' && refId) {
@@ -133,10 +141,15 @@ export async function POST(request: Request) {
         
         return NextResponse.json({ success: true, status: 'Approved' });
       } else {
-        await prisma.approvalRequest.update({
-          where: { id: approvalId },
+        const result = await prisma.approvalRequest.updateMany({
+          where: { id: approvalId, status: 'Pending' },
           data: { currentStep: nextStep, history: JSON.stringify(history) }
         });
+
+        if (result.count === 0) {
+          return NextResponse.json({ error: 'Conflict: Approval request has already been processed by another user or session.' }, { status: 409 });
+        }
+
         const nextApprover = approvers[nextStep];
         return NextResponse.json({ success: true, status: 'Pending', nextApprover });
       }
@@ -150,6 +163,15 @@ export async function POST(request: Request) {
         date: new Date().toISOString()
       });
 
+      const result = await prisma.approvalRequest.updateMany({
+        where: { id: approvalId, status: 'Pending' },
+        data: { status: 'Approved', currentStep: approvers.length, history: JSON.stringify(history) }
+      });
+
+      if (result.count === 0) {
+        return NextResponse.json({ error: 'Conflict: Approval request has already been processed by another user or session.' }, { status: 409 });
+      }
+
       await prisma.auditLog.create({
         data: {
           action: 'Admin Override',
@@ -160,18 +182,13 @@ export async function POST(request: Request) {
           details: JSON.stringify({ reason: 'Forced approval by admin', bypassed: approvers[approval.currentStep] || 'Unknown' })
         }
       });
-
-      await prisma.approvalRequest.update({
-        where: { id: approvalId },
-        data: { status: 'Approved', currentStep: approvers.length, history: JSON.stringify(history) }
-      });
       
-      if (isPoApproval && poId) {
+      if (type === 'PO_APPROVAL' && refId) {
          await prisma.purchaseOrder.update({
-            where: { id: poId },
+            where: { id: refId },
             data: { status: 'Pending Vendor', erpStatus: 'Pending Sync' }
          });
-      } else {
+      } else if (approval.eventId && approval.eventId !== 'GLOBAL') {
          await prisma.event.update({
            where: { id: approval.eventId },
            data: { status: 'Active' }

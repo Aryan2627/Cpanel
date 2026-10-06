@@ -149,6 +149,46 @@ export async function consumeTokens(
 }
 
 // ----------------------------------------------------------
+// CORE: refundTokens
+// Call this if LLM or token-gated operation fails downstream
+// ----------------------------------------------------------
+export async function refundTokens(
+  orgId: string,
+  action: string,
+  actorEmail?: string,
+  entityRef?: string
+): Promise<{ tokensUsed: number }> {
+  const cost = TOKEN_COSTS[action] ?? 1;
+
+  const [org] = await prisma.$transaction([
+    prisma.organization.update({
+      where: { id: orgId },
+      data: { tokensUsed: { decrement: cost } },
+    }),
+    prisma.tokenLedger.create({
+      data: {
+        organizationId: orgId,
+        action: `REFUND_${action}`,
+        tokensConsumed: -cost,
+        entityRef: entityRef ?? null,
+        actorEmail: actorEmail ?? 'system',
+      },
+    }),
+  ]);
+
+  logAudit({
+    actorEmail: actorEmail ?? 'system',
+    action: `TOKEN_REFUNDED:${action}`,
+    entityType: 'TokenLedger',
+    entityRef: orgId,
+    details: { tokensRefunded: cost, newTokensUsed: org.tokensUsed },
+    organizationId: orgId,
+  });
+
+  return { tokensUsed: org.tokensUsed };
+}
+
+// ----------------------------------------------------------
 // getTokenStatus — lightweight read, no deduction
 // ----------------------------------------------------------
 export async function getTokenStatus(orgId: string) {
