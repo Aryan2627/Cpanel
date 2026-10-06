@@ -18,7 +18,6 @@ export async function GET(request: Request) { // PAGINATION_ADDED
     await purgeExpiredVendors();
     if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
 
-    const { searchParams } = new URL(request.url);
     const eventId = searchParams.get('eventId');
 
     const whereClause: any = { organizationId: orgId }; // ALWAYS enforce tenant isolation
