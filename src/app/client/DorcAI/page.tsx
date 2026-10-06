@@ -979,7 +979,6 @@ export default function DorcPage() {
                                     {/* BOM Upload UI */}
                   {msg.uiComponent==='bom_upload' && (
                     <label className="cx-form-card" style={{ marginTop:'14px', borderRadius:'16px', border:'1px dashed rgba(45,212,191,0.4)', background: isDark ? 'rgba(45,212,191,0.03)' : 'rgba(45,212,191,0.05)', padding:'32px 24px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', transition:'all 0.2s', cursor:'pointer' }}>
-<<<<<<< HEAD
                       <input type="file" style={{ display: 'none' }} accept=".csv,.xlsx" onChange={handleBomUpload} />
                       <div style={{ width:'64px', height:'64px', borderRadius:'50%', background:'linear-gradient(135deg, rgba(45,212,191,0.2), rgba(20,184,166,0.2))', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:'16px', boxShadow:'0 0 20px rgba(45,212,191,0.1)' }}>
                         <FileUp size={28} color="#2dd4bf" />
