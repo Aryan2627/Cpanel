@@ -101,6 +101,10 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'event not found' }, { status: 404, headers: corsHeaders });
     }
 
+    if (event.endTime && new Date() > new Date(event.endTime)) {
+        return NextResponse.json({ error: 'Event has closed. Bidding is no longer allowed.' }, { status: 403, headers: corsHeaders });
+    }
+
     const vendorRecord = await prisma.vendor.findFirst({
         where: {
             organizationId: event.organizationId,

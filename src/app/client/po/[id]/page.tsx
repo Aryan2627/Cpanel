@@ -18,6 +18,25 @@ export default function PurchaseOrderDetailPage() {
   const [grns, setGrns] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
 
+  const [showGrnModal, setShowGrnModal] = useState(false);
+  const [grnData, setGrnData] = useState({ receivedBy: 'Warehouse Worker', location: 'Main Dock', details: 'All items received in good condition' });
+
+  const handleCreateGrn = async () => {
+    try {
+      const res = await fetch(`/api/pos/${params.id}/grn`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(grnData)
+      });
+      if (res.ok) {
+        alert('Goods Received and GRN created!');
+        setShowGrnModal(false);
+      } else {
+        alert('Failed to receive goods.');
+      }
+    } catch(e) {}
+  };
+
   useEffect(() => {
     if(po && activeTab !== 'details') {
       fetch('/api/pos/'+params.id+'/'+activeTab).then(r=>r.json()).then(data => {
@@ -121,6 +140,9 @@ export default function PurchaseOrderDetailPage() {
               <Gift size={16} /> Simulate Vendor Loot Drop
             </button>
           )}
+          <button onClick={() => setShowGrnModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', border: 'none', backgroundColor: '#10b981', color: '#fff', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
+            <Package size={16} /> Receive Goods (GRN)
+          </button>
           <button onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', border: 'none', backgroundColor: '#2563eb', color: '#fff', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
             <Printer size={16} /> Export to PDF / Print
           </button>
@@ -320,6 +342,30 @@ export default function PurchaseOrderDetailPage() {
         </div>
 
       </div>
+
+      {showGrnModal && (
+        <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+          <div style={{ backgroundColor: '#fff', padding: '24px', borderRadius: '8px', width: '400px' }}>
+            <h2 style={{ margin: '0 0 16px 0' }}>Warehouse Receiving</h2>
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '4px' }}>Received By</label>
+              <input type="text" value={grnData.receivedBy} onChange={e => setGrnData({...grnData, receivedBy: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+            </div>
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '4px' }}>Location</label>
+              <input type="text" value={grnData.location} onChange={e => setGrnData({...grnData, location: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+            </div>
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '4px' }}>Details/Notes</label>
+              <textarea value={grnData.details} onChange={e => setGrnData({...grnData, details: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', resize: 'vertical' }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+              <button onClick={() => setShowGrnModal(false)} style={{ padding: '8px 16px', border: '1px solid #cbd5e1', backgroundColor: '#fff', borderRadius: '4px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={handleCreateGrn} style={{ padding: '8px 16px', border: 'none', backgroundColor: '#10b981', color: '#fff', borderRadius: '4px', cursor: 'pointer' }}>Create GRN</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
