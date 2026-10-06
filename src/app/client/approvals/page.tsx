@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, Clock, AlertTriangle, ChevronRight, FileText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -26,7 +26,7 @@ export default function ApprovalsPage() {
     }
   };
 
-  const handleAction = async (approvalId: string, action: 'approve' | 'reject') => {
+  const handleAction = async (approvalId: string, action: 'approve' | 'reject' | 'force_approve') => {
     if (action === 'reject') {
       const confirm = window.confirm('Are you sure you want to reject this request? This will cancel the event/PO.');
       if (!confirm) return;
@@ -127,6 +127,12 @@ export default function ApprovalsPage() {
                           style={{ padding: '8px 16px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)' }}
                         >
                           Approve
+                        </button>
+                        <button 
+                          onClick={() => handleAction(approval.id, 'force_approve')}
+                          style={{ padding: '8px 16px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(59, 130, 246, 0.2)' }}
+                        >
+                          Force Approve (Admin)
                         </button>
                       </div>
                     ) : (

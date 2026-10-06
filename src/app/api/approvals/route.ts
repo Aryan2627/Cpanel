@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 
 export const runtime = 'nodejs';
@@ -138,6 +138,44 @@ export async function POST(request: Request) {
         const nextApprover = approvers[nextStep];
         return NextResponse.json({ success: true, status: 'Pending', nextApprover });
       }
+    }
+
+    if (action === 'force_approve') {
+      history.push({
+        action: 'Admin Override',
+        user: userEmail || 'System',
+        comment: comment || 'Bypassed assigned approver',
+        date: new Date().toISOString()
+      });
+
+      await prisma.auditLog.create({
+        data: {
+          action: 'Admin Override',
+          entity: 'ApprovalRequest',
+          entityId: approvalId,
+          userId: userEmail || 'Admin',
+          details: JSON.stringify({ reason: 'Forced approval by admin', bypassed: approvers[approval.currentStep] || 'Unknown' })
+        }
+      });
+
+      await prisma.approvalRequest.update({
+        where: { id: approvalId },
+        data: { status: 'Approved', currentStep: approvers.length, history: JSON.stringify(history) }
+      });
+      
+      if (isPoApproval && poId) {
+         await prisma.purchaseOrder.update({
+            where: { id: poId },
+            data: { status: 'Pending Vendor', erpStatus: 'Pending Sync' }
+         });
+      } else {
+         await prisma.event.update({
+           where: { id: approval.eventId },
+           data: { status: 'Active' }
+         });
+      }
+      
+      return NextResponse.json({ success: true, status: 'Approved' });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
