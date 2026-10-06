@@ -1,8 +1,37 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../../lib/prisma';
+import crypto from 'crypto';
 
 export async function POST(request: Request) {
   try {
+    const signature = request.headers.get('x-niti-signature') || 
+                      request.headers.get('x-resend-signature') || 
+                      request.headers.get('x-sendgrid-signature') || 
+                      request.headers.get('x-webhook-signature');
+
+    const webhookSecret = process.env.NITI_WEBHOOK_SECRET || process.env.RESEND_WEBHOOK_SECRET;
+
+    // HMAC Signature / Auth Verification
+    if (webhookSecret) {
+      if (!signature) {
+        return NextResponse.json({ error: 'Unauthorized: Missing webhook signature' }, { status: 401 });
+      }
+
+      const bodyText = await request.clone().text();
+      const hmac = crypto.createHmac('sha256', webhookSecret).update(bodyText).digest('hex');
+      const expectedSignature = `sha256=${hmac}`;
+
+      if (signature !== hmac && signature !== expectedSignature) {
+        return NextResponse.json({ error: 'Unauthorized: Invalid webhook signature' }, { status: 401 });
+      }
+    } else {
+      // Fallback auth header check if env secret is not set
+      const authHeader = request.headers.get('authorization') || request.headers.get('x-webhook-secret');
+      if (!authHeader) {
+        return NextResponse.json({ error: 'Unauthorized: Webhook authentication header missing' }, { status: 401 });
+      }
+    }
+
     let text = '';
     let fromEmail = '';
 
@@ -36,7 +65,7 @@ export async function POST(request: Request) {
 
     const bid = await prisma.bid.findFirst({
         where: { vendorId: vendor.id },
-        orderBy: { updatedAt: 'desc' }
+        orderBy: { createdAt: 'desc' }
     });
 
     if (!bid) {
@@ -58,6 +87,17 @@ export async function POST(request: Request) {
     await prisma.bid.update({
         where: { id: bid.id },
         data: { amount: newAmount }
+    });
+
+    // Record audit log entry for automated bid update
+    await prisma.auditLog.create({
+      data: {
+        action: 'NITI_DISCOUNT_APPLIED',
+        actorEmail: parsedEmail,
+        entityType: 'Bid',
+        entityRef: bid.id,
+        details: JSON.stringify({ oldAmount: bid.amount, newAmount, emailTextSnippet: text.substring(0, 200) })
+      }
     });
 
     return NextResponse.json({ success: true, newAmount });

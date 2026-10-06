@@ -4,6 +4,7 @@ import { prisma } from '../../../../lib/prisma';
 import { verifyToken } from '../../../../lib/session';
 import { headers } from 'next/headers';
 import intents from '../../../../data/intents.json';
+import * as xlsx from 'xlsx';
 
 // Comprehensive Stop Words (never used for typo/fuzzy matching against entity names)
 const STOP_WORDS = new Set([
@@ -262,7 +263,7 @@ function scoreUserIntent(rawQuery: string): EntityScore {
 
 export async function POST(req: Request) {
   try {
-    const { prompt, userName, history } = await req.json();
+    const { prompt, userName, history, fileData, fileUrl } = await req.json();
     await new Promise(r => setTimeout(r, 300));
     const text = (prompt || '').trim();
     const lowerText = text.toLowerCase();
@@ -766,7 +767,39 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
     if (text.startsWith('/execute-bom-upload')) {
       let extractedText = "No file data received.";
       
-      if (fileData) {
+      let targetUrl = fileUrl || '';
+      if (!targetUrl) {
+        try {
+          const jsonMatch = text.match(/{[\s\S]*}/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (parsed.url) targetUrl = parsed.url;
+          }
+        } catch (e) {}
+      }
+
+      if (targetUrl) {
+        try {
+          let buffer: Buffer;
+          if (targetUrl.startsWith('/uploads/')) {
+            const { readFile } = await import('fs/promises');
+            const { join } = await import('path');
+            const localPath = join(process.cwd(), 'public', targetUrl);
+            buffer = await readFile(localPath);
+          } else {
+            const fetchRes = await fetch(targetUrl);
+            buffer = Buffer.from(await fetchRes.arrayBuffer());
+          }
+
+          const workbook = xlsx.read(buffer, { type: 'buffer' });
+          const firstSheet = workbook.SheetNames[0];
+          const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+          extractedText = JSON.stringify(sheetData).substring(0, 5000);
+        } catch (err: any) {
+          console.error("File fetch/parse error:", err);
+          extractedText = `Error fetching or parsing file from ${targetUrl}: ${err.message}`;
+        }
+      } else if (fileData) {
         try {
           const base64Data = fileData.split(',')[1] || fileData;
           if (base64Data) {

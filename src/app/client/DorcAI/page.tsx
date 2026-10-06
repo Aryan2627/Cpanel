@@ -433,6 +433,36 @@ export default function DorcPage() {
   const endRef = useRef<HTMLDivElement>(null);
   const [isClient, setIsClient] = useState(false);
 
+  const handleBomUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+
+    setanys(p => [...p, { role: 'user', content: `Uploading ${file.name} to storage...` }]);
+    setIsProcessing(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      setIsProcessing(false);
+
+      if (res.ok && data.url) {
+        execute(`/execute-bom-upload {"url": "${data.url}"}`);
+      } else {
+        setanys(p => [...p, { role: 'agent', content: `Failed to upload ${file.name}: ${data.error || 'Upload error'}` }]);
+      }
+    } catch (err: any) {
+      setIsProcessing(false);
+      setanys(p => [...p, { role: 'agent', content: `Failed to upload ${file.name}: ${err.message}` }]);
+    }
+  };
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const playGreeting = () => {
@@ -603,24 +633,6 @@ export default function DorcPage() {
       setanys(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
     } catch(e) { setanys(p=>[...p,{ role:'agent', content:'Connection to Dorc AI Core failed.' }]); }
     setIsProcessing(false);
-  };
-
-  const handleBomUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    // To prevent Vercel 4.5MB payload limit on serverless functions,
-    // we fetch a presigned URL and upload directly to S3/Supabase Storage.
-    // Cortex AI will only read the URL, not the raw Base64 bytes.
-    setanys(p => [...p, { role: 'user', content: `Uploading ${file.name} to secure storage...` }]);
-    setIsProcessing(true);
-    
-    // Simulate getting presigned URL and uploading
-    setTimeout(() => {
-      const fileUrl = `https://storage.enterprise.com/bom/${Date.now()}_${file.name}`;
-      setIsProcessing(false);
-      execute(`/execute-bom-upload {"url": "${fileUrl}"}`);
-    }, 1500);
   };
 
   const fmt = (txt: string) => txt.split('\n').map((l,i)=>(

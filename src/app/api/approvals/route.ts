@@ -153,9 +153,10 @@ export async function POST(request: Request) {
       await prisma.auditLog.create({
         data: {
           action: 'Admin Override',
-          entity: 'ApprovalRequest',
-          entityId: approvalId,
-          userId: userEmail || 'Admin',
+          entityType: 'ApprovalRequest',
+          entityRef: approvalId,
+          actorEmail: userEmail || 'Admin',
+          organizationId: approval.organizationId,
           details: JSON.stringify({ reason: 'Forced approval by admin', bypassed: approvers[approval.currentStep] || 'Unknown' })
         }
       });
