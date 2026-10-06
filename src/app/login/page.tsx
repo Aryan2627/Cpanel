@@ -45,9 +45,7 @@ export default function Login() {
       const data = await res.json();
       if (res.ok) {
         setOtpStep('verify');
-        if (data.mockOtp) {
-          setSuccessMsg(`UAT Mode: Your mock OTP is ${data.mockOtp}`);
-        }
+        setSuccessMsg('A login code has been sent to your email. Please check your inbox.');
       } else {
         setError(data.error || 'Failed to request OTP');
       }

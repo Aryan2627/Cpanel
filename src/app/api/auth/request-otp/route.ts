@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { sendEmail } from '../../../../lib/email';
 import { PrismaClient } from '@prisma/client';
 import nodemailer from 'nodemailer';
 import twilio from 'twilio';
