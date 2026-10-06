@@ -1429,7 +1429,36 @@ export default function DorcPage() {
                       </div>
                     )}
 
-                    {/* 3Way Match */}
+                    {/* 3Way Match UI */}
+                    {msg.uiComponent==='3way_match_result' && msg.uiData && (
+                      <div style={{ marginTop:'14px', padding:'20px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: `1px solid ${msg.uiData.color}40`, borderLeft: `4px solid ${msg.uiData.color}`, boxShadow: isDark ? 'none' : '0 4px 15px rgba(0,0,0,0.03)' }}>
+                        <div style={{ marginBottom:'16px', fontWeight:700, color: msg.uiData.color, fontSize:'1rem', display:'flex', alignItems:'center', gap:'8px' }}>
+                          <CheckCircle2 size={18} /> {msg.uiData.status}
+                        </div>
+                        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'16px', marginBottom:'16px', paddingBottom:'16px', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}>
+                          <div>
+                            <div style={{ fontSize:'0.75rem', color: isDark ? '#94a3b8' : '#64748b', marginBottom:'4px' }}>Purchase Order</div>
+                            <div style={{ fontWeight:600, color: isDark ? '#f1f5f9' : '#0f172a' }}>{msg.uiData.poNumber}</div>
+                            <div style={{ fontSize:'0.85rem', color: isDark ? '#cbd5e1' : '#334155' }}>${msg.uiData.poTotal.toLocaleString()}</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize:'0.75rem', color: isDark ? '#94a3b8' : '#64748b', marginBottom:'4px' }}>Invoiced Amount</div>
+                            <div style={{ fontWeight:600, color: isDark ? '#f1f5f9' : '#0f172a' }}>${msg.uiData.invoiceTotal.toLocaleString()}</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize:'0.75rem', color: isDark ? '#94a3b8' : '#64748b', marginBottom:'4px' }}>Goods Receipt (GRN)</div>
+                            <div style={{ fontWeight:600, color: isDark ? '#f1f5f9' : '#0f172a' }}>{msg.uiData.grnCount} records</div>
+                          </div>
+                        </div>
+                        <div style={{ fontSize:'0.85rem', color: isDark ? '#cbd5e1' : '#334155' }}>
+                          <ul style={{ margin:0, paddingLeft:'20px' }}>
+                            {msg.uiData.details.map((d:string, idx:number) => (
+                              <li key={idx} style={{ marginBottom:'4px' }}>{d}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
                     
                     {/* Bid Matrix */}
                     {msg.uiComponent==='bid_matrix' && msg.uiData && (
@@ -1468,7 +1497,7 @@ export default function DorcPage() {
                         <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#e2e8f0' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> 3-Way Reconciliation</div>
                         <div style={{ overflowX:'auto' }}>
                           <table style={{ width:'100%', fontSize:'0.75rem', textAlign:'left', borderCollapse:'collapse' }}>
-                            <thead><tr style={{ color: isDark ? '#94a3b8' : '#64748b', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}><th style={{padding:'8px'}}>PO #</th><th style={{padding:'8px'}}>PO Qty</th><th style={{padding:'8px'}}>GRN Qty</th><th style={{padding:'8px'}}>Inv Qty</th><th style={{padding:'8px'}}>Status</th></tr></thead>
+                            <thead><tr style={{ color: isDark ? '#94a3b8' : '#64748b', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}><th style={{padding:'8px'}}>PO #</th><th style={{padding:'8px'}}>PO Amount</th><th style={{padding:'8px'}}>GRN Records</th><th style={{padding:'8px'}}>Inv Amount</th><th style={{padding:'8px'}}>Status</th></tr></thead>
                             <tbody>
                               <tr style={{ color: isDark ? '#e2e8f0' : '#0f172a', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #f1f5f9' }}><td style={{padding:'8px'}}>PO-102</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px',color:'#10b981'}}>Matched</td></tr>
                               <tr style={{ color: isDark ? '#e2e8f0' : '#0f172a' }}><td style={{padding:'8px'}}>PO-103</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px'}}>180</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px',color:'#ef4444'}}>Mismatch</td></tr>

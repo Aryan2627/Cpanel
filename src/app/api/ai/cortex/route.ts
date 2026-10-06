@@ -933,10 +933,58 @@ if (text.trim().toLowerCase() === '/analyze-bids') {
       }
 
       if (text.startsWith('/3way-match')) {
+        const poRefMatch = text.match(/\/3way-match\s+(.+)/i);
+        const poRef = poRefMatch ? poRefMatch[1].trim() : null;
+
+        if (!poRef) {
+          return NextResponse.json({ final_response: "Please provide a Purchase Order ID to run the match (e.g., /3way-match PO-2023-001)" });
+        }
+
+        const po = await prisma.purchaseOrder.findUnique({ where: { organizationId: orgId, poNumber: poRef } });
+        if (!po) return NextResponse.json({ final_response: `I couldn't find Purchase Order ${poRef} in your database.` });
+
+        const grns = await prisma.gRN.findMany({ where: { purchaseOrderId: po.id } });
+        const invoices = await prisma.invoice.findMany({ where: { purchaseOrderId: po.id } });
+
+        const totalReceived = grns.reduce((acc, g) => acc + g.receivedQty, 0);
+        const totalInvoiced = invoices.reduce((acc, i) => acc + i.totalAmount, 0);
+
+        // Assume PO quantity is roughly 1 if no line items are linked, or we can just use totals for the matrix
+        // The mock UI expects: PO Qty, GRN Qty, Inv Qty, Status
+
+        let status = 'Matched';
+        let matchColor = '#10b981';
+        let discrepancyText = '';
+
+        if (invoices.length === 0) {
+           status = 'Missing Invoice'; matchColor = '#ef4444'; discrepancyText = 'No invoices uploaded.';
+        } else if (grns.length === 0) {
+           status = 'Missing GRN'; matchColor = '#ef4444'; discrepancyText = 'No goods received yet.';
+        } else {
+           if (Math.abs(totalInvoiced - po.total) > 0.01) {
+             status = 'Mismatch'; matchColor = '#ef4444'; discrepancyText = 'Invoiced amount does not match PO total.';
+           }
+        }
+
+        if (status === 'Matched') {
+           // Auto-approve the invoice
+           await prisma.invoice.updateMany({
+             where: { purchaseOrderId: po.id, status: 'Pending' },
+             data: { status: 'Approved' }
+           });
+        }
+
         return NextResponse.json({
-          final_response: "3-Way Invoice Reconciliation complete. I found 1 mismatch where the vendor invoiced for more items than the warehouse received.",
+          final_response: `3-Way Invoice Reconciliation complete for ${poRef}. Result: **${status}**.` + (discrepancyText ? ` ${discrepancyText}` : ''),
           ui_component: 'three_way_match',
-          ui_data: {}
+          ui_data: {
+            poNumber: po.poNumber,
+            poTotal: po.total,
+            grnCount: grns.length,
+            invoiceTotal: totalInvoiced,
+            status: status,
+            color: matchColor
+          }
         });
       }
 
