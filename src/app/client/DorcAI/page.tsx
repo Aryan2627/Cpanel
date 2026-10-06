@@ -508,7 +508,7 @@ export default function DorcPage() {
   }, []);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior:'smooth' }); }, [messages, isProcessing]);
 
-  const execute = async (cmd: string) => {
+  const execute = async (cmd: string, fileData?: string) => {
     if(isProcessing) return;
     let display = cmd;
     if(cmd.startsWith('/execute-')) display = 'Executing action...';
@@ -524,7 +524,7 @@ export default function DorcPage() {
     }
     setIsProcessing(true);
     try {
-      const r = await fetch('/api/ai/cortex',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ prompt:cmd, userName, history:messages.slice(-5) }) });
+      const r = await fetch('/api/ai/cortex',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ prompt:cmd, userName, history:messages.slice(-5), fileData }) });
       const d = await r.json();
       setanys(p=>[...p,{ role:'agent', content:d.final_response, uiComponent:d.ui_component, uiData:d.ui_data, thoughtProcess:d.thought_process }]);
         if (d && d.final_response) speakText(d.final_response);
@@ -961,7 +961,17 @@ export default function DorcPage() {
                                     {/* BOM Upload UI */}
                   {msg.uiComponent==='bom_upload' && (
                     <label className="cx-form-card" style={{ marginTop:'14px', borderRadius:'16px', border:'1px dashed rgba(45,212,191,0.4)', background: isDark ? 'rgba(45,212,191,0.03)' : 'rgba(45,212,191,0.05)', padding:'32px 24px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', transition:'all 0.2s', cursor:'pointer' }}>
-                      <input type="file" style={{ display: 'none' }} accept=".csv,.xlsx" onChange={(e) => { if(e.target.files && e.target.files.length > 0) execute('/execute-bom-upload'); }} />
+                      <input type="file" style={{ display: 'none' }} accept=".csv,.xlsx" onChange={async (e) => { 
+    if(e.target.files && e.target.files.length > 0) { 
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const base64 = ev.target?.result;
+        execute('/execute-bom-upload', base64 as string);
+      };
+      reader.readAsDataURL(file);
+    } 
+  }} />
                       <div style={{ width:'64px', height:'64px', borderRadius:'50%', background:'linear-gradient(135deg, rgba(45,212,191,0.2), rgba(20,184,166,0.2))', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:'16px', boxShadow:'0 0 20px rgba(45,212,191,0.1)' }}>
                         <FileUp size={28} color="#2dd4bf" />
                       </div>
