@@ -176,10 +176,10 @@ export default function ApprovalRulesPage() {
           <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #ddd', zIndex: 10, maxHeight: '150px', overflowY: 'auto', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
             <div style={{ padding: '4px', borderBottom: '1px solid #ddd', fontSize: '0.75rem', color: 'var(--primary)', cursor: 'pointer', textAlign: 'center' }} onClick={() => setIsOpen(false)}>Done</div>
             {dbUsers.map(u => {
-               const uName = u.name || u.email;
+               const uName = u.name || u.email; const uVal = u.email || u.name;
                return (
-                 <div key={u.id} style={{ padding: '6px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }} onClick={() => toggleUser(uName)}>
-                   <input type="checkbox" checked={value.includes(uName)} readOnly style={{ margin: 0 }} />
+                 <div key={u.id} style={{ padding: '6px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }} onClick={() => toggleUser(uVal)}>
+                   <input type="checkbox" checked={value.includes(uVal)} readOnly style={{ margin: 0 }} />
                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{uName}</span>
                  </div>
                );
