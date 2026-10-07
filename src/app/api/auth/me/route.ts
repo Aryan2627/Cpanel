@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 import { prisma } from '../../../../lib/prisma';
 import { verifyToken } from '../../../../lib/session';
 import { decrypt } from '../../../../lib/encryption';

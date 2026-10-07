@@ -73,7 +73,7 @@ export async function POST(req: Request) {
 
     response.cookies.set('proc-session', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // FORCED FALSE TO FIX REDIRECT LOOP
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 30, // 30 days
       path: '/',
