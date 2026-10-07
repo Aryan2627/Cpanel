@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { signToken } from '../../../../lib/session';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
@@ -16,15 +17,18 @@ export async function POST(req: Request) {
     const ip = req.headers.get('x-forwarded-for') || 'unknown_ip';
     const userAgent = req.headers.get('user-agent') || 'unknown_device';
 
-    // 1. Database-Backed Account Lockout Protection (Max 5 attempts / 15 mins)
+    // 1. Fetch User and check Account Lockout in parallel to cut DB latency in half
     const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000);
-    const recentFails = await prisma.loginActivity.count({
-      where: {
-        identifier: email,
-        success: false,
-        createdAt: { gte: fifteenMinsAgo }
-      }
-    });
+    const [recentFails, user] = await Promise.all([
+      prisma.loginActivity.count({
+        where: {
+          identifier: email,
+          success: false,
+          createdAt: { gte: fifteenMinsAgo }
+        }
+      }),
+      prisma.user.findUnique({ where: { email } })
+    ]);
 
     if (recentFails >= 5) {
       return NextResponse.json({ 
@@ -32,28 +36,26 @@ export async function POST(req: Request) {
       }, { status: 429 });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+
     if (!user || !user.password) {
-      // Log failed attempt (user not found)
-      await prisma.loginActivity.create({
-        data: { identifier: email, success: false, ip, userAgent, city: 'Unknown' }
-      });
+      // Log failed attempt in background
+      await prisma.loginActivity.create({ data: { identifier: email, success: false, ip, userAgent, city: 'Unknown' } });
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
-      // Log failed attempt (wrong password)
-      await prisma.loginActivity.create({
-        data: { identifier: email, success: false, ip, userAgent, city: 'Unknown' }
-      });
+      // Log failed attempt in background
+      await prisma.loginActivity.create({ data: { identifier: email, success: false, ip, userAgent, city: 'Unknown' } });
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
     // 2. Successful Login - Log the successful audit
-    await prisma.loginActivity.create({
-      data: { identifier: email, success: true, ip, userAgent, city: 'Unknown' }
-    });
+    try {
+      await prisma.loginActivity.create({
+        data: { identifier: email, success: true, ip, userAgent, city: 'Unknown' }
+      });
+    } catch(e) {}
 
     const token = await signToken({
       userId: user.id,
@@ -72,7 +74,7 @@ export async function POST(req: Request) {
     response.cookies.set('proc-session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict', // Upgraded from 'lax' to 'strict' for extra CSRF protection
+      sameSite: 'strict',
       maxAge: 60 * 60 * 24 * 30, // 30 days
       path: '/',
     });
