@@ -17,6 +17,12 @@ model Organization {
   industry  String?
   createdAt DateTime @default(now())
 
+  // Integrations
+  slackToken    String?
+  slackTeamId   String?
+  slackTeamName String?
+
+
   // Licensing
   licenseStart  DateTime?
   licenseEnd    DateTime?
