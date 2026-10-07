@@ -35,7 +35,7 @@ export async function GET(request: Request) {
     
     if (!data.ok) {
       console.error('Slack OAuth Error:', data);
-      return NextResponse.redirect(new URL('/client/settings/integrations?error=slack_oauth_failed', request.url));
+      return NextResponse.json({ error: 'SLACK_OAUTH_FAILED', details: data, sentRedirectUri: redirectUri }, { status: 400 });
     }
 
     // Save to database
