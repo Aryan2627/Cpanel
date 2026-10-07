@@ -92,7 +92,7 @@ export async function createPendingApproval(
     }
   });
 
-  return await prisma.approvalRequest.create({
+  const approval = await prisma.approvalRequest.create({
     data: {
       organizationId: organizationId,
       eventId: eventId || 'GLOBAL', 
@@ -108,4 +108,65 @@ export async function createPendingApproval(
       }])
     }
   });
+
+  // Slack Integration - Notify First Approver
+  if (approvers.length > 0) {
+    try {
+      const org = await prisma.organization.findUnique({ where: { id: organizationId } });
+      if (org?.slackToken) {
+        const approverEmail = approvers[0];
+        
+        // Convert poId or eventId to a display string
+        const targetRef = poId ? `PO #${poId.split('-')[0]}` : `Event #${(eventId||'').split('-')[0]}`;
+        const titleText = type === 'PRODUCT_APPROVAL' ? 'New Product' : type === 'USER_APPROVAL' ? 'New User Access' : 'Purchase Order';
+
+        const slackPayload = {
+          channel: approverEmail, // Slack routes by email if channel ID isn't found for enterprise grid
+          text: `Approval Required: ${titleText}`,
+          blocks: [
+            {
+              type: "header",
+              text: { type: "plain_text", text: `🚨 Approval Required: ${titleText}` }
+            },
+            {
+              type: "section",
+              text: { type: "mrkdwn", text: `You have been requested to approve *${targetRef}*.\n*Workflow:* ${workflowName}` }
+            },
+            {
+              type: "actions",
+              elements: [
+                { type: "button", text: { type: "plain_text", text: "Approve" }, style: "primary", value: `approve:${approval.id}` },
+                { type: "button", text: { type: "plain_text", text: "Reject" }, style: "danger", value: `reject:${approval.id}` }
+              ]
+            }
+          ]
+        };
+
+        // First, lookup user by email to get their Slack Member ID
+        const lookupRes = await fetch(`https://slack.com/api/users.lookupByEmail?email=${encodeURIComponent(approverEmail)}`, {
+          headers: { 'Authorization': `Bearer ${org.slackToken}` }
+        });
+        const lookupData = await lookupRes.json();
+        
+        if (lookupData.ok && lookupData.user?.id) {
+          slackPayload.channel = lookupData.user.id;
+          
+          await fetch('https://slack.com/api/chat.postMessage', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${org.slackToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(slackPayload)
+          });
+        } else {
+          console.log(`Slack user not found for email ${approverEmail}`);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to send Slack notification:", e);
+    }
+  }
+
+  return approval;
 }
