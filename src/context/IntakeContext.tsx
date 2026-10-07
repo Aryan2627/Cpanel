@@ -31,9 +31,7 @@ export function IntakeProvider({ children }: { children: ReactNode }) {
     fetch('/api/intakes')
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) {
-          setIntakes(data);
-        }
+        if (Array.isArray(data)) { setIntakes(data); } else if (data && Array.isArray(data.data)) { setIntakes(data.data); }
       })
       .catch(err => console.error('Failed to fetch intakes:', err));
   }, []);
