@@ -12,7 +12,7 @@ export default function IntegrationsPage() {
   const handleSlackConnect = () => {
     const clientId = process.env.NEXT_PUBLIC_SLACK_CLIENT_ID;
     const redirectUri = encodeURIComponent(window.location.origin + '/api/auth/slack/callback');
-    const slackAuthUrl = `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=chat:write,chat:write.public,users:read.email&redirect_uri=${redirectUri}`;
+    const slackAuthUrl = `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=chat:write,users:read.email&redirect_uri=${redirectUri}`;
     window.location.href = slackAuthUrl;
   };
 
