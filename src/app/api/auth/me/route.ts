@@ -61,7 +61,7 @@ export async function GET() {
       isImpersonating: !!payload.impersonatorId,
       impersonatorId: payload.impersonatorId || null
     });
-  } catch (err) {
-    return NextResponse.json({ error: 'Failed to authenticate' }, { status: 500 });
+  } catch (err: any) {
+    return NextResponse.json({ error: 'Failed to authenticate', details: err?.message || String(err), stack: err?.stack }, { status: 500 });
   }
 }
