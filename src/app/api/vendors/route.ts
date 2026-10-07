@@ -2,12 +2,12 @@ import { purgeExpiredVendors } from '../vendor-auth/route';
 import { NextResponse } from 'next/server';
 import { getTenantId } from '../../../lib/tenant';
 import { prisma } from '../../../lib/prisma';
+import { encryptPII, decryptPII } from '../../../lib/encryption';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) { // PAGINATION_ADDED
-
+export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
@@ -19,8 +19,7 @@ export async function GET(request: Request) { // PAGINATION_ADDED
     if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
 
     const eventId = searchParams.get('eventId');
-
-    const whereClause: any = { organizationId: orgId }; // ALWAYS enforce tenant isolation
+    const whereClause: any = { organizationId: orgId };
 
     if (eventId) {
       const event = await prisma.event.findUnique({
@@ -51,7 +50,15 @@ export async function GET(request: Request) { // PAGINATION_ADDED
       where: whereClause,
       orderBy: { createdAt: 'desc' }
     });
-    return NextResponse.json(vendors);
+
+    // Decrypt PII data for authenticated vendor response
+    const safeVendors = vendors.map(v => ({
+      ...v,
+      taxId: decryptPII(v.taxId || ''),
+      tradeLicense: decryptPII(v.tradeLicense || ''),
+    }));
+
+    return NextResponse.json(safeVendors);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -63,6 +70,11 @@ export async function POST(request: Request) {
     if (!orgId || orgId === '__unauthenticated__') return NextResponse.json({error: 'Unauthorized'}, {status: 401});
 
     const data = await request.json();
+
+    // Encrypt sensitive PII fields (Tax ID & Trade License) before DB persistence
+    const encryptedTaxId = data.taxId ? encryptPII(data.taxId) : null;
+    const encryptedTradeLicense = data.tradeLicense ? encryptPII(data.tradeLicense) : null;
+
     const vendor = await prisma.vendor.create({
       data: {
         organizationId: orgId,
@@ -73,14 +85,19 @@ export async function POST(request: Request) {
         vendorCode: data.vendorCode,
         companyCode: data.companyCode,
         dealsIn: data.dealsIn,
-        tradeLicense: data.tradeLicense,
-        taxId: data.taxId,
+        tradeLicense: encryptedTradeLicense,
+        taxId: encryptedTaxId,
         city: data.city,
         tags: data.tags ? JSON.stringify(data.tags) : null,
         status: data.status || 'Invited',
       }
     });
-    return NextResponse.json(vendor, { status: 201 });
+
+    return NextResponse.json({
+      ...vendor,
+      taxId: data.taxId || null,
+      tradeLicense: data.tradeLicense || null,
+    }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

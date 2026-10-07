@@ -1,46 +1,91 @@
 import crypto from 'crypto';
 
-// Match Configurations exactly: 32-byte key for AES-256-CBC
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default_super_secret_key_0000000'; // Must be 32 bytes
-const IV_LENGTH = 16; 
+const SECRET_KEY = process.env.ENCRYPTION_KEY || 'enterprise_pii_encryption_key_default_32bytes!!';
+// Generate exact 32-byte key buffer for AES-256
+const KEY_BUFFER = crypto.createHash('sha256').update(SECRET_KEY).digest();
 
-export function encrypt(text: string) {
+/**
+ * Encrypt sensitive string data using AES-256-GCM
+ */
+export function encrypt(text: string): string {
   if (!text) return '';
+  if (text.startsWith('enc:gcm:')) return text; // Prevent double encryption
+
   try {
-    const iv = crypto.randomBytes(IV_LENGTH);
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-    let encrypted = cipher.update(text);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return iv.toString('hex') + ':' + encrypted.toString('hex');
-  } catch(e) {
+    const iv = crypto.randomBytes(12); // 12-byte IV for AES-256-GCM
+    const cipher = crypto.createCipheriv('aes-256-gcm', KEY_BUFFER, iv);
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    const authTag = cipher.getAuthTag().toString('hex');
+
+    return `enc:gcm:${iv.toString('hex')}:${authTag}:${encrypted}`;
+  } catch (err) {
+    console.error('AES-256-GCM Encryption Error:', err);
     return text;
   }
 }
 
-export function decrypt(text: string) {
+/**
+ * Decrypt AES-256-GCM or legacy CBC encrypted strings
+ */
+export function decrypt(text: string): string {
   if (!text) return '';
-  try {
-    if (!text.includes(':')) return text;
-    const textParts = text.split(':');
-    if (textParts.length !== 2) return text; // gcm would have 3, cbc has 2
-    
-    const iv = Buffer.from(textParts.shift()!, 'hex');
-    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
-  } catch (e) {
-    // Return original text if not encrypted or decryption fails (for backwards compatibility)
-    return text;
+  
+  // Format check for AES-256-GCM
+  if (text.startsWith('enc:gcm:')) {
+    try {
+      const parts = text.split(':');
+      if (parts.length !== 5) return text;
+      
+      const [, , ivHex, authTagHex, encryptedHex] = parts;
+      const iv = Buffer.from(ivHex, 'hex');
+      const authTag = Buffer.from(authTagHex, 'hex');
+      const decipher = crypto.createDecipheriv('aes-256-gcm', KEY_BUFFER, iv);
+      decipher.setAuthTag(authTag);
+
+      let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      return decrypted;
+    } catch (err) {
+      console.error('AES-256-GCM Decryption Error:', err);
+      return text;
+    }
   }
+
+  // Legacy CBC support "iv:encrypted"
+  if (text.includes(':')) {
+    try {
+      const parts = text.split(':');
+      if (parts.length === 2) {
+        const iv = Buffer.from(parts[0], 'hex');
+        const encryptedText = Buffer.from(parts[1], 'hex');
+        const decipher = crypto.createDecipheriv('aes-256-cbc', KEY_BUFFER, iv);
+        let decrypted = decipher.update(encryptedText);
+        decrypted = Buffer.concat([decrypted, decipher.final()]);
+        return decrypted.toString('utf8');
+      }
+    } catch {
+      return text;
+    }
+  }
+
+  // Unencrypted plain text
+  return text;
 }
 
+export const encryptPII = encrypt;
+export const decryptPII = decrypt;
+
+/**
+ * Mask PII data for display/logging
+ */
 export function maskPII(value: string): string {
   if (!value) return '';
-  if (value.includes('@')) {
-    const [local, domain] = value.split('@');
+  const plain = decrypt(value);
+  if (plain.includes('@')) {
+    const [local, domain] = plain.split('@');
     return local.slice(0, 2) + '***@' + domain;
   }
-  return value.slice(0, 3) + '***' + value.slice(-2);
+  if (plain.length <= 4) return '****';
+  return plain.slice(0, 2) + '****' + plain.slice(-2);
 }

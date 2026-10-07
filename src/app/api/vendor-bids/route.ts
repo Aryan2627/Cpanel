@@ -153,6 +153,11 @@ export async function POST(request: Request) {
       });
     }
 
+    try {
+      const { broadcastRealtimeEvent } = await import('../../../lib/realtime');
+      broadcastRealtimeEvent('bids', existingBid ? 'UPDATE' : 'INSERT', bid);
+    } catch {}
+
     return NextResponse.json(bid, { status: 200, headers: corsHeaders });
   } catch (error: any) {
     console.error(`[vendor-bids-post] Error:`, error.message);

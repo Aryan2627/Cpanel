@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import jwt from 'jsonwebtoken';
+import { encryptPII } from '../../../lib/encryption';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -65,9 +66,17 @@ export async function POST(request: Request) {
     if (bankIfsc && !ifscRegex.test(bankIfsc.toUpperCase())) return NextResponse.json({ error: 'Invalid IFSC format.' }, { status: 400 });
     if (bankAccountNumber && !bankAccRegex.test(bankAccountNumber)) return NextResponse.json({ error: 'Invalid Bank Account format.' }, { status: 400 });
 
+    const encryptedTaxId = taxId ? encryptPII(taxId) : null;
+    const encryptedTradeLicense = tradeLicense ? encryptPII(tradeLicense) : null;
+
     const onboardingData = {
-      entityType, registeredAddress, contactPerson, pan, gstin, cin, msme,
-      productsOffered, productCategory, bankAccountName, bankAccountNumber, bankIfsc,
+      entityType, registeredAddress, contactPerson, 
+      pan: pan ? encryptPII(pan) : null, 
+      gstin: gstin ? encryptPII(gstin) : null, 
+      cin, msme,
+      productsOffered, productCategory, bankAccountName, 
+      bankAccountNumber: bankAccountNumber ? encryptPII(bankAccountNumber) : null, 
+      bankIfsc,
       companyProfile, certifications, previousExperience,
       documents
     };
@@ -76,8 +85,8 @@ export async function POST(request: Request) {
       where: { id: decoded.id },
       data: {
         companyCode,
-        tradeLicense,
-        taxId,
+        tradeLicense: encryptedTradeLicense,
+        taxId: encryptedTaxId,
         city,
         phone,
         type,

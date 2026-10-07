@@ -1,11 +1,10 @@
-﻿import nodemailer from 'nodemailer';
+import nodemailer from 'nodemailer';
+import { enqueueDeadLetterJob } from './dlq';
 
-// Configure the SMTP transport
-// We use fallback environment variables so the app doesn't crash if they are missing
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.sendgrid.net',
   port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: false, // true for 465, false for other ports
+  secure: false,
   auth: {
     user: process.env.SMTP_USER || 'apikey',
     pass: process.env.SMTP_PASS || '',
@@ -13,13 +12,9 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
- * Sends an email invitation to a vendor
- * @param email Vendor's email address
- * @param eventTitle Title of the event
- * @param loginLink The link to the Supplier Portal login
+ * Sends an email invitation to a vendor with Dead Letter Queue (DLQ) fallback
  */
 export async function sendVendorInvitation(email: string, eventTitle: string, loginLink: string) {
-  // If no SMTP password is provided, we simulate the email sending (useful for local development)
   if (!process.env.SMTP_PASS) {
     console.log(`[Email Service Simulation] Invitation sent to ${email} for event "${eventTitle}"`);
     return { success: true, simulated: true };
@@ -27,7 +22,7 @@ export async function sendVendorInvitation(email: string, eventTitle: string, lo
 
   try {
     const info = await transporter.sendMail({
-      from: `"Procurement Portal" <${(process.env.SMTP_FROM_EMAIL || process.env.SMTP_FROM) || 'noreply@yourdomain.com'}>`, // sender address
+      from: `"Procurement Portal" <${(process.env.SMTP_FROM_EMAIL || process.env.SMTP_FROM) || 'noreply@yourdomain.com'}>`,
       to: email, 
       subject: `You have been invited to bid: ${eventTitle}`, 
       text: `You have been invited to participate in a new bidding event: ${eventTitle}.\n\nPlease log in to the Supplier Portal to place your bid: ${loginLink}`,
@@ -47,8 +42,16 @@ export async function sendVendorInvitation(email: string, eventTitle: string, lo
 
     console.log(`[Email Service] Message sent: ${info.messageId}`);
     return { success: true, messageId: info.messageId };
-  } catch (error) {
-    console.error(`[Email Service] Failed to send email to ${email}:`, error);
-    return { success: false, error };
+  } catch (error: any) {
+    console.error(`[Email Service Failure] Outage detected while sending email to ${email}. Enqueuing to DLQ:`, error);
+    
+    // Automatically enqueue to Dead Letter Queue for retry
+    const dlqJob = await enqueueDeadLetterJob(
+      'EMAIL_DISPATCH',
+      { to: email, subject: `You have been invited to bid: ${eventTitle}`, eventTitle, loginLink },
+      error?.message || 'SMTP Provider Outage'
+    );
+
+    return { success: false, error: error?.message, queuedForRetry: true, dlqJobId: dlqJob.id };
   }
 }
