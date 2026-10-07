@@ -84,7 +84,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => { if (d?.name) { setCurrentUser(d); } else { window.location.href = '/login'; } }).catch(() => { window.location.href = '/login'; });
+    fetch('/api/auth/me').then(async r => { if (!r.ok) { const txt = await r.text(); alert('Server Error ' + r.status + ': ' + txt); window.location.href='/login'; return null; } return r.json(); }).then(d => { if (!d) return; if (d?.name) { setCurrentUser(d); } else { alert('Missing Name: ' + JSON.stringify(d)); window.location.href='/login'; } }).catch(e => { alert('Network Error: ' + e.message); window.location.href='/login'; });
   }, []);
 
   const handleGeneratePO = async () => {
