@@ -9,7 +9,7 @@ import TourButton from './TourButton';
 const SpotlightSearch = dynamic(() => import('./SpotlightSearch'), { ssr: false });
 const CartOverlay = dynamic(() => import('./CartOverlay'), { ssr: false });
 const DorcWidget = dynamic(() => import('./DorcWidget'), { ssr: false });
-import { LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles, Command } from 'lucide-react';
+import { Link2, LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles, Command } from 'lucide-react';
 
 const TOP_MENUS = [
   { name: 'Dashboard', path: '/client', icon: LayoutDashboard },
@@ -58,6 +58,13 @@ const TOP_MENUS = [
       { name: 'Maintenance Expiry', path: '/client/license/expiry/maintenance' },
       { name: 'Contract Expiry', path: '/client/license/expiry/contracts' },
       { name: 'Payments Due', path: '/client/license/expiry/payments' },
+    ]
+  },
+  {
+    name: 'Integrations',
+    icon: Link2,
+    sub: [
+      { name: 'Slack Integration', path: '/client/settings/integrations' },
     ]
   },
   {
