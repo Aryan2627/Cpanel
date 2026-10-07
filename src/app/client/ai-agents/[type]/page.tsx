@@ -353,7 +353,7 @@ export default function FullScreenAgentPage() {
                     {status === 2 ? <CheckCircle2 size={16} /> : status === 1 ? <Loader2 size={16} className="animate-spin" /> : <div style={{width:'8px', height:'8px', borderRadius:'50%', backgroundColor:'#cbd5e1'}}/>}
                   </div>
                   <div style={{ paddingTop: '4px' }}>
-                    <div style={{ fontSize: '0.95rem', fontWeight: 700, color: status === 1 ? '#f8fafc' : status === 2 ? '#cbd5e1' : '#475569', marginBottom: '4px' }}>{task.title}</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 700, color: status === 1 ? '#0f172a' : status === 2 ? '#64748b' : '#94a3b8', marginBottom: '4px' }}>{task.title}</div>
                     <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.4 }}>{task.desc}</div>
                   </div>
                 </div>
@@ -368,7 +368,7 @@ export default function FullScreenAgentPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
             <div style={{ display: 'flex', gap: '8px' }}>
               {data.tabs.map((tab, i) => (
-                <button key={i} onClick={() => setActiveTab(tab)} style={{ padding: '8px 16px', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', backgroundColor: activeTab === tab ? 'rgba(255,255,255,0.1)' : 'transparent', color: activeTab === tab ? '#fff' : '#64748b', border: 'none' }}>
+                <button key={i} onClick={() => setActiveTab(tab)} style={{ padding: '8px 16px', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', backgroundColor: activeTab === tab ? 'rgba(255,255,255,0.1)' : 'transparent', color: activeTab === tab ? '#0f172a' : '#64748b', border: 'none' }}>
                   {tab}
                 </button>
               ))}
