@@ -322,8 +322,8 @@ export default function FullScreenAgentPage() {
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#f8fafc', margin: 0, letterSpacing: '-0.5px', textShadow: '0 2px 10px rgba(255,255,255,0.1)' }}>{data.name}</h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', fontWeight: 800, color: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.2)' }}><Cpu size={12} /> LEVEL 4 AUTONOMY</div>
+                <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.5px', textShadow: '0 2px 10px rgba(255,255,255,0.1)' }}>{data.name}</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', fontWeight: 800, color: '#0369a1', backgroundColor: 'rgba(56, 189, 248, 0.1)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.2)' }}><Cpu size={12} /> LEVEL 4 AUTONOMY</div>
                   {true && (
                     <a href="/client/manage/context-studio" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 700, color: '#a78bfa', backgroundColor: 'rgba(167, 139, 250, 0.15)', padding: '4px 12px', borderRadius: '12px', border: '1px solid rgba(167, 139, 250, 0.3)', textDecoration: 'none', marginLeft: '12px' }}>
                       <Database size={12} /> OPEN CONTEXT STUDIO
@@ -424,7 +424,7 @@ export default function FullScreenAgentPage() {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {loadingData && (
-              <div style={{ padding: '64px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', color: '#38bdf8' }}>
+              <div style={{ padding: '64px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', color: '#0369a1' }}>
                 <Loader2 size={32} className="animate-spin" />
                 <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>Syncing Agent Context...</div>
               </div>
@@ -445,7 +445,7 @@ export default function FullScreenAgentPage() {
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                                <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f8fafc' }}>{item.title}</div>
+                                <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>{item.title}</div>
                                 {item.type === 'URGENT' ? (
                                   <span style={{ fontSize: '0.7rem', fontWeight: 800, backgroundColor: '#fef2f2', color: '#ef4444', padding: '2px 8px', borderRadius: '4px', border: '1px solid #fee2e2' }}>URGENT</span>
                                 ) : (
@@ -473,7 +473,7 @@ export default function FullScreenAgentPage() {
                           </div>
 
                           {isProcessing && !isDone && scanLogs[item.id] && (
-                            <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#0f172a', borderRadius: '8px', fontFamily: 'monospace', fontSize: '0.8rem', color: '#38bdf8' }}>
+                            <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#e2e8f0', borderRadius: '8px', fontFamily: 'monospace', fontSize: '0.8rem', color: '#0369a1' }}>
                               {scanLogs[item.id].map((log, i) => <div key={i} className="log-entry" style={{ marginBottom: '4px', display: 'flex', gap: '8px' }}><span style={{ color: '#10b981' }}>→</span> {log}</div>)}
                               <div style={{ marginTop: '4px', color: '#94a3b8', animation: 'pulse-ring 1.5s infinite' }}>_</div>
                             </div>
@@ -482,18 +482,18 @@ export default function FullScreenAgentPage() {
 
                         {/* AI RESULTS */}
                           {isDone && taskResults[item.id] && taskResults[item.id].isNiti && (
-                          <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '24px' }}>
+                          <div style={{ borderTop: '1px solid #cbd5e1', backgroundColor: '#f1f5f9', padding: '24px' }}>
                             <div style={{ backgroundColor: 'rgba(167, 139, 250, 0.05)', border: '1px solid rgba(167, 139, 250, 0.2)', borderRadius: '12px', padding: '24px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                                 <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', border: '2px solid rgba(167, 139, 250, 0.5)', flexShrink: 0, boxShadow: '0 0 15px rgba(167, 139, 250, 0.3)' }}>
                                   <img src="/niti-avatar.jpg" alt="Niti" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
                                 <div>
-                                  <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#f8fafc' }}>Niti Generated Counter-Offer</div>
+                                  <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0f172a' }}>Niti Generated Counter-Offer</div>
                                   <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Targeted for {item.title}</div>
                                 </div>
                               </div>
-                              <div style={{ backgroundColor: '#0f172a', padding: '20px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', fontFamily: 'monospace', fontSize: '0.9rem', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                              <div style={{ backgroundColor: '#e2e8f0', padding: '20px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', color: '#0f172a', fontFamily: 'monospace', fontSize: '0.9rem', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
                                 {taskResults[item.id].reply}
                               </div>
                               <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -511,22 +511,22 @@ export default function FullScreenAgentPage() {
                         )}
                         
                         {isDone && taskResults[item.id] && !taskResults[item.id].isNiti && (
-                          <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '24px' }}>
+                          <div style={{ borderTop: '1px solid #cbd5e1', backgroundColor: '#f1f5f9', padding: '24px' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
                               
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                <div style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
                                   <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <Search size={14} /> Semantic Extraction
                                   </div>
                                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                    {taskResults[item.id].extractedSpecs?.map((spec: string, i: number) => <span key={i} style={{ padding: '4px 10px', backgroundColor: '#f1f5f9', color: '#f8fafc', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, border: '1px solid #e2e8f0' }}>{spec}</span>)}
+                                    {taskResults[item.id].extractedSpecs?.map((spec: string, i: number) => <span key={i} style={{ padding: '4px 10px', backgroundColor: '#e2e8f0', color: '#0f172a', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, border: '1px solid #cbd5e1' }}>{spec}</span>)}
                                   </div>
                                 </div>
                               </div>
 
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', borderTop: '3px solid #3b82f6' }}>
+                                <div style={{ backgroundColor: '#ffffff', padding: '16px', borderRadius: '8px', border: '1px solid #cbd5e1', borderTop: '3px solid #3b82f6' }}>
                                   <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <Globe size={14} /> Direct Supplier Profiles ({location})
                                   </div>
@@ -534,11 +534,11 @@ export default function FullScreenAgentPage() {
                                     {taskResults[item.id].webDiscoveries?.map((web: any, i: number) => (
                                       <div key={i} style={{ padding: '16px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div style={{ flex: 1, paddingRight: '16px' }}>
-                                          <div style={{ fontWeight: 800, color: '#f8fafc', fontSize: '1rem', marginBottom: '4px' }}>{web.name}</div>
+                                          <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '1rem', marginBottom: '4px' }}>{web.name}</div>
                                           <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.4 }}>{web.reason}</div>
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
-                                          <a href={web.url?.startsWith('http') ? web.url : `https://${web.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#f8fafc', backgroundColor: 'rgba(255,255,255,0.1)', padding: '6px 12px', borderRadius: '4px', textDecoration: 'none', fontWeight: 600, border: '1px solid rgba(255,255,255,0.2)' }}>
+                                          <a href={web.url?.startsWith('http') ? web.url : `https://${web.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#0f172a', backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '4px', textDecoration: 'none', fontWeight: 600, border: '1px solid #cbd5e1' }}>
                                             Visit Direct Profile <ArrowRight size={12} />
                                           </a>
                                           <button 
@@ -577,14 +577,14 @@ export default function FullScreenAgentPage() {
                   {loadingRisk || !riskReports[selectedSupplier.name] ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '64px', color: '#3b82f6' }}>
                       <Loader2 size={48} className="animate-spin" style={{ marginBottom: '16px' }} />
-                      <h3 style={{ margin: '0 0 8px 0', color: '#f8fafc' }}>Live AI Risk Analysis...</h3>
+                      <h3 style={{ margin: '0 0 8px 0', color: '#0f172a' }}>Live AI Risk Analysis...</h3>
                       <p style={{ margin: 0, color: '#94a3b8' }}>Scraping global registries and B2B reviews for {selectedSupplier.name}</p>
                     </div>
                   ) : (
                     <div style={{ backgroundColor: 'rgba(15,23,42,0.6)', padding: '24px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)', borderTop: `4px solid ${riskReports[selectedSupplier.name].riskScore > 70 ? '#ef4444' : riskReports[selectedSupplier.name].riskScore > 30 ? '#f59e0b' : '#10b981'}` }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
                         <div>
-                          <h2 style={{ margin: '0 0 8px 0', color: '#f8fafc' }}>Compliance & Risk Profile</h2>
+                          <h2 style={{ margin: '0 0 8px 0', color: '#0f172a' }}>Compliance & Risk Profile</h2>
                           <p style={{ margin: 0, color: '#94a3b8' }}>Live AI Generation for <strong>{selectedSupplier.name}</strong></p>
                         </div>
                         <span style={{ 
@@ -599,11 +599,11 @@ export default function FullScreenAgentPage() {
 
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                         <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc', fontWeight: 600, marginBottom: '8px' }}><Building size={16} color="#3b82f6"/> Entity Verification</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: 600, marginBottom: '8px' }}><Building size={16} color="#3b82f6"/> Entity Verification</div>
                           <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5 }}>{riskReports[selectedSupplier.name].entityVerification}</div>
                         </div>
                         <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc', fontWeight: 600, marginBottom: '8px' }}><Globe size={16} color="#10b981"/> Geo-Political Risk</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: 600, marginBottom: '8px' }}><Globe size={16} color="#10b981"/> Geo-Political Risk</div>
                           <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5 }}>{riskReports[selectedSupplier.name].geoRisk}</div>
                         </div>
                         <div style={{ padding: '16px', backgroundColor: riskReports[selectedSupplier.name].riskScore > 50 ? '#fef2f2' : '#f8fafc', borderRadius: '8px', border: `1px solid ${riskReports[selectedSupplier.name].riskScore > 50 ? '#fee2e2' : '#e2e8f0'}` }}>
@@ -628,11 +628,11 @@ export default function FullScreenAgentPage() {
                 </div>
               ) : (
                 <div style={{ backgroundColor: 'rgba(15,23,42,0.6)', padding: '32px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)', borderTop: '4px solid #3b82f6' }}>
-                  <h2 style={{ margin: '0 0 8px 0', color: '#f8fafc' }}>Market Competitiveness</h2>
+                  <h2 style={{ margin: '0 0 8px 0', color: '#0f172a' }}>Market Competitiveness</h2>
                   <p style={{ margin: '0 0 24px 0', color: '#94a3b8' }}>Pricing and capabilities for <strong>{selectedSupplier.name}</strong></p>
                   
-                  <div style={{ backgroundColor: 'rgba(0,0,0,0.2)', padding: '24px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-                    <h4 style={{ margin: '0 0 12px 0', color: '#f8fafc' }}>Supplier Context</h4>
+                  <div style={{ backgroundColor: '#f1f5f9', padding: '24px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                    <h4 style={{ margin: '0 0 12px 0', color: '#0f172a' }}>Supplier Context</h4>
                     <p style={{ fontSize: '0.9rem', color: '#475569', lineHeight: 1.6 }}>{selectedSupplier.reason}</p>
                   </div>
 
@@ -642,7 +642,7 @@ export default function FullScreenAgentPage() {
                       <div style={{ fontSize: '0.85rem', color: '#3b82f6', fontWeight: 600 }}>Estimated Price Competitiveness in {location}</div>
                     </div>
                     <div style={{ flex: 1, padding: '20px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc', marginBottom: '4px' }}>Net-30 or LC</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>Net-30 or LC</div>
                       <div style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: 600 }}>Standard Payment Terms</div>
                     </div>
                   </div>
