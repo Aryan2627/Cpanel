@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { rateLimit } from '../../../lib/ratelimit';
+import { rateLimit } from '@/lib/ratelimit';
 import { sendEmail } from '../../../../lib/email';
 import { PrismaClient } from '@prisma/client';
 import nodemailer from 'nodemailer';

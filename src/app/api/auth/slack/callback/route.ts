@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '../../../../../../lib/prisma';
-import { getTenantId } from '../../../../../../lib/tenant';
+import { prisma } from '@/lib/prisma';
+import { getTenantId } from '@/lib/tenant';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

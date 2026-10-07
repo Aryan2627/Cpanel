@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { rateLimit } from '../../../../lib/ratelimit';
+import { rateLimit } from '@/lib/ratelimit';
 import { sendEmail } from '../../../lib/email';
-import { prisma } from '../../../lib/prisma';
+import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
