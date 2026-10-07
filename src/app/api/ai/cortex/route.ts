@@ -437,11 +437,7 @@ export async function POST(req: Request) {
     }
 
     // --- ADVANCED SLASH COMMANDS ---
-    if (text.trim().toLowerCase() === '/approve-all') {
-      await prisma.approvalRequest.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });
-      await prisma.intake.updateMany({ where: { status: 'Pending' }, data: { status: 'Approved' } });
-      return NextResponse.json({ final_response: "ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ **Bulk Approval Complete.** All pending requests and intakes have been instantly approved." });
-    }
+    // /approve-all command removed for security (cross-tenant vulnerability)
 
     if (text.trim().toLowerCase() === '/spend-report') {
       const pos = await prisma.purchaseOrder.findMany({ where: orgId ? { organizationId: orgId } : undefined });

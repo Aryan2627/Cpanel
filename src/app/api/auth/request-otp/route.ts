@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { rateLimit } from '../../../lib/ratelimit';
 import { sendEmail } from '../../../../lib/email';
 import { PrismaClient } from '@prisma/client';
 import nodemailer from 'nodemailer';
@@ -39,6 +40,10 @@ async function getEmailTransporter() {
 }
 
 export async function POST(req: Request) {
+    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+    if (!rateLimit(ip, 5, 15 * 60 * 1000)) { // 5 requests per 15 mins
+      return NextResponse.json({ error: 'Too many login attempts. Please try again later.' }, { status: 429 });
+    }
   try {
     const { identifier } = await req.json();
     if (!identifier) {

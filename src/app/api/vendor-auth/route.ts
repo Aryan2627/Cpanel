@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { rateLimit } from '../../../../lib/ratelimit';
 import { sendEmail } from '../../../lib/email';
 import { prisma } from '../../../lib/prisma';
 import jwt from 'jsonwebtoken';
@@ -75,6 +76,10 @@ async function getEmailTransporter() {
 }
 
 export async function POST(request: Request) {
+    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+    if (!rateLimit(ip, 5, 15 * 60 * 1000)) { // 5 requests per 15 mins
+      return NextResponse.json({ error: 'Too many login attempts. Please try again later.' }, { status: 429 });
+    }
   try {
     const authHeader = request.headers.get('authorization');
     const data = await request.json();

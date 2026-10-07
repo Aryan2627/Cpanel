@@ -373,6 +373,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', border: '2px solid #071330' }} />
               </div>
               
+              
+              <Link prefetch={false} href="/client/admin/logs" style={{ textDecoration: 'none', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '16px', borderLeft: pathname.includes('logs') ? '2px solid #3b82f6' : '2px solid transparent' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: pathname.includes('logs') ? '#3b82f6' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', color: pathname.includes('logs') ? '#fff' : 'rgba(255,255,255,0.4)' }}>
+                    <Shield size={16} />
+                  </div>
+                  <span style={{ color: pathname.includes('logs') ? '#fff' : 'rgba(255,255,255,0.7)', fontSize: '0.95rem', fontWeight: pathname.includes('logs') ? 600 : 400 }}>Audit Logs</span>
+                </div>
+              </Link>
               <Link prefetch={false} href="/client/settings" style={{ textDecoration: 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '16px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
                   <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e293b, #334155)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>
