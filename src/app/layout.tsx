@@ -11,6 +11,15 @@ const outfit = Outfit({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "ProcGen | Enterprise Sourcing",
   description: "Modern Gen-Z Procurement Platform",
+  icons: {
+    icon: [
+      { url: '/icon.png' },
+      { url: '/logo.png' }
+    ],
+    apple: [
+      { url: '/logo.png' }
+    ]
+  }
 };
 
 export default function RootLayout({
