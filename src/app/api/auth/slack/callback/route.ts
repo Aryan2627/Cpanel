@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
     const clientId = process.env.NEXT_PUBLIC_SLACK_CLIENT_ID;
     const clientSecret = process.env.SLACK_CLIENT_SECRET;
-    const host = req.headers.get('host') || 'localhost:3000';
+    const host = request.headers.get('host') || 'localhost:3000';
     const protocol = host.includes('localhost') ? 'http' : 'https';
     const redirectUri = `${protocol}://${host}/api/auth/slack/callback`;
 
