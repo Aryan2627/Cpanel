@@ -49,8 +49,8 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.redirect(new URL('/client/settings/integrations?success=slack_connected', request.url));
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return NextResponse.redirect(new URL('/client/settings/integrations?error=internal_error', request.url));
+    return NextResponse.json({ error: 'INTERNAL_ERROR', details: error.message }, { status: 500 });
   }
 }
