@@ -58,8 +58,9 @@ export default function FullScreenAgentPage() {
 
       const res = await fetch(endpoint);
       if (res.ok) {
-        const data = await res.json();
-        const formatted = data.map((d: any) => {
+        const rawData = await res.json();
+        const dataList = Array.isArray(rawData) ? rawData : (rawData.data || []);
+        const formatted = dataList.map((d: any) => {
           let title = '';
           if (agent === 'Procurement Agent') title = d.title || `Intake Request #${d.id.substring(0,6)}`;
           else if (agent === 'Sourcing Agent') title = d.supplierName ? `Quote_${d.supplierName}.pdf` : `Bid_${d.id.substring(0,6)}.pdf`;
