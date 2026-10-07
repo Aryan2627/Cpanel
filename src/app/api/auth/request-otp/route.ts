@@ -40,7 +40,7 @@ async function getEmailTransporter() {
 }
 
 export async function POST(req: Request) {
-    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+    const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
     if (!rateLimit(ip, 5, 15 * 60 * 1000)) { // 5 requests per 15 mins
       return NextResponse.json({ error: 'Too many login attempts. Please try again later.' }, { status: 429 });
     }
