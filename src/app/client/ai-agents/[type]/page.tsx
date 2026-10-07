@@ -391,7 +391,7 @@ export default function FullScreenAgentPage() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search for a PR name or ID..." 
-                    style={{ width: '100%', padding: '18px 18px 18px 48px', borderRadius: '100px', border: 'none', fontSize: '1rem', outline: 'none', backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.5)' }}
+                    style={{ width: '100%', padding: '18px 18px 18px 48px', borderRadius: '100px', fontSize: '1rem', outline: 'none', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', color: '#0f172a', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
                   />
                 </div>
                 <div style={{ position: 'relative', width: '200px' }}>
@@ -399,7 +399,7 @@ export default function FullScreenAgentPage() {
                   <select 
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    style={{ width: '100%', padding: '18px 18px 18px 48px', borderRadius: '100px', border: 'none', fontSize: '1rem', outline: 'none', backgroundColor: 'rgba(15,23,42,0.6)', cursor: 'pointer', appearance: 'none', fontWeight: 700, color: '#f8fafc', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.5)' }}
+                    style={{ width: '100%', padding: '18px 18px 18px 48px', borderRadius: '100px', fontSize: '1rem', outline: 'none', backgroundColor: '#ffffff', cursor: 'pointer', appearance: 'none', fontWeight: 700, color: '#0f172a', border: '1px solid #cbd5e1', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
                   >
                     <option value="Global">Global Search</option>
                     <option value="India">India</option>
