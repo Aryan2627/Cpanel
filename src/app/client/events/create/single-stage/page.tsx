@@ -125,10 +125,11 @@ function SingleStageCreateContent() {
 
   
   // State for Event Duration
-  const [durationValue, setDurationValue] = useState('');
+  const [durationHours, setDurationHours] = useState('');
+  const [durationMins, setDurationMins] = useState('');
   const [minBidStep, setMinBidStep] = useState('');
   const [ceilingPrice, setCeilingPrice] = useState('');
-  const [durationUnit, setDurationUnit] = useState('Days');
+  
   const [coiAgreed, setCoiAgreed] = useState(false);
   const [nfaText, setNfaText] = useState('');
 
@@ -478,21 +479,19 @@ function SingleStageCreateContent() {
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '8px' }}>Event Duration</label>
                 <div style={{ display: 'flex', alignItems: 'center', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)' }}>
                   <input 
-                    type="number" min="0" value={durationValue} onChange={e => setDurationValue(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                    placeholder=""
-                    style={{ width: '80px', padding: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', borderRight: 'none', borderRadius: '12px 0 0 12px', background: 'rgba(255,255,255,0.9)', outline: 'none', fontSize: '0.95rem', fontWeight: '500', color: '#0f172a' }}
-                    onFocus={e => e.currentTarget.style.borderColor = '#3b82f6'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.8)'}
-                  />
-                  <select
-                    value={durationUnit}
-                    onChange={e => setDurationUnit(e.target.value)}
-                    style={{ flex: 1, padding: '12px 24px 12px 16px', border: '1px solid rgba(226, 232, 240, 0.8)', borderRadius: '0 12px 12px 0', background: 'rgba(248, 250, 252, 0.9)', outline: 'none', fontSize: '0.95rem', fontWeight: '500', color: '#0f172a', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '10px' }}
-                  >
-                    <option value="Minutes">Minutes</option>
-                    <option value="Hours">Hours</option>
-                    <option value="Days">Days</option>
-                    <option value="Months">Months</option>
-                  </select>
+                      type="number" min="0" value={durationHours} onChange={e => setDurationHours(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                      placeholder="Hrs"
+                      style={{ width: '80px', padding: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', borderRight: 'none', borderRadius: '12px 0 0 12px', background: 'rgba(255,255,255,0.9)', outline: 'none', fontSize: '0.95rem', fontWeight: '500', color: '#0f172a' }}
+                      onFocus={e => e.currentTarget.style.borderColor = '#3b82f6'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.8)'}
+                    />
+                    <div style={{ padding: '12px 8px', background: 'rgba(255,255,255,0.9)', borderTop: '1px solid rgba(226, 232, 240, 0.8)', borderBottom: '1px solid rgba(226, 232, 240, 0.8)', color: '#64748b', fontSize: '0.9rem' }}>h</div>
+                    <input 
+                      type="number" min="0" max="59" value={durationMins} onChange={e => setDurationMins(e.target.value)} onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                      placeholder="Min"
+                      style={{ width: '80px', padding: '12px', border: '1px solid rgba(226, 232, 240, 0.8)', borderLeft: 'none', borderRadius: '0', background: 'rgba(255,255,255,0.9)', outline: 'none', fontSize: '0.95rem', fontWeight: '500', color: '#0f172a' }}
+                      onFocus={e => e.currentTarget.style.borderColor = '#3b82f6'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.8)'}
+                    />
+                    <div style={{ padding: '12px 12px 12px 8px', background: 'rgba(255,255,255,0.9)', borderTop: '1px solid rgba(226, 232, 240, 0.8)', borderBottom: '1px solid rgba(226, 232, 240, 0.8)', borderRight: '1px solid rgba(226, 232, 240, 0.8)', borderRadius: '0 12px 12px 0', color: '#64748b', fontSize: '0.9rem' }}>m</div>
                 </div>
               </div>
             </div>
@@ -878,24 +877,21 @@ function SingleStageCreateContent() {
           </div>
           <button 
             onClick={async () => {
-              const isValidDuration = durationValue && parseInt(durationValue) > 0;
+              const isValidDuration = (durationHours && parseInt(durationHours) > 0) || (durationMins && parseInt(durationMins) > 0);
               const isValidJap = eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval);
                 const isValidNfa = nfaText && nfaText.trim().length > 0;
                 if (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && isValidDuration && isValidJap && isValidNfa && coiAgreed) {
                 try {
                   // Calculate endTime if duration is provided
                   let calculatedEndTime = null;
-                  if (durationValue) {
-                    const num = parseInt(durationValue);
-                    if (!isNaN(num) && num > 0) {
-                      let ms = 0;
-                      if (durationUnit === 'Minutes') ms = num * 60 * 1000;
-                      else if (durationUnit === 'Hours') ms = num * 60 * 60 * 1000;
-                      else if (durationUnit === 'Days') ms = num * 24 * 60 * 60 * 1000;
-                      else if (durationUnit === 'Months') ms = num * 30 * 24 * 60 * 60 * 1000;
-                      calculatedEndTime = new Date(Date.now() + ms).toISOString();
+                  if (durationHours || durationMins) {
+                      let totalMs = 0;
+                      if (durationHours && !isNaN(parseInt(durationHours))) totalMs += parseInt(durationHours) * 60 * 60 * 1000;
+                      if (durationMins && !isNaN(parseInt(durationMins))) totalMs += parseInt(durationMins) * 60 * 1000;
+                      if (totalMs > 0) {
+                        calculatedEndTime = new Date(Date.now() + totalMs).toISOString();
+                      }
                     }
-                  }
 
                   const finalStages = [];
                   if (enableTechnical) {
@@ -958,15 +954,15 @@ function SingleStageCreateContent() {
                 if (enableRFQ && rfqTemplate === 'Select Templates') missing.push("an RFQ Template");
                 if (enableAuction && auctionTemplate === 'Select Templates') missing.push("an Auction Template");
                 if (!enableTechnical && !enableRFQ && !enableAuction) missing.push("at least one stage enabled");
-                  if (!durationValue || parseInt(durationValue) <= 0) missing.push("Event Duration");
+                  if ((!durationHours && !durationMins)) missing.push("Event Duration");
                   if (!nfaText || !nfaText.trim()) missing.push("NFA Details");
                   if (!coiAgreed) missing.push("Conflict of Interest Declaration");
                 alert(`Please provide: ${missing.join(', ')}`);
               }
             }}
             style={{ 
-              background: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && (eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval)) && nfaText && nfaText.trim().length > 0 && coiAgreed) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
-              color: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && durationValue && parseInt(durationValue) > 0 && (eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval)) && nfaText && nfaText.trim().length > 0 && coiAgreed) ? '#ffffff' : '#94a3b8', 
+              background: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && ((durationHours && parseInt(durationHours) > 0) || (durationMins && parseInt(durationMins) > 0)) && (eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval)) && nfaText && nfaText.trim().length > 0 && coiAgreed) ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' : '#e2e8f0', 
+              color: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates') && ((durationHours && parseInt(durationHours) > 0) || (durationMins && parseInt(durationMins) > 0)) && (eventType !== 'Japanese Reverse Auction' || (japStartPrice && japDropAmount && japTickInterval)) && nfaText && nfaText.trim().length > 0 && coiAgreed) ? '#ffffff' : '#94a3b8', 
               border: 'none', borderRadius: '30px', 
               padding: '16px 32px', fontWeight: '600', fontSize: '1.05rem', 
               cursor: (title && selectedVendors.length > 0 && (enableTechnical || enableRFQ || enableAuction) && (!enableTechnical || technicalTemplate !== 'Select Templates') && (!enableRFQ || rfqTemplate !== 'Select Templates') && (!enableAuction || auctionTemplate !== 'Select Templates')) ? 'pointer' : 'not-allowed',

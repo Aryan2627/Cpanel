@@ -231,7 +231,7 @@ export default function IntakeTablePage() {
                     </span>
                   </th>
                 ))}
-                <th style={{ padding: '13px 16px', color: '#475569', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', textAlign: 'center' }}>Actions</th>
+                
               </tr>
             </thead>
             <tbody>
@@ -272,21 +272,7 @@ export default function IntakeTablePage() {
                     <td style={{ padding: '13px 16px', color: '#475569', fontWeight: 600, fontSize: '0.875rem' }}>{item.quantity || 1}</td>
                     <td style={{ padding: '13px 16px', color: '#0f172a', fontWeight: 600, fontSize: '0.875rem' }}>{item.budget ? '$' + item.budget.toLocaleString() : '-'}</td>
                     <td style={{ padding: '13px 16px', color: '#94a3b8', fontSize: '0.8rem' }}>{item.reqAt}</td>
-                    <td style={{ padding: '13px 16px', textAlign: 'center', position: 'relative' }}>
-                      <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
-                        <button onClick={() => router.push('/client/intake')} style={{ background: '#f8faff', border: '1px solid #e5edff', borderRadius: '7px', padding: '5px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', fontWeight: 600, color: '#475569', transition: 'all 0.15s' }}
-                          onMouseOver={e => { (e.currentTarget as HTMLElement).style.background = '#f8faff'; (e.currentTarget as HTMLElement).style.color = '#0f172a'; }}
-                          onMouseOut={e => { (e.currentTarget as HTMLElement).style.background = '#f8faff'; (e.currentTarget as HTMLElement).style.color = '#475569'; }}>
-                          <Eye size={13} /> View
-                        </button>
-                        <button onClick={() => router.push(`/client/events/create/single-stage?title=${encodeURIComponent(item.title)}`)}
-                          style={{ background: '#f8faff', border: '1px solid #e5edff', borderRadius: '7px', padding: '5px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', fontWeight: 700, color: '#0f172a', transition: 'all 0.15s' }}
-                          onMouseOver={e => { (e.currentTarget as HTMLElement).style.background = '#eff6ff'; }}
-                          onMouseOut={e => { (e.currentTarget as HTMLElement).style.background = '#f8faff'; }}>
-                          <ArrowUpRight size={13} /> RFQ
-                        </button>
-                      </div>
-                    </td>
+                    
                   </tr>
                 );
               }) : (

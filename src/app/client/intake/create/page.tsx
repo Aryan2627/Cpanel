@@ -12,6 +12,7 @@ export default function PurchaseIntake() {
   const [category, setCategory] = useState('');
   const [quantity, setQuantity] = useState<number | string>('');
   const [budget, setBudget] = useState<number | string>('');
+  const [location, setLocation] = useState('');
   const [customData, setCustomData] = useState<any>({});
   const [categories, setCategories] = useState<string[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
@@ -61,6 +62,7 @@ export default function PurchaseIntake() {
         updAt: formattedDate,
         quantity: Number(quantity) || 1,
         budget: typeof budget === 'string' ? Number(budget.replace(/[^0-9.]/g, '')) || 0 : Number(budget) || 0,
+        location,
       });
 
       setSubmitted(true);

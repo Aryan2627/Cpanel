@@ -669,9 +669,24 @@ export default function BuyerEventDetailsPage() {
                       <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Clock size={14} /> Time Remaining
                       </div>
-                      {event.endTime ? (
-                        <Countdown endTime={event.endTime} />
-                      ) : (
+                      
+                        {event.endTime ? (
+                          isEditingTime ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <input type="datetime-local" value={newEndTime} onChange={e => setNewEndTime(e.target.value)} style={{ padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+                              <button onClick={handleUpdateTime} style={{ padding: '6px 12px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem' }}>Save</button>
+                              <button onClick={() => setIsEditingTime(false)} style={{ padding: '6px 12px', background: '#e2e8f0', color: '#334155', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem' }}>Cancel</button>
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <Countdown endTime={event.endTime} />
+                              <button onClick={() => { setNewEndTime(new Date(new Date(event.endTime).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)); setIsEditingTime(true); }} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '4px' }} title="Edit Time">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                              </button>
+                            </div>
+                          )
+                        ) : (
+
                         <div style={{ fontWeight: 700, color: '#16a34a', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.2rem' }}>
                           <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block', boxShadow: '0 0 10px #22c55e', animation: 'pulse 2s infinite' }}></span>
                           Live / No Time Limit

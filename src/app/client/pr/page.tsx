@@ -32,7 +32,7 @@ export default function PRPage() {
       let tabStatus = 'Open';
       if (row.status === 'Approved') tabStatus = 'Completed';
       else if (row.status === 'In Progress') tabStatus = 'In Progress';
-      return { ...row, refId: row.refId.replace('IR-', 'PR-'), items, priority, tabStatus, fundCenter: 100000 + (i * 12345) % 900000, storageLocation: ['HRSP', 'EDSP', 'ESSP'][i % 3] };
+      return { ...row, refId: row.refId.replace('IR-', 'PR-'), items, tabStatus, fundCenter: 100000 + (i * 12345) % 900000, storageLocation: row.customData?.location || ['HRSP', 'EDSP', 'ESSP'][i % 3] };
     });
   }, [intakes]);
 
@@ -179,7 +179,7 @@ export default function PRPage() {
                   <input type="checkbox" checked={selectedRows.size === filteredData.length && filteredData.length > 0} onChange={handleSelectAll} style={{ accentColor: '#0f172a', cursor: 'pointer' }} />
                 </th>
                 <th style={{ padding: '13px 8px', width: '36px' }}></th>
-                {[['refId', 'PR No (Ref ID)'], ['title', 'Title / Material'], ['quantity', 'Quantity'], ['budget', 'Budget'], ['reqName', 'Requester'], ['priority', 'Priority'], ['storageLocation', 'Location'], ['action', 'Agent Action']].map(([key, label]) => (
+                {[['refId', 'PR No (Ref ID)'], ['title', 'Title / Material'], ['quantity', 'Quantity'], ['budget', 'Budget'], ['reqName', 'Requester'], ['storageLocation', 'Location'], ['action', 'Agent Action']].map(([key, label]) => (
                   <th key={key} style={{ padding: '13px 16px', textAlign: 'left', color: '#475569', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', whiteSpace: 'nowrap' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>{label} <ArrowUpDown size={10} color="#cbd5e1" /></span>
                   </th>

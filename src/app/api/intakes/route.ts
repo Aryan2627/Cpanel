@@ -28,6 +28,7 @@ export async function GET(request: Request) { // PAGINATION_ADDED
       let budget = undefined;
       if (i.customData && typeof i.customData === 'object' && !Array.isArray(i.customData)) {
         budget = (i.customData as any).budget;
+        (i as any).location = (i.customData as any).location;
       }
       return { ...i, budget };
     });
@@ -89,7 +90,7 @@ export async function POST(request: Request) {
         reqAt: data.reqAt || new Date().toISOString(),
         updAt: data.updAt || new Date().toISOString(),
         quantity: data.quantity || 1,
-        customData: (data.budget !== undefined && data.budget !== null) ? { budget: Number(data.budget) } : undefined,
+        customData: { budget: Number(data.budget || 0), location: data.location },
       }
     });
 
@@ -107,6 +108,7 @@ export async function POST(request: Request) {
     let budget = undefined;
     if (newIntake.customData && typeof newIntake.customData === 'object' && !Array.isArray(newIntake.customData)) {
         budget = (newIntake.customData as any).budget;
+      (newIntake as any).location = (newIntake.customData as any).location;
     }
 
     return NextResponse.json({ ...newIntake, budget }, { status: 201 });
