@@ -676,7 +676,7 @@ export default function DorcPage() {
     ];
 
   return (
-    <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', flex: 1, width: '100%', height: '100%', flex: 1, minHeight: 0, background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+    <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', flex: 1, width: '100%', height: 'calc(100vh - 64px)', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
         <style>{`
           @keyframes voiceRing1 {
             0% { transform: scale(1); opacity: 0.8; }
@@ -855,7 +855,7 @@ export default function DorcPage() {
 
         {/* History */}
         <div className="cx-sidebar-history" style={{ flex:1, overflowY:'auto', padding:'12px 10px' }}>
-          <div style={{ fontSize:'0.63rem', fontWeight:700, color:'#cbd5e1', textTransform:'uppercase', letterSpacing:'1.5px', padding:'0 8px', marginBottom:'8px' }}>Recent</div>
+          <div style={{ fontSize:'0.63rem', fontWeight:700, color: isDark ? '#cbd5e1' : '#64748b', textTransform:'uppercase', letterSpacing:'1.5px', padding:'0 8px', marginBottom:'8px' }}>Recent</div>
           {chats.map((chat)=>{
             const isActive = activeChatId===chat.id;
             const menuOpen = menuOpenId===chat.id;
@@ -875,11 +875,11 @@ export default function DorcPage() {
                     style={{ flex:1, background:'rgba(255,255,255,0.08)', border:'1px solid rgba(99,102,241,0.4)', borderRadius:'4px', padding:'2px 6px', color:'#1e293b', fontSize:'0.8rem', outline:'none' }}
                   />
                 ) : (
-                  <span style={{ flex:1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', color: isActive?'#a5b4fc':'#e2e8f0' }}>{chat.title}</span>
+                  <span style={{ flex:1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', color: isActive ? (isDark ? '#a5b4fc' : '#4f46e5') : (isDark ? '#e2e8f0' : '#475569') }}>{chat.title}</span>
                 )}
                 <button
                   onClick={e=>{ e.stopPropagation(); setMenuOpenId(menuOpen?null:chat.id); }}
-                  style={{ background:'none', border:'none', color:'#e2e8f0', cursor:'pointer', padding:'2px 4px', borderRadius:'4px', flexShrink:0, opacity: isActive||menuOpen?1:0, transition:'opacity 0.2s', fontSize:'1rem', lineHeight:'1', display:'flex', alignItems:'center' }}
+                  style={{ background:'none', border:'none', color: isDark ? '#e2e8f0' : '#475569', cursor:'pointer', padding:'2px 4px', borderRadius:'4px', flexShrink:0, opacity: isActive||menuOpen?1:0, transition:'opacity 0.2s', fontSize:'1rem', lineHeight:'1', display:'flex', alignItems:'center' }}
                   className="dots-btn"
                 >⋯</button>
                 {menuOpen && (
