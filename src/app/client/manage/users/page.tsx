@@ -14,11 +14,13 @@ export default function UsersPage() {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', role: 'Buyer', erpId: '', status: 'Active', department: '' });
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc'|'desc' }|null>(null);
   const [formError, setFormError] = useState('');
+  const [departments, setDepartments] = useState<string[]>([]);
 
   useEffect(() => {
     const cached = localStorage.getItem('users_db_cache');
     if (cached) { try { setUsers(JSON.parse(cached)); setLoading(false); } catch(e){} }
     fetch('/api/users').then(r=>r.json()).then(d=>{ const arr = Array.isArray(d)?d:[]; setUsers(arr); localStorage.setItem('users_db_cache', JSON.stringify(arr)); setLoading(false); }).catch(()=>setLoading(false));
+    fetch('/api/data-dictionary').then(r=>r.json()).then(d=>{ if(Array.isArray(d)) { setDepartments(d.filter(x => x.category.toLowerCase().includes('department')).map(x => x.value)); } });
   }, []);
 
   const roles = ['All', 'Admin', 'Manager', 'Buyer', 'Finance', 'Viewer'];
@@ -215,11 +217,21 @@ export default function UsersPage() {
             </div>
             <div style={{ padding:'24px',display:'flex',flexDirection:'column',gap:'14px' }}>
               {formError&&<div style={{ background:'#fef2f2',border:'1px solid #fca5a5',borderRadius:'8px',padding:'10px 14px',color:'#dc2626',fontSize:'0.8rem' }}>{formError}</div>}
-              {[['name','Full Name','text'],['email','Email Address','email'],['phone','Phone','text'],['erpId','ERP ID','text'],['department','Department','text']].map(([field,label,type])=>(
+              {[['name','Full Name','text'],['email','Email Address','email'],['phone','Phone','text'],['erpId','ERP ID','text']].map(([field,label,type])=>(
                 <div key={field}><label style={{ display:'block',fontSize:'0.75rem',fontWeight:700,color:'#475569',marginBottom:'5px',textTransform:'uppercase',letterSpacing:'0.04em' }}>{label}</label>
                 <input type={type} value={(formData as any)[field]} onChange={e=>setFormData(p=>({...p,[field]:e.target.value}))}
                   style={{ width:'100%',padding:'10px 12px',border:'1px solid #e2e8f0',borderRadius:'8px',fontSize:'0.875rem',outline:'none',boxSizing:'border-box' }} /></div>
               ))}
+              {/* Dynamic Department Dropdown */}
+              <div>
+                <label style={{ display:'block',fontSize:'0.75rem',fontWeight:700,color:'#475569',marginBottom:'5px',textTransform:'uppercase',letterSpacing:'0.04em' }}>Department</label>
+                <select value={formData.department} onChange={e=>setFormData(p=>({...p, department: e.target.value}))}
+                  style={{ width:'100%',padding:'10px 12px',border:'1px solid #e2e8f0',borderRadius:'8px',fontSize:'0.875rem',outline:'none',background:'#fff' }}>
+                  <option value="">Select a Department...</option>
+                  {departments.map((d:string)=><option key={d} value={d}>{d}</option>)}
+                </select>
+              </div>
+
               {[['role','Role',['Admin','Manager','Buyer','Finance','Viewer']],['status','Status',['Active','Inactive']]].map(([field,label,opts])=>(
                 <div key={field}><label style={{ display:'block',fontSize:'0.75rem',fontWeight:700,color:'#475569',marginBottom:'5px',textTransform:'uppercase',letterSpacing:'0.04em' }}>{label}</label>
                 <select value={(formData as any)[field]} onChange={e=>setFormData(p=>({...p,[field]:e.target.value}))}
