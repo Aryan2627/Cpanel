@@ -42,13 +42,20 @@ const TOP_MENUS = [
       { name: 'Products', path: '/client/manage/products' },
       { name: 'Templates', path: '/client/manage/templates' },
       { name: 'Approval Rules', path: '/client/manage/approvals' },
-      { name: 'Context Studio (AI)', path: '/client/manage/context-studio' },
-      { name: 'Routing Engine (New)', path: '/client/settings/approval-rules' },
-      { name: '? Tokens and Usage', path: '/client/manage/tokens' },
+      
     ]
   },
   {
-    name: 'Licensing',
+    name: 'Master Center',
+      icon: Settings,
+      sub: [
+        { name: 'Context Studio (AI)', path: '/client/manage/context-studio' },
+        { name: 'Routing Engine (New)', path: '/client/settings/approval-rules' },
+        { name: '? Tokens and Usage', path: '/client/manage/tokens' },
+      ]
+    },
+    {
+      name: 'Licensing',
     icon: Shield,
     sub: [
       { name: 'License Summary', path: '/client/license/summary' },
