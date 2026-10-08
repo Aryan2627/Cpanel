@@ -50,7 +50,8 @@ const TOP_MENUS = [
         subItems: [
           { name: 'Context Studio (AI)', path: '/client/manage/context-studio' },
           { name: 'Routing Engine (New)', path: '/client/settings/approval-rules' },
-          { name: '? Tokens and Usage', path: '/client/manage/tokens' }
+          { name: '? Tokens and Usage', path: '/client/manage/tokens' },
+            { name: 'Integrations', path: '/client/settings/integrations' }
         ]
       }
       ]
@@ -68,13 +69,6 @@ const TOP_MENUS = [
       { name: 'Maintenance Expiry', path: '/client/license/expiry/maintenance' },
       { name: 'Contract Expiry', path: '/client/license/expiry/contracts' },
       { name: 'Payments Due', path: '/client/license/expiry/payments' },
-    ]
-  },
-  {
-    name: 'Integrations',
-    icon: Link2,
-    sub: [
-      { name: 'Slack Integration', path: '/client/settings/integrations' },
     ]
   },
   {
