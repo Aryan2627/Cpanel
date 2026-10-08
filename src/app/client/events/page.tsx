@@ -236,7 +236,9 @@ export default function EventsPage() {
                           ) : (
                             <>
                               {event.endTime ? <Countdown endTime={event.endTime} /> : stage.timeText}
-                              <button onClick={() => { setEditingTimeFor({ eventId: event.id, sIdx }); setNewTimeVal(''); }} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.15s' }} onMouseOver={e => (e.currentTarget as HTMLElement).style.color = '#0f172a'} onMouseOut={e => (e.currentTarget as HTMLElement).style.color = '#94a3b8'}><Edit2 size={13} /></button>
+                              <button onClick={() => { setEditingTimeFor({ eventId: event.id, sIdx });
+  const defaultDate = event.endTime ? new Date(event.endTime) : new Date(Date.now() + 24 * 60 * 60 * 1000);
+  setNewTimeVal(new Date(defaultDate.getTime() - defaultDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16)); }} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px', display: 'flex', transition: 'all 0.15s', marginLeft: '6px', borderRadius: '4px' }} onMouseOver={e => { (e.currentTarget as HTMLElement).style.color = '#0f172a'; (e.currentTarget as HTMLElement).style.background = '#e2e8f0'; }} onMouseOut={e => { (e.currentTarget as HTMLElement).style.color = '#94a3b8'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}><Edit2 size={13} /></button>
                             </>
                           )}
                         </div>
