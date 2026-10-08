@@ -394,7 +394,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
               
               {(true) && (
-<Link prefetch={false} href="/client/cortex"
+<Link prefetch={false} href="/client/DorcAI"
                 style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
                   background: 'linear-gradient(135deg, #00c6ff, #0072ff)',
