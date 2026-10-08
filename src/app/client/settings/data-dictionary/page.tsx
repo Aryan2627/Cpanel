@@ -87,7 +87,7 @@ export default function DataDictionaryPage() {
   };
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%', height: '100%', fontFamily: 'Inter, system-ui, sans-serif', background: '#f8fafc' }}>
       
       {/* Toast Notification */}
       <AnimatePresence>
@@ -104,7 +104,7 @@ export default function DataDictionaryPage() {
         )}
       </AnimatePresence>
 
-      <div style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)', borderRadius: '24px', border: '1px solid #e2e8f0', padding: '32px 40px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+      <div style={{ background: '#ffffff', borderBottom: '1px solid #e2e8f0', padding: '32px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 style={{ margin: '0 0 8px 0', fontSize: '2.2rem', color: '#0f172a', fontWeight: 800, letterSpacing: '-0.02em' }}>Data Dictionaries</h1>
           <p style={{ margin: 0, color: '#64748b', fontSize: '1rem' }}>
@@ -116,10 +116,10 @@ export default function DataDictionaryPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '32px', alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '40px', padding: '40px 48px', flex: 1, minHeight: 0, alignItems: 'stretch' }}>
         
         {/* Left Pane: Categories */}
-        <div style={{ background: '#fff', borderRadius: '20px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+        <div style={{ background: '#fff', borderRadius: '20px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9' }}>
             <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <LayoutList size={16} /> Menus
@@ -208,7 +208,7 @@ export default function DataDictionaryPage() {
         </div>
 
         {/* Right Pane: Options */}
-        <div style={{ background: '#fff', borderRadius: '20px', border: '1px solid #e2e8f0', minHeight: '600px', display: 'flex', flexDirection: 'column', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+        <div style={{ background: '#fff', borderRadius: '20px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', boxShadow: '0 4px 15px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
           {!selectedCategory ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
               <div style={{ width: '64px', height: '64px', background: '#f8fafc', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
