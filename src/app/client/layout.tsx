@@ -397,15 +397,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 <Link prefetch={false} href="/client/DorcAI"
                 style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
-                  background: 'linear-gradient(135deg, #00c6ff, #0072ff)',
+                  background: '#fff',
                   textDecoration: 'none',
-                  border: 'none', borderRadius: '24px',
-                  padding: '6px 14px', color: '#fff', fontSize: '0.8rem', fontWeight: 600,
-                  cursor: 'pointer', boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)',
+                  border: '1px solid #e2e8f0', borderRadius: '24px',
+                  padding: '6px 14px', color: '#0f172a', fontSize: '0.8rem', fontWeight: 700,
+                  cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
                   transition: 'transform 0.2s',
                 }}
               >
-                <img src="/dorc-logo.png" style={{ width: 16, height: 16, objectFit: "contain", filter: "brightness(0) invert(1)" }} /> Dorc AI
+                <img src="/dorc-logo.png" style={{ width: 16, height: 16, objectFit: "contain", filter: "none" }} /> Dorc AI
               </Link>
               )}
 
