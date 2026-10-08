@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useIntake } from '../../../../context/IntakeContext';
@@ -21,14 +21,21 @@ export default function PurchaseIntake() {
   const [currentUser, setCurrentUser] = useState('Current User');
 
   useEffect(() => {
-    const saved = localStorage.getItem('customDropdowns');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.categories) setCategories(parsed.categories);
-        if (parsed.departments) setDepartments(parsed.departments);
-      } catch (e) {}
-    }
+    // Fetch dynamic options from the Data Dictionary
+    fetch('/api/data-dictionary')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const fetchedCats = data.filter(d => d.category === 'Product Categories' || d.category === 'Categories').map(d => d.value);
+          const fetchedDepts = data.filter(d => d.category === 'Departments').map(d => d.value);
+          const fetchedLocations = data.filter(d => d.category === 'Locations').map(d => d.value);
+          
+          if (fetchedCats.length > 0) setCategories(fetchedCats);
+          if (fetchedDepts.length > 0) setDepartments(fetchedDepts);
+          // If you want to use fetchedLocations, you can set a state for it, but for now we map categories and departments.
+        }
+      })
+      .catch(err => console.error('Failed to fetch data dictionary', err));
     
     // Fetch current user name
     fetch('/api/auth/me')

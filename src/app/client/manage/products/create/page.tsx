@@ -12,13 +12,17 @@ export default function CreateProductPage() {
   
   useEffect(() => {
     const loadCategories = () => {
-      const saved = localStorage.getItem('customDropdowns');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setCategories(parsed.categories || []);
-        } catch (e) {}
-      }
+      fetch('/api/data-dictionary')
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const cats = data.filter(d => d.category === 'Product Categories' || d.category === 'Categories').map(d => d.value);
+          const depts = data.filter(d => d.category === 'Departments').map(d => d.value);
+          if (cats.length > 0) setCategories(cats);
+          if (depts.length > 0) setDepartments(depts);
+        }
+      })
+      .catch(e => console.error(e));
     };
     
     loadCategories();
