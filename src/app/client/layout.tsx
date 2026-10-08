@@ -50,7 +50,7 @@ const TOP_MENUS = [
         subItems: [
           { name: 'Context Studio (AI)', path: '/client/manage/context-studio' },
           { name: 'Routing Engine (New)', path: '/client/settings/approval-rules' },
-          { name: '? Tokens and Usage', path: '/client/manage/tokens' },
+          { name: 'Tokens and Usage', path: '/client/manage/tokens' },
             { name: 'Integrations', path: '/client/settings/integrations' }
         ]
       }
