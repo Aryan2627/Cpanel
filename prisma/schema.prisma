@@ -45,6 +45,7 @@ model Organization {
   users              User[]
   vendors            Vendor[]
   workflows          Workflow[]
+  dataDictionaries   DataDictionary[]
 }
 
 model User {
@@ -464,4 +465,18 @@ model CandidateResponse {
   completedAt         DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
+}
+
+model DataDictionary {
+  id             String   @id @default(uuid())
+  organizationId String?
+  category       String
+  value          String
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, category, value])
+  @@index([organizationId, category])
 }
