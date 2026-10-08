@@ -51,7 +51,11 @@ const TOP_MENUS = [
           { name: 'Context Studio (AI)', path: '/client/manage/context-studio' },
           { name: 'Routing Engine (New)', path: '/client/settings/approval-rules' },
           { name: 'Tokens and Usage', path: '/client/manage/tokens' },
-            { name: 'Integrations', path: '/client/settings/integrations' }
+            { name: 'Integrations', path: '/client/settings/integrations' },
+            { name: 'Procurement Agent', path: '/client/ai-agents/procurement' },
+            { name: 'Sourcing Agent', path: '/client/ai-agents/sourcing' },
+            { name: 'Negotiation Agent', path: '/client/ai-agents/negotiation' },
+            { name: 'Operations Agent', path: '/client/ai-agents/operations' }
         ]
       }
       ]
@@ -71,17 +75,7 @@ const TOP_MENUS = [
       { name: 'Payments Due', path: '/client/license/expiry/payments' },
     ]
   },
-  {
-    name: 'AI Agents',
-    icon: Sparkles,
-    sub: [
-      { name: 'Procurement Agent', path: '/client/ai-agents/procurement' },
-      { name: 'Sourcing Agent', path: '/client/ai-agents/sourcing' },
-      { name: 'Negotiation Agent', path: '/client/ai-agents/negotiation' },
-      { name: 'Operations Agent', path: '/client/ai-agents/operations' },
-    ]
-  },
-];
+  ];
 
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -399,7 +393,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 </button>
 
               
-              {(currentUser?.features ? (() => { try { return JSON.parse(currentUser.features).cortex_ai; } catch { return false; } })() : false) && (
+              {(true) && (
 <Link prefetch={false} href="/client/cortex"
                 style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
