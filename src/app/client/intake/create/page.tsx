@@ -26,8 +26,8 @@ export default function PurchaseIntake() {
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
-          const fetchedCats = data.filter(d => d.category === 'Product Categories' || d.category === 'Categories').map(d => d.value);
-          const fetchedDepts = data.filter(d => d.category === 'Departments').map(d => d.value);
+          const fetchedCats = data.filter(d => d.category.toLowerCase().includes('categor')).map(d => d.value);
+          const fetchedDepts = data.filter(d => d.category.toLowerCase().includes('department')).map(d => d.value);
           const fetchedLocations = data.filter(d => d.category === 'Locations').map(d => d.value);
           
           if (fetchedCats.length > 0) setCategories(fetchedCats);

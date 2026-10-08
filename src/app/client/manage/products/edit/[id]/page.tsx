@@ -40,8 +40,8 @@ export default function EditProductPage({ params }: { params: any }) {
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
-          const cats = data.filter(d => d.category === 'Product Categories' || d.category === 'Categories').map(d => d.value);
-          const depts = data.filter(d => d.category === 'Departments').map(d => d.value);
+          const cats = data.filter(d => d.category.toLowerCase().includes('categor')).map(d => d.value);
+          const depts = data.filter(d => d.category.toLowerCase().includes('department')).map(d => d.value);
           if (cats.length > 0) setCategories(cats);
           if (depts.length > 0) setDepartments(depts);
         }
