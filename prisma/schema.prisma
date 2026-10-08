@@ -9,85 +9,74 @@ datasource db {
 }
 
 model Organization {
-  id        String   @id @default(uuid())
-  name      String
-  domain    String?
-  theme     String? // JSON string for colors, logos
-  features  String? // JSON string for feature toggles
-  industry  String?
-  createdAt DateTime @default(now())
-
-  // Integrations
-  slackToken    String?
-  slackTeamId   String?
-  slackTeamName String?
-
-
-  // Licensing
-  licenseStart  DateTime?
-  licenseEnd    DateTime?
-  licenseStatus String?   @default("Active")
-  licensePlan   String?   @default("Enterprise") // Active, Expired, Suspended
-
-  // Token-Based Plan Metering
-  plan          String   @default("starter") // starter | growth | enterprise | unlimited
-  tokensTotal   Int      @default(500)
-  tokensUsed    Int      @default(0)
-  tokensResetAt DateTime @default(now())
-
-  // Relations
-  users              User[]
-  formConfigurations FormConfiguration[]
-  teams              Team[]
-  locations          Location[]
-  categories         Category[]
-  products           Product[]
-  intakes            Intake[]
-  events             Event[]
-  vendors            Vendor[]
-  purchaseOrders     PurchaseOrder[]
-  bids               Bid[]
-  contracts          Contract[]
-  templates          Template[]
-  jarvisMemories     JarvisMemory[]
-  workflows          Workflow[]
+  id                 String              @id @default(uuid())
+  name               String
+  domain             String?
+  theme              String?
+  features           String?
+  slackToken         String?
+  slackTeamId        String?
+  slackTeamName      String?
+  createdAt          DateTime            @default(now())
+  industry           String?
+  licenseEnd         DateTime?
+  licenseStart       DateTime?
+  licenseStatus      String?             @default("Active")
+  licensePlan        String?             @default("Enterprise")
+  plan               String              @default("starter")
+  tokensResetAt      DateTime            @default(now())
+  tokensTotal        Int                 @default(500)
+  tokensUsed         Int                 @default(0)
   approvalReqs       ApprovalRequest[]
   ApprovalRule       ApprovalRule[]
+  bids               Bid[]
+  categories         Category[]
+  contracts          Contract[]
+  events             Event[]
+  formConfigurations FormConfiguration[]
+  intakes            Intake[]
+  jarvisMemories     JarvisMemory[]
+  locations          Location[]
+  products           Product[]
+  purchaseOrders     PurchaseOrder[]
+  teams              Team[]
+  templates          Template[]
+  users              User[]
+  vendors            Vendor[]
+  workflows          Workflow[]
 }
 
 model User {
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String?
   email          String?       @unique
   phone          String?
   role           String?
-  permissions    Json?
-  impersonatedBy String?
-  password       String?
   erpId          String?
   status         String        @default("Active")
-  onboardingData Json?
   createdAt      DateTime      @default(now())
+  organizationId String?
+  password       String?
+  onboardingData Json?
+  impersonatedBy String?
+  permissions    Json?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model Team {
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String?
   type           String?
-  users          String? // JSON string
-  categories     String? // JSON string
-  locations      String? // JSON string
+  users          String?
+  categories     String?
+  locations      String?
   createdAt      DateTime      @default(now())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model Location {
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String?
   city           String?
   type           String?
@@ -95,13 +84,12 @@ model Location {
   code           String?
   status         String        @default("Active")
   createdAt      DateTime      @default(now())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model Category {
-  customData     Json?
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String?
   type           String?
   code           String?
@@ -110,13 +98,13 @@ model Category {
   subCats        Int           @default(0)
   products       Int           @default(0)
   createdAt      DateTime      @default(now())
+  organizationId String?
+  customData     Json?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model Product {
-  customData     Json?
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   code           String        @unique @default(uuid())
   name           String?
   uom            String?
@@ -131,15 +119,15 @@ model Product {
   createdBy      String        @default("Admin")
   phone          String?
   createdAt      DateTime      @default(now())
+  organizationId String?
+  customData     Json?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId])
 }
 
 model Intake {
-  customData     Json?
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   refId          String        @unique
   title          String?
   reqName        String?
@@ -150,8 +138,11 @@ model Intake {
   updAt          String?
   source         String        @default("Manual")
   erpId          String?
-  quantity       Int           @default(1)
   createdAt      DateTime      @default(now())
+  quantity       Int           @default(1)
+  organizationId String?
+  customData     Json?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId])
   @@index([refId])
@@ -159,21 +150,21 @@ model Intake {
 
 model Event {
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   refId          String        @unique
   title          String?
   type           String?
   account        String?
   itemsCount     Int           @default(1)
-  stages         String? // JSON string of stages array
-  participants   String? // JSON string of invited vendors array
+  stages         String?
+  participants   String?
   endTime        DateTime?
+  createdAt      DateTime      @default(now())
   baseCurrency   String        @default("USD")
   feedbackMode   String        @default("Sealed")
   status         String        @default("Draft")
+  organizationId String?
   sourcePrs      String?
-  createdAt      DateTime      @default(now())
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId, createdAt(sort: Desc)])
   @@index([refId])
@@ -181,8 +172,6 @@ model Event {
 
 model Vendor {
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String?
   email          String?
   phone          String?
@@ -193,33 +182,35 @@ model Vendor {
   tradeLicense   String?
   taxId          String?
   city           String?
-  tags           String? // JSON string of tags
+  tags           String?
   status         String        @default("Invited")
+  createdAt      DateTime      @default(now())
+  organizationId String?
   password       String?
   onboardingData Json?
-  createdAt      DateTime      @default(now())
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId])
 }
 
 model PurchaseOrder {
-  asns           ASN[]
-  grns           GRN[]
-  invoices       Invoice[]
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   poNumber       String        @unique
   title          String?
   status         String        @default("Draft")
   vendorId       String?
   eventId        String?
   total          Float         @default(0)
-  details        String? // JSON string containing detailed template and items
+  details        String?
   source         String        @default("Manual")
   erpId          String?
   erpStatus      String        @default("Pending Sync")
   createdAt      DateTime      @default(now())
+  organizationId String?
+  asns           ASN[]
+  grns           GRN[]
+  invoices       Invoice[]
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId, createdAt(sort: Desc)])
   @@index([poNumber])
@@ -227,20 +218,20 @@ model PurchaseOrder {
 
 model Bid {
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   eventId        String
   vendorId       String
   vendorName     String?
   amount         Float
-  initialAmount  Float?
-  localAmount    Float?
-  currency       String        @default("USD")
-  exchangeRate   Float         @default(1.0)
-  templateData   String? // JSON string
-  chatHistory    String? // JSON array of messages
+  templateData   String?
   status         String        @default("Submitted")
   createdAt      DateTime      @default(now())
+  currency       String        @default("USD")
+  exchangeRate   Float         @default(1.0)
+  localAmount    Float?
+  initialAmount  Float?
+  organizationId String?
+  chatHistory    String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 
   @@index([eventId])
   @@index([organizationId, createdAt(sort: Desc)])
@@ -248,8 +239,6 @@ model Bid {
 
 model Contract {
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   title          String?
   status         String        @default("Draft")
   vendorId       String?
@@ -261,53 +250,55 @@ model Contract {
   clientSigned   Boolean       @default(false)
   vendorSigned   Boolean       @default(false)
   createdAt      DateTime      @default(now())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId, createdAt(sort: Desc)])
 }
 
 model Template {
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String
-  type           String        @default("RFQ")
-  fields         String // JSON string of fields
+  fields         String
   createdAt      DateTime      @default(now())
+  type           String        @default("RFQ")
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model JarvisMemory {
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-  entityType     String // e.g., "Event"
-  entityRef      String // e.g., "EVT-123"
-  context        String // e.g., "New Sourcing Event Created"
+  entityType     String
+  entityRef      String
+  context        String
   createdAt      DateTime      @default(now())
   expiresAt      DateTime
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model Workflow {
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   name           String
-  category       String // e.g. "IT Hardware"
-  approvers      String // JSON array of approver emails
+  category       String
+  approvers      String
   isActive       Boolean       @default(true)
   createdAt      DateTime      @default(now())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model ApprovalRequest {
   id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   eventId        String
   workflowId     String
-  status         String        @default("Pending") // Pending, Approved, Rejected
+  status         String        @default("Pending")
   currentStep    Int           @default(0)
-  history        String? // JSON array of approval actions (who, when, comment)
+  history        String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model VerificationToken {
@@ -335,10 +326,15 @@ model AuditLog {
   id             String   @id @default(uuid())
   organizationId String?
   actorEmail     String
+  actorName      String?
   action         String
   entityType     String?
   entityRef      String?
   details        String?
+  ipAddress      String?
+  userAgent      String?
+  severity       String   @default("INFO")
+  status         String   @default("SUCCESS")
   createdAt      DateTime @default(now())
 
   @@index([organizationId, createdAt(sort: Desc)])
@@ -348,14 +344,14 @@ model AuditLog {
 model ASN {
   id              String        @id @default(uuid())
   purchaseOrderId String
-  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
   asnNumber       String
   trackingId      String?
   carrier         String?
   status          String        @default("In Transit")
   estimatedDate   DateTime?
-  details         String? // JSON
+  details         String?
   createdAt       DateTime      @default(now())
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
 
   @@index([purchaseOrderId])
 }
@@ -363,14 +359,14 @@ model ASN {
 model GRN {
   id              String        @id @default(uuid())
   purchaseOrderId String
-  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
   asnId           String?
   grnNumber       String
   receivedBy      String?
   location        String?
   status          String        @default("Received")
-  details         String? // JSON
+  details         String?
   createdAt       DateTime      @default(now())
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
 
   @@index([purchaseOrderId])
 }
@@ -378,7 +374,6 @@ model GRN {
 model Invoice {
   id              String        @id @default(uuid())
   purchaseOrderId String
-  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
   invoiceNumber   String
   vendorId        String?
   totalAmount     Float         @default(0)
@@ -386,8 +381,9 @@ model Invoice {
   dueDate         DateTime?
   status          String        @default("Pending")
   matchStatus     String        @default("Unmatched")
-  details         String? // JSON
+  details         String?
   createdAt       DateTime      @default(now())
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
 
   @@index([purchaseOrderId])
 }
@@ -395,15 +391,15 @@ model Invoice {
 model FormConfiguration {
   id             String       @id @default(uuid())
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  formName       String // e.g. "Intake", "Product", "Category"
-  fieldName      String // e.g. "custom_field_1"
-  fieldLabel     String // The display label
-  fieldType      String       @default("dropdown") // "dropdown", "text", "number"
-  options        String? // JSON array of options if dropdown
+  formName       String
+  fieldName      String
+  fieldLabel     String
+  fieldType      String       @default("dropdown")
+  options        String?
   isActive       Boolean      @default(true)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, formName, fieldName])
 }
@@ -439,19 +435,18 @@ model ContextDefinition {
 model ApprovalRule {
   id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-  flowName       String        @default("Default Flow")
-  approvalType   String        @default("Quote Selection")
-  type           String
-  value1         String
-  logic          String
-  value2         String?
-  department     String
-  approvers      String
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  approvers      String
+  department     String
+  logic          String
+  type           String
+  value1         String
+  value2         String?
+  approvalType   String        @default("Quote Selection")
+  flowName       String        @default("Default Flow")
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 }
-
 
 model CandidateResponse {
   id                  String    @id @default(uuid())
@@ -460,9 +455,9 @@ model CandidateResponse {
   phone               String?
   education           String?
   experience          String?
-  status              String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, SUSPENDED
+  status              String    @default("PENDING")
   currentSectionIndex Int       @default(0)
-  answers             String?   
+  answers             String?
   logicalScore        Int?
   quantScore          Int?
   completedAt         DateTime?

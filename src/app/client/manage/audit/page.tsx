@@ -1,13 +1,20 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Shield, Download, Search, Clock, Activity, Filter, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Shield, Download, Search, Clock, Activity, Filter, ChevronLeft, ChevronRight, CheckCircle2, Eye, X, AlertTriangle, Info, AlertCircle } from 'lucide-react';
 
 export default function AuditLogPage() {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, total: 0, pages: 1, limit: 50 });
+  
+  // Filters
   const [search, setSearch] = useState('');
   const [actionFilter, setActionFilter] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+
+  // Modal
+  const [selectedLog, setSelectedLog] = useState<any>(null);
 
   const fetchLogs = async (page = 1) => {
     setLoading(true);
@@ -15,6 +22,8 @@ export default function AuditLogPage() {
       const params = new URLSearchParams({ page: page.toString(), limit: '50' });
       if (search) params.set('actor', search);
       if (actionFilter) params.set('action', actionFilter);
+      if (fromDate) params.set('from', fromDate);
+      if (toDate) params.set('to', toDate);
       const res = await fetch(`/api/audit/logs?${params}`);
       const data = await res.json();
       setLogs(data.logs || []);
@@ -27,6 +36,36 @@ export default function AuditLogPage() {
 
   useEffect(() => { fetchLogs(); }, []);
 
+  const exportToCSV = () => {
+    const headers = ['ID', 'Timestamp (IST)', 'Actor Name', 'Actor Email', 'IP Address', 'User Agent', 'Action', 'Severity', 'Status', 'Entity Type', 'Entity Ref', 'Details'];
+    const rows = logs.map(l => [
+      l.id,
+      new Date(l.createdAt).toLocaleString('en-IN'),
+      l.actorName || 'System',
+      l.actorEmail || 'System',
+      l.ipAddress || 'N/A',
+      l.userAgent || 'N/A',
+      l.action,
+      l.severity || 'INFO',
+      l.status || 'SUCCESS',
+      l.entityType || 'N/A',
+      l.entityRef || 'N/A',
+      l.details ? l.details.replace(/"/g, '""') : 'N/A' // Escape quotes for CSV
+    ]);
+    
+    const csvContent = "data:text/csv;charset=utf-8," 
+        + headers.join(',') + '\n' 
+        + rows.map(e => e.map(cell => `"${cell}"`).join(',')).join('\n');
+        
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `audit_logs_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const actionColor = (action: string) => {
     if (!action) return '#64748b';
     if (action.includes('DELETE') || action.includes('REJECT') || action.includes('FAIL')) return '#ef4444';
@@ -38,6 +77,12 @@ export default function AuditLogPage() {
   };
 
   const actionBg = (action: string) => actionColor(action) + '15';
+
+  const renderSeverity = (sev: string) => {
+    if (sev === 'CRITICAL') return <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#ef4444', fontWeight: 700, fontSize: '0.72rem' }}><AlertCircle size={14}/> Critical</span>;
+    if (sev === 'WARNING') return <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#f59e0b', fontWeight: 700, fontSize: '0.72rem' }}><AlertTriangle size={14}/> Warning</span>;
+    return <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#3b82f6', fontWeight: 700, fontSize: '0.72rem' }}><Info size={14}/> Info</span>;
+  };
 
   return (
     <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -61,10 +106,10 @@ export default function AuditLogPage() {
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button
-            onClick={() => window.open('/api/gdpr/export', '_blank')}
+            onClick={exportToCSV}
             style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', background: '#fff', color: '#0f172a', border: '1px solid #e2e8f0', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
           >
-            <Download size={16} /> Export Data (GDPR)
+            <Download size={16} /> Export to CSV
           </button>
         </div>
       </div>
@@ -88,14 +133,14 @@ export default function AuditLogPage() {
       </div>
 
       {/* Filters */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, position: 'relative', minWidth: '200px' }}>
           <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && fetchLogs(1)}
-            placeholder="Search by actor email..."
+            placeholder="Search by actor email/name..."
             style={{ width: '100%', padding: '11px 14px 11px 42px', border: '1px solid #e2e8f0', borderRadius: '10px', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', background: '#fff' }}
           />
         </div>
@@ -106,78 +151,113 @@ export default function AuditLogPage() {
           placeholder="Filter action (e.g. LOGIN)..."
           style={{ width: '220px', padding: '11px 14px', border: '1px solid #e2e8f0', borderRadius: '10px', fontSize: '0.9rem', outline: 'none', background: '#fff' }}
         />
-        <button onClick={() => fetchLogs(1)} style={{ padding: '11px 20px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fff', padding: '4px 12px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+          <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>From:</span>
+          <input
+            type="date"
+            value={fromDate}
+            onChange={e => setFromDate(e.target.value)}
+            style={{ border: 'none', outline: 'none', fontSize: '0.85rem', color: '#0f172a' }}
+          />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fff', padding: '4px 12px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+          <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>To:</span>
+          <input
+            type="date"
+            value={toDate}
+            onChange={e => setToDate(e.target.value)}
+            style={{ border: 'none', outline: 'none', fontSize: '0.85rem', color: '#0f172a' }}
+          />
+        </div>
+        <button onClick={() => fetchLogs(1)} style={{ padding: '11px 20px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>
           Search
         </button>
-        <button onClick={() => { setSearch(''); setActionFilter(''); fetchLogs(1); }} style={{ padding: '11px 16px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}>
+        <button onClick={() => { setSearch(''); setActionFilter(''); setFromDate(''); setToDate(''); fetchLogs(1); }} style={{ padding: '11px 16px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}>
           Clear
         </button>
       </div>
 
       {/* Table */}
       <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
-              {['Timestamp (IST)', 'Actor', 'Action', 'Entity', 'Reference', 'Details'].map(h => (
-                <th key={h} style={{ padding: '14px 16px', textAlign: 'left', fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: '64px', color: '#94a3b8' }}>
-                  <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '3px solid #e2e8f0', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                  <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-                </td>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '1000px' }}>
+            <thead>
+              <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                {['Timestamp (IST)', 'Actor', 'Action', 'Severity', 'Entity Type', 'Reference', 'Inspect'].map(h => (
+                  <th key={h} style={{ padding: '14px 16px', textAlign: 'left', fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
+                ))}
               </tr>
-            ) : logs.length === 0 ? (
-              <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: '64px', color: '#94a3b8' }}>
-                  <Shield size={40} style={{ marginBottom: '12px', display: 'block', margin: '0 auto 12px' }} />
-                  <div style={{ fontWeight: 600 }}>No audit events found</div>
-                  <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>Audit events will appear here as users interact with the platform</div>
-                </td>
-              </tr>
-            ) : logs.map((log, i) => (
-              <tr key={log.id} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.1s' }} onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                <td style={{ padding: '13px 16px', fontSize: '0.78rem', color: '#475569', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
-                  {new Date(log.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                </td>
-                <td style={{ padding: '13px 16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: '#475569', flexShrink: 0 }}>
-                      {(log.actorEmail || '?').charAt(0).toUpperCase()}
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '64px', color: '#94a3b8' }}>
+                    <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '3px solid #e2e8f0', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                  </td>
+                </tr>
+              ) : logs.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '64px', color: '#94a3b8' }}>
+                    <Shield size={40} style={{ marginBottom: '12px', display: 'block', margin: '0 auto 12px' }} />
+                    <div style={{ fontWeight: 600 }}>No audit events found</div>
+                    <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>Audit events will appear here as users interact with the platform</div>
+                  </td>
+                </tr>
+              ) : logs.map((log) => (
+                <tr key={log.id} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.1s' }} onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                  <td style={{ padding: '13px 16px', fontSize: '0.78rem', color: '#475569', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
+                    {new Date(log.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  </td>
+                  <td style={{ padding: '13px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 800, color: '#475569', flexShrink: 0 }}>
+                        {(log.actorName || log.actorEmail || '?').charAt(0).toUpperCase()}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: '0.85rem', color: '#0f172a', fontWeight: 600 }}>{log.actorName || log.actorEmail || 'System'}</span>
+                        <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{log.ipAddress || 'System Internal'}</span>
+                      </div>
                     </div>
-                    <span style={{ fontSize: '0.85rem', color: '#0f172a', fontWeight: 500 }}>{log.actorEmail || 'System'}</span>
-                  </div>
-                </td>
-                <td style={{ padding: '13px 16px' }}>
-                  <span style={{ display: 'inline-flex', padding: '4px 10px', background: actionBg(log.action), color: actionColor(log.action), borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                    {log.action}
-                  </span>
-                </td>
-                <td style={{ padding: '13px 16px', fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>
-                  {log.entityType || '—'}
-                </td>
-                <td style={{ padding: '13px 16px', fontSize: '0.78rem', color: '#94a3b8', fontFamily: 'monospace' }}>
-                  {log.entityRef ? `…${log.entityRef.slice(-8)}` : '—'}
-                </td>
-                <td style={{ padding: '13px 16px', fontSize: '0.78rem', color: '#64748b', maxWidth: '220px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {log.details ? (() => { try { return JSON.stringify(JSON.parse(log.details)); } catch { return log.details; } })() : '—'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </td>
+                  <td style={{ padding: '13px 16px' }}>
+                    <span style={{ display: 'inline-flex', padding: '4px 10px', background: actionBg(log.action), color: actionColor(log.action), borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                      {log.action}
+                    </span>
+                  </td>
+                  <td style={{ padding: '13px 16px' }}>
+                    {renderSeverity(log.severity || 'INFO')}
+                  </td>
+                  <td style={{ padding: '13px 16px', fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>
+                    {log.entityType || 'N/A'}
+                  </td>
+                  <td style={{ padding: '13px 16px', fontSize: '0.78rem', color: '#3b82f6', fontFamily: 'monospace' }}>
+                    {log.entityRef ? (
+                      <span style={{ cursor: 'pointer', textDecoration: 'underline' }}>?{log.entityRef.slice(-8)}</span>
+                    ) : 'N/A'}
+                  </td>
+                  <td style={{ padding: '13px 16px' }}>
+                    <button 
+                      onClick={() => setSelectedLog(log)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', color: '#475569', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#f1f5f9')}
+                      onMouseLeave={e => (e.currentTarget.style.background = '#f8fafc')}
+                    >
+                      <Eye size={14} /> View
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Pagination */}
       {pagination.pages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', padding: '0 4px' }}>
           <div style={{ fontSize: '0.85rem', color: '#64748b' }}>
-            Showing {((pagination.page - 1) * pagination.limit) + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total.toLocaleString()} events
+            Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total.toLocaleString()} events
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button disabled={pagination.page <= 1} onClick={() => fetchLogs(pagination.page - 1)} style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#475569', cursor: pagination.page <= 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: pagination.page <= 1 ? 0.4 : 1 }}>
@@ -196,6 +276,69 @@ export default function AuditLogPage() {
           </div>
         </div>
       )}
+
+      {/* Modal */}
+      {selectedLog && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '24px' }}>
+          <div style={{ background: '#fff', borderRadius: '24px', width: '100%', maxWidth: '600px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
+            <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h2 style={{ margin: '0 0 4px 0', fontSize: '1.25rem', color: '#0f172a', fontWeight: 700 }}>Log Details</h2>
+                <div style={{ fontSize: '0.85rem', color: '#64748b' }}>ID: {selectedLog.id}</div>
+              </div>
+              <button onClick={() => setSelectedLog(null)} style={{ background: '#f1f5f9', border: 'none', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', cursor: 'pointer' }}>
+                <X size={18} />
+              </button>
+            </div>
+            
+            <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Actor</div>
+                  <div style={{ fontSize: '0.9rem', color: '#0f172a', fontWeight: 600 }}>{selectedLog.actorName || selectedLog.actorEmail || 'System'}</div>
+                  <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{selectedLog.actorEmail}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Network & Device</div>
+                  <div style={{ fontSize: '0.9rem', color: '#0f172a', fontWeight: 600 }}>IP: {selectedLog.ipAddress || 'Internal'}</div>
+                  <div style={{ fontSize: '0.85rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={selectedLog.userAgent}>{selectedLog.userAgent || 'Server Process'}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Action & Status</div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ padding: '2px 8px', background: actionBg(selectedLog.action), color: actionColor(selectedLog.action), borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700 }}>
+                      {selectedLog.action}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: selectedLog.status === 'FAILED' ? '#ef4444' : '#10b981' }}>
+                      {selectedLog.status || 'SUCCESS'}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Timestamp</div>
+                  <div style={{ fontSize: '0.9rem', color: '#0f172a', fontWeight: 600 }}>{new Date(selectedLog.createdAt).toLocaleString('en-IN')}</div>
+                </div>
+              </div>
+              
+              <div>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>Metadata Payload</div>
+                <div style={{ background: '#0f172a', color: '#e2e8f0', padding: '16px', borderRadius: '12px', fontSize: '0.85rem', fontFamily: 'monospace', overflowX: 'auto', maxHeight: '250px', overflowY: 'auto' }}>
+                  <pre style={{ margin: 0 }}>
+                    {selectedLog.details ? (() => { 
+                      try { 
+                        return JSON.stringify(JSON.parse(selectedLog.details), null, 2); 
+                      } catch { 
+                        return selectedLog.details; 
+                      } 
+                    })() : 'No additional details provided.'}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

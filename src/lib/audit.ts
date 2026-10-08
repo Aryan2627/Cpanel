@@ -4,28 +4,43 @@ const prisma = new PrismaClient();
 
 export async function logAudit({
   actorEmail,
+  actorName,
   action,
   entityType,
   entityRef,
   details,
   organizationId,
+  ipAddress,
+  userAgent,
+  severity,
+  status,
 }: {
   actorEmail: string;
+  actorName?: string;
   action: string;
   entityType?: string;
   entityRef?: string;
   details?: object;
   organizationId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  severity?: string;
+  status?: string;
 }) {
   try {
     await prisma.auditLog.create({
       data: {
         actorEmail,
+        actorName,
         action,
         entityType,
         entityRef,
         details: details ? JSON.stringify(details) : null,
         organizationId,
+        ipAddress,
+        userAgent,
+        severity,
+        status,
       },
     });
   } catch (err) {
