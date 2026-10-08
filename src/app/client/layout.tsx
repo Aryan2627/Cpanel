@@ -9,7 +9,7 @@ import TourButton from './TourButton';
 const SpotlightSearch = dynamic(() => import('./SpotlightSearch'), { ssr: false });
 const CartOverlay = dynamic(() => import('./CartOverlay'), { ssr: false });
 const DorcWidget = dynamic(() => import('./DorcWidget'), { ssr: false });
-import { Link2, LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles, Command } from 'lucide-react';
+import { Settings, Link2, LayoutDashboard, ShoppingCart, Users, Database, Shield, Bot, Bell, Search, ChevronDown, LogOut, Menu, X, Sparkles, Command } from 'lucide-react';
 
 const TOP_MENUS = [
   { name: 'Dashboard', path: '/client', icon: LayoutDashboard },
