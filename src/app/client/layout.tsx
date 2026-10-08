@@ -35,8 +35,9 @@ const TOP_MENUS = [
   },
   {
     name: 'Master Data',
-    icon: Database,
-    sub: [
+      icon: Database,
+      sub: [
+        { name: 'Data Dictionaries', path: '/client/settings/data-dictionary' },
       { name: 'Users', path: '/client/manage/users' },
       { name: 'Products', path: '/client/manage/products' },
       { name: 'Templates', path: '/client/manage/templates' },
