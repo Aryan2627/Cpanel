@@ -676,7 +676,7 @@ export default function DorcPage() {
     ];
 
   return (
-    <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ display:'flex', flex: 1, width: '100%', height: 'calc(100vh - 64px)', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif', position:'relative' }}>
+    <div className={(isDark ? "cortex-dark" : "cortex-light") + " cx-wrapper"} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', background: isDark ? '#040810' : '#f0f4f8', overflow:'hidden', fontFamily:'system-ui,sans-serif' }}>
         <style>{`
           @keyframes voiceRing1 {
             0% { transform: scale(1); opacity: 0.8; }
@@ -833,7 +833,7 @@ export default function DorcPage() {
       <div style={{ position:'fixed', bottom:'-100px', right:'10%', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)', animation:'bgFloat 12s ease-in-out infinite reverse', pointerEvents:'none', zIndex:0 }}/>
 
       {/* ── LEFT SIDEBAR ── */}
-      <div className="cx-sidebar" style={{ width:'270px', background:'rgba(255,255,255,0.02)', borderRight:'1px solid rgba(0, 0, 0, 0.02)', display:'flex', flexDirection:'column', flexShrink:0, position: 'sticky', top: 0, backdropFilter:'blur(20px)' }}>
+      <div className="cx-sidebar" style={{ width:'270px', background:'rgba(255,255,255,0.02)', borderRight:'1px solid rgba(0, 0, 0, 0.02)', display:'flex', flexDirection:'column', flexShrink:0, backdropFilter:'blur(20px)' }}>
         
         {/* Brand */}
         <div style={{ padding:'20px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
