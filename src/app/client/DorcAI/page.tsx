@@ -904,7 +904,7 @@ export default function DorcPage() {
                  <Monitor size={14} color="#fff" style={{ position: 'relative', zIndex: 1 }} />
                </div>
                <div>
-                 <div style={{ fontSize:'0.8rem', fontWeight:800, color: isDark ? '#1e293b' : '#ffffff' }}>Launch Web Copilot</div>
+                 <div style={{ fontSize:'0.8rem', fontWeight:800, color: isDark ? '#ffffff' : '#0f172a' }}>Launch Web Copilot</div>
                  <div style={{ fontSize:'0.65rem', color: isDark ? '#64748b' : '#64748b' }}>Zero-Install Floating Widget</div>
                </div>
             </div>
@@ -940,7 +940,7 @@ export default function DorcPage() {
               <div key={idx} className="cortex-msg cx-msg-bubble" style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
                 
                 {/* Avatar */}
-                <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background: msg.role==='agent'?'linear-gradient(135deg,#6366f1,#8b5cf6)':'rgba(255,255,255,0.07)', border: msg.role==='agent'?'none':'1px solid rgba(0, 0, 0, 0.05)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', boxShadow: msg.role==='agent'?'0 0 16px rgba(99,102,241,0.3)':'none' }}>
+                <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background: msg.role==='agent'?'linear-gradient(135deg,#6366f1,#8b5cf6)':(isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'), border: msg.role==='agent'?'none':'1px solid rgba(0, 0, 0, 0.05)', display:'flex', alignItems:'center', justifyContent:'center', color: msg.role==='agent'?'#fff':(isDark ? '#fff' : '#0f172a'), boxShadow: msg.role==='agent'?'0 0 16px rgba(99,102,241,0.3)':'none' }}>
                   {msg.role==='agent' ? <img src="/dorc-logo.png" style={{ width: 22, height: 22, objectFit: "contain", filter: "brightness(0) invert(1)" }} /> : <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{userName.charAt(0)}</span>}
                 </div>
 
@@ -948,7 +948,7 @@ export default function DorcPage() {
                   <div style={{ fontSize:'0.78rem', fontWeight:700, marginBottom:'8px', color: msg.role==='agent'?'#818cf8': isDark ? '#64748b' : '#64748b', textTransform:'uppercase', letterSpacing:'0.5px' }}>
                     {msg.role==='agent' ? 'Dorc AI' : 'You'}
                   </div>
-                  <div style={{ color: msg.role==='agent'? (isDark ? '#1e293b' : '#ffffff') : (isDark ? '#64748b' : '#e2e8f0'), fontSize:'0.95rem', lineHeight:'1.7' }}>
+                  <div style={{ color: msg.role==='agent'? (isDark ? '#f8fafc' : '#0f172a') : (isDark ? '#cbd5e1' : '#334155'), fontSize:'0.95rem', lineHeight:'1.7' }}>
                     {fmt(msg.content)}
                   </div>
 
@@ -1055,7 +1055,7 @@ export default function DorcPage() {
                           <tbody>
                             {msg.uiData.items.map((item: any) => (
                               <tr className="bom-row" key={item.id} style={{ borderBottom: isDark ? '1px solid rgba(255,255,255,0.03)' : '1px solid #0f172a' }}>
-                                <td style={{ padding:'12px 16px', fontWeight:600, color: isDark ? '#1e293b' : '#ffffff' }}>{item.part}</td>
+                                <td style={{ padding:'12px 16px', fontWeight:600, color: isDark ? '#ffffff' : '#0f172a' }}>{item.part}</td>
                                 <td style={{ padding:'12px 16px', color: isDark ? '#cbd5e1' : '#e2e8f0' }}>{item.desc}<br/><span style={{ fontSize:'0.7rem', color: isDark ? '#64748b' : '#64748b' }}>Qty: {item.qty}</span></td>
                                 <td style={{ padding:'12px 16px' }}>
                                   {item.status === 'IN CATALOG' ? (
@@ -1070,7 +1070,7 @@ export default function DorcPage() {
                                 </td>
                                 <td style={{ padding:'12px 16px', color: isDark ? '#cbd5e1' : '#e2e8f0' }}>{item.vendor}</td>
                                 <td style={{ padding:'12px 16px', textAlign:'right', fontWeight:700, color: isDark ? '#64748b' : '#64748b' }}>${item.unitCost.toLocaleString()}</td>
-                                <td style={{ padding:'12px 16px', textAlign:'right', fontWeight:800, color: isDark ? '#1e293b' : '#ffffff' }}>${(item.qty * item.unitCost).toLocaleString()}</td>
+                                <td style={{ padding:'12px 16px', textAlign:'right', fontWeight:800, color: isDark ? '#ffffff' : '#0f172a' }}>${(item.qty * item.unitCost).toLocaleString()}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1304,7 +1304,7 @@ export default function DorcPage() {
                                  alt="Product Preview" 
                                />
                                
-                               <button onClick={(e) => { e.preventDefault(); setViewImage(productForm.imageUrl); }} style={{ position:'absolute', top:'12px', right:'12px', background:'rgba(255, 255, 255,0.7)', border:'1px solid rgba(0, 0, 0, 0.1)', borderRadius:'8px', padding:'8px 14px', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'8px', fontSize:'0.8rem', fontWeight:600, backdropFilter:'blur(8px)', transition:'all 0.2s' }}>
+                               <button onClick={(e) => { e.preventDefault(); setViewImage(productForm.imageUrl); }} style={{ position:'absolute', top:'12px', right:'12px', background:'rgba(255, 255, 255,0.7)', border:'1px solid rgba(0, 0, 0, 0.1)', borderRadius:'8px', padding:'8px 14px', color:'#0f172a', cursor:'pointer', display:'flex', alignItems:'center', gap:'8px', fontSize:'0.8rem', fontWeight:600, backdropFilter:'blur(8px)', transition:'all 0.2s' }}>
                                  <Eye size={16}/> View 4K
                                </button>
                             </div>
@@ -1390,12 +1390,12 @@ export default function DorcPage() {
 
                     {/* Draft Contract */}
                     {msg.uiComponent==='draft_contract_form' && msg.uiData && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #1e293b', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><FileText size={16} color="#2563eb"/> Contract Editor: {msg.uiData.vendor}</div>
-                        <textarea rows={8} defaultValue={"MASTER SERVICE AGREEMENT\n\nThis Master Service Agreement (\"Agreement\") is made between Your Company and " + msg.uiData.vendor + ".\n\n1. SERVICES\nVendor agrees to provide services as outlined in applicable Statements of Work..."} style={{ width:'100%', padding:'14px', borderRadius:'8px', border: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #cbd5e1', background: isDark ? 'rgba(0,0,0,0.3)' : '#f8fafc', color: isDark ? '#1e293b' : '#cbd5e1', fontSize:'0.8rem', fontFamily:'monospace', outline:'none', resize:'vertical', lineHeight:'1.5' }}/>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><FileText size={16} color="#2563eb"/> Contract Editor: {msg.uiData.vendor}</div>
+                        <textarea rows={8} defaultValue={"MASTER SERVICE AGREEMENT\n\nThis Master Service Agreement (\"Agreement\") is made between Your Company and " + msg.uiData.vendor + ".\n\n1. SERVICES\nVendor agrees to provide services as outlined in applicable Statements of Work..."} style={{ width:'100%', padding:'14px', borderRadius:'8px', border: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #cbd5e1', background: isDark ? 'rgba(0,0,0,0.3)' : '#f8fafc', color: isDark ? '#cbd5e1' : '#475569', fontSize:'0.8rem', fontFamily:'monospace', outline:'none', resize:'vertical', lineHeight:'1.5' }}/>
                         <div style={{ display:'flex', gap:'10px', marginTop:'12px' }}>
                           <button onClick={()=>alert('PDF Downloaded!')} style={{ flex:1, padding:'11px', background:'#2563eb', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Download PDF</button>
-                          <button onClick={()=>alert('Sent for E-Signature')} style={{ flex:1, padding:'11px', background: isDark ? 'rgba(0, 0, 0, 0.02)' : '#ffffff', color: isDark ? '#1e293b' : '#cbd5e1', border: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #cbd5e1', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Send via DocuSign</button>
+                          <button onClick={()=>alert('Sent for E-Signature')} style={{ flex:1, padding:'11px', background: isDark ? 'rgba(0, 0, 0, 0.02)' : '#ffffff', color: isDark ? '#cbd5e1' : '#475569', border: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #cbd5e1', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Send via DocuSign</button>
                         </div>
                       </div>
                     )}
@@ -1403,11 +1403,11 @@ export default function DorcPage() {
                     {/* Clause Review */}
                     {msg.uiComponent==='clause_review' && msg.uiData && (
                       <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: '1px solid #f43f5e', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Shield size={16} color="#f43f5e"/> Risk Analysis: {msg.uiData.riskLevel} Risk</div>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Shield size={16} color="#f43f5e"/> Risk Analysis: {msg.uiData.riskLevel} Risk</div>
                         <div style={{ fontSize:'0.8rem', color: isDark ? '#64748b' : '#cbd5e1', lineHeight:'1.6', background: isDark ? 'rgba(0,0,0,0.3)' : '#fff1f2', padding:'12px', borderRadius:'8px', borderLeft:'3px solid #f43f5e' }}>
                           "The Supplier's liability shall be capped at <span style={{backgroundColor: isDark ? 'rgba(244,63,94,0.2)' : '#ffe4e6', color:'#f43f5e', padding:'2px 4px', borderRadius:'4px'}}>the total amount paid under this SOW</span>, and Supplier shall not be liable for any <span style={{backgroundColor: isDark ? 'rgba(244,63,94,0.2)' : '#ffe4e6', color:'#f43f5e', padding:'2px 4px', borderRadius:'4px'}}>indirect or consequential damages</span>."
                         </div>
-                        <div style={{ marginTop:'12px', fontSize:'0.75rem', color: isDark ? '#1e293b' : '#f8fafc' }}>
+                        <div style={{ marginTop:'12px', fontSize:'0.75rem', color: isDark ? '#f8fafc' : '#0f172a' }}>
                           <strong style={{color:'#f43f5e'}}>Flag ({msg.uiData.flagged}):</strong> Liability cap is non-standard. Corporate playbook requires cap at 2x contract value.
                         </div>
                       </div>
@@ -1415,13 +1415,13 @@ export default function DorcPage() {
 
                     {/* Shipment Tracker */}
                     {msg.uiComponent==='shipment_tracker' && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #1e293b', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Zap size={16} color="#eab308"/> Active Shipments</div>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Zap size={16} color="#eab308"/> Active Shipments</div>
                         <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
                           {[ { id:'ASN-9921', status:'In Transit', prog:'60%', delay:false }, { id:'ASN-9922', status:'Delayed (Port)', prog:'30%', delay:true } ].map(s=>(
                             <div key={s.id} style={{ padding:'12px', background: isDark ? 'rgba(0,0,0,0.2)' : '#f8fafc', borderRadius:'8px', border: isDark ? 'none' : '1px solid #0f172a' }}>
                               <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'8px' }}>
-                                <span style={{ fontSize:'0.8rem', fontWeight:600, color: isDark ? '#1e293b' : '#f8fafc' }}>{s.id}</span>
+                                <span style={{ fontSize:'0.8rem', fontWeight:600, color: isDark ? '#f8fafc' : '#0f172a' }}>{s.id}</span>
                                 <span style={{ fontSize:'0.7rem', color: s.delay ? '#ef4444' : '#10b981', fontWeight:600 }}>{s.status}</span>
                               </div>
                               <div style={{ height:'6px', background: isDark ? 'rgba(0, 0, 0, 0.05)' : '#1e293b', borderRadius:'3px', overflow:'hidden' }}>
@@ -1436,12 +1436,12 @@ export default function DorcPage() {
                     {/* Stockout Predictions */}
                     {msg.uiComponent==='stockout_predictions' && (
                       <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: '1px solid #ef4444', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><AlertTriangle size={16} color="#ef4444"/> Critical Shortages Predicted</div>
-                        <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:'8px', fontSize:'0.75rem', color: isDark ? '#64748b' : '#64748b', paddingBottom:'8px', borderBottom: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #1e293b' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><AlertTriangle size={16} color="#ef4444"/> Critical Shortages Predicted</div>
+                        <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:'8px', fontSize:'0.75rem', color: isDark ? '#64748b' : '#64748b', paddingBottom:'8px', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}>
                           <div>SKU</div><div>Stock</div><div>Empty In</div>
                         </div>
                         {[ { sku:'Servers (42U)', stock:4, days:12 }, { sku:'Optic Cables', stock:150, days:18 } ].map((s,i)=>(
-                          <div key={i} style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:'8px', fontSize:'0.8rem', color: isDark ? '#1e293b' : '#f8fafc', padding:'10px 0', borderBottom: isDark ? '1px solid rgba(0, 0, 0, 0.02)' : '1px solid #0f172a' }}>
+                          <div key={i} style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:'8px', fontSize:'0.8rem', color: isDark ? '#f8fafc' : '#0f172a', padding:'10px 0', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #f1f5f9' }}>
                             <div style={{fontWeight:600}}>{s.sku}</div><div>{s.stock}</div><div style={{color:'#ef4444', fontWeight:700}}>{s.days} days</div>
                           </div>
                         ))}
@@ -1455,7 +1455,7 @@ export default function DorcPage() {
                         <div style={{ marginBottom:'16px', fontWeight:700, color: msg.uiData.color, fontSize:'1rem', display:'flex', alignItems:'center', gap:'8px' }}>
                           <CheckCircle2 size={18} /> {msg.uiData.status}
                         </div>
-                        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'16px', marginBottom:'16px', paddingBottom:'16px', borderBottom: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #1e293b' }}>
+                        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'16px', marginBottom:'16px', paddingBottom:'16px', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}>
                           <div>
                             <div style={{ fontSize:'0.75rem', color: isDark ? '#64748b' : '#64748b', marginBottom:'4px' }}>Purchase Order</div>
                             <div style={{ fontWeight:600, color: isDark ? '#0f172a' : '#f8fafc' }}>{msg.uiData.poNumber}</div>
@@ -1482,12 +1482,12 @@ export default function DorcPage() {
                     
                     {/* Bid Matrix */}
                     {msg.uiComponent==='bid_matrix' && msg.uiData && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #1e293b', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> Vendor Bid Matrix - {msg.uiData.eventName}</div>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> Vendor Bid Matrix - {msg.uiData.eventName}</div>
                         <div style={{ overflowX:'auto' }}>
                           <table style={{ width:'100%', fontSize:'0.75rem', textAlign:'left', borderCollapse:'collapse' }}>
                             <thead>
-                              <tr style={{ color: isDark ? '#64748b' : '#64748b', borderBottom: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #1e293b' }}>
+                              <tr style={{ color: isDark ? '#64748b' : '#64748b', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}>
                                 <th style={{padding:'8px'}}>Vendor</th>
                                 <th style={{padding:'8px'}}>Total Price</th>
                                 <th style={{padding:'8px'}}>Quoted Lines</th>
@@ -1498,7 +1498,7 @@ export default function DorcPage() {
                             </thead>
                             <tbody>
                               {msg.uiData.bids.map((b: any, idx: number) => (
-                                <tr key={idx} style={{ color: isDark ? '#1e293b' : '#f8fafc', borderBottom: isDark ? '1px solid rgba(0, 0, 0, 0.02)' : '1px solid #0f172a' }}>
+                                <tr key={idx} style={{ color: isDark ? '#f8fafc' : '#0f172a', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #f1f5f9' }}>
                                   <td style={{padding:'8px', fontWeight:600}}>{b.vendor}</td>
                                   <td style={{padding:'8px', color: idx===0 ? '#10b981' : 'inherit', fontWeight: idx===0 ? 700 : 400}}>${b.price.toLocaleString()}</td>
                                   <td style={{padding:'8px'}}>{b.timeline}</td>
@@ -1513,14 +1513,14 @@ export default function DorcPage() {
                       </div>
                     )}
 {msg.uiComponent==='three_way_match' && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #1e293b', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> 3-Way Reconciliation</div>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Database size={16} color="#10b981"/> 3-Way Reconciliation</div>
                         <div style={{ overflowX:'auto' }}>
                           <table style={{ width:'100%', fontSize:'0.75rem', textAlign:'left', borderCollapse:'collapse' }}>
-                            <thead><tr style={{ color: isDark ? '#64748b' : '#64748b', borderBottom: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #1e293b' }}><th style={{padding:'8px'}}>PO #</th><th style={{padding:'8px'}}>PO Amount</th><th style={{padding:'8px'}}>GRN Records</th><th style={{padding:'8px'}}>Inv Amount</th><th style={{padding:'8px'}}>Status</th></tr></thead>
+                            <thead><tr style={{ color: isDark ? '#64748b' : '#64748b', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}><th style={{padding:'8px'}}>PO #</th><th style={{padding:'8px'}}>PO Amount</th><th style={{padding:'8px'}}>GRN Records</th><th style={{padding:'8px'}}>Inv Amount</th><th style={{padding:'8px'}}>Status</th></tr></thead>
                             <tbody>
-                              <tr style={{ color: isDark ? '#1e293b' : '#f8fafc', borderBottom: isDark ? '1px solid rgba(0, 0, 0, 0.02)' : '1px solid #0f172a' }}><td style={{padding:'8px'}}>PO-102</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px',color:'#10b981'}}>Matched</td></tr>
-                              <tr style={{ color: isDark ? '#1e293b' : '#f8fafc' }}><td style={{padding:'8px'}}>PO-103</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px'}}>180</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px',color:'#ef4444'}}>Mismatch</td></tr>
+                              <tr style={{ color: isDark ? '#f8fafc' : '#0f172a', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #f1f5f9' }}><td style={{padding:'8px'}}>PO-102</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px'}}>500</td><td style={{padding:'8px',color:'#10b981'}}>Matched</td></tr>
+                              <tr style={{ color: isDark ? '#f8fafc' : '#0f172a' }}><td style={{padding:'8px'}}>PO-103</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px'}}>180</td><td style={{padding:'8px'}}>200</td><td style={{padding:'8px',color:'#ef4444'}}>Mismatch</td></tr>
                             </tbody>
                           </table>
                         </div>
@@ -1530,13 +1530,13 @@ export default function DorcPage() {
                     {/* ESG Audit */}
                     {msg.uiComponent==='esg_audit' && msg.uiData && (
                       <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: '1px solid #14b8a6', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle2 size={16} color="#14b8a6"/> ESG Audit: {msg.uiData.vendor}</div>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle2 size={16} color="#14b8a6"/> ESG Audit: {msg.uiData.vendor}</div>
                         <div style={{ display:'flex', alignItems:'center', gap:'16px' }}>
                           <div style={{ width:'60px', height:'60px', borderRadius:'30px', border:'4px solid #14b8a6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.2rem', fontWeight:800, color:'#14b8a6' }}>B+</div>
                           <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'6px' }}>
-                            <div style={{ fontSize:'0.75rem', color: isDark ? '#1e293b' : '#cbd5e1', display:'flex', justifyContent:'space-between' }}><span>Environmental</span><span style={{color:'#14b8a6', fontWeight:600}}>82/100</span></div>
-                            <div style={{ fontSize:'0.75rem', color: isDark ? '#1e293b' : '#cbd5e1', display:'flex', justifyContent:'space-between' }}><span>Social</span><span style={{color:'#eab308', fontWeight:600}}>74/100</span></div>
-                            <div style={{ fontSize:'0.75rem', color: isDark ? '#1e293b' : '#cbd5e1', display:'flex', justifyContent:'space-between' }}><span>Governance</span><span style={{color:'#14b8a6', fontWeight:600}}>90/100</span></div>
+                            <div style={{ fontSize:'0.75rem', color: isDark ? '#cbd5e1' : '#475569', display:'flex', justifyContent:'space-between' }}><span>Environmental</span><span style={{color:'#14b8a6', fontWeight:600}}>82/100</span></div>
+                            <div style={{ fontSize:'0.75rem', color: isDark ? '#cbd5e1' : '#475569', display:'flex', justifyContent:'space-between' }}><span>Social</span><span style={{color:'#eab308', fontWeight:600}}>74/100</span></div>
+                            <div style={{ fontSize:'0.75rem', color: isDark ? '#cbd5e1' : '#475569', display:'flex', justifyContent:'space-between' }}><span>Governance</span><span style={{color:'#14b8a6', fontWeight:600}}>90/100</span></div>
                           </div>
                         </div>
                       </div>
@@ -1544,9 +1544,9 @@ export default function DorcPage() {
 
                     {/* Market Intel */}
                     {msg.uiComponent==='market_intel' && msg.uiData && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(99,102,241,0.3)' : '1px solid #1e293b', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><BarChart3 size={16} color="#2563eb"/> Market Trend: {msg.uiData.commodity}</div>
-                        <div style={{ height:'100px', display:'flex', alignItems:'flex-end', gap:'4px', paddingBottom:'10px', borderBottom: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #1e293b' }}>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(99,102,241,0.3)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><BarChart3 size={16} color="#2563eb"/> Market Trend: {msg.uiData.commodity}</div>
+                        <div style={{ height:'100px', display:'flex', alignItems:'flex-end', gap:'4px', paddingBottom:'10px', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}>
                           {[80, 85, 90, 82, 75, 70, 65].map((val, i)=>(
                             <div key={i} style={{ flex:1, background: i > 3 ? '#10b981' : '#ef4444', height: val+'%', borderRadius:'4px 4px 0 0', opacity: 0.8 }} />
                           ))}
@@ -1557,8 +1557,8 @@ export default function DorcPage() {
 
                     {/* Vendor Scorecard */}
                                         {msg.uiComponent==='supplier_ops_form' && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(20,184,166,0.3)' : '1px solid #1e293b' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Users size={16} color="#14b8a6"/> Select Vendor for Analysis</div>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(20,184,166,0.3)' : '1px solid #e2e8f0' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><Users size={16} color="#14b8a6"/> Select Vendor for Analysis</div>
                         <div style={{ position: 'relative' }}>
                           <input 
                             type="text" 
@@ -1579,10 +1579,10 @@ export default function DorcPage() {
                                 setOpsVendors([]);
                               }
                             }}
-                            style={{ width:'100%', padding:'12px 14px', borderRadius:'8px', border: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #cbd5e1', background: isDark ? 'rgba(0, 0, 0, 0.02)' : '#fff', color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.85rem', outline:'none' }}
+                            style={{ width:'100%', padding:'12px 14px', borderRadius:'8px', border: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #cbd5e1', background: isDark ? 'rgba(255,255,255,0.05)' : '#ffffff', color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.85rem', outline:'none' }}
                           />
                           {opsVendors.length > 0 && (
-                            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '4px', background: isDark ? '#ffffff' : '#fff', border: isDark ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid #1e293b', borderRadius: '8px', zIndex: 10, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '4px', background: isDark ? '#1e293b' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0', borderRadius: '8px', zIndex: 10, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                               {opsVendors.map(v => (
                                 <button 
                                   key={v.id}
@@ -1592,7 +1592,7 @@ export default function DorcPage() {
                                     setOpsVendors([]);
                                     execute('/supplier-ops ' + v.name);
                                   }}
-                                  style={{ width: '100%', padding: '10px 14px', textAlign: 'left', background: 'transparent', border: 'none', borderBottom: isDark ? '1px solid rgba(0, 0, 0, 0.02)' : '1px solid #0f172a', cursor: 'pointer', color: isDark ? '#1e293b' : '#f8fafc', fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between' }}
+                                  style={{ width: '100%', padding: '10px 14px', textAlign: 'left', background: 'transparent', border: 'none', borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #f1f5f9', cursor: 'pointer', color: isDark ? '#f8fafc' : '#0f172a', fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between' }}
                                   onMouseEnter={(e) => (e.target as any).style.background = isDark ? 'rgba(0, 0, 0, 0.02)' : '#f8fafc'}
                                   onMouseLeave={(e) => (e.target as any).style.background = 'transparent'}
                                 >
@@ -1606,8 +1606,8 @@ export default function DorcPage() {
                       </div>
                     )}
                     {msg.uiComponent==='vendor_scorecard' && msg.uiData && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(59,130,246,0.3)' : '1px solid #1e293b', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle size={16} color="#2563eb"/> Scorecard: {msg.uiData.vendor}</div>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(59,130,246,0.3)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><CheckCircle size={16} color="#2563eb"/> Scorecard: {msg.uiData.vendor}</div>
                         <div style={{ display:'flex', gap:'12px' }}>
                           <div style={{ width:'70px', height:'70px', background: msg.uiData.gradeColor || '#2563eb', borderRadius:'12px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', fontWeight:900, color:'#fff', boxShadow: 'none' }}>{msg.uiData.grade || 'A'}</div>
                           <div style={{ flex:1, display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px' }}>
@@ -1623,8 +1623,8 @@ export default function DorcPage() {
                   
                     {/* Vendor Comparison Matrix */}
                     {msg.uiComponent==='vendor_compare_matrix' && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(59,130,246,0.3)' : '1px solid #1e293b', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)', overflowX: 'auto' }}>
-                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#1e293b' : '#f8fafc', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(59,130,246,0.3)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)', overflowX: 'auto' }}>
+                        <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}>
                           <Users size={16} color="#2563eb"/> Vendor Comparison Matrix
                         </div>
                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
