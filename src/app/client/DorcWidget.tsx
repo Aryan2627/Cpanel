@@ -83,10 +83,10 @@ export default function DorcWidget() {
           right: '30px',
           width: '400px',
           height: '600px',
-          background: '#0f172a',
+          background: '#fff',
           borderRadius: '16px',
-          border: '1px solid rgba(0, 198, 255, 0.2)',
-          boxShadow: '0 10px 40px rgba(0,0,0,0.5), 0 0 20px rgba(0, 198, 255, 0.1)',
+          border: '1px solid rgba(226, 232, 240, 1)',
+          boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)',
           display: 'flex',
           flexDirection: 'column',
           zIndex: 9999,
@@ -96,23 +96,23 @@ export default function DorcWidget() {
           {/* Header */}
           <div style={{
             padding: '20px',
-            background: 'linear-gradient(to bottom, rgba(0, 198, 255, 0.05), transparent)',
-            borderBottom: '1px solid rgba(255,255,255,0.05)',
+            background: 'linear-gradient(to bottom, #f8fafc, #fff)',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start'
           }}>
             <div>
-              <h3 style={{ margin: '0 0 4px 0', color: '#00c6ff', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '1.1rem' }}>
-                <img src="/dorc-logo.png" style={{ width: 22, height: 22, objectFit: "contain", filter: "brightness(0) invert(1)" }} /> Dorc AI
+              <h3 style={{ margin: '0 0 4px 0', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '1.1rem' }}>
+                <img src="/dorc-logo.png" style={{ width: 22, height: 22, objectFit: "contain", filter: "none" }} /> Dorc AI
               </h3>
-              <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Live Vision AI (Local OCR)
               </span>
             </div>
             <button 
               onClick={() => setIsOpen(false)}
-              style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
+              style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '4px' }}
             >
               <X size={20} />
             </button>
@@ -123,17 +123,17 @@ export default function DorcWidget() {
             {messages.map((msg) => (
               <div key={msg.id} style={{
                 background: msg.title === 'Real Screen Analysis Ready' 
-                  ? 'linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 114, 255, 0.1))'
-                  : 'rgba(255,255,255,0.03)',
-                border: '1px solid ' + (msg.title === 'Real Screen Analysis Ready' ? 'rgba(0, 114, 255, 0.2)' : 'rgba(255,255,255,0.05)'),
+                  ? 'linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.1))'
+                  : 'rgba(0, 0, 0, 0.02)',
+                border: '1px solid ' + (msg.title === 'Real Screen Analysis Ready' ? 'rgba(37, 99, 235, 0.2)' : 'rgba(0, 0, 0, 0.06)'),
                 padding: '16px',
                 borderRadius: '12px',
               }}>
-                <strong style={{ color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', fontSize: '0.9rem' }}>
-                  {msg.title === 'Scanning...' || msg.title === 'Processing...' ? <Loader2 size={14} className="animate-spin" color="#00c6ff" /> : null}
+                <strong style={{ color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', fontSize: '0.9rem' }}>
+                  {msg.title === 'Scanning...' || msg.title === 'Processing...' ? <Loader2 size={14} className="animate-spin" color="#2563eb" /> : null}
                   {msg.title}
                 </strong>
-                <div style={{ color: '#cbd5e1', fontSize: '0.85rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                <div style={{ color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
                   {msg.content}
                 </div>
               </div>
@@ -141,15 +141,15 @@ export default function DorcWidget() {
           </div>
 
           {/* Action Area */}
-          <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ padding: '20px', borderTop: '1px solid rgba(0, 0, 0, 0.06)' }}>
             <button 
               onClick={handleScan}
               disabled={isScanning}
               style={{
                 width: '100%',
                 padding: '14px',
-                background: 'linear-gradient(135deg, #00c6ff, #0072ff)',
-                color: '#fff',
+                background: '#2563eb',
+                color: '#0f172a',
                 border: 'none',
                 borderRadius: '12px',
                 fontWeight: 600,
@@ -159,7 +159,7 @@ export default function DorcWidget() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                boxShadow: '0 4px 15px rgba(0, 114, 255, 0.3)'
+                boxShadow: '0 4px 15px rgba(37, 99, 235, 0.3)'
               }}
             >
               <Monitor size={18} />
@@ -181,8 +181,8 @@ export default function DorcWidget() {
           height: '60px',
           borderRadius: '50%',
           background: 'linear-gradient(135deg, #f8fafc, #e0f2fe)',
-          border: '2px solid #00c6ff',
-          boxShadow: '0 0 20px rgba(0, 198, 255, 0.6)',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -192,10 +192,13 @@ export default function DorcWidget() {
           backdropFilter: 'blur(10px)'
         }}
       >
-        {isOpen ? <X size={28} color="#00c6ff" /> : <img src="/dorc-logo.png" style={{ width: 44, height: 44, objectFit: "contain", filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.2))" }} />}
+        {isOpen ? <X size={28} color="#2563eb" /> : <img src="/dorc-logo.png" style={{ width: 44, height: 44, objectFit: "contain", filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.2))" }} />}
         <style>{`
           @keyframes pulseRing {
-            0% { box-shadow: 0 0 15px rgba(0, 198, 255, 0.4), inset 0 0 10px rgba(0, 198, 255, 0.3); }
+            0% { box-shadow: 0 0 10px rgba(0, 0, 0, 0.05), inset 0 0 5px rgba(0, 0, 0, 0.05); }
+            50% { box-shadow: 0 0 20px rgba(0, 0, 0, 0.1), inset 0 0 10px rgba(0, 0, 0, 0.02); }
+            100% { box-shadow: 0 0 10px rgba(0, 0, 0, 0.05), inset 0 0 5px rgba(0, 0, 0, 0.05); }
+          }
             50% { box-shadow: 0 0 25px rgba(0, 198, 255, 0.8), inset 0 0 15px rgba(0, 198, 255, 0.5); }
             100% { box-shadow: 0 0 15px rgba(0, 198, 255, 0.4), inset 0 0 10px rgba(0, 198, 255, 0.3); }
           }
