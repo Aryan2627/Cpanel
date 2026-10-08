@@ -37,23 +37,25 @@ const TOP_MENUS = [
     name: 'Master Data',
       icon: Database,
       sub: [
+
         { name: 'Data Dictionaries', path: '/client/settings/data-dictionary' },
       { name: 'Users', path: '/client/manage/users' },
       { name: 'Products', path: '/client/manage/products' },
       { name: 'Templates', path: '/client/manage/templates' },
       { name: 'Approval Rules', path: '/client/manage/approvals' },
       
-    ]
-  },
-  {
-    name: 'Master Center',
-      icon: Settings,
-      sub: [
-        { name: 'Context Studio (AI)', path: '/client/manage/context-studio' },
-        { name: 'Routing Engine (New)', path: '/client/settings/approval-rules' },
-        { name: '? Tokens and Usage', path: '/client/manage/tokens' },
+          {
+        name: 'Master Center',
+        path: '#',
+        subItems: [
+          { name: 'Context Studio (AI)', path: '/client/manage/context-studio' },
+          { name: 'Routing Engine (New)', path: '/client/settings/approval-rules' },
+          { name: '? Tokens and Usage', path: '/client/manage/tokens' }
+        ]
+      }
       ]
-    },
+  },
+  ,
     {
       name: 'Licensing',
     icon: Shield,
@@ -95,6 +97,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // Track which dropdown is open
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
+  const [hoveredSubMenu, setHoveredSubMenu] = useState<string | null>(null);
   const [activeAgent, setActiveAgent] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -310,23 +313,61 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                       border: '1px solid #e2e8f0',
                       display: 'flex', flexDirection: 'column', gap: '4px'
                     }}>
-                      {menu.sub.map((sub) => (
-                          <Link
-                            key={sub.name}
-                            href={sub.path}
-                            onClick={() => setHoveredMenu(null)}
-                            style={{ 
-                              padding: '10px 12px', borderRadius: '8px', color: '#334155', 
-                              textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500,
-                              display: 'flex', alignItems: 'center', gap: '8px',
-                              backgroundColor: pathname === sub.path ? '#f1f5f9' : 'transparent',
-                              transition: 'all 0.2s'
-                            }}
+                      {menu.sub.map((sub: any) => (
+                          <div 
+                            key={sub.name} 
+                            style={{ position: 'relative' }}
+                            onMouseEnter={() => setHoveredSubMenu(sub.name)}
+                            onMouseLeave={() => setHoveredSubMenu(null)}
                           >
-                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: pathname === sub.path ? '#2563eb' : '#cbd5e1' }} />
-                            {sub.name}
-                          </Link>
-                      ))}
+                            <Link
+                              href={sub.path}
+                              onClick={() => { if(!sub.subItems) setHoveredMenu(null); }}
+                              style={{ 
+                                padding: '10px 12px', borderRadius: '8px', color: '#334155', 
+                                textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500,
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                backgroundColor: (pathname === sub.path || hoveredSubMenu === sub.name) ? '#f1f5f9' : 'transparent',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: pathname === sub.path ? '#2563eb' : '#cbd5e1' }} />
+                                {sub.name}
+                              </div>
+                              {sub.subItems && <ChevronDown size={14} style={{ transform: 'rotate(-90deg)', opacity: 0.5 }} />}
+                            </Link>
+                            
+                            {sub.subItems && hoveredSubMenu === sub.name && (
+                              <div style={{ 
+                                position: 'absolute', top: 0, left: '100%', marginLeft: '8px',
+                                backgroundColor: '#fff', borderRadius: '12px', padding: '8px',
+                                minWidth: '220px', zIndex: 101,
+                                boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+                                border: '1px solid #e2e8f0',
+                                display: 'flex', flexDirection: 'column', gap: '4px'
+                              }}>
+                                {sub.subItems.map((item: any) => (
+                                  <Link
+                                    key={item.name}
+                                    href={item.path}
+                                    onClick={() => { setHoveredMenu(null); setHoveredSubMenu(null); }}
+                                    style={{ 
+                                      padding: '10px 12px', borderRadius: '8px', color: '#334155', 
+                                      textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500,
+                                      display: 'flex', alignItems: 'center', gap: '8px',
+                                      backgroundColor: pathname === item.path ? '#f1f5f9' : 'transparent',
+                                      transition: 'all 0.2s'
+                                    }}
+                                  >
+                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: pathname === item.path ? '#2563eb' : '#cbd5e1' }} />
+                                    {item.name}
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
                     </div>
                   )}
                 </div>
