@@ -429,7 +429,7 @@ export default function DorcPage() {
   const [productForm, setProductForm] = useState({ name:'', sku:'', price:'', imageUrl:'', isGenerating:false });
   const [viewImage, setViewImage] = useState<string | null>(null);
   const [tutorialVideo, setTutorialVideo] = useState<string | null>(null);
-    const [isDark, setIsDark] = useState(true);
+    const [isDark, setIsDark] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const [isClient, setIsClient] = useState(false);
 
@@ -711,66 +711,66 @@ export default function DorcPage() {
         .cortex-light { color-scheme: light; }
 
         /* Sidebar */
-        .cortex-light .cx-sidebar { background: #ffffff !important; border-right-color: #1e293b !important; }
-        .cortex-light .cx-sidebar > div { border-color: #1e293b !important; }
-        .cortex-light .cx-sidebar span { color: #e2e8f0 !important; }
-        .cortex-light .cx-sidebar div[style*="color:'#cbd5e1'"] { color: #64748b !important; }
-        .cortex-light .hist-item:hover { background: #0f172a !important; }
-        .cortex-light .hist-item[style*="rgba(99,102,241"] { background: #eff6ff !important; border-color: #bfdbfe !important; }
-        
-        /* Main chat background */
-        .cortex-light .cx-main { background: #f0f4f8 !important; }
-
-        /* any text */
-        .cortex-light .cortex-msg div[style*="color: msg.role==='agent'?'#1e293b"] { color: #ffffff !important; }
-
-        /* Slash menu */
-        .cortex-light div[style*="rgba(7,13,28"] { background: #ffffff !important; border-color: #1e293b !important; box-shadow: 0 -20px 60px rgba(0,0,0,0.1) !important; }
-        .cortex-light div[style*="rgba(7,13,28"] span { color: #64748b !important; }
-        .cortex-light .slash-btn:hover { background: #f8fafc !important; }
-        .cortex-light .slash-btn div[style*="color:'#1e293b'"] { color: #ffffff !important; }
-        .cortex-light .slash-btn div[style*="color:'#e2e8f0'"] { color: #64748b !important; }
-        .cortex-light .slash-btn { border-bottom-color: #0f172a !important; }
-
-        /* Thinking dots */
-        .cortex-light div[style*="rgba(99,102,241,0.08)"][style*="border"] { background: #eff6ff !important; border-color: #bfdbfe !important; }
-        .cortex-light div[style*="rgba(99,102,241,0.08)"][style*="border"] span { color: #4f46e5 !important; }
-
-        /* FORM CARDS - light backgrounds */
-        .cortex-light .cx-form-card { background: #ffffff !important; border-color: #e0e7ff !important; box-shadow: 0 4px 24px rgba(99,102,241,0.1) !important; }
-        .cortex-light .cx-event-card { border-color: #fed7aa !important; box-shadow: 0 4px 24px rgba(234,88,12,0.1) !important; }
-
-        /* Form card header bands */
-        .cortex-light .cx-form-card div[style*="padding:'16px 20px 14px'"] { background: rgba(99,102,241,0.06) !important; border-bottom-color: #e0e7ff !important; }
-        .cortex-light .cx-event-card div[style*="padding:'16px 20px 14px'"] { background: rgba(234,88,12,0.05) !important; border-bottom-color: #fed7aa !important; }
-
-        /* Form card text */
-        .cortex-light .cx-form-card div[style*="color:'#0f172a'"] { color: #f8fafc !important; }
-        .cortex-light .cx-form-card div[style*="color:'rgba(148,163,184,0.5)'"] { color: #64748b !important; }
-        .cortex-light .cx-form-card label { color: #e2e8f0 !important; }
-        .cortex-light .cx-form-card span[style*="color:'rgba(148,163,184"] { color: #64748b !important; }
-
-        /* Form inner dividers */
-        .cortex-light .cx-form-card div[style*="borderTop:'1px solid rgba(0, 0, 0, 0.02)'"] { border-top-color: #1e293b !important; }
-
-        /* ALL FORM INPUTS, TEXTAREAS, SELECTS */
-        .cortex-light input, .cortex-light textarea, .cortex-light select {
-          background: #f8fafc !important;
-          color: #f8fafc !important;
-          border-color: #1e293b !important;
-          color-scheme: light !important;
-        }
-        .cortex-light input::placeholder, .cortex-light textarea::placeholder { color: #64748b !important; }
-        .cortex-light input:focus, .cortex-light textarea:focus { border-color: rgba(99,102,241,0.4) !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.08) !important; }
-
-        /* Main chat input bar */
-        .cortex-light .cx-input-bar input { background: #ffffff !important; color: #f8fafc !important; border-color: #1e293b !important; box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important; }
-        .cortex-light .cx-input-bar input:focus { border-color: rgba(99,102,241,0.4) !important; }
-
-        /* Footer tagline */
-        .cortex-light div[style*="color:'#ffffff'"][style*="0.7rem"] { color: #64748b !important; }
-
-        /* Scrollbar */
+          .cortex-light .cx-sidebar { background: #ffffff !important; border-right-color: #e2e8f0 !important; }
+          .cortex-light .cx-sidebar > div { border-color: #e2e8f0 !important; }
+          .cortex-light .cx-sidebar span { color: #0f172a !important; }
+          .cortex-light .cx-sidebar div[style*="color:'#cbd5e1'"] { color: #64748b !important; }
+          .cortex-light .hist-item:hover { background: #f8fafc !important; }
+          .cortex-light .hist-item[style*="rgba(99,102,241"] { background: #eff6ff !important; border-color: #bfdbfe !important; }
+          
+          /* Main chat background */
+          .cortex-light .cx-main { background: #f8fafc !important; }
+  
+          /* any text */
+          .cortex-light .cortex-msg div[style*="color: msg.role==='agent'?'#1e293b"] { color: #0f172a !important; }
+  
+          /* Slash menu */
+          .cortex-light div[style*="rgba(7,13,28"] { background: #ffffff !important; border-color: #e2e8f0 !important; box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important; }
+          .cortex-light div[style*="rgba(7,13,28"] span { color: #64748b !important; }
+          .cortex-light .slash-btn:hover { background: #f1f5f9 !important; }
+          .cortex-light .slash-btn div[style*="color:'#1e293b'"] { color: #0f172a !important; }
+          .cortex-light .slash-btn div[style*="color:'#e2e8f0'"] { color: #64748b !important; }
+          .cortex-light .slash-btn { border-bottom-color: #e2e8f0 !important; }
+  
+          /* Thinking dots */
+          .cortex-light div[style*="rgba(99,102,241,0.08)"][style*="border"] { background: #eff6ff !important; border-color: #bfdbfe !important; }
+          .cortex-light div[style*="rgba(99,102,241,0.08)"][style*="border"] span { color: #4f46e5 !important; }
+  
+          /* FORM CARDS - light backgrounds */
+          .cortex-light .cx-form-card { background: #ffffff !important; border-color: #e2e8f0 !important; box-shadow: 0 4px 24px rgba(0,0,0,0.05) !important; }
+          .cortex-light .cx-event-card { border-color: #fed7aa !important; box-shadow: 0 4px 24px rgba(234,88,12,0.1) !important; }
+  
+          /* Form card header bands */
+          .cortex-light .cx-form-card div[style*="padding:'16px 20px 14px'"] { background: #f8fafc !important; border-bottom-color: #e2e8f0 !important; }
+          .cortex-light .cx-event-card div[style*="padding:'16px 20px 14px'"] { background: #fff7ed !important; border-bottom-color: #ffedd5 !important; }
+  
+          /* Form card text */
+          .cortex-light .cx-form-card div[style*="color:'#0f172a'"] { color: #0f172a !important; }
+          .cortex-light .cx-form-card div[style*="color:'rgba(148,163,184,0.5)'"] { color: #64748b !important; }
+          .cortex-light .cx-form-card label { color: #475569 !important; }
+          .cortex-light .cx-form-card span[style*="color:'rgba(148,163,184"] { color: #64748b !important; }
+  
+          /* Form inner dividers */
+          .cortex-light .cx-form-card div[style*="borderTop:'1px solid rgba(0, 0, 0, 0.02)'"] { border-top-color: #e2e8f0 !important; }
+  
+          /* ALL FORM INPUTS, TEXTAREAS, SELECTS */
+          .cortex-light input, .cortex-light textarea, .cortex-light select {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #e2e8f0 !important;
+            color-scheme: light !important;
+          }
+          .cortex-light input::placeholder, .cortex-light textarea::placeholder { color: #94a3b8 !important; }
+          .cortex-light input:focus, .cortex-light textarea:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.1) !important; }
+  
+          /* Main chat input bar */
+          .cortex-light .cx-input-bar input { background: #ffffff !important; color: #0f172a !important; border-color: #e2e8f0 !important; box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important; }
+          .cortex-light .cx-input-bar input:focus { border-color: #3b82f6 !important; }
+  
+          /* Footer tagline */
+          .cortex-light div[style*="color:'#ffffff'"][style*="0.7rem"] { color: #64748b !important; }
+  
+          /* Scrollbar */
         .cortex-light ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.15) !important; }
 
         /* ── ANIMATIONS (shared) ── */
