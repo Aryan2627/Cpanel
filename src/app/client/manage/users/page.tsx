@@ -209,13 +209,14 @@ export default function UsersPage() {
 
       {/* Add/Edit Modal */}
       {isCreateModalOpen&&(
-        <div style={{ position:'fixed',inset:0,background:'rgba(15,23,42,0.55)',backdropFilter:'blur(4px)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center' }} onClick={()=>setIsCreateModalOpen(false)}>
-          <div style={{ background:'#fff',borderRadius:'20px',width:'480px',maxWidth:'92vw',boxShadow:'0 30px 60px rgba(0,0,0,0.2)',overflow:'hidden' }} onClick={e=>e.stopPropagation()}>
-            <div style={{ background: '#fff', borderBottom: '1px solid #e5edff',padding:'22px 24px',display:'flex',justifyContent:'space-between',alignItems:'center' }}>
-              <h2 style={{ margin:0,fontSize:'1.1rem',fontWeight:800,color:'#fff' }}>{isEditMode?'Edit User':'Add New User'}</h2>
-              <button onClick={()=>setIsCreateModalOpen(false)} style={{ background:'rgba(255,255,255,0.1)',border:'none',cursor:'pointer',color: '#0f172a', width: '32px',height:'32px',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center' }}><X size={16} /></button>
+        <div style={{ position:'fixed',inset:0,background:'rgba(15,23,42,0.4)',backdropFilter:'blur(4px)',zIndex:1000,display:'flex',justifyContent:'flex-end' }} onClick={()=>setIsCreateModalOpen(false)}>
+          <div style={{ background:'#fff',height:'100vh',width:'480px',maxWidth:'100vw',boxShadow:'-10px 0 40px rgba(0,0,0,0.15)',display:'flex',flexDirection:'column',animation:'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }} onClick={e=>e.stopPropagation()}>
+            <style>{`@keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
+            <div style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0',padding:'24px 32px',display:'flex',justifyContent:'space-between',alignItems:'center' }}>
+              <h2 style={{ margin:0,fontSize:'1.2rem',fontWeight:800,color:'#0f172a' }}>{isEditMode?'Edit User':'Add New User'}</h2>
+              <button onClick={()=>setIsCreateModalOpen(false)} style={{ background:'transparent',border:'none',cursor:'pointer',color: '#64748b', display:'flex',alignItems:'center',justifyContent:'center', padding: '4px' }}><X size={20} /></button>
             </div>
-            <div style={{ padding:'24px',display:'flex',flexDirection:'column',gap:'14px' }}>
+            <div style={{ padding:'32px',display:'flex',flexDirection:'column',gap:'20px',flex:1,overflowY:'auto' }}>
               {formError&&<div style={{ background:'#fef2f2',border:'1px solid #fca5a5',borderRadius:'8px',padding:'10px 14px',color:'#dc2626',fontSize:'0.8rem' }}>{formError}</div>}
               {[['name','Full Name','text'],['email','Email Address','email'],['phone','Phone','text'],['erpId','ERP ID','text']].map(([field,label,type])=>(
                 <div key={field}><label style={{ display:'block',fontSize:'0.75rem',fontWeight:700,color:'#475569',marginBottom:'5px',textTransform:'uppercase',letterSpacing:'0.04em' }}>{label}</label>
@@ -249,12 +250,12 @@ export default function UsersPage() {
                   ))}
                 </div>
               </div>
-              <div style={{ display:'flex',gap:'10px',marginTop:'4px' }}>
-                <button onClick={()=>setIsCreateModalOpen(false)} style={{ flex:1,padding:'11px',border:'1px solid #e2e8f0',borderRadius:'10px',background:'#fff',color:'#475569',fontWeight:600,fontSize:'0.875rem',cursor:'pointer' }}>Cancel</button>
-                <button onClick={handleSave} style={{ flex:2,padding:'11px',background:'#0f172a',color:'#fff',border:'none',borderRadius:'10px',fontWeight:700,fontSize:'0.875rem',cursor:'pointer' }}>
-                  {isEditMode?'Save Changes':'Create User'}
-                </button>
-              </div>
+            </div>
+            <div style={{ padding:'24px 32px',borderTop:'1px solid #e2e8f0',background:'#f8fafc',display:'flex',gap:'12px' }}>
+              <button onClick={()=>setIsCreateModalOpen(false)} style={{ flex:1,padding:'12px',border:'1px solid #cbd5e1',borderRadius:'10px',background:'#fff',color:'#475569',fontWeight:600,fontSize:'0.9rem',cursor:'pointer' }}>Cancel</button>
+              <button onClick={handleSave} style={{ flex:2,padding:'12px',background:'#2563eb',color:'#fff',border:'none',borderRadius:'10px',fontWeight:700,fontSize:'0.9rem',cursor:'pointer',boxShadow:'0 4px 12px rgba(37,99,235,0.2)' }}>
+                {isEditMode?'Save Changes':'Create User'}
+              </button>
             </div>
           </div>
         </div>
