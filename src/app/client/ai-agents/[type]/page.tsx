@@ -117,7 +117,7 @@ export default function FullScreenAgentPage() {
         name: 'Tark', role: 'The Analyst', tag: 'STAGE 2 • ANALYTICAL',
         purpose: 'Crunches the numbers to find the best total-cost trade-offs and normalizes quotes.',
         tasks: [
-          { title: 'Extract pricing from PDFs', desc: 'Scan real uploaded vendor bids/quotes' },
+          { title: 'Process structured bids', desc: 'Instantly analyze platform-native vendor submissions' },
           { title: 'Normalize line items', desc: 'by unit, currency, and MOQ' },
           { title: 'Rank by total cost', desc: 'including freight and payment terms' }
         ],
