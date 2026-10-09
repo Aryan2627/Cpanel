@@ -42,7 +42,6 @@ const TOP_MENUS = [
       { name: 'Users', path: '/client/manage/users' },
       { name: 'Products', path: '/client/manage/products' },
       { name: 'Templates', path: '/client/manage/templates' },
-      { name: 'Approval Rules', path: '/client/manage/approvals' },
       
           {
         name: 'Master Center',
