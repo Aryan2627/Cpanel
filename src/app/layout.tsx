@@ -1,3 +1,13 @@
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It handles standard logic and rendering.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
@@ -22,6 +32,10 @@ export const metadata: Metadata = {
   }
 };
 
+/**
+ * Renders the main RootLayout component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{

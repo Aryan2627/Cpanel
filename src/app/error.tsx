@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It handles standard logic and rendering.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useEffect, useState } from 'react';
 import { ShieldAlert, Terminal, RefreshCw, Cpu, Activity, Copy, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';

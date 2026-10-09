@@ -1,4 +1,15 @@
 ﻿'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Search, Activity, Clock, AlertCircle, ChevronDown, FileCheck, TrendingUp, Eye, Check, X, Edit2, Users, Award, Gavel, CheckCircle2, MoreHorizontal } from 'lucide-react';
@@ -12,6 +23,10 @@ const Countdown = ({ endTime }: { endTime: string | Date }) => {
   return <span style={{ color: '#0f172a', fontWeight: 700 }}>{d > 0 ? d + 'd ' : ''}{h > 0 || d > 0 ? h + 'h ' : ''}{m}m {s}s</span>;
 };
 
+/**
+ * Renders the main EventsPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function EventsPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('LIVE');

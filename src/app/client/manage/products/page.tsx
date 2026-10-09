@@ -1,8 +1,23 @@
 ﻿'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from 'react';
 import { Search, Plus, X, Package, Tag, Layers, BarChart3, ArrowUpDown, Upload, Eye } from 'lucide-react';
 
+/**
+ * Renders the main ProductsPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

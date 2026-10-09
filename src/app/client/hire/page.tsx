@@ -1,7 +1,22 @@
-"use client";
+'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useEffect, useState } from 'react';
 import { Users, FileCheck2, Clock, Search, ExternalLink } from 'lucide-react';
 
+/**
+ * Renders the main HireDashboard component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function HireDashboard() {
   const [candidates, setCandidates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,16 +51,26 @@ export default function HireDashboard() {
           <p style={{ color: 'var(--text-secondary)' }}>View and review all technical assessments taken by candidates.</p>
         </div>
         
-        <div style={{ position: 'relative', width: '300px' }}>
-          <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input 
-            type="text" 
-            placeholder="Search candidates..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="form-input"
-            style={{ paddingLeft: '36px', width: '100%' }}
-          />
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <div style={{ position: 'relative', width: '250px' }}>
+            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input 
+              type="text" 
+              placeholder="Search candidates..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="form-input"
+              style={{ paddingLeft: '36px', width: '100%' }}
+            />
+          </div>
+          <button 
+            onClick={() => window.open('https://hire.procgen.in', '_blank')} 
+            className="btn btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+            title="Open the external candidate testing portal"
+          >
+            <ExternalLink size={16} /> Open Candidate Portal
+          </button>
         </div>
       </div>
 

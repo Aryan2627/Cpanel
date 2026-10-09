@@ -1,9 +1,24 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It handles standard logic and rendering.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Package, FileText, CheckCircle, TrendingUp, AlertCircle, MessageSquare, Bell, LogOut, LayoutDashboard, ShoppingBag, ClipboardList, Settings, ChevronRight, ArrowRight } from 'lucide-react';
 
+/**
+ * Renders the main VendorDashboard component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function VendorDashboard() {
   const router = useRouter();
   const [vendor, setVendor] = useState<{ name: string; email: string; vendorCode?: string } | null>(null);

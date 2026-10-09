@@ -1,4 +1,15 @@
-"use client";
+'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useState, useEffect, useRef } from 'react';
 import { Bot, Zap, CheckCircle2, Sparkles, Activity, Cpu, Plus, X, ArrowUpRight, ArrowDownRight, Brain } from 'lucide-react';
 
@@ -11,6 +22,10 @@ const INITIAL_SESSIONS: Session[] = [
   { id:'n3', name:'Office Hardware', status:'Closed', model:'γ-Rapid v1', target:13000, limit:15000, vendorInitial:16000, concessions:[], messages:[{sender:'ai',text:"CONTRACT SECURED",time:'Yesterday'}], closed:true, logs:[], sentiment:'Stable', sentimentColor:'#64748b' },
 ];
 
+/**
+ * Renders the main AIAgentsPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function AIAgentsPage() {
   const [viewMode, setViewMode] = useState<'negotiator'|'predictor'>('predictor');
   const [sessions, setSessions] = useState<Session[]>(INITIAL_SESSIONS);

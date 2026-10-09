@@ -1,9 +1,24 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useIntake } from '../../../../context/IntakeContext';
 import DynamicFields from '../../../../components/DynamicFields';
 
+/**
+ * Renders the main PurchaseIntake component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function PurchaseIntake() {
   const router = useRouter();
   const { addIntake } = useIntake();

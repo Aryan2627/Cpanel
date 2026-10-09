@@ -1,7 +1,22 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { useState } from 'react';
 import Link from 'next/link';
 
+/**
+ * Renders the main ProjectSetupPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function ProjectSetupPage() {
   const [activeTab, setActiveTab] = useState('technical');
 

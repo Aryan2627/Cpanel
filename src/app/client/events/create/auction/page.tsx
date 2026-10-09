@@ -1,4 +1,15 @@
 ﻿'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useIntake } from '@/context/IntakeContext';
@@ -1142,6 +1153,10 @@ function AuctionCreateContent() {
   );
 }
 
+/**
+ * Renders the main AuctionCreatePage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function AuctionCreatePage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>

@@ -1,8 +1,23 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
+/**
+ * Renders the main EditProductPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function EditProductPage({ params }: { params: any }) {
   const router = useRouter();
   const { id } = React.use(params as any) as any;

@@ -1,8 +1,22 @@
 'use client';
 
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, X, Loader2, Monitor } from 'lucide-react';
 
+/**
+ * Renders the main DorcWidget component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function DorcWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([

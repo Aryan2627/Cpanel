@@ -1,4 +1,15 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { useState, useEffect } from 'react';
 import { Zap, TrendingUp, ArrowUpRight, CheckCircle2, Clock, RotateCcw, ShoppingCart, Shield, Cpu, Package, Server, AlertCircle } from 'lucide-react';
 import Script from 'next/script';
@@ -24,6 +35,10 @@ const TOKEN_PACKAGES = [
   { id: 'tokens_5000', label: '5,000 Tokens', price: '₹3,999', popular: false, desc: 'High volume' },
 ];
 
+/**
+ * Renders the main TokensAndUsagePage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function TokensAndUsagePage() {
   const [status, setStatus] = useState<any>(null);
   const [plans, setPlans] = useState<any>({});

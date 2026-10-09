@@ -1,8 +1,23 @@
 
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { useState, useEffect } from 'react';
 import { Settings, Plus, X, List, CheckCircle2, User, Workflow } from 'lucide-react';
 
+/**
+ * Renders the main WorkflowsPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function WorkflowsPage() {
   const [activeTab, setActiveTab] = useState<'DATA' | 'APPROVALS'>('APPROVALS');
 

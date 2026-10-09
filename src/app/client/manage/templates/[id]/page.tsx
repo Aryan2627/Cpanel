@@ -1,8 +1,23 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { GripVertical, Plus, Trash2, ArrowUp, ArrowDown, Info, Save, X, Eye, Wand2, Leaf, Settings } from 'lucide-react';
 
+/**
+ * Renders the main EditTemplatePage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function EditTemplatePage() {
   const router = useRouter();
   const params = useParams();

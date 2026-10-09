@@ -1,4 +1,15 @@
 ﻿'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
@@ -15,6 +26,10 @@ const mockPos = [
   { id: 'mock-po-5', poNumber: 'PO-1706441000000', title: 'Marketing Material Print Run', vendorId: 'Vendor-E', vendorName: 'PrintPro Studios', total: 12300, createdAt: new Date(Date.now() - 86400000 * 10).toISOString(), status: 'Rejected' },
 ];
 
+/**
+ * Renders the main PurchaseOrdersPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function PurchaseOrdersPage() {
   const [pos, setPos] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');

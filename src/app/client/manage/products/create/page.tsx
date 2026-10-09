@@ -1,9 +1,24 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import DynamicFields from '../../../../../components/DynamicFields';
 
+/**
+ * Renders the main CreateProductPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function CreateProductPage() {
   const router = useRouter();
   const [imagePreview, setImagePreview] = useState<string | null>(null);

@@ -1,9 +1,24 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { useState, useEffect, useRef } from 'react';
 import { Search, Send, Paperclip, FileText, IndianRupee, Clock, CheckCircle2, Building2, MessageSquare, X } from 'lucide-react';
 
 type Message = { id: string; sender: 'me'|'vendor'; text: string; timestamp: string; isFile?: boolean; fileName?: string; };
 
+/**
+ * Renders the main VendorMessagesPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function VendorMessagesPage() {
   const [activeVendor, setActiveVendor] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);

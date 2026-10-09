@@ -1,3 +1,13 @@
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It serves as a backend API endpoint, handling data transactions securely.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 ﻿import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
@@ -6,6 +16,10 @@ import { logLoginActivity, logAudit } from '../../../../lib/audit';
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_for_procgen';
 
+/**
+ * Handles incoming POST requests for this route.
+ * Parses the payload, performs necessary validations, and writes to the database.
+ */
 export async function POST(req: Request) {
   try {
     const { identifier, otp } = await req.json();

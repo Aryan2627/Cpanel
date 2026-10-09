@@ -1,4 +1,15 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { useState, useRef, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -10,6 +21,10 @@ import {
   X, Eye, Edit, ArrowUpRight, AlertCircle, ArrowUpDown, FileCheck
 } from 'lucide-react';
 
+/**
+ * Renders the main IntakeTablePage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function IntakeTablePage() {
   const { intakes, addIntake } = useIntake();
   const router = useRouter();

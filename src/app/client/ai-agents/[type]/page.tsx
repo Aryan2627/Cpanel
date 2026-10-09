@@ -1,9 +1,24 @@
 
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useState, useEffect } from 'react';
 import { Zap, Play, CheckCircle2, Loader2, Database, Search, ShieldAlert, Cpu, Globe, ArrowRight, Activity, Mail, MapPin, Building, AlertTriangle, TrendingUp, Bot, ExternalLink } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
+/**
+ * Renders the main FullScreenAgentPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function FullScreenAgentPage() {
   const params = useParams();
   const rawType = params.type as string; 

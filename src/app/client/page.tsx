@@ -1,9 +1,24 @@
 ﻿'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FileText, Users, ShoppingBag, TrendingUp, ArrowRight, Gavel, ClipboardCheck, Clock, Activity, BarChart3, Package } from 'lucide-react';
 
+/**
+ * Renders the main ClientDashboard component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function ClientDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState({ users: 0, vendors: 0, pos: 0, intakes: 0, totalSpend: 0 });

@@ -1,6 +1,20 @@
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It serves as a backend API endpoint, handling data transactions securely.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { NextResponse } from 'next/server';
 
 // Step 1: Redirect user to Google's OAuth consent screen
+/**
+ * Handles incoming GET requests for this route.
+ * Fetches required data from the database and returns a JSON response to the client.
+ */
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const source = searchParams.get('source'); // e.g., 'vendor'

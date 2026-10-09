@@ -1,8 +1,22 @@
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It serves as a backend API endpoint, handling data transactions securely.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+/**
+ * Handles incoming GET requests for this route.
+ * Fetches required data from the database and returns a JSON response to the client.
+ */
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -18,6 +32,10 @@ export async function GET(request: Request) {
   }
 }
 
+/**
+ * Handles incoming POST requests for this route.
+ * Parses the payload, performs necessary validations, and writes to the database.
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -53,6 +71,10 @@ export async function POST(request: Request) {
   }
 }
 
+/**
+ * Handles incoming DELETE requests for this route.
+ * Safely removes the specified resource or marks it as inactive.
+ */
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

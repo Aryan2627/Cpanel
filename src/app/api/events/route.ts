@@ -1,3 +1,13 @@
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It serves as a backend API endpoint, handling data transactions securely.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { NextResponse } from 'next/server';
 import { after } from 'next/server';
 import { prisma } from '../../../lib/prisma';
@@ -8,6 +18,10 @@ import { evaluateApprovalMatrix, createPendingApproval } from '../../../lib/appr
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+/**
+ * Handles incoming GET requests for this route.
+ * Fetches required data from the database and returns a JSON response to the client.
+ */
 export async function GET(request: Request) { // PAGINATION_ADDED
 
   try {
@@ -40,6 +54,10 @@ export async function GET(request: Request) { // PAGINATION_ADDED
   }
 }
 
+/**
+ * Handles incoming POST requests for this route.
+ * Parses the payload, performs necessary validations, and writes to the database.
+ */
 export async function POST(request: Request) {
   try {
     const orgId = await getTenantId();

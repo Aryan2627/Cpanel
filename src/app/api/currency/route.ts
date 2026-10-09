@@ -1,9 +1,23 @@
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It serves as a backend API endpoint, handling data transactions securely.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { NextResponse } from 'next/server';
 
 // Cache exchange rates for 10 minutes
 let ratesCache: { rates: Record<string, number>; updatedAt: number } | null = null;
 const CACHE_TTL = 10 * 60 * 1000;
 
+/**
+ * Handles incoming GET requests for this route.
+ * Fetches required data from the database and returns a JSON response to the client.
+ */
 export async function GET() {
   try {
     const now = Date.now();

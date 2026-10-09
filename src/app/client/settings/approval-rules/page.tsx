@@ -1,7 +1,22 @@
-"use client";
+'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useState, useEffect } from 'react';
 import { Plus, Minus, Trash2, Zap, Save, Check } from 'lucide-react';
 
+/**
+ * Renders the main ApprovalRulesPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function ApprovalRulesPage() {
   const [rules, setRules] = useState<any[]>([]);
   const [dbUsers, setDbUsers] = useState<any[]>([]);

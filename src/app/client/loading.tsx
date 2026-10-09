@@ -1,5 +1,19 @@
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React from 'react';
 
+/**
+ * Renders the main Loading component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function Loading() {
   return (
     <div style={{ 

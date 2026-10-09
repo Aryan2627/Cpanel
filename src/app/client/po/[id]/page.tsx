@@ -1,8 +1,23 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Printer, Download, Gift, QrCode, CheckCircle2, ShieldCheck, FileSignature, Key, Lock, Scale, Globe, Package, Truck, Receipt } from 'lucide-react';
 
+/**
+ * Renders the main PurchaseOrderDetailPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function PurchaseOrderDetailPage() {
   const params = useParams();
   const router = useRouter();

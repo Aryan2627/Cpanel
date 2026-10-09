@@ -1,9 +1,24 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It handles standard logic and rendering.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Clock, TrendingDown, ArrowLeft, Send, AlertTriangle, ShieldCheck, Zap } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
+/**
+ * Renders the main VendorLiveBidding component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function VendorLiveBidding() {
   const router = useRouter();
   const params = useParams();

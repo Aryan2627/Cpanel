@@ -1,4 +1,15 @@
 'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It handles standard logic and rendering.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { useState, useEffect } from 'react';
 
 interface AuditLog {
@@ -24,6 +35,10 @@ const ACTION_COLORS: Record<string, string> = {
   APPROVAL_REJECTED: '#dc2626',
 };
 
+/**
+ * Renders the main AuditPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function AuditPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [total, setTotal] = useState(0);

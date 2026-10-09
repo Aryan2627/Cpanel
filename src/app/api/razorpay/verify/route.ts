@@ -1,3 +1,13 @@
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It serves as a backend API endpoint, handling data transactions securely.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { prisma } from '../../../../lib/prisma';
@@ -10,6 +20,10 @@ export const dynamic = 'force-dynamic';
 // POST /api/razorpay/verify
 // Called by client after Razorpay popup payment success
 // body: { razorpay_order_id, razorpay_payment_id, razorpay_signature, notes }
+/**
+ * Handles incoming POST requests for this route.
+ * Parses the payload, performs necessary validations, and writes to the database.
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json();

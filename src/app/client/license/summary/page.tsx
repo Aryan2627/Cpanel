@@ -1,4 +1,15 @@
-"use client";
+'use client';
+
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It manages the client-side UI, user interactions, and state management.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { useState, useEffect } from 'react';
 import { useSession } from '../../../../context/SessionContext';
 import { Calendar, ShieldCheck, Clock, CheckCircle2, AlertCircle, Zap, RotateCcw } from 'lucide-react';
@@ -6,6 +17,10 @@ import Script from 'next/script';
 
 declare global { interface Window { Razorpay: any; } }
 
+/**
+ * Renders the main LicenseSummaryPage component.
+ * This component handles its own local state and orchestrates user interactions.
+ */
 export default function LicenseSummaryPage() {
   const { session, loading } = useSession();
   const [tokenStatus, setTokenStatus] = useState<any>(null);

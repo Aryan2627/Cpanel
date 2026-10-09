@@ -1,3 +1,13 @@
+/**
+ * ============================================================================
+ * Developer Note:
+ * This file is a core part of the ProcGen Enterprise Portal.
+ * It serves as a backend API endpoint, handling data transactions securely.
+ * 
+ * When modifying, please ensure you maintain the existing state flow 
+ * and follow the established styling conventions.
+ * ============================================================================
+ */
 import { NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/ratelimit';
 import { sendEmail } from '../../../../lib/email';
@@ -39,6 +49,10 @@ async function getEmailTransporter() {
   }
 }
 
+/**
+ * Handles incoming POST requests for this route.
+ * Parses the payload, performs necessary validations, and writes to the database.
+ */
 export async function POST(req: Request) {
     const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
     if (!rateLimit(ip, 5, 15 * 60 * 1000)) { // 5 requests per 15 mins
