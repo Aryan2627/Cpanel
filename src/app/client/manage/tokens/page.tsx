@@ -161,7 +161,7 @@ export default function TokensAndUsagePage() {
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
-      <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%', minHeight: '100%', fontFamily: 'Inter, system-ui, sans-serif', background: '#f8fafc' }}>
         
         {toast && (
           <div style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 9999, padding: '12px 20px', background: toast.ok ? '#0f172a' : '#ef4444', color: '#fff', borderRadius: '8px', fontWeight: 500, fontSize: '0.9rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -170,8 +170,8 @@ export default function TokensAndUsagePage() {
           </div>
         )}
 
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        {/* Full Bleed Header */}
+          <div style={{ background: '#ffffff', borderBottom: '1px solid #e2e8f0', padding: '32px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h1 style={{ margin: '0 0 4px 0', fontSize: '1.75rem', fontWeight: 700, color: '#0f172a' }}>Usage & Tokens</h1>
             <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>Monitor plan limits and purchase additional AI credits.</p>
@@ -182,11 +182,12 @@ export default function TokensAndUsagePage() {
             </button>
             <button onClick={() => setShowUpgradeModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 20px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}>
               <ArrowUpRight size={16} /> Upgrade Plan
-            </button>
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Main Usage Card - Platform Standard UI */}
+          <div style={{ padding: '40px 48px', flex: 1, maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
+          {/* Main Usage Card - Platform Standard UI */}
         <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', marginBottom: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
@@ -280,6 +281,7 @@ export default function TokensAndUsagePage() {
           </table>
         </div>
 
+        </div>
         {/* Buy Topup Modal */}
         {showTopupModal && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
