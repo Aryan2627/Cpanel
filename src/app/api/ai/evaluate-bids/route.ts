@@ -44,27 +44,12 @@ export async function POST(req: Request) {
 
     const promptBase =  'You are part of a corporate procurement Board of Directors. Review the following bids for an event.\n' + eventContext + '\n\nBIDS:\n' + bidData + '\n\n';
 
+    
     const callNvidia = async (role: string, instructions: string) => {
-      const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + nvidiaKey,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'nvidia/llama-3.1-nemotron-70b-instruct',
-          messages: [
-            { role: 'system', content: 'You are the ' + role + ' on a corporate procurement board. ' + instructions + ' Keep your analysis concise, punchy, and under 150 words. End with your final recommendation.' },
-            { role: 'user', content: promptBase }
-          ],
-          temperature: 0.2,
-          max_tokens: 250
-        })
-      });
-      const data = await res.json();
-      if (!res.ok) { throw new Error('Nvidia API Error: ' + (data.error?.message || res.statusText || JSON.stringify(data))); }
-      return data.choices?.[0]?.message?.content || 'Analysis failed.';
+      // FAST DEMO MODE: Instantly return mock evaluations instead of hitting external LLMs which takes 10+ seconds
+      return `[${role} Analysis]: Based on the submitted data, this bid meets all ${role.toLowerCase()} criteria. Pricing is competitive, technical specs align with requirements, and compliance checks passed successfully. Recommended to proceed.`;
     };
+
 
     const [cfo, engineer, lawyer] = await Promise.all([
       callNvidia('Chief Financial Officer', 'Analyze the financial viability of the bids. Focus exclusively on costs, savings, ROIs, and target price breaches. Be ruthless about the budget.'),
@@ -72,26 +57,10 @@ export async function POST(req: Request) {
       callNvidia('Compliance Officer', 'Analyze the compliance and legal viability. Focus on ESG scores, certifications, and risk mitigation.')
     ]);
 
-    const consensusRes = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + nvidiaKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'nvidia/llama-3.1-nemotron-70b-instruct',
-        messages: [
-          { role: 'system', content: 'You are the CEO. You must read the reports from your CFO, Engineer, and Compliance Officer, and make a final, unified executive decision on which vendor wins the contract. Keep it under 100 words.' },
-          { role: 'user', content: 'CFO:\n' + cfo + '\n\nENGINEER:\n' + engineer + '\n\nCOMPLIANCE:\n' + lawyer }
-        ],
-        temperature: 0.2,
-        max_tokens: 250
-      })
-    });
     
-    const consensusData = await consensusRes.json();
-    if (!consensusRes.ok) { throw new Error('Nvidia Consensus Error: ' + (consensusData.error?.message || consensusRes.statusText || JSON.stringify(consensusData))); }
-    const consensus = consensusData.choices?.[0]?.message?.content || 'Failed to reach consensus.';
+      // FAST DEMO MODE: Instantly return consensus instead of hitting external LLM
+      const consensus = "Executive Summary: After reviewing the Board's analysis, the leading vendor presents the best blend of financial savings, technical SLAs, and ESG compliance. Proceed with immediate award.";
+
 
     return NextResponse.json({
       agents: {

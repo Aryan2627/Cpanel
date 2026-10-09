@@ -152,9 +152,9 @@ const S2PProgressAndEvent = ({ data, execute }: { data: any, execute: (c:string)
   
   useEffect(() => {
     const ts = [
-      setTimeout(()=>setStep(1), 1000),
-      setTimeout(()=>setStep(2), 2200),
-      setTimeout(()=>setStep(3), 3400)
+      setTimeout(()=>setStep(1), 100),
+      setTimeout(()=>setStep(2), 200),
+      setTimeout(()=>setStep(3), 300)
     ];
     return () => ts.forEach(clearTimeout);
   }, []);
@@ -212,11 +212,11 @@ const AgentSwarm = ({ data }: { data: any }) => {
   useEffect(() => {
     // 5 steps now
     const ts = [
-      setTimeout(()=>setStep(1), 1200), 
-      setTimeout(()=>setStep(2), 2400), 
-      setTimeout(()=>setStep(3), 3600), 
-      setTimeout(()=>setStep(4), 4800),
-      setTimeout(()=>setStep(5), 5500)
+      setTimeout(()=>setStep(1), 100), 
+      setTimeout(()=>setStep(2), 200), 
+      setTimeout(()=>setStep(3), 300), 
+      setTimeout(()=>setStep(4), 400),
+      setTimeout(()=>setStep(5), 500)
     ];
     return () => ts.forEach(clearTimeout);
   }, []);
