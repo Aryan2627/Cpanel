@@ -406,7 +406,7 @@ export default function DorcPage() {
 
   const [userName, setUserName] = useState('Admin');
   const [messages, setanys] = useState<any[]>([
-    { role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }
+    { role:'agent', content:'Welcome to ProcGen. I am Dorc AI, your advanced procurement intelligence system. I am equipped to handle deep contract analysis, strategic sourcing, and real-time vendor risk management. How can I accelerate your workflows today?' }
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSlash, setShowSlash] = useState(false);
@@ -848,7 +848,7 @@ export default function DorcPage() {
               </div>
             </div>
           </div>
-          <button onClick={()=>{ setanys([{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); setActiveChatId(null); setMenuOpenId(null); }} style={{ width:'100%', background:'rgba(59,130,246,0.15)', border:'1px solid rgba(59,130,246,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#93c5fd', transition:'all 0.2s' }}>
+          <button onClick={()=>{ setanys([{ role:'agent', content:'Welcome to ProcGen. I am Dorc AI, your advanced procurement intelligence system. I am equipped to handle deep contract analysis, strategic sourcing, and real-time vendor risk management. How can I accelerate your workflows today?' }]); setInput(''); setActiveChatId(null); setMenuOpenId(null); }} style={{ width:'100%', background:'rgba(59,130,246,0.15)', border:'1px solid rgba(59,130,246,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#93c5fd', transition:'all 0.2s' }}>
             <Plus size={15}/> New Chat
           </button>
         </div>
@@ -862,7 +862,7 @@ export default function DorcPage() {
             const isEditing = editingId===chat.id;
             return (
               <div key={chat.id} className="hist-item" style={{ padding:'9px 12px', paddingRight:'8px', background: isActive?'rgba(59,130,246,0.12)':'transparent', border: isActive?'1px solid rgba(59,130,246,0.25)':'1px solid transparent', borderRadius:'8px', fontSize:'0.8rem', cursor:'pointer', marginBottom:'3px', transition:'all 0.2s', position:'relative', display:'flex', alignItems:'center', gap:'6px' }}
-                onClick={()=>{ if(!isEditing){ setActiveChatId(chat.id); setanys(chat.messages.length>0?chat.messages:[{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setMenuOpenId(null); } }}
+                onClick={()=>{ if(!isEditing){ setActiveChatId(chat.id); setanys(chat.messages.length>0?chat.messages:[{ role:'agent', content:'Welcome to ProcGen. I am Dorc AI, your advanced procurement intelligence system. I am equipped to handle deep contract analysis, strategic sourcing, and real-time vendor risk management. How can I accelerate your workflows today?' }]); setMenuOpenId(null); } }}
               >
                 {isEditing ? (
                   <input
@@ -887,7 +887,7 @@ export default function DorcPage() {
                     <button onClick={()=>{ setEditTitle(chat.title); setEditingId(chat.id); setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#1e293b', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
                       ✏️ Rename
                     </button>
-                    <button onClick={()=>{ setChats(p=>p.filter(c=>c.id!==chat.id)); if(activeChatId===chat.id){ setActiveChatId(null); setanys([{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); } setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#f87171', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
+                    <button onClick={()=>{ setChats(p=>p.filter(c=>c.id!==chat.id)); if(activeChatId===chat.id){ setActiveChatId(null); setanys([{ role:'agent', content:'Welcome to ProcGen. I am Dorc AI, your advanced procurement intelligence system. I am equipped to handle deep contract analysis, strategic sourcing, and real-time vendor risk management. How can I accelerate your workflows today?' }]); } setMenuOpenId(null); }} style={{ display:'flex', alignItems:'center', gap:'8px', width:'100%', padding:'10px 14px', background:'none', border:'none', color:'#f87171', fontSize:'0.82rem', cursor:'pointer', textAlign:'left' }}>
                       🗑️ Delete
                     </button>
                   </div>
