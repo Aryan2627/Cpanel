@@ -88,7 +88,7 @@ const BidAnalyzerForm = ({ onSubmit }: { onSubmit: (eventId: string) => void }) 
   const [eventId, setEventId] = useState('');
   const inp = { width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(0, 0, 0, 0.05)', background:'rgba(255,255,255,0.07)', color:'#1e293b', fontSize:'0.85rem', outline:'none' };
   return (
-    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(255, 255, 255,0.9)', border:'1px solid rgba(99,102,241,0.3)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(255, 255, 255,0.9)', border:'1px solid rgba(59,130,246,0.3)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <div style={{ marginBottom:'14px' }}>
         <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Target Event ID / Name</label>
         <input 
@@ -115,10 +115,10 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => 
   const inp = { width:'100%', padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(0, 0, 0, 0.05)', background:'rgba(255,255,255,0.07)', color:'#1e293b', fontSize:'0.85rem', outline:'none' };
   return (
 
-    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(255, 255, 255,0.9)', border:'1px solid rgba(99,102,241,0.3)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+    <div style={{ marginTop:'12px', padding:'20px', borderRadius:'14px', background:'rgba(255, 255, 255,0.9)', border:'1px solid rgba(59,130,246,0.3)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <div style={{ marginBottom:'14px' }}>
         <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'6px' }}>Document Type</label>
-        <select value={docType} onChange={e=>{ setDocType(e.target.value); setFd({}); }} style={{ ...inp, cursor:'pointer', backgroundColor:'#ffffff', color:'#0f172a', border:'1px solid rgba(99,102,241,0.3)' }}>
+        <select value={docType} onChange={e=>{ setDocType(e.target.value); setFd({}); }} style={{ ...inp, cursor:'pointer', backgroundColor:'#ffffff', color:'#0f172a', border:'1px solid rgba(59,130,246,0.3)' }}>
           <option value="NDA" style={{ backgroundColor:'#ffffff', color:'#0f172a' }}>Non-Disclosure Agreement (NDA)</option>
           <option value="SOW" style={{ backgroundColor:'#ffffff', color:'#0f172a' }}>Statement of Work (SOW)</option>
           <option value="RFP" style={{ backgroundColor:'#ffffff', color:'#0f172a' }}>Request for Proposal (RFP)</option>
@@ -136,7 +136,7 @@ const DocumentGeneratorForm = ({ onSubmit }: { onSubmit: (d: any) => void }) => 
           <input type="number" onKeyDown={(e)=>{if(["-","+","e","E"].includes(e.key)){e.preventDefault();}}} onWheel={(e) => (e.target as any).blur()} placeholder="Total Compensation ($)" onChange={e=>setFd({...fd, amount:e.target.value})} style={inp}/>
         </div>
       )}
-      <button onClick={()=>onSubmit({ type:docType, ...fd })} style={{ width:'100%', marginTop:'16px', padding:'11px', background:'linear-gradient(135deg,#7c3aed,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px', fontSize:'0.85rem' }}>
+      <button onClick={()=>onSubmit({ type:docType, ...fd })} style={{ width:'100%', marginTop:'16px', padding:'11px', background:'linear-gradient(135deg,#7c3aed,#1d4ed8)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center', gap:'8px', fontSize:'0.85rem' }}>
         <Zap size={15}/> Generate Document
       </button>
       
@@ -173,7 +173,7 @@ const S2PProgressAndEvent = ({ data, execute }: { data: any, execute: (c:string)
         
         {[{t:'Intake Created', d:data.intakeRef}, {t:'Routed to PR', d:data.poRef}, {t:'Ready for Sourcing', d:'Awaiting Event Creation'}].map((s, i) => (
            <div key={i} style={{ display:'flex', gap:'16px', alignItems:'center', position:'relative', zIndex:1, opacity: step>=i ? 1 : 0.3, transform: step>=i ? 'translateX(0)' : 'translateX(-10px)', transition:'all 0.5s' }}>
-             <div style={{ width:'24px', height:'24px', borderRadius:'50%', background: step>i ? '#10b981' : step===i ? '#818cf8' : '#ffffff', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #f8fafc', flexShrink:0 }}>
+             <div style={{ width:'24px', height:'24px', borderRadius:'50%', background: step>i ? '#10b981' : step===i ? '#60a5fa' : '#ffffff', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #f8fafc', flexShrink:0 }}>
                 {step>i ? <CheckCircle2 size={12} color="#fff"/> : <div style={{width:'6px',height:'6px',background:'#fff',borderRadius:'50%'}}/>}
              </div>
              <div>
@@ -230,11 +230,11 @@ const AgentSwarm = ({ data }: { data: any }) => {
   const riskColor = data.riskLevel ? getRiskColor(data.riskLevel) : '#ef4444';
 
   return (
-    <div style={{ background:'linear-gradient(135deg,rgba(255, 255, 255,0.95),rgba(248, 250, 252,0.9))', border:'1px solid rgba(99,102,241,0.3)', borderRadius:'16px', overflow:'hidden', width:'100%', backdropFilter:'blur(20px)' }}>
+    <div style={{ background:'linear-gradient(135deg,rgba(255, 255, 255,0.95),rgba(248, 250, 252,0.9))', border:'1px solid rgba(59,130,246,0.3)', borderRadius:'16px', overflow:'hidden', width:'100%', backdropFilter:'blur(20px)' }}>
       <div style={{ padding:'16px 20px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', alignItems:'center', gap:'12px' }}>
-        <div style={{ background:'linear-gradient(135deg,#6366f1,#8b5cf6)', padding:'8px', borderRadius:'10px', display:'flex' }}><Sparkles size={16} color="#fff"/></div>
+        <div style={{ background:'linear-gradient(135deg,#2563eb,#3b82f6)', padding:'8px', borderRadius:'10px', display:'flex' }}><Sparkles size={16} color="#fff"/></div>
         <div>
-          <div style={{ fontSize:'0.65rem', fontWeight:700, color:'#6366f1', textTransform:'uppercase', letterSpacing:'2px' }}>Enterprise Risk Swarm</div>
+          <div style={{ fontSize:'0.65rem', fontWeight:700, color:'#2563eb', textTransform:'uppercase', letterSpacing:'2px' }}>Enterprise Risk Swarm</div>
           <div style={{ fontSize:'0.95rem', fontWeight:700, color:'#0f172a', marginTop:'1px' }}>{data.target}</div>
         </div>
       </div>
@@ -243,16 +243,16 @@ const AgentSwarm = ({ data }: { data: any }) => {
         {data.agents.map((agent: any, i: number) => {
           const active = step===i, done = step>i;
           return (
-            <div key={agent.id} style={{ display:'flex', gap:'12px', alignItems:'flex-start', padding:'12px', background: done?'rgba(16,185,129,0.06)':active?'rgba(99,102,241,0.08)':'rgba(255,255,255,0.02)', border:'1px solid', borderColor: done?'rgba(16,185,129,0.2)':active?'rgba(99,102,241,0.3)':'rgba(0, 0, 0, 0.02)', borderRadius:'10px', transition:'all 0.4s' }}>
-              <div style={{ width:'28px', height:'28px', borderRadius:'50%', background: done?'linear-gradient(135deg,#10b981,#059669)':active?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(0, 0, 0, 0.05)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <div key={agent.id} style={{ display:'flex', gap:'12px', alignItems:'flex-start', padding:'12px', background: done?'rgba(16,185,129,0.06)':active?'rgba(59,130,246,0.08)':'rgba(255,255,255,0.02)', border:'1px solid', borderColor: done?'rgba(16,185,129,0.2)':active?'rgba(59,130,246,0.3)':'rgba(0, 0, 0, 0.02)', borderRadius:'10px', transition:'all 0.4s' }}>
+              <div style={{ width:'28px', height:'28px', borderRadius:'50%', background: done?'linear-gradient(135deg,#10b981,#059669)':active?'linear-gradient(135deg,#2563eb,#1d4ed8)':'rgba(0, 0, 0, 0.05)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                 {done ? <CheckCircle size={14} color="#fff"/> : active ? <Loader2 size={14} color="#fff" className="animate-spin"/> : <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#e2e8f0'}}/>}
               </div>
               <div style={{ flex:1 }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                   <div style={{ fontSize:'0.85rem', fontWeight:700, color:'#1e293b' }}>{agent.name}</div>
-                  <div style={{ fontSize:'0.65rem', fontWeight:700, color: done?'#10b981':active?'#818cf8':'#e2e8f0', background: done?'rgba(16,185,129,0.1)':active?'rgba(99,102,241,0.15)':'rgba(0, 0, 0, 0.02)', padding:'2px 8px', borderRadius:'20px' }}>{agent.role}</div>
+                  <div style={{ fontSize:'0.65rem', fontWeight:700, color: done?'#10b981':active?'#60a5fa':'#e2e8f0', background: done?'rgba(16,185,129,0.1)':active?'rgba(59,130,246,0.15)':'rgba(0, 0, 0, 0.02)', padding:'2px 8px', borderRadius:'20px' }}>{agent.role}</div>
                 </div>
-                {active && <div style={{ fontSize:'0.78rem', color:'#818cf8', marginTop:'5px' }}>Scanning datalakes and running models...</div>}
+                {active && <div style={{ fontSize:'0.78rem', color:'#60a5fa', marginTop:'5px' }}>Scanning datalakes and running models...</div>}
                 {done && <div style={{ fontSize:'0.78rem', color:'#64748b', marginTop:'5px', paddingLeft:'8px', borderLeft:'2px solid rgba(16,185,129,0.4)' }}>{agent.finding}</div>}
               </div>
             </div>
@@ -284,10 +284,10 @@ const AgentSwarm = ({ data }: { data: any }) => {
                 </div>
                 {data.mitigations && data.mitigations.length > 0 && (
                   <div style={{ display:'flex', flexDirection:'column', gap:'6px' }}>
-                    <div style={{ fontSize:'0.7rem', fontWeight:700, color:'#818cf8', textTransform:'uppercase' }}>Recommended Actions:</div>
+                    <div style={{ fontSize:'0.7rem', fontWeight:700, color:'#60a5fa', textTransform:'uppercase' }}>Recommended Actions:</div>
                     {data.mitigations.map((m:string, idx:number) => (
                        <div key={idx} style={{ display:'flex', alignItems:'flex-start', gap:'8px', fontSize:'0.78rem', color:'#cbd5e1' }}>
-                         <Shield size={14} color="#818cf8" style={{ marginTop:'2px', flexShrink:0 }}/>
+                         <Shield size={14} color="#60a5fa" style={{ marginTop:'2px', flexShrink:0 }}/>
                          <span>{m}</span>
                        </div>
                     ))}
@@ -297,7 +297,7 @@ const AgentSwarm = ({ data }: { data: any }) => {
             </div>
 
             <div style={{ display:'flex', gap:'10px', marginTop:'16px' }}>
-              <button style={{ flex:1, padding:'10px', background:'linear-gradient(135deg,#6366f1,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:600, fontSize:'0.8rem', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px' }}>
+              <button style={{ flex:1, padding:'10px', background:'linear-gradient(135deg,#2563eb,#1d4ed8)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:600, fontSize:'0.8rem', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px' }}>
                 <FileText size={14}/> Download Full Risk Dossier (PDF)
               </button>
               <button style={{ flex:1, padding:'10px', background:'rgba(0, 0, 0, 0.02)', color:'#1e293b', border:'1px solid rgba(0, 0, 0, 0.05)', borderRadius:'8px', fontWeight:600, fontSize:'0.8rem', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px' }}>
@@ -643,14 +643,14 @@ export default function DorcPage() {
       { category:'Sourcing', cmd:'/bom', label:'BOM to Purchase Request (AI Matcher)', icon:<FileUp size={14}/>, color:'#2dd4bf', bg:'rgba(45,212,191,0.12)', auto:true, hasTutorial: false },
       { category:'Sourcing', cmd:'/analyze-bids', label:'Compare Vendor Bids & Export', icon:<BarChart3 size={14}/>, color:'#f43f5e', bg:'rgba(244,63,94,0.12)', auto:true, hasTutorial: false },
       { category:'System', cmd:'/analyze-risk', label:'Multi-Agent Risk Swarm', icon:<AlertTriangle size={14}/>, color:'#f87171', bg:'rgba(239,68,68,0.12)', auto:true },
-      { category:'Legal', cmd:'/analyze-contract', label:'Deep Legal Clause Review', icon:<Shield size={14}/>, color:'#c084fc', bg:'rgba(168,85,247,0.12)', auto:true },
-      { category:'Legal', cmd:'/draft-contract', label:'Generate Legal Document', icon:<FileText size={14}/>, color:'#818cf8', bg:'rgba(99,102,241,0.12)', auto:false, hasTutorial: true },
+      { category:'Legal', cmd:'/analyze-contract', label:'Deep Legal Clause Review', icon:<Shield size={14}/>, color:'#c084fc', bg:'rgba(37,99,235,0.12)', auto:true },
+      { category:'Legal', cmd:'/draft-contract', label:'Generate Legal Document', icon:<FileText size={14}/>, color:'#60a5fa', bg:'rgba(59,130,246,0.12)', auto:false, hasTutorial: true },
       { category:'Legal', cmd:'/review-clause', label:'AI Legal Risk Analysis', icon:<Shield size={14}/>, color:'#f43f5e', bg:'rgba(244,63,94,0.12)', auto:true },
       { category:'Logistics', cmd:'/track-shipments', label:'Live ASN/GRN Tracking', icon:<Zap size={14}/>, color:'#eab308', bg:'rgba(234,179,8,0.12)', auto:true },
       { category:'Logistics', cmd:'/predict-stockout', label:'Inventory Shortage Alerts', icon:<AlertTriangle size={14}/>, color:'#ef4444', bg:'rgba(239,68,68,0.12)', auto:true },
       { category:'Finance', cmd:'/3way-match', label:'Invoice Reconciliation', icon:<Database size={14}/>, color:'#10b981', bg:'rgba(16,185,129,0.12)', auto:true },
       { category:'Vendors', cmd:'/esg-audit', label:'Vendor Sustainability Score', icon:<CheckCircle2 size={14}/>, color:'#14b8a6', bg:'rgba(20,184,166,0.12)', auto:true },
-      { category:'System', cmd:'/market-intel', label:'Live Commodity Pricing Trends', icon:<BarChart3 size={14}/>, color:'#6366f1', bg:'rgba(99,102,241,0.12)', auto:true },
+      { category:'System', cmd:'/market-intel', label:'Live Commodity Pricing Trends', icon:<BarChart3 size={14}/>, color:'#2563eb', bg:'rgba(59,130,246,0.12)', auto:true },
       { category:'Vendors', cmd:'/vendor-scorecard', label:'Vendor Performance Grades', icon:<CheckCircle size={14}/>, color:'#3b82f6', bg:'rgba(59,130,246,0.12)', auto:true },
       { category:'Sourcing', cmd:'/s2p', label:'End-to-End Source to Pay', icon:<Database size={14}/>, color:'#10b981', bg:'rgba(16,185,129,0.12)', auto:true },
       { category:'Sourcing', cmd:'/create-event', label:'Create Sourcing Event / Auction', icon:<Zap size={14}/>, color:'#fb923c', bg:'rgba(249,115,22,0.12)', auto:false },
@@ -660,12 +660,12 @@ export default function DorcPage() {
       { category:'System', cmd:'/scan', label:'Analyze Current Screen (OCR)', icon:<Monitor size={14}/>, color:'#2563eb', bg:'rgba(37, 99, 235,0.12)', auto:true },
       { category:'System', cmd:'/clear', label:'Clear Conversation', icon:<X size={14}/>, color:'#64748b', bg:'rgba(148,163,184,0.08)', auto:true },
         { category:'Sourcing', cmd:'/discover-suppliers', label:'Supplier Discovery Agent', icon:<Search size={14}/>, color:'#38bdf8', bg:'rgba(56,189,248,0.12)', auto:true },
-        { category:'Sourcing', cmd:'/negotiate', label:'Autonomous Negotiation Agent', icon:<MessageCircle size={14}/>, color:'#818cf8', bg:'rgba(129,140,248,0.12)', auto:true },
+        { category:'Sourcing', cmd:'/negotiate', label:'Autonomous Negotiation Agent', icon:<MessageCircle size={14}/>, color:'#60a5fa', bg:'rgba(129,140,248,0.12)', auto:true },
         { category:'Sourcing', cmd:'/aggregate-demand', label:'Demand Aggregation Agent', icon:<Layers size={14}/>, color:'#10b981', bg:'rgba(16,185,129,0.12)', auto:true },
         { category:'Sourcing', cmd:'/auto-award', label:'Auto-Award Agent', icon:<Award size={14}/>, color:'#fbbf24', bg:'rgba(251,191,36,0.12)', auto:true },
         { category:'Sourcing', cmd:'/should-cost', label:'Should-Cost Modeling Agent', icon:<Calculator size={14}/>, color:'#f43f5e', bg:'rgba(244,63,94,0.12)', auto:true },
         { category:'Finance', cmd:'/validate-budget', label:'Budget Validation Agent', icon:<CreditCard size={14}/>, color:'#eab308', bg:'rgba(234,179,8,0.12)', auto:true },
-        { category:'Finance', cmd:'/spend-analytics', label:'Spend Compliance Agent', icon:<PieChart size={14}/>, color:'#8b5cf6', bg:'rgba(139,92,246,0.12)', auto:true },
+        { category:'Finance', cmd:'/spend-analytics', label:'Spend Compliance Agent', icon:<PieChart size={14}/>, color:'#3b82f6', bg:'rgba(139,92,246,0.12)', auto:true },
         { category:'Finance', cmd:'/detect-fraud', label:'Fraud Detection Agent', icon:<ShieldAlert size={14}/>, color:'#ef4444', bg:'rgba(239,68,68,0.12)', auto:true },
         { category:'Finance', cmd:'/process-payment', label:'Payment Processing Agent', icon:<Banknote size={14}/>, color:'#34d399', bg:'rgba(52,211,153,0.12)', auto:true },
         { category:'Finance', cmd:'/resolve-exceptions', label:'Exception Resolution Agent', icon:<Wrench size={14}/>, color:'#f97316', bg:'rgba(249,115,22,0.12)', auto:true },
@@ -717,7 +717,7 @@ export default function DorcPage() {
           .cortex-light .cx-sidebar span { color: #0f172a !important; }
           .cortex-light .cx-sidebar div[style*="color:'#cbd5e1'"] { color: #64748b !important; }
           .cortex-light .hist-item:hover { background: #f8fafc !important; }
-          .cortex-light .hist-item[style*="rgba(99,102,241"] { background: #eff6ff !important; border-color: #bfdbfe !important; }
+          .cortex-light .hist-item[style*="rgba(59,130,246"] { background: #eff6ff !important; border-color: #bfdbfe !important; }
           
           /* Main chat background */
           .cortex-light .cx-main { background: #f8fafc !important; }
@@ -734,8 +734,8 @@ export default function DorcPage() {
           .cortex-light .slash-btn { border-bottom-color: #e2e8f0 !important; }
   
           /* Thinking dots */
-          .cortex-light div[style*="rgba(99,102,241,0.08)"][style*="border"] { background: #eff6ff !important; border-color: #bfdbfe !important; }
-          .cortex-light div[style*="rgba(99,102,241,0.08)"][style*="border"] span { color: #4f46e5 !important; }
+          .cortex-light div[style*="rgba(59,130,246,0.08)"][style*="border"] { background: #eff6ff !important; border-color: #bfdbfe !important; }
+          .cortex-light div[style*="rgba(59,130,246,0.08)"][style*="border"] span { color: #1d4ed8 !important; }
   
           /* FORM CARDS - light backgrounds */
           .cortex-light .cx-form-card { background: #ffffff !important; border-color: #e2e8f0 !important; box-shadow: 0 4px 24px rgba(0,0,0,0.05) !important; }
@@ -772,7 +772,7 @@ export default function DorcPage() {
           .cortex-light div[style*="color:'#ffffff'"][style*="0.7rem"] { color: #64748b !important; }
   
           /* Scrollbar */
-        .cortex-light ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.15) !important; }
+        .cortex-light ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.15) !important; }
 
         /* ── ANIMATIONS (shared) ── */
         @keyframes bgFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-20px) scale(1.05)} }
@@ -804,8 +804,8 @@ export default function DorcPage() {
         .cortex-dark .bom-row:hover { background: rgba(255,255,255,0.04) !important; }
         .cortex-light .bom-row:hover { background: rgba(0,0,0,0.02) !important; }
         .hist-item:hover { background: rgba(0, 0, 0, 0.02) !important; } .hist-item:hover .dots-btn { opacity: 1 !important; }
-        ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(99,102,241,0.2); border-radius:4px; }
-        ::-webkit-scrollbar-thumb:hover { background:rgba(99,102,241,0.35); }
+        ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:rgba(59,130,246,0.2); border-radius:4px; }
+        ::-webkit-scrollbar-thumb:hover { background:rgba(59,130,246,0.35); }
         /* ══ MOBILE RESPONSIVENESS ══ */
         @media (max-width: 768px) {
           .cx-wrapper { flex-direction: column !important; }
@@ -829,8 +829,8 @@ export default function DorcPage() {
           .cx-slash-menu { bottom: 70px !important; width: calc(100% - 24px) !important; left: 12px !important; }
         }
       `}</style>
-      <div style={{ position:'fixed', top:'-200px', left:'30%', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', animation:'bgFloat 8s ease-in-out infinite', pointerEvents:'none', zIndex:0 }}/>
-      <div style={{ position:'fixed', bottom:'-100px', right:'10%', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)', animation:'bgFloat 12s ease-in-out infinite reverse', pointerEvents:'none', zIndex:0 }}/>
+      <div style={{ position:'fixed', top:'-200px', left:'30%', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%)', animation:'bgFloat 8s ease-in-out infinite', pointerEvents:'none', zIndex:0 }}/>
+      <div style={{ position:'fixed', bottom:'-100px', right:'10%', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(37,99,235,0.05) 0%, transparent 70%)', animation:'bgFloat 12s ease-in-out infinite reverse', pointerEvents:'none', zIndex:0 }}/>
 
       {/* ── LEFT SIDEBAR ── */}
       <div className="cx-sidebar" style={{ width:'270px', background:'rgba(255,255,255,0.02)', borderRight:'1px solid rgba(0, 0, 0, 0.02)', display:'flex', flexDirection:'column', flexShrink:0, backdropFilter:'blur(20px)' }}>
@@ -838,7 +838,7 @@ export default function DorcPage() {
         {/* Brand */}
         <div style={{ padding:'20px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'14px' }}>
-            <div style={{ width:'32px', height:'32px', borderRadius:'10px', background:'linear-gradient(135deg,#6366f1,#8b5cf6)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 20px rgba(99,102,241,0.4)' }}>
+            <div style={{ width:'32px', height:'32px', borderRadius:'10px', background:'linear-gradient(135deg,#2563eb,#3b82f6)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 20px rgba(59,130,246,0.4)' }}>
               <BrainCircuit size={18} color="#fff"/>
             </div>
             <div>
@@ -848,7 +848,7 @@ export default function DorcPage() {
               </div>
             </div>
           </div>
-          <button onClick={()=>{ setanys([{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); setActiveChatId(null); setMenuOpenId(null); }} style={{ width:'100%', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#a5b4fc', transition:'all 0.2s' }}>
+          <button onClick={()=>{ setanys([{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setInput(''); setActiveChatId(null); setMenuOpenId(null); }} style={{ width:'100%', background:'rgba(59,130,246,0.15)', border:'1px solid rgba(59,130,246,0.3)', padding:'9px 14px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', fontWeight:600, fontSize:'0.82rem', color:'#93c5fd', transition:'all 0.2s' }}>
             <Plus size={15}/> New Chat
           </button>
         </div>
@@ -861,7 +861,7 @@ export default function DorcPage() {
             const menuOpen = menuOpenId===chat.id;
             const isEditing = editingId===chat.id;
             return (
-              <div key={chat.id} className="hist-item" style={{ padding:'9px 12px', paddingRight:'8px', background: isActive?'rgba(99,102,241,0.12)':'transparent', border: isActive?'1px solid rgba(99,102,241,0.25)':'1px solid transparent', borderRadius:'8px', fontSize:'0.8rem', cursor:'pointer', marginBottom:'3px', transition:'all 0.2s', position:'relative', display:'flex', alignItems:'center', gap:'6px' }}
+              <div key={chat.id} className="hist-item" style={{ padding:'9px 12px', paddingRight:'8px', background: isActive?'rgba(59,130,246,0.12)':'transparent', border: isActive?'1px solid rgba(59,130,246,0.25)':'1px solid transparent', borderRadius:'8px', fontSize:'0.8rem', cursor:'pointer', marginBottom:'3px', transition:'all 0.2s', position:'relative', display:'flex', alignItems:'center', gap:'6px' }}
                 onClick={()=>{ if(!isEditing){ setActiveChatId(chat.id); setanys(chat.messages.length>0?chat.messages:[{ role:'agent', content:'Dorc AI is online. I am your advanced multi-agent procurement intelligence system, powered by enterprise RAG. How can I assist you today?' }]); setMenuOpenId(null); } }}
               >
                 {isEditing ? (
@@ -872,10 +872,10 @@ export default function DorcPage() {
                     onBlur={()=>{ setChats(p=>p.map(c=>c.id===chat.id?{...c,title:editTitle}:c)); setEditingId(null); }}
                     onKeyDown={e=>{ if(e.key==='Enter'){ setChats(p=>p.map(c=>c.id===chat.id?{...c,title:editTitle}:c)); setEditingId(null); } if(e.key==='Escape') setEditingId(null); }}
                     onClick={e=>e.stopPropagation()}
-                    style={{ flex:1, background:'rgba(255,255,255,0.08)', border:'1px solid rgba(99,102,241,0.4)', borderRadius:'4px', padding:'2px 6px', color:'#1e293b', fontSize:'0.8rem', outline:'none' }}
+                    style={{ flex:1, background:'rgba(255,255,255,0.08)', border:'1px solid rgba(59,130,246,0.4)', borderRadius:'4px', padding:'2px 6px', color:'#1e293b', fontSize:'0.8rem', outline:'none' }}
                   />
                 ) : (
-                  <span style={{ flex:1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', color: isActive ? (isDark ? '#a5b4fc' : '#4f46e5') : (isDark ? '#e2e8f0' : '#475569') }}>{chat.title}</span>
+                  <span style={{ flex:1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', color: isActive ? (isDark ? '#93c5fd' : '#1d4ed8') : (isDark ? '#e2e8f0' : '#475569') }}>{chat.title}</span>
                 )}
                 <button
                   onClick={e=>{ e.stopPropagation(); setMenuOpenId(menuOpen?null:chat.id); }}
@@ -941,12 +941,12 @@ export default function DorcPage() {
               <div key={idx} className="cortex-msg cx-msg-bubble" style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
                 
                 {/* Avatar */}
-                <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background: msg.role==='agent'?'linear-gradient(135deg,#6366f1,#8b5cf6)':(isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'), border: msg.role==='agent'?'none':'1px solid rgba(0, 0, 0, 0.05)', display:'flex', alignItems:'center', justifyContent:'center', color: msg.role==='agent'?'#fff':(isDark ? '#fff' : '#0f172a'), boxShadow: msg.role==='agent'?'0 0 16px rgba(99,102,241,0.3)':'none' }}>
+                <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background: msg.role==='agent'?'linear-gradient(135deg,#2563eb,#3b82f6)':(isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'), border: msg.role==='agent'?'none':'1px solid rgba(0, 0, 0, 0.05)', display:'flex', alignItems:'center', justifyContent:'center', color: msg.role==='agent'?'#fff':(isDark ? '#fff' : '#0f172a'), boxShadow: msg.role==='agent'?'0 0 16px rgba(59,130,246,0.3)':'none' }}>
                   {msg.role==='agent' ? <img src="/dorc-logo.png" style={{ width: 22, height: 22, objectFit: "contain", filter: "brightness(0) invert(1)" }} /> : <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{userName.charAt(0)}</span>}
                 </div>
 
                 <div style={{ flex:1, paddingTop:'4px', minWidth:0 }}>
-                  <div style={{ fontSize:'0.78rem', fontWeight:700, marginBottom:'8px', color: msg.role==='agent'?'#818cf8': isDark ? '#64748b' : '#64748b', textTransform:'uppercase', letterSpacing:'0.5px' }}>
+                  <div style={{ fontSize:'0.78rem', fontWeight:700, marginBottom:'8px', color: msg.role==='agent'?'#60a5fa': isDark ? '#64748b' : '#64748b', textTransform:'uppercase', letterSpacing:'0.5px' }}>
                     {msg.role==='agent' ? 'Dorc AI' : 'You'}
                   </div>
                   <div style={{ color: msg.role==='agent'? (isDark ? '#f8fafc' : '#0f172a') : (isDark ? '#cbd5e1' : '#334155'), fontSize:'0.95rem', lineHeight:'1.7' }}>
@@ -1105,9 +1105,9 @@ export default function DorcPage() {
                   {/* Drafted Document */}
                   {msg.uiComponent==='drafted_document' && msg.uiData && (
                     <div style={{ marginTop:'14px', borderRadius:'14px', overflow:'hidden', border:'1px solid rgba(255,255,255,0.08)' }}>
-                      <div style={{ background:'rgba(255, 255, 255,0.9)', padding:'14px 18px', borderBottom:'1px solid rgba(99,102,241,0.2)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                        <div style={{ fontWeight:700, color:'#1e293b', display:'flex', alignItems:'center', gap:'8px' }}><FileText size={16} color="#818cf8"/>{msg.uiData.title}</div>
-                        <button onClick={()=>{ const w=window.open('','_blank'); w?.document.write('<html><body style="font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;">'+msg.uiData.htmlContent+'</body></html>'); w?.document.close(); setTimeout(()=>w?.print(),500); }} style={{ padding:'6px 12px', background:'rgba(99,102,241,0.2)', color:'#a5b4fc', borderRadius:'6px', fontSize:'0.78rem', cursor:'pointer', border:'1px solid rgba(99,102,241,0.3)', fontWeight:600 }}>Download PDF</button>
+                      <div style={{ background:'rgba(255, 255, 255,0.9)', padding:'14px 18px', borderBottom:'1px solid rgba(59,130,246,0.2)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                        <div style={{ fontWeight:700, color:'#1e293b', display:'flex', alignItems:'center', gap:'8px' }}><FileText size={16} color="#60a5fa"/>{msg.uiData.title}</div>
+                        <button onClick={()=>{ const w=window.open('','_blank'); w?.document.write('<html><body style="font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;">'+msg.uiData.htmlContent+'</body></html>'); w?.document.close(); setTimeout(()=>w?.print(),500); }} style={{ padding:'6px 12px', background:'rgba(59,130,246,0.2)', color:'#93c5fd', borderRadius:'6px', fontSize:'0.78rem', cursor:'pointer', border:'1px solid rgba(59,130,246,0.3)', fontWeight:600 }}>Download PDF</button>
                       </div>
                       <div contentEditable suppressContentEditableWarning style={{ padding:'24px', maxHeight:'400px', overflowY:'auto', background:'rgba(255, 255, 255,0.95)', fontSize:'0.9rem', lineHeight:'1.9', color:'#1e293b', outline:'none', minHeight:'200px' }} dangerouslySetInnerHTML={{ __html:msg.uiData.htmlContent }}/>
                     </div>
@@ -1116,9 +1116,9 @@ export default function DorcPage() {
 
                     {/* S2P Intake Form */}
                     {msg.uiComponent==='s2p_intake_form' && (
-                      <div className="cx-form-card" style={{ marginTop:'16px', borderRadius:'18px', overflow:'hidden', border:'1px solid rgba(99,102,241,0.15)', background: isDark ? 'linear-gradient(145deg,rgba(15,12,35,0.97),rgba(10,8,25,0.98))' : '#ffffff', boxShadow: isDark ? '0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(0, 0, 0, 0.02)' : '0 8px 40px rgba(99,102,241,0.1),inset 0 1px 0 rgba(99,102,241,0.1)' }}>
-                        <div style={{ padding:'16px 20px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(99,102,241,0.07)', display:'flex', alignItems:'center', gap:'10px' }}>
-                          <div style={{ width:'30px', height:'30px', borderRadius:'9px', background:'linear-gradient(135deg,#4f46e5,#7c3aed)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.9rem', boxShadow:'0 4px 10px rgba(99,102,241,0.4)', flexShrink:0 }}>📋</div>
+                      <div className="cx-form-card" style={{ marginTop:'16px', borderRadius:'18px', overflow:'hidden', border:'1px solid rgba(59,130,246,0.15)', background: isDark ? 'linear-gradient(145deg,rgba(15,12,35,0.97),rgba(10,8,25,0.98))' : '#ffffff', boxShadow: isDark ? '0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(0, 0, 0, 0.02)' : '0 8px 40px rgba(59,130,246,0.1),inset 0 1px 0 rgba(59,130,246,0.1)' }}>
+                        <div style={{ padding:'16px 20px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(59,130,246,0.07)', display:'flex', alignItems:'center', gap:'10px' }}>
+                          <div style={{ width:'30px', height:'30px', borderRadius:'9px', background:'linear-gradient(135deg,#1d4ed8,#7c3aed)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.9rem', boxShadow:'0 4px 10px rgba(59,130,246,0.4)', flexShrink:0 }}>📋</div>
                           <div>
                             <div style={{ color:'#0f172a', fontWeight:700, fontSize:'0.88rem' }}>Source-to-Pay Intake</div>
                             <div style={{ color:'rgba(148,163,184,0.5)', fontSize:'0.7rem', marginTop:'1px' }}>Fill in the procurement request details</div>
@@ -1127,7 +1127,7 @@ export default function DorcPage() {
                         <div style={{ padding:'18px 20px', display:'flex', flexDirection:'column', gap:'13px' }}>
                           <div>
                             <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Request Title <span style={{color:'#f87171'}}>*</span></label>
-                            <input type="text" placeholder="e.g. Q4 Marketing Software Licenses" value={s2pForm.title} onChange={e=>setS2pForm({...s2pForm, title:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                            <input type="text" placeholder="e.g. Q4 Marketing Software Licenses" value={s2pForm.title} onChange={e=>setS2pForm({...s2pForm, title:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(59,130,246,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(59,130,246,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
                           </div>
                           <div className="cx-form-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
                             <div>
@@ -1156,26 +1156,26 @@ export default function DorcPage() {
                               <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Budget (USD) <span style={{color:'#f87171'}}>*</span></label>
                               <div style={{position:'relative'}}>
                                 <span style={{position:'absolute',left:'11px',top:'50%',transform:'translateY(-50%)',color:'rgba(148,163,184,0.35)',fontSize:'0.85rem',fontWeight:700,pointerEvents:'none'}}>$</span>
-                                <input type="number" onKeyDown={(e)=>{if(["-","+","e","E"].includes(e.key)){e.preventDefault();}}} min="0" step="0.01" onWheel={(e)=>(e.target as any).blur()} placeholder="0.00" value={s2pForm.budget} onChange={e=>setS2pForm({...s2pForm, budget:e.target.value})} style={{ width:'100%', padding:'10px 13px 10px 24px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                                <input type="number" onKeyDown={(e)=>{if(["-","+","e","E"].includes(e.key)){e.preventDefault();}}} min="0" step="0.01" onWheel={(e)=>(e.target as any).blur()} placeholder="0.00" value={s2pForm.budget} onChange={e=>setS2pForm({...s2pForm, budget:e.target.value})} style={{ width:'100%', padding:'10px 13px 10px 24px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(59,130,246,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(59,130,246,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
                               </div>
                             </div>
                             <div>
                               <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Quantity <span style={{color:'#f87171'}}>*</span></label>
-                              <input type="number" onKeyDown={(e)=>{if(["-","+","e","E"].includes(e.key)){e.preventDefault();}}} min="1" step="1" onWheel={(e)=>(e.target as any).blur()} placeholder="1" value={s2pForm.quantity||''} onChange={e=>setS2pForm({...s2pForm, quantity:parseInt(e.target.value)||1})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                              <input type="number" onKeyDown={(e)=>{if(["-","+","e","E"].includes(e.key)){e.preventDefault();}}} min="1" step="1" onWheel={(e)=>(e.target as any).blur()} placeholder="1" value={s2pForm.quantity||''} onChange={e=>setS2pForm({...s2pForm, quantity:parseInt(e.target.value)||1})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(59,130,246,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(59,130,246,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
                             </div>
                           </div>
                           <div>
                             <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Item Description <span style={{color:'#f87171'}}>*</span></label>
-                            <textarea rows={3} placeholder="Describe what you need in detail..." value={s2pForm.description} onChange={e=>setS2pForm({...s2pForm, description:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', resize:'vertical', fontFamily:'inherit', lineHeight:'1.6', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                            <textarea rows={3} placeholder="Describe what you need in detail..." value={s2pForm.description} onChange={e=>setS2pForm({...s2pForm, description:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', resize:'vertical', fontFamily:'inherit', lineHeight:'1.6', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(59,130,246,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(59,130,246,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
                           </div>
                           <div className="cx-form-grid-2-1" style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:'10px' }}>
                             <div>
                               <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Required By</label>
-                              <input type="date" value={s2pForm.requiredDate} onChange={e=>setS2pForm({...s2pForm, requiredDate:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', colorScheme:'dark', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';}}/>
+                              <input type="date" value={s2pForm.requiredDate} onChange={e=>setS2pForm({...s2pForm, requiredDate:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', colorScheme:'dark', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(59,130,246,0.5)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';}}/>
                             </div>
                             <div>
                               <label style={{ display:'block', color:'rgba(148,163,184,0.65)', fontSize:'0.68rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'6px' }}>Delivery Address <span style={{color:'#f87171'}}>*</span></label>
-                              <input type="text" placeholder="123 Main St, City, Country" value={s2pForm.address} onChange={e=>setS2pForm({...s2pForm, address:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(99,102,241,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
+                              <input type="text" placeholder="123 Main St, City, Country" value={s2pForm.address} onChange={e=>setS2pForm({...s2pForm, address:e.target.value})} style={{ width:'100%', padding:'10px 13px', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#0f172a', fontSize:'0.84rem', outline:'none', boxSizing:'border-box' }} onFocus={e=>{e.target.style.border='1px solid rgba(59,130,246,0.5)';e.target.style.boxShadow='0 0 0 3px rgba(59,130,246,0.1)';}} onBlur={e=>{e.target.style.border='1px solid rgba(255,255,255,0.08)';e.target.style.boxShadow='none';}}/>
                             </div>
                           </div>
                           <div style={{ paddingTop:'8px', borderTop:'1px solid rgba(0, 0, 0, 0.02)' }}>
@@ -1275,7 +1275,7 @@ export default function DorcPage() {
                             const safePrompt = encodeURIComponent('high quality professional product photography of ' + productForm.name + ', studio lighting, clean minimal background');
                             const seed = Math.floor(Math.random() * 100000);
                             setProductForm({...productForm, imageUrl: `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=500&nologo=1&seed=${seed}`});
-                          }} style={{ flex:1, padding:'8px', background:'rgba(99,102,241,0.15)', color:'#818cf8', border:'1px solid rgba(99,102,241,0.3)', borderRadius:'8px', fontSize:'0.75rem', cursor:'pointer' }}>
+                          }} style={{ flex:1, padding:'8px', background:'rgba(59,130,246,0.15)', color:'#60a5fa', border:'1px solid rgba(59,130,246,0.3)', borderRadius:'8px', fontSize:'0.75rem', cursor:'pointer' }}>
                             ✨ Generate AI Image
                           </button>
                           <button onClick={(e) => { e.preventDefault(); alert('Gallery upload simulation active! In production, this opens a file picker.'); }} style={{ flex:1, padding:'8px', background:'rgba(0, 0, 0, 0.02)', color:'#1e293b', border:'1px solid rgba(0, 0, 0, 0.05)', borderRadius:'8px', fontSize:'0.75rem', cursor:'pointer' }}>
@@ -1284,17 +1284,17 @@ export default function DorcPage() {
                         </div>
 
                         {productForm.isGenerating && (
-                            <div style={{ position:'relative', width:'100%', aspectRatio:'8/5', borderRadius:'12px', border:'1px solid rgba(99,102,241,0.5)', overflow:'hidden', background:'#070d1c', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', marginTop: '10px', marginBottom: '10px', boxShadow:'0 0 40px rgba(99,102,241,0.15)' }}>
+                            <div style={{ position:'relative', width:'100%', aspectRatio:'8/5', borderRadius:'12px', border:'1px solid rgba(59,130,246,0.5)', overflow:'hidden', background:'#070d1c', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', marginTop: '10px', marginBottom: '10px', boxShadow:'0 0 40px rgba(59,130,246,0.15)' }}>
                                <style>{`@keyframes scanline { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }`}</style>
-                               <div style={{ position:'absolute', top:0, left:0, width:'100%', height:'4px', background:'linear-gradient(90deg, transparent, #818cf8, transparent)', animation:'scanline 2s ease-in-out infinite', boxShadow:'0 0 15px #818cf8' }} />
-                               <Loader2 className="animate-spin" size={36} color="#818cf8" style={{ marginBottom:'20px' }} />
-                               <div style={{ color:'#a5b4fc', fontWeight:700, fontSize:'0.9rem', letterSpacing:'2px', textTransform:'uppercase', marginBottom:'8px' }}>Synthesizing Latent Space</div>
+                               <div style={{ position:'absolute', top:0, left:0, width:'100%', height:'4px', background:'linear-gradient(90deg, transparent, #60a5fa, transparent)', animation:'scanline 2s ease-in-out infinite', boxShadow:'0 0 15px #60a5fa' }} />
+                               <Loader2 className="animate-spin" size={36} color="#60a5fa" style={{ marginBottom:'20px' }} />
+                               <div style={{ color:'#93c5fd', fontWeight:700, fontSize:'0.9rem', letterSpacing:'2px', textTransform:'uppercase', marginBottom:'8px' }}>Synthesizing Latent Space</div>
                                <div style={{ color:'#64748b', fontSize:'0.75rem', fontFamily:'monospace' }}>Applying 8K Textures & Studio Lighting...</div>
                                <div style={{ color:'#e2e8f0', fontSize:'0.65rem', fontFamily:'monospace', marginTop:'4px' }}>Model: SDXL-Turbo-v2 &middot; Seed: Randomized</div>
                             </div>
                           )}
                           {!productForm.isGenerating && productForm.imageUrl && (
-                            <div style={{ position:'relative', width:'100%', aspectRatio:'8/5', borderRadius:'12px', border:'1px solid rgba(99,102,241,0.3)', overflow:'hidden', background:'rgba(0,0,0,0.6)', display:'flex', alignItems:'flex-start', justifyContent:'center', marginTop: '10px', marginBottom: '10px', boxShadow:'0 10px 30px rgba(0,0,0,0.3)' }}>
+                            <div style={{ position:'relative', width:'100%', aspectRatio:'8/5', borderRadius:'12px', border:'1px solid rgba(59,130,246,0.3)', overflow:'hidden', background:'rgba(0,0,0,0.6)', display:'flex', alignItems:'flex-start', justifyContent:'center', marginTop: '10px', marginBottom: '10px', boxShadow:'0 10px 30px rgba(0,0,0,0.3)' }}>
                                <img 
                                  src={productForm.imageUrl} 
                                  onError={(e) => { 
@@ -1315,7 +1315,7 @@ export default function DorcPage() {
                           <input type="text" placeholder="SKU" value={productForm.sku} onChange={e=>setProductForm({...productForm, sku:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(0, 0, 0, 0.05)', background:'rgba(0, 0, 0, 0.02)', color:'#1e293b', fontSize:'0.85rem', outline:'none' }}/>
                           <input type="number" onKeyDown={(e)=>{if(["-","+","e","E"].includes(e.key)){e.preventDefault();}}} onWheel={(e) => (e.target as any).blur()} placeholder="Price ($)" value={productForm.price} onChange={e=>setProductForm({...productForm, price:e.target.value})} style={{ flex:1, padding:'10px 14px', borderRadius:'8px', border:'1px solid rgba(0, 0, 0, 0.05)', background:'rgba(0, 0, 0, 0.02)', color:'#1e293b', fontSize:'0.85rem', outline:'none' }}/>
                         </div>
-                        <button onClick={(e)=>{ e.preventDefault(); execute('/execute-add-product '+JSON.stringify(productForm)); }} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#6366f1,#4f46e5)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Add to Catalog</button>
+                        <button onClick={(e)=>{ e.preventDefault(); execute('/execute-add-product '+JSON.stringify(productForm)); }} style={{ width:'100%', padding:'11px', background:'linear-gradient(135deg,#2563eb,#1d4ed8)', color:'#fff', border:'none', borderRadius:'8px', fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>Add to Catalog</button>
                       </div>
                     </div>
                   )}
@@ -1545,7 +1545,7 @@ export default function DorcPage() {
 
                     {/* Market Intel */}
                     {msg.uiComponent==='market_intel' && msg.uiData && (
-                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(99,102,241,0.3)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
+                      <div style={{ marginTop:'14px', padding:'18px', borderRadius:'14px', background: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff', border: isDark ? '1px solid rgba(59,130,246,0.3)' : '1px solid #e2e8f0', boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.02)' }}>
                         <div style={{ marginBottom:'14px', fontWeight:700, color: isDark ? '#f8fafc' : '#0f172a', fontSize:'0.9rem', display:'flex', alignItems:'center', gap:'8px' }}><BarChart3 size={16} color="#2563eb"/> Market Trend: {msg.uiData.commodity}</div>
                         <div style={{ height:'100px', display:'flex', alignItems:'flex-end', gap:'4px', paddingBottom:'10px', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e2e8f0' }}>
                           {[80, 85, 90, 82, 75, 70, 65].map((val, i)=>(
@@ -1648,12 +1648,12 @@ export default function DorcPage() {
 
                     {/* AI Generated Image */}
                   {msg.uiComponent==='generated_image' && msg.uiData && (
-                    <div style={{ marginTop:'14px', borderRadius:'14px', overflow:'hidden', border:'1px solid rgba(99,102,241,0.3)', background:'rgba(255, 255, 255,0.9)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                      <div style={{ padding:'14px 18px', borderBottom:'1px solid rgba(99,102,241,0.2)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                    <div style={{ marginTop:'14px', borderRadius:'14px', overflow:'hidden', border:'1px solid rgba(59,130,246,0.3)', background:'rgba(255, 255, 255,0.9)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                      <div style={{ padding:'14px 18px', borderBottom:'1px solid rgba(59,130,246,0.2)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                         <div style={{ display:'flex', alignItems:'center', gap:'8px', fontWeight:700, color:'#1e293b', fontSize:'0.85rem' }}>
-                          <Sparkles size={16} color="#818cf8"/> AI Generation Complete
+                          <Sparkles size={16} color="#60a5fa"/> AI Generation Complete
                         </div>
-                        <button onClick={()=>{ const a = document.createElement('a'); a.href = msg.uiData.url; a.download = 'cortex-generation.jpg'; a.target = '_blank'; a.click(); }} style={{ padding:'6px 12px', background:'rgba(99,102,241,0.2)', color:'#a5b4fc', borderRadius:'6px', fontSize:'0.75rem', cursor:'pointer', border:'1px solid rgba(99,102,241,0.3)', fontWeight:600 }}>Open Image</button>
+                        <button onClick={()=>{ const a = document.createElement('a'); a.href = msg.uiData.url; a.download = 'cortex-generation.jpg'; a.target = '_blank'; a.click(); }} style={{ padding:'6px 12px', background:'rgba(59,130,246,0.2)', color:'#93c5fd', borderRadius:'6px', fontSize:'0.75rem', cursor:'pointer', border:'1px solid rgba(59,130,246,0.3)', fontWeight:600 }}>Open Image</button>
                       </div>
                       <div style={{ position:'relative', width:'100%', minHeight:'300px', background:'rgba(0,0,0,0.5)', display:'flex', justifyContent:'center', alignItems:'center' }}>
                         {/* The image takes time to load from pollinations, so we show it directly. It streams down. */}
@@ -1671,23 +1671,23 @@ export default function DorcPage() {
             {/* Thinking Indicator */}
             {isProcessing && (
               <div className="cortex-msg cx-msg-bubble" style={{ display:'flex', gap:'14px', alignItems:'flex-start' }}>
-                <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background:'linear-gradient(135deg,#6366f1,#8b5cf6)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 16px rgba(99,102,241,0.4)' }}>
+                <div style={{ width:'34px', height:'34px', flexShrink:0, borderRadius:'10px', background:'linear-gradient(135deg,#2563eb,#3b82f6)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 16px rgba(59,130,246,0.4)' }}>
                   <Loader2 size={18} color="#fff" className="animate-spin"/>
                 </div>
                 <div style={{ paddingTop:'8px' }}>
-                  <div style={{ fontSize:'0.78rem', fontWeight:700, color:'#818cf8', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'8px' }}>Dorc AI</div>
-                  <div style={{ display:'flex', alignItems:'center', gap:'10px', background:'rgba(99,102,241,0.08)', border:'1px solid rgba(99,102,241,0.15)', padding:'10px 16px', borderRadius:'12px' }}>
+                  <div style={{ fontSize:'0.78rem', fontWeight:700, color:'#60a5fa', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'8px' }}>Dorc AI</div>
+                  <div style={{ display:'flex', alignItems:'center', gap:'10px', background:'rgba(59,130,246,0.08)', border:'1px solid rgba(59,130,246,0.15)', padding:'10px 16px', borderRadius:'12px' }}>
                     <div style={{ display:'flex', gap:'4px' }}>
                                             <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
                         <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <circle cx="6" cy="12" r="3" fill="#6366f1" />
-                          <circle cx="34" cy="4" r="3" fill="#8b5cf6" />
+                          <circle cx="6" cy="12" r="3" fill="#2563eb" />
+                          <circle cx="34" cy="4" r="3" fill="#3b82f6" />
                           <circle cx="34" cy="12" r="3" fill="#ec4899" />
                           <circle cx="34" cy="20" r="3" fill="#14b8a6" />
                           
-                          <path id="path1" d="M 6 12 C 18 12, 22 4, 34 4" stroke="rgba(99,102,241,0.3)" strokeWidth="1.5" fill="none"/>
-                          <path id="path2" d="M 6 12 L 34 12" stroke="rgba(99,102,241,0.3)" strokeWidth="1.5" fill="none"/>
-                          <path id="path3" d="M 6 12 C 18 12, 22 20, 34 20" stroke="rgba(99,102,241,0.3)" strokeWidth="1.5" fill="none"/>
+                          <path id="path1" d="M 6 12 C 18 12, 22 4, 34 4" stroke="rgba(59,130,246,0.3)" strokeWidth="1.5" fill="none"/>
+                          <path id="path2" d="M 6 12 L 34 12" stroke="rgba(59,130,246,0.3)" strokeWidth="1.5" fill="none"/>
+                          <path id="path3" d="M 6 12 C 18 12, 22 20, 34 20" stroke="rgba(59,130,246,0.3)" strokeWidth="1.5" fill="none"/>
 
                           <circle r="1.5" fill="#fff">
                             <animateMotion dur="1.5s" repeatCount="indefinite" path="M 6 12 C 18 12, 22 4, 34 4" />
@@ -1704,7 +1704,7 @@ export default function DorcPage() {
                         </svg>
                       </div>
                     </div>
-                    <span style={{ fontSize:'0.83rem', color:'#818cf8', fontWeight:500 }}>Dorc AI is thinking...</span>
+                    <span style={{ fontSize:'0.83rem', color:'#60a5fa', fontWeight:500 }}>Dorc AI is thinking...</span>
                   </div>
                 </div>
               </div>
@@ -1725,7 +1725,7 @@ export default function DorcPage() {
                       <button 
                         key={cat} 
                         onClick={(e) => { e.preventDefault(); setSlashCategory(cat); }}
-                        style={{ background: slashCategory === cat ? 'rgba(99,102,241,0.15)' : 'transparent', color: slashCategory === cat ? '#818cf8' : '#64748b', padding:'6px 12px', borderRadius:'14px', border:'none', cursor:'pointer', fontSize:'0.75rem', fontWeight:600, whiteSpace:'nowrap', transition:'all 0.2s' }}
+                        style={{ background: slashCategory === cat ? 'rgba(59,130,246,0.15)' : 'transparent', color: slashCategory === cat ? '#60a5fa' : '#64748b', padding:'6px 12px', borderRadius:'14px', border:'none', cursor:'pointer', fontSize:'0.75rem', fontWeight:600, whiteSpace:'nowrap', transition:'all 0.2s' }}
                       >
                         {cat}
                       </button>
@@ -1745,7 +1745,7 @@ export default function DorcPage() {
                           </div>
                         </button>
                         {item.hasTutorial && (
-                           <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTutorialVideo(item.cmd); setShowSlash(false); }} style={{ position:'absolute', right:'16px', background:'rgba(99,102,241,0.15)', border:'1px solid rgba(99,102,241,0.4)', color:'#a5b4fc', borderRadius:'6px', padding:'5px 8px', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.65rem', fontWeight:600, cursor:'pointer', zIndex: 10, transition:'all 0.2s', textTransform:'uppercase', letterSpacing:'0.5px' }}>
+                           <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setTutorialVideo(item.cmd); setShowSlash(false); }} style={{ position:'absolute', right:'16px', background:'rgba(59,130,246,0.15)', border:'1px solid rgba(59,130,246,0.4)', color:'#93c5fd', borderRadius:'6px', padding:'5px 8px', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.65rem', fontWeight:600, cursor:'pointer', zIndex: 10, transition:'all 0.2s', textTransform:'uppercase', letterSpacing:'0.5px' }}>
                              <Eye size={12}/> Tutorial
                            </button>
                         )}
@@ -1800,7 +1800,7 @@ export default function DorcPage() {
                 onKeyDown={e=>{ if(e.key==='Escape') setShowSlash(false); }}
                 placeholder="Ask Dorc AI anything, or type / for AI workflows..."
                 disabled={isProcessing}
-                className="cx-input-field" style={{ width:'100%', padding:'16px 100px 16px 50px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#1e293b', fontSize:'16px', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(0, 0, 0, 0.02)', transition:'border-color 0.2s', borderColor: input?'rgba(99,102,241,0.4)':'rgba(255,255,255,0.08)' }}
+                className="cx-input-field" style={{ width:'100%', padding:'16px 100px 16px 50px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.08)', background:'rgba(255,255,255,0.04)', color:'#1e293b', fontSize:'16px', outline:'none', backdropFilter:'blur(20px)', boxShadow:'0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(0, 0, 0, 0.02)', transition:'border-color 0.2s', borderColor: input?'rgba(59,130,246,0.4)':'rgba(255,255,255,0.08)' }}
               />
               
               <button 
@@ -1815,7 +1815,7 @@ export default function DorcPage() {
               
                 
                 
-                <button type="submit" disabled={!input.trim()||isProcessing} style={{ position:'absolute', right:'10px', width:'38px', height:'38px', borderRadius:'12px', background: input.trim()&&!isProcessing?'linear-gradient(135deg,#6366f1,#4f46e5)':'rgba(0, 0, 0, 0.02)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor: input.trim()&&!isProcessing?'pointer':'default', transition:'all 0.2s', boxShadow: input.trim()&&!isProcessing?'0 0 16px rgba(99,102,241,0.4)':'none' }}>
+                <button type="submit" disabled={!input.trim()||isProcessing} style={{ position:'absolute', right:'10px', width:'38px', height:'38px', borderRadius:'12px', background: input.trim()&&!isProcessing?'linear-gradient(135deg,#2563eb,#1d4ed8)':'rgba(0, 0, 0, 0.02)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor: input.trim()&&!isProcessing?'pointer':'default', transition:'all 0.2s', boxShadow: input.trim()&&!isProcessing?'0 0 16px rgba(59,130,246,0.4)':'none' }}>
                 <Send size={15} color={input.trim()&&!isProcessing?'#fff':'#cbd5e1'}/>
               </button>
             </form>
@@ -1829,7 +1829,7 @@ export default function DorcPage() {
 {/* Video Tutorial Modal */}
       {tutorialVideo && (
         <div style={{ position:'fixed', top:0, left:0, width:'100vw', height:'100vh', background:'rgba(0,0,0,0.85)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(10px)' }}>
-          <div style={{ position:'relative', width:'800px', maxWidth:'95vw', background:'#070d1c', padding:'8px', borderRadius:'16px', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+          <div style={{ position:'relative', width:'800px', maxWidth:'95vw', background:'#070d1c', padding:'8px', borderRadius:'16px', border:'1px solid rgba(59,130,246,0.3)', boxShadow:'0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
             <button onClick={()=>setTutorialVideo(null)} style={{ position:'absolute', top:'-40px', right:0, background:'transparent', border:'none', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.9rem', fontWeight:600 }}>
               <X size={20}/> Close
             </button>
@@ -1839,7 +1839,7 @@ export default function DorcPage() {
                   Your browser does not support the video tag.
                </video>
             </div>
-            <div style={{ padding:'12px 16px', color:'#a5b4fc', fontSize:'0.75rem', textAlign:'center', background:'rgba(99,102,241,0.05)' }}>
+            <div style={{ padding:'12px 16px', color:'#93c5fd', fontSize:'0.75rem', textAlign:'center', background:'rgba(59,130,246,0.05)' }}>
               <strong>Video Tutorial Loaded!</strong> Your AI tutorial is now fully integrated.
             </div>
           </div>
@@ -1849,7 +1849,7 @@ export default function DorcPage() {
       {/* Image Viewer Modal */}
       {viewImage && (
         <div style={{ position:'fixed', top:0, left:0, width:'100vw', height:'100vh', background:'rgba(0,0,0,0.85)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', backdropFilter:'blur(10px)' }}>
-          <div style={{ position:'relative', maxWidth:'90vw', maxHeight:'90vh', background:'#070d1c', padding:'8px', borderRadius:'16px', border:'1px solid rgba(99,102,241,0.3)', boxShadow:'0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+          <div style={{ position:'relative', maxWidth:'90vw', maxHeight:'90vh', background:'#070d1c', padding:'8px', borderRadius:'16px', border:'1px solid rgba(59,130,246,0.3)', boxShadow:'0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
             <button onClick={()=>setViewImage(null)} style={{ position:'absolute', top:'-40px', right:0, background:'transparent', border:'none', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', fontSize:'0.9rem', fontWeight:600 }}>
               <X size={20}/> Close
             </button>
