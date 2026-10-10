@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma';
 /**
  * ============================================================================
  * Developer Note:
@@ -9,11 +10,11 @@
  * ============================================================================
  */
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+
 import jwt from 'jsonwebtoken';
 import { logLoginActivity, logAudit } from '../../../../../lib/audit';
 
-const prisma = new PrismaClient();
+
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_for_procgen';
 
 // Step 2: Google redirects here with a `code`. Exchange it for user info.

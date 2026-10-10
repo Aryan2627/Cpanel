@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma';
 /**
  * ============================================================================
  * Developer Note:
@@ -11,9 +12,9 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+
+
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_for_procgen';
 
 /**

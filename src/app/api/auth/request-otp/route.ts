@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma';
 /**
  * ============================================================================
  * Developer Note:
@@ -11,11 +12,11 @@
 import { NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/ratelimit';
 import { sendEmail } from '../../../../lib/email';
-import { PrismaClient } from '@prisma/client';
+
 import nodemailer from 'nodemailer';
 import twilio from 'twilio';
 
-const prisma = new PrismaClient();
+
 
 // Helper to get transporter - uses real SMTP if configured, otherwise falls back to Ethereal for testing
 let testAccount: nodemailer.TestAccount | null = null;

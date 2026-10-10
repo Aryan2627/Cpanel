@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma';
 /**
  * ============================================================================
  * Developer Note:
@@ -9,9 +10,9 @@
  * ============================================================================
  */
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+
+
 
 /**
  * Handles incoming GET requests for this route.
