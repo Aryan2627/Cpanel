@@ -362,26 +362,26 @@ export default function BuyerEventDetailsPage() {
     URL.revokeObjectURL(url);
   };
 
-  const fetchEventData = () => {
-    Promise.all([
-      fetch(`/api/events/${params.id}`).then(res => {
-        if (!res.ok) throw new Error('Failed to fetch event');
-        return res.json();
-      }),
-      fetch(`/api/events/${params.id}`) // Temporary query to get eventId to fetch bids
-        .then(res => res.ok ? res.json() : Promise.reject())
-        .then(eventData => fetch(`/api/bids?eventId=${eventData.id}`).then(r => r.json()))
-        .catch(() => []) // If bids fail, return empty
-    ])
-    .then(([eventData, bidsData]) => {
+  const fetchEventData = async () => {
+    try {
+      // 1. Fetch Event (Single network trip)
+      const eventRes = await fetch(`/api/events/${params.id}`);
+      if (!eventRes.ok) throw new Error('Failed to fetch event');
+      const eventData = await eventRes.json();
+      
+      // Update UI immediately with event info while bids load
       setEvent(eventData);
+
+      // 2. Fetch Bids using the actual Event ID (Single network trip)
+      const bidsRes = await fetch(`/api/bids?eventId=${eventData.id}`);
+      const bidsData = bidsRes.ok ? await bidsRes.json() : [];
       setBids(Array.isArray(bidsData) ? bidsData : []);
-      setLoading(false);
-    })
-    .catch(err => {
+      
+    } catch (err: any) {
       setError(err.message || 'Failed to load details');
+    } finally {
       setLoading(false);
-    });
+    }
   };
 
   useEffect(() => {
