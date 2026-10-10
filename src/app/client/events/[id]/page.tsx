@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /**
  * ============================================================================
@@ -64,6 +64,7 @@ export default function BuyerEventDetailsPage() {
   const [event, setEvent] = useState<any>(null);
   const [bids, setBids] = useState<any[]>([]);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [viewTab, setViewTab] = useState('Overview');
   const parsedStages = useMemo(() => {
     if (!event || !event.stages) return [];
     try { return JSON.parse(event.stages); } catch(e) { return []; }
@@ -659,7 +660,70 @@ export default function BuyerEventDetailsPage() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '24px', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', marginBottom: '24px', backgroundColor: '#fff', padding: '0 24px', borderRadius: '12px 12px 0 0', border: '1px solid #e2e8f0', borderBottom: 'none' }}>
+          <div style={{ display: 'flex', gap: '24px' }}>
+            {['Responses', 'Overview', 'Participants', 'Analytics', 'Price Trends', 'Participant Remarks'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setViewTab(tab)}
+                style={{
+                  padding: '16px 4px',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: viewTab === tab ? '2px solid #2563eb' : '2px solid transparent',
+                  color: viewTab === tab ? '#2563eb' : '#0f172a',
+                  fontWeight: viewTab === tab ? 600 : 500,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <button style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#2563eb', fontWeight: 500, fontSize: '0.85rem', cursor: 'pointer' }}>
+              <FileText size={16} /> Download Report
+            </button>
+            <button style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#475569', fontWeight: 500, fontSize: '0.85rem', cursor: 'pointer' }}>
+              Settings <ArrowLeft size={14} style={{ transform: 'rotate(-90deg)' }} />
+            </button>
+          </div>
+        </div>
+
+        {viewTab === 'Overview' && (
+          <div style={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '0 0 12px 12px', padding: '24px', borderTop: 'none', marginBottom: '24px' }}>
+            <div style={{ marginBottom: '32px' }}>
+              <h3 style={{ fontSize: '1rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontWeight: 700 }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #cbd5e1', color: '#64748b', fontSize: '14px', fontWeight: 'bold' }}>-</span> Participation Summary
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Total Participants</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>{parsedParticipants.length || 0}</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Active participants</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>{new Set(processedBids.map(b => b.vendorName)).size || 0}</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Total Bids</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>{processedBids.length || 0}</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Revised bids</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>0</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Rejected bids</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>0</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Counter offers</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>0</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Active Counter Offers</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>0</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Accepted Counter Offers</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>0</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Dynamic time extended</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>0 min</div></div>
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '24px' }}>
+              <h3 style={{ fontSize: '1rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '48px', fontWeight: 700 }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #cbd5e1', color: '#64748b', fontSize: '14px', fontWeight: 'bold' }}>-</span> Savings Summary
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', gap: '12px', paddingBottom: '48px' }}>
+                <Layers size={40} color="#e2e8f0" />
+                <span style={{ fontSize: '0.9rem', color: '#cbd5e1' }}>Savings reference is not added</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div style={{ display: viewTab === 'Responses' ? 'flex' : 'none', gap: '24px', flexDirection: 'column' }}>
           <div style={{ width: '100%' }}>
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
               <h2 style={{ margin: '0 0 16px 0', fontSize: '1.1rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
