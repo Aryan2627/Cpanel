@@ -720,6 +720,80 @@ export default function BuyerEventDetailsPage() {
                 <span style={{ fontSize: '0.9rem', color: '#cbd5e1' }}>Savings reference is not added</span>
               </div>
             </div>
+
+            <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '24px', marginBottom: '24px' }}>
+              <h3 style={{ fontSize: '1rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontWeight: 700 }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #cbd5e1', color: '#64748b', fontSize: '14px', fontWeight: 'bold' }}>-</span> Bidding Summary
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Highest Bid</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>{processedBids.length ? Math.max(...processedBids.map(b => b.baseAmount || 0)).toLocaleString() : 0} {event?.baseCurrency || 'INR'}</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Lowest Bid</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#10b981' }}>{processedBids.length ? Math.min(...processedBids.map(b => b.baseAmount || 0)).toLocaleString() : 0} {event?.baseCurrency || 'INR'}</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Average Bid</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>{processedBids.length ? (processedBids.reduce((a, b) => a + (b.baseAmount || 0), 0) / processedBids.length).toLocaleString() : 0} {event?.baseCurrency || 'INR'}</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Target Amount</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>Not Set</div></div>
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '24px', marginBottom: '24px' }}>
+              <h3 style={{ fontSize: '1rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontWeight: 700 }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #cbd5e1', color: '#64748b', fontSize: '14px', fontWeight: 'bold' }}>-</span> Product Sheet
+              </h3>
+              <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                      <th style={{ padding: '12px 16px', fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>Field Name</th>
+                      <th style={{ padding: '12px 16px', fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>Type</th>
+                      <th style={{ padding: '12px 16px', fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>Weight</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {templateFields.map((f: any, i: number) => (
+                      <tr key={f.key || i} style={{ borderBottom: i === templateFields.length - 1 ? 'none' : '1px solid #e2e8f0' }}>
+                        <td style={{ padding: '12px 16px', fontSize: '0.9rem', color: '#0f172a', fontWeight: 500 }}>{f.name} {f.required && <span style={{ color: '#ef4444' }}>*</span>}</td>
+                        <td style={{ padding: '12px 16px', fontSize: '0.9rem', color: '#64748b' }}>{f.type}</td>
+                        <td style={{ padding: '12px 16px', fontSize: '0.9rem', color: '#64748b' }}>{f.weight ? f.weight + '%' : '-'}</td>
+                      </tr>
+                    ))}
+                    {templateFields.length === 0 && (
+                      <tr><td colSpan={3} style={{ padding: '24px', textAlign: 'center', color: '#94a3b8', fontSize: '0.9rem' }}>No template fields configured</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '24px', marginBottom: '24px' }}>
+              <h3 style={{ fontSize: '1rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontWeight: 700 }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #cbd5e1', color: '#64748b', fontSize: '14px', fontWeight: 'bold' }}>-</span> Terms and Conditions
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', color: '#64748b', gap: '12px', fontSize: '0.9rem' }}>
+                <p style={{ margin: 0 }}>1. Standard Enterprise terms and conditions apply to all awarded purchase orders.</p>
+                <p style={{ margin: 0 }}>2. Deliveries must comply with the specified lead times.</p>
+                <p style={{ margin: 0 }}>3. Payment terms are Net 45 unless otherwise negotiated.</p>
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '24px', marginBottom: '24px' }}>
+              <h3 style={{ fontSize: '1rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontWeight: 700 }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #cbd5e1', color: '#64748b', fontSize: '14px', fontWeight: 'bold' }}>-</span> Order Configuration
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Split Award Allowed</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>Yes</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Multi-currency</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>Enabled</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '4px' }}>Approval Routing</div><div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>Standard L1</div></div>
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '24px' }}>
+              <h3 style={{ fontSize: '1rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontWeight: 700 }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #cbd5e1', color: '#64748b', fontSize: '14px', fontWeight: 'bold' }}>-</span> Last Order Details
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', gap: '12px', paddingBottom: '24px', backgroundColor: '#f8fafc', padding: '32px', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+                <FileText size={32} color="#cbd5e1" />
+                <span style={{ fontSize: '0.9rem', color: '#64748b' }}>No previous orders found for this category</span>
+              </div>
+            </div>
+
           </div>
         )}
 
