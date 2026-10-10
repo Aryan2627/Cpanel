@@ -11,8 +11,11 @@
  * ============================================================================
  */
 import React, { useState, useEffect, useMemo } from 'react';
+import useSWR from 'swr';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Clock, CheckCircle2, AlertCircle, BarChart3, FileText, User, Users, Leaf, AlertTriangle, Target, Globe, BrainCircuit, Hammer, X, Layers, SplitSquareHorizontal , Brain, Shield, Briefcase, Calculator, Star, Search } from 'lucide-react';
+
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 const Countdown = ({ endTime }: { endTime: string | Date }) => {
   const [now, setNow] = useState(new Date());
@@ -364,43 +367,44 @@ export default function BuyerEventDetailsPage() {
     URL.revokeObjectURL(url);
   };
 
-  const fetchEventData = async () => {
-    try {
-      // 1. Fetch Event (Single network trip)
-      const eventRes = await fetch(`/api/events/${params.id}`);
-      if (!eventRes.ok) throw new Error('Failed to fetch event');
-      const eventData = await eventRes.json();
-      
-      // Update UI immediately with event info while bids load
-      setEvent(eventData);
+  // High-Performance SWR Caching Layer
+  const { data: swrEvent, error: swrEventError, mutate: mutateEvent } = useSWR(`/api/events/${params.id}`, fetcher, { revalidateOnFocus: true });
+  const { data: swrBids, mutate: mutateBids } = useSWR(swrEvent?.id ? `/api/bids?eventId=${swrEvent.id}` : null, fetcher, { revalidateOnFocus: true });
+  const { data: swrVendors } = useSWR('/api/vendors', fetcher, { revalidateOnFocus: false });
 
-      // 2. Fetch Bids and Vendors concurrently using the actual Event ID
-      const [bidsRes, vendorsRes] = await Promise.all([
-        fetch(`/api/bids?eventId=${eventData.id}`),
-        fetch(`/api/vendors`)
-      ]);
-      
-      const bidsData = bidsRes.ok ? await bidsRes.json() : [];
-      const vendorsData = vendorsRes.ok ? await vendorsRes.json() : [];
-      
-      setBids(Array.isArray(bidsData) ? bidsData : []);
-      setAllVendors(Array.isArray(vendorsData) ? vendorsData : []);
-      
-    } catch (err: any) {
-      setError(err.message || 'Failed to load details');
-    } finally {
-      setLoading(false);
-    }
+  const fetchEventData = async () => {
+    await Promise.all([mutateEvent(), mutateBids()]);
   };
 
   useEffect(() => {
-    fetchEventData();
+    if (swrEvent) {
+      setEvent(swrEvent);
+      setLoading(false);
+    }
+    if (swrEventError) {
+      setError(swrEventError.message || 'Failed to load details');
+      setLoading(false);
+    }
+  }, [swrEvent, swrEventError]);
+
+  useEffect(() => {
+    if (swrBids) setBids(Array.isArray(swrBids) ? swrBids : []);
+  }, [swrBids]);
+
+  useEffect(() => {
+    if (swrVendors) setAllVendors(Array.isArray(swrVendors) ? swrVendors : []);
+  }, [swrVendors]);
+
+  useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
-      if (e.key === 'latest_bid_sync') fetchEventData();
+      if (e.key === 'latest_bid_sync') {
+        mutateEvent();
+        mutateBids();
+      }
     };
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
-  }, [params.id]);
+  }, [mutateEvent, mutateBids]);
 
   const handleAiEvaluation = async () => {
     if (bids.length === 0) { alert('No bids to evaluate!'); return; }
