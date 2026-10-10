@@ -1,17 +1,11 @@
 import { PrismaClient } from '@prisma/client'
-import { withAccelerate } from '@prisma/extension-accelerate'
 
 const prismaClientSingleton = () => {
-  let url = process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL || '';
+  let url = process.env.DATABASE_URL || '';
   
   // Basic query params for connection reliability
   if (url && (url.includes('supabase.com') || url.includes('neon.tech')) && !url.includes('pgbouncer=true') && !url.startsWith('prisma://')) {
     url += (url.includes('?') ? '&' : '?') + 'pgbouncer=true&connection_limit=1';
-  }
-  
-  // Return standard client or Accelerate extended client based on URL protocol
-  if (url.startsWith('prisma://')) {
-    return (url ? new PrismaClient({ datasources: { db: { url } } }) : new PrismaClient()).$extends(withAccelerate()) as unknown as PrismaClient;
   }
   
   return url ? new PrismaClient({ datasources: { db: { url } } }) : new PrismaClient();
