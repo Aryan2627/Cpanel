@@ -773,44 +773,46 @@ export default function BuyerEventDetailsPage() {
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center' }}>
                   <thead>
                     <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #e2e8f0' }}>
-                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600, width: '60px' }}>S no.</th>
-                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Product<span style={{color: '#ef4444'}}>*</span></th>
-                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Product Variant<span style={{color: '#ef4444'}}>*</span></th>
-                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Quantity Requested<span style={{color: '#ef4444'}}>*</span></th>
-                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Delivery location<span style={{color: '#ef4444'}}>*</span></th>
-                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Price<span style={{color: '#ef4444'}}>*</span></th>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Product Name<span style={{color: '#ef4444'}}>*</span></th>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Details</th>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Base Price<span style={{color: '#ef4444'}}>*</span></th>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Quantity<span style={{color: '#ef4444'}}>*</span></th>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Unit<span style={{color: '#ef4444'}}>*</span></th>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Total<span style={{color: '#ef4444'}}>*</span></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {templateFields.length > 0 ? templateFields.map((f: any, i: number) => (
-                      <tr key={f.key || i} style={{ borderBottom: i === templateFields.length - 1 ? 'none' : '1px solid #e2e8f0', backgroundColor: '#fff' }}>
-                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>{i + 1}</td>
-                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>
-                          <div style={{ color: '#475569' }}>{f.name.toUpperCase()}</div>
-                          <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '0.85rem', marginTop: '4px', display: 'inline-block' }}>Details</a>
-                        </td>
-                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>{f.type === 'number' ? 'Standard' : f.name}</td>
-                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>{f.quantity || '12'} {f.uom || 'KG'}</td>
-                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>
-                          <div style={{ color: '#475569' }}>{f.location || 'Gurgaon(1827873)'}</div>
-                          <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '0.85rem', marginTop: '4px', display: 'inline-block' }}>Details</a>
-                        </td>
-                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}></td>
-                      </tr>
-                    )) : (
+                    {templateFields.length > 0 ? templateFields.map((f: any, i: number) => {
+                      const qty = parseFloat(f.quantity) || 12;
+                      const price = parseFloat(f.targetPrice) || 0;
+                      return (
+                        <tr key={f.key || i} style={{ borderBottom: i === templateFields.length - 1 ? 'none' : '1px solid #e2e8f0', backgroundColor: '#fff' }}>
+                          <td style={{ padding: '16px', fontSize: '0.9rem', color: '#0f172a', fontWeight: 500 }}>
+                            {f.name?.toUpperCase()}
+                          </td>
+                          <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>
+                            <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '0.85rem' }}>View Details</a>
+                          </td>
+                          <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>
+                            {price > 0 ? `${event?.baseCurrency || 'INR'} ${price.toFixed(2)}` : '-'}
+                          </td>
+                          <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>{qty}</td>
+                          <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>{f.uom || 'KG'}</td>
+                          <td style={{ padding: '16px', fontSize: '0.9rem', color: '#0f172a', fontWeight: 600 }}>
+                            {price > 0 ? `${event?.baseCurrency || 'INR'} ${(price * qty).toFixed(2)}` : '-'}
+                          </td>
+                        </tr>
+                      );
+                    }) : (
                       <tr style={{ backgroundColor: '#fff' }}>
-                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>1</td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#0f172a', fontWeight: 500 }}>CHILLY POWDER - RED</td>
                         <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>
-                          <div style={{ color: '#475569' }}>CHILLY POWDER - RED</div>
-                          <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '0.85rem', marginTop: '4px', display: 'inline-block' }}>Details</a>
+                          <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '0.85rem' }}>View Details</a>
                         </td>
-                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>Chilli Powder</td>
-                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>12 KG</td>
-                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>
-                          <div style={{ color: '#475569' }}>Gurgaon(1827873)</div>
-                          <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '0.85rem', marginTop: '4px', display: 'inline-block' }}>Details</a>
-                        </td>
-                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}></td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>-</td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>12</td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>KG</td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#0f172a', fontWeight: 600 }}>-</td>
                       </tr>
                     )}
                   </tbody>
