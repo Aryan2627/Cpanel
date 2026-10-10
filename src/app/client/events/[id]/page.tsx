@@ -770,24 +770,48 @@ export default function BuyerEventDetailsPage() {
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #cbd5e1', color: '#64748b', fontSize: '14px', fontWeight: 'bold' }}>-</span> Product Sheet
               </h3>
               <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center' }}>
                   <thead>
-                    <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                      <th style={{ padding: '12px 16px', fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>Field Name</th>
-                      <th style={{ padding: '12px 16px', fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>Type</th>
-                      <th style={{ padding: '12px 16px', fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>Weight</th>
+                    <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #e2e8f0' }}>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600, width: '60px' }}>S no.</th>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Product<span style={{color: '#ef4444'}}>*</span></th>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Product Variant<span style={{color: '#ef4444'}}>*</span></th>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Quantity Requested<span style={{color: '#ef4444'}}>*</span></th>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Delivery location<span style={{color: '#ef4444'}}>*</span></th>
+                      <th style={{ padding: '14px 16px', fontSize: '0.85rem', color: '#334155', fontWeight: 600 }}>Price<span style={{color: '#ef4444'}}>*</span></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {templateFields.map((f: any, i: number) => (
-                      <tr key={f.key || i} style={{ borderBottom: i === templateFields.length - 1 ? 'none' : '1px solid #e2e8f0' }}>
-                        <td style={{ padding: '12px 16px', fontSize: '0.9rem', color: '#0f172a', fontWeight: 500 }}>{f.name} {f.required && <span style={{ color: '#ef4444' }}>*</span>}</td>
-                        <td style={{ padding: '12px 16px', fontSize: '0.9rem', color: '#64748b' }}>{f.type}</td>
-                        <td style={{ padding: '12px 16px', fontSize: '0.9rem', color: '#64748b' }}>{f.weight ? f.weight + '%' : '-'}</td>
+                    {templateFields.length > 0 ? templateFields.map((f: any, i: number) => (
+                      <tr key={f.key || i} style={{ borderBottom: i === templateFields.length - 1 ? 'none' : '1px solid #e2e8f0', backgroundColor: '#fff' }}>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>{i + 1}</td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>
+                          <div style={{ color: '#475569' }}>{f.name.toUpperCase()}</div>
+                          <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '0.85rem', marginTop: '4px', display: 'inline-block' }}>Details</a>
+                        </td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>{f.type === 'number' ? 'Standard' : f.name}</td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>{f.quantity || '12'} {f.uom || 'KG'}</td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>
+                          <div style={{ color: '#475569' }}>{f.location || 'Gurgaon(1827873)'}</div>
+                          <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '0.85rem', marginTop: '4px', display: 'inline-block' }}>Details</a>
+                        </td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}></td>
                       </tr>
-                    ))}
-                    {templateFields.length === 0 && (
-                      <tr><td colSpan={3} style={{ padding: '24px', textAlign: 'center', color: '#94a3b8', fontSize: '0.9rem' }}>No template fields configured</td></tr>
+                    )) : (
+                      <tr style={{ backgroundColor: '#fff' }}>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>1</td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>
+                          <div style={{ color: '#475569' }}>CHILLY POWDER - RED</div>
+                          <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '0.85rem', marginTop: '4px', display: 'inline-block' }}>Details</a>
+                        </td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>Chilli Powder</td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>12 KG</td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}>
+                          <div style={{ color: '#475569' }}>Gurgaon(1827873)</div>
+                          <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '0.85rem', marginTop: '4px', display: 'inline-block' }}>Details</a>
+                        </td>
+                        <td style={{ padding: '16px', fontSize: '0.9rem', color: '#475569' }}></td>
+                      </tr>
                     )}
                   </tbody>
                 </table>
