@@ -12,7 +12,7 @@
  */
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Clock, CheckCircle2, AlertCircle, BarChart3, FileText, User, Users, Leaf, AlertTriangle, Target, Globe, BrainCircuit, Hammer, X, Layers, SplitSquareHorizontal , Brain, Shield, Briefcase, Calculator, Star } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle2, AlertCircle, BarChart3, FileText, User, Users, Leaf, AlertTriangle, Target, Globe, BrainCircuit, Hammer, X, Layers, SplitSquareHorizontal , Brain, Shield, Briefcase, Calculator, Star, Search } from 'lucide-react';
 
 const Countdown = ({ endTime }: { endTime: string | Date }) => {
   const [now, setNow] = useState(new Date());
@@ -63,6 +63,8 @@ export default function BuyerEventDetailsPage() {
   
   const [event, setEvent] = useState<any>(null);
   const [bids, setBids] = useState<any[]>([]);
+  const [allVendors, setAllVendors] = useState<any[]>([]);
+  const [vendorSearch, setVendorSearch] = useState('');
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [viewTab, setViewTab] = useState('Overview');
   const parsedStages = useMemo(() => {
@@ -372,10 +374,17 @@ export default function BuyerEventDetailsPage() {
       // Update UI immediately with event info while bids load
       setEvent(eventData);
 
-      // 2. Fetch Bids using the actual Event ID (Single network trip)
-      const bidsRes = await fetch(`/api/bids?eventId=${eventData.id}`);
+      // 2. Fetch Bids and Vendors concurrently using the actual Event ID
+      const [bidsRes, vendorsRes] = await Promise.all([
+        fetch(`/api/bids?eventId=${eventData.id}`),
+        fetch(`/api/vendors`)
+      ]);
+      
       const bidsData = bidsRes.ok ? await bidsRes.json() : [];
+      const vendorsData = vendorsRes.ok ? await vendorsRes.json() : [];
+      
       setBids(Array.isArray(bidsData) ? bidsData : []);
+      setAllVendors(Array.isArray(vendorsData) ? vendorsData : []);
       
     } catch (err: any) {
       setError(err.message || 'Failed to load details');
@@ -409,6 +418,29 @@ export default function BuyerEventDetailsPage() {
       alert('AI Evaluation failed'); setIsAiBoardOpen(false);
     } finally {
       setAiLoading(false);
+    }
+  };
+
+  const toggleParticipant = async (vendor: any, isChecked: boolean) => {
+    let currentParticipants = parsedParticipants || [];
+    let updated;
+    if (isChecked) {
+      updated = [...currentParticipants, { id: vendor.id, name: vendor.name, email: vendor.email, code: vendor.vendorCode, phone: vendor.phone }];
+    } else {
+      updated = currentParticipants.filter((p: any) => p.email !== vendor.email);
+    }
+    
+    // Optimistic UI update
+    setEvent({ ...event, participants: JSON.stringify(updated) });
+    
+    try {
+      await fetch(`/api/events/${event.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ participants: JSON.stringify(updated) })
+      });
+    } catch (e) {
+      console.error('Failed to update participants', e);
     }
   };
 
