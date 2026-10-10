@@ -820,16 +820,16 @@ export default function BuyerEventDetailsPage() {
               </div>
             </div>
 
-            <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '24px', marginBottom: '24px' }}>
-              <h3 style={{ fontSize: '1rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontWeight: 700 }}>
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #cbd5e1', color: '#64748b', fontSize: '14px', fontWeight: 'bold' }}>-</span> Terms and Conditions
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', color: '#64748b', gap: '12px', fontSize: '0.9rem' }}>
-                <p style={{ margin: 0 }}>1. Standard Enterprise terms and conditions apply to all awarded purchase orders.</p>
-                <p style={{ margin: 0 }}>2. Deliveries must comply with the specified lead times.</p>
-                <p style={{ margin: 0 }}>3. Payment terms are Net 45 unless otherwise negotiated.</p>
+            {parsedStages[activeTabIndex]?.tcDetails && (
+              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '24px', marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '1rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontWeight: 700 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', borderRadius: '4px', border: '1px solid #cbd5e1', color: '#64748b', fontSize: '14px', fontWeight: 'bold' }}>-</span> Terms and Conditions
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', color: '#64748b', gap: '12px', fontSize: '0.9rem', whiteSpace: 'pre-wrap' }}>
+                  {parsedStages[activeTabIndex].tcDetails}
+                </div>
               </div>
-            </div>
+            )}
 
             <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '24px', marginBottom: '24px' }}>
               <h3 style={{ fontSize: '1rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontWeight: 700 }}>
