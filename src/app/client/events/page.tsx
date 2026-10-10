@@ -224,53 +224,13 @@ export default function EventsPage() {
                       <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>{event.title}</div>
                     </div>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <button onClick={() => setSelectedEventForDetails(event)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: '#f8faff', border: '1px solid #e5edff', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, color: '#475569', cursor: 'pointer' }}>
-                        <Eye size={14} /> Details
-                      </button>
                       <button onClick={() => router.push('/client/events/' + event.id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: '#0f172a', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
                         View Bids <Eye size={14} />
                       </button>
                     </div>
                   </div>
 
-                  {/* Stage Rows */}
-                  {event.stages.map((stage: any, sIdx: number) => {
-                    const sb = statusBadge(stage.actionType);
-                    return (
-                      <div key={sIdx} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 2fr', gap: '8px', alignItems: 'center', padding: '12px 24px 12px 28px', backgroundColor: '#f8faff', borderTop: '1px solid #eff6ff' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', fontWeight: 600, color: '#1e3a8a' }}>
-                          {stage.statusIcon}{stage.name}
-                        </div>
-                        <div style={{ fontSize: '0.85rem', color: stage.timeColor, fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          {editingTimeFor?.eventId === event.id && editingTimeFor?.sIdx === sIdx ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <input type="datetime-local" value={newTimeVal} onChange={e => setNewTimeVal(e.target.value)} style={{ padding: '4px 8px', border: '1px solid #e5edff', borderRadius: '6px', fontSize: '0.8rem', outline: 'none' }} />
-                              <button onClick={() => saveNewTime(event.id, !!dbEvents.find(e => e.id === event.id))} style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: '5px', padding: '4px', cursor: 'pointer', display: 'flex' }}><Check size={13} /></button>
-                              <button onClick={() => setEditingTimeFor(null)} style={{ background: '#dc2626', color: '#fff', border: 'none', borderRadius: '5px', padding: '4px', cursor: 'pointer', display: 'flex' }}><X size={13} /></button>
-                            </div>
-                          ) : (
-                            <>
-                              {event.endTime ? <Countdown endTime={event.endTime} /> : stage.timeText}
-                              <button onClick={() => { setEditingTimeFor({ eventId: event.id, sIdx });
-  const defaultDate = event.endTime ? new Date(event.endTime) : new Date(Date.now() + 24 * 60 * 60 * 1000);
-  setNewTimeVal(new Date(defaultDate.getTime() - defaultDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16)); }} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px', display: 'flex', transition: 'all 0.15s', marginLeft: '6px', borderRadius: '4px' }} onMouseOver={e => { (e.currentTarget as HTMLElement).style.color = '#0f172a'; (e.currentTarget as HTMLElement).style.background = '#e2e8f0'; }} onMouseOut={e => { (e.currentTarget as HTMLElement).style.color = '#94a3b8'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}><Edit2 size={13} /></button>
-                            </>
-                          )}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: stage.participantsColor, fontSize: '0.82rem', fontWeight: 600 }}>
-                          <Users size={14} />{stage.name.includes('Live') ? '—' : stage.participants}
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                          {stage.actionText && (
-                            <button onClick={() => { if (stage.name.includes('Live')) router.push('/client/events/' + event.id); }} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '7px', fontWeight: 700, fontSize: '0.78rem', border: '1px solid ' + sb.border, backgroundColor: sb.bg, color: sb.color, cursor: 'pointer', transition: 'opacity 0.15s' }} onMouseEnter={e => (e.currentTarget as HTMLElement).style.opacity = '0.85'} onMouseLeave={e => (e.currentTarget as HTMLElement).style.opacity = '1'}>
-                              {stage.actionText}
-                              <span style={{ background: sb.color, color: '#fff', padding: '1px 6px', borderRadius: '4px', fontSize: '0.68rem' }}>{stage.actionBadge}</span>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                  
                 </div>
               );
             }) : (
