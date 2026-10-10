@@ -5,7 +5,7 @@ const prismaClientSingleton = () => {
   let url = process.env.DATABASE_URL || '';
   
   // Basic query params for connection reliability
-  if (url && url.includes('supabase.com') && !url.includes('pgbouncer=true') && !url.startsWith('prisma://')) {
+  if (url && (url.includes('supabase.com') || url.includes('neon.tech')) && !url.includes('pgbouncer=true') && !url.startsWith('prisma://')) {
     url += (url.includes('?') ? '&' : '?') + 'pgbouncer=true&connection_limit=1';
   }
   
